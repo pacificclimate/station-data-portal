@@ -19,7 +19,7 @@ const options = [
   },
   {
     label: 'MS Excel 2010',
-    value: 'xslx',
+    value: 'xlsx',
   },
 ];
 

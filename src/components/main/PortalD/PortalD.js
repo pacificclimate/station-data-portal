@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Button, Col, Panel, Row, Tab, Tabs } from 'react-bootstrap';
 import memoize from 'memoize-one';
 import flow from 'lodash/fp/flow';
+import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 import filter from 'lodash/fp/filter';
 import join from 'lodash/fp/join';
@@ -30,6 +31,8 @@ import OnlyWithClimatologyControl
   from '../../controls/OnlyWithClimatologyControl';
 import StationMap from '../../maps/StationMap';
 import AdjustableColumns from '../../util/AdjustableColumns';
+import JSONstringify from '../../util/JSONstringify';
+import capitalize from 'react-bootstrap/lib/utils/capitalize';
 
 
 logger.configure({ active: true });
@@ -74,14 +77,14 @@ class Portal extends Component {
     //  options derived from them.
     allNetworks: null,
     selectedNetworks: [],
-    networkActions: {},
+    networkActions: null,
 
     allVariables: null,
     selectedVariables: [],
-    variableActions: {},
+    variableActions: null,
 
     selectedFrequencies: [],
-    frequencyActions: {},
+    frequencyActions: null,
 
     onlyWithClimatology: false,
 
@@ -139,8 +142,20 @@ class Portal extends Component {
 
   stationFilter = memoize(stationFilter);
 
-  downloadData = dataCategory => () => {
-    const href = dataDownloadTarget({
+  dataDownloadUrl = dataCategory => {
+    // Check whether state has settled. Each selector calls an onReady callback
+    // to export information (e.g., all its options) that it has set up
+    // internally. In retrospect, this is a too-clever solution to the problem
+    // of passing a pile of props around, but it's what we've got.
+    if (
+      !this.state.networkActions
+      || !this.state.variableActions
+      || !this.state.frequencyActions
+    ) {
+      return "#";
+    }
+
+    return dataDownloadTarget({
       startDate: this.state.startDate,
       endDate: this.state.endDate,
       networks: this.state.selectedNetworks,
@@ -155,14 +170,14 @@ class Portal extends Component {
       allVariables: this.state.variableActions.getAllOptions(),
       allFrequencies: this.state.frequencyActions.getAllOptions(),
     });
-    console.log(`### Download ${dataCategory}: ${href.slice(10)}`)
-    // window.location.href = href;
   };
 
-  downloadTimeseries = this.downloadData('timeseries');
-  downloadClimatology = this.downloadData('climatology');
+  dataDownloadFilename = id => {
+    return `${id}.${get('value', this.state.fileFormat)}`;
+  }
 
   render() {
+    console.log("### PortalD render", this.state)
     const filteredStations = this.stationFilter(
       this.state.startDate,
       this.state.endDate,
@@ -326,12 +341,20 @@ class Portal extends Component {
                       />
 
                       <ButtonToolbar>
-                        <Button onClick={this.downloadTimeseries}>
-                          Download Timeseries
-                        </Button>
-                        <Button onClick={this.downloadClimatology}>
-                          Download Climatology
-                        </Button>
+                        {
+                          map(
+                            id => (
+                              <a
+                                href={this.dataDownloadUrl(id)}
+                                download={this.dataDownloadFilename(id)}
+                                className="btn btn-primary"
+                              >
+                                Download {capitalize(id)}
+                              </a>
+                            ),
+                            ['timeseries', 'climatology']
+                          )
+                        }
                       </ButtonToolbar>
 
                     </Tab>
