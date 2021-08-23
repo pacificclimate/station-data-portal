@@ -34,26 +34,35 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import without from 'lodash/fp/without';
 
-import { BCBaseMap } from 'pcic-react-leaflet-components';
-import { FeatureGroup, LayerGroup } from 'react-leaflet';
+import { BCBaseMap, YNWTBaseMap } from 'pcic-react-leaflet-components';
+import { LayerGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import StationMarkers from '../StationMarkers';
-import { geoJSONToLeafletLayers, layersToGeoJSONMultipolygon } from '../../../utils/geoJSON-leaflet';
+import LayerControlledFeatureGroup from '../LayerControlledFeatureGroup';
+import BaseMapControl from '../BaseMapControl';
+import { geoJSONToLeafletLayers, layersToGeoJSONMultipolygon }
+  from '../../../utils/geoJSON-leaflet';
 
 import logger from '../../../logger';
 
 import './StationMap.css';
-import LayerControlledFeatureGroup from '../LayerControlledFeatureGroup';
 
 logger.configure({ active: true });
 
-const initialViewport = {
-  center: {
-    lat: 65.0,
-    lng: -120
-  },
-  zoom: 2
-};
+const initialViewport = new Map([
+  [
+    BCBaseMap,
+    {
+      center: {
+        lat: 65.0,
+        lng: -120
+      },
+      zoom: 2
+    }
+  ],
+
+  [YNWTBaseMap, YNWTBaseMap.initialViewport],
+]);
 
 export default class StationMap extends Component {
   static propTypes = {
@@ -64,6 +73,7 @@ export default class StationMap extends Component {
   };
 
   state = {
+    BaseMap: YNWTBaseMap,
     geometryLayers: [],
   };
 
@@ -139,13 +149,21 @@ export default class StationMap extends Component {
     this.addGeometryLayers(geoJSONToLeafletLayers(geoJSON));
   };
 
-  render() {
-    const allowGeometryDraw = true || this.state.geometryLayers.length === 0;
+  // Handler for base map selector
+  handleChangeBaseMap = BaseMap => {
+    console.log("Change base map to", BaseMap)
+    this.setState({ BaseMap });
+  };
 
+  render() {
+    const { BaseMap, geometryLayers } = this.state;
+    const allowGeometryDraw = true || geometryLayers.length === 0;
+
+    let viewport = initialViewport.get(BaseMap);
     return (
-      <BCBaseMap viewport={initialViewport}>
+      <BaseMap viewport={viewport}>
         <LayerControlledFeatureGroup
-          layers={this.state.geometryLayers}
+          layers={geometryLayers}
         >
           <EditControl
             position={'topleft'}
@@ -175,7 +193,11 @@ export default class StationMap extends Component {
             allVariables={this.props.allVariables}
           />
         </LayerGroup>
-      </BCBaseMap>
+        <BaseMapControl position={'topright'}
+          value={BaseMap}
+          onChange={this.handleChangeBaseMap}
+        />
+      </BaseMap>
     );
   }
 }
