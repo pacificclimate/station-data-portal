@@ -31,8 +31,8 @@ import OnlyWithClimatologyControl
   from '../../controls/OnlyWithClimatologyControl';
 import StationMap from '../../maps/StationMap';
 import AdjustableColumns from '../../util/AdjustableColumns';
-import JSONstringify from '../../util/JSONstringify';
 import capitalize from 'react-bootstrap/lib/utils/capitalize';
+import baseMaps from '../../maps/baseMaps';
 
 
 logger.configure({ active: true });
@@ -219,6 +219,7 @@ class Portal extends Component {
             defaultLgs={defaultLgs}
             contents={[
               <StationMap
+                {...baseMaps[process.env.REACT_APP_BASE_MAP]}
                 stations={filteredStations}
                 allNetworks={this.state.allNetworks}
                 allVariables={this.state.allVariables}

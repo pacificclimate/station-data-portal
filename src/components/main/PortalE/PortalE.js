@@ -33,7 +33,7 @@ import StationMetadata from '../../info/StationMetadata';
 import OnlyWithClimatologyControl
   from '../../controls/OnlyWithClimatologyControl';
 import StationMap from '../../maps/StationMap';
-import JSONstringify from '../../util/JSONstringify';
+import baseMaps from '../../maps/baseMaps';
 import AdjustableColumns from '../../util/AdjustableColumns';
 import capitalize from 'react-bootstrap/lib/utils/capitalize';
 import get from 'lodash/fp/get';
@@ -295,6 +295,7 @@ class Portal extends Component {
               ,
 
               <StationMap
+                {...baseMaps[process.env.REACT_APP_BASE_MAP]}
                 stations={filteredStations}
                 allNetworks={this.state.allNetworks}
                 allVariables={this.state.allVariables}
