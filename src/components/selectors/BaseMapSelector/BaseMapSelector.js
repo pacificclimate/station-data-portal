@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { FormGroup, Radio } from 'react-bootstrap';
 
 import logger from '../../../logger';
 
-import { FormGroup, Radio } from 'react-bootstrap';
-import { BCBaseMap, YNWTBaseMap } from 'pcic-react-leaflet-components';
 
 logger.configure({ active: true });
+
 
 export default class BaseMapSelector extends Component {
   static propTypes = {
@@ -22,11 +22,11 @@ export default class BaseMapSelector extends Component {
   static options = [
     {
       label: 'Yukon Albers',
-      value: YNWTBaseMap,
+      value: 'YNWT',
     },
     {
       label: 'BC Albers',
-      value: BCBaseMap,
+      value: 'BC',
     },
   ];
 

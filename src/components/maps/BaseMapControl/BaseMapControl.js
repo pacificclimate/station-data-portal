@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import StaticControl from '../StaticControl';
+import { StaticControl } from 'pcic-react-leaflet-components';
 import BaseMapSelector from '../../selectors/BaseMapSelector';
 import layersIcon from 'leaflet/dist/images/layers.png';
 import { Button } from 'react-bootstrap';
