@@ -1,5 +1,13 @@
 ## Production
 
+### Docker
+
+We currently deploy all apps using Docker. 
+This project contains [Docker infrastructure](docker) and a 
+[GitHub action](.github/workflows/docker-publish.yml) that automatically 
+builds and tags a Docker image on each commit. The image name is
+`pcic/station-data-portal-frontend`.
+
 ### Configuration, environment variables, and Docker
 
 It is best practice to configure a web app externally, at run-time, typically using environment variables for any

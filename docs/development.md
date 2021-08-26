@@ -24,7 +24,9 @@ deployment on a server. To do so:
 1. Pull or build image.
     - To pull:
 
-      `docker pull pcic/station-data-portal-frontend:<tag>`
+      ```
+      docker pull pcic/station-data-portal-frontend:<tag>
+      ```
 
       Typically `<tag>` is your current branch name.
 
@@ -34,7 +36,11 @@ deployment on a server. To do so:
 
       This automatically builds an image tagged with the current branch name.
 
-3. Run container: `make up`
+2. Run container: 
+   
+   `make up`
 
-4. Stop and remove container: `make down`
+3. Stop and remove container:  
+   
+   `make down`
 
