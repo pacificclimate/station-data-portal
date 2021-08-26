@@ -50,23 +50,34 @@ For more details, see the
 Environment variables for configuring the app are:
 
 `PUBLIC_URL`
-* Base URL for Station Data Portal frontend.
-* For production, set this to the URL configured in our proxy server.
+- Base URL for Station Data Portal frontend.
+- For production, set this to the URL configured in our proxy server.
 
 `REACT_APP_VERSION`
-* Current version of the app.
-* This value should be set using `generate-commitish.sh` when the Docker image is built (see below).
-* It is not recommended to manually override the automatically generated value when the image is run.
-* No default value for this variable is provided in any `.env` file.
+- Current version of the app.
+- This value should be set using `generate-commitish.sh` when the Docker image is built (see below).
+- It is not recommended to manually override the automatically generated value when the image is run.
+- No default value for this variable is provided in any `.env` file.
 
 `REACT_APP_SDS_URL`
-* URL for station data portal backend (Station Data Service; SDS).
+- URL for station data portal backend (Station Data Service; SDS).
 
 `REACT_APP_PDP_DATA_URL`
-* URL for PDP PCDS data download service. 
+- URL for PDP PCDS data download service. 
 
-`REACT_APP_TILECACHE_URL`
-* Tilecache URL for basemap layers.
+`REACT_APP_BASE_MAP`
+- Selects which base map (and thus which projection) to use for station 
+  map. Valid values:
+  - `BC`: BC OSM Lite (or similar) base map; BC Albers projection.
+  - `YNWT`: YNWT OSM Lite (or similar) base map; Yukon Albers projection.
+  
+`REACT_APP_BC_BASE_MAP_TILES_URL`
+- URL template (includes x, y, z) for BC base map tiles.
+- Required only if `REACT_APP_BASE_MAP=BC`
+
+`REACT_APP_YNWT_BASE_MAP_TILES_URL`
+- URL template (includes x, y, z) for YNWT base map tiles.
+- Required only if `REACT_APP_BASE_MAP=YNWT`
 
 ## Installation
 
