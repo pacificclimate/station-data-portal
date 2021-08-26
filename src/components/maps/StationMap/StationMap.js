@@ -34,12 +34,10 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import without from 'lodash/fp/without';
 
-import { BCBaseMap, YNWTBaseMap } from 'pcic-react-leaflet-components';
 import { LayerGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import StationMarkers from '../StationMarkers';
 import LayerControlledFeatureGroup from '../LayerControlledFeatureGroup';
-import BaseMapControl from '../BaseMapControl';
 import { geoJSONToLeafletLayers, layersToGeoJSONMultipolygon }
   from '../../../utils/geoJSON-leaflet';
 
@@ -49,23 +47,10 @@ import './StationMap.css';
 
 logger.configure({ active: true });
 
-const initialViewport = new Map([
-  [
-    BCBaseMap,
-    {
-      center: {
-        lat: 65.0,
-        lng: -120
-      },
-      zoom: 2
-    }
-  ],
-
-  [YNWTBaseMap, YNWTBaseMap.initialViewport],
-]);
-
 export default class StationMap extends Component {
   static propTypes = {
+    BaseMap: PropTypes.object.isRequired,
+    initialViewport: PropTypes.object.isRequired,
     stations: PropTypes.array.isRequired,
     allNetworks: PropTypes.array.isRequired,
     allVariables: PropTypes.array.isRequired,
@@ -73,7 +58,6 @@ export default class StationMap extends Component {
   };
 
   state = {
-    BaseMap: YNWTBaseMap,
     geometryLayers: [],
   };
 
@@ -156,12 +140,13 @@ export default class StationMap extends Component {
   };
 
   render() {
-    const { BaseMap, geometryLayers } = this.state;
+    const { BaseMap, initialViewport, stations, allNetworks, allVariables } =
+      this.props;
+    const { geometryLayers } = this.state;
     const allowGeometryDraw = true || geometryLayers.length === 0;
 
-    let viewport = initialViewport.get(BaseMap);
     return (
-      <BaseMap viewport={viewport}>
+      <BaseMap viewport={initialViewport}>
         <LayerControlledFeatureGroup
           layers={geometryLayers}
         >
@@ -188,15 +173,11 @@ export default class StationMap extends Component {
         </LayerControlledFeatureGroup>
         <LayerGroup>
           <StationMarkers
-            stations={this.props.stations}
-            allNetworks={this.props.allNetworks}
-            allVariables={this.props.allVariables}
+            stations={stations}
+            allNetworks={allNetworks}
+            allVariables={allVariables}
           />
         </LayerGroup>
-        <BaseMapControl position={'topright'}
-          value={BaseMap}
-          onChange={this.handleChangeBaseMap}
-        />
       </BaseMap>
     );
   }
