@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Table } from 'react-bootstrap';
 import { Popup } from 'react-leaflet'
-import { map } from 'lodash/fp';
+import map from 'lodash/fp/map';
 import chroma from 'chroma-js';
 import FrequencySelector from '../../selectors/FrequencySelector';
 
@@ -21,12 +21,18 @@ class StationPopup extends Component {
     station: PropTypes.object.isRequired,
     network: PropTypes.object.isRequired,
     variables: PropTypes.array.isRequired,
+    defaultNetworkColor: PropTypes.string,
   };
 
+  static defaultProps = {
+    defaultNetworkColor: process.env.REACT_APP_DEFAULT_NETWORK_COLOR,
+  }
+
   render() {
-    const { station, network, variables } = this.props;
+    const { station, network, variables, defaultNetworkColor } = this.props;
     const history = station.histories[0];
-    const networkColor = chroma(network.color).alpha(0.5).css();
+    const networkColor =
+      chroma(network.color ?? defaultNetworkColor).alpha(0.5).css();
     return (
       <Popup>
         <h1>Station: {history.station_name} <span>({network.name})</span></h1>
