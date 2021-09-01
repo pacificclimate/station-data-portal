@@ -146,7 +146,7 @@ export default class StationMap extends Component {
     const allowGeometryDraw = true || geometryLayers.length === 0;
 
     return (
-      <BaseMap viewport={initialViewport}>
+      <BaseMap viewport={initialViewport} preferCanvas={true}>
         <LayerControlledFeatureGroup
           layers={geometryLayers}
         >
