@@ -73,7 +73,8 @@ class NetworkSelector extends Component {
         map(
           network => ({
             value: network,
-            label: `${network.name} – ${network.long_name}`,
+            label: `${network.name}`,
+            // label: `${network.name} – ${network.long_name}`,
             isDisabled: !network.publish,
           })
         ),
