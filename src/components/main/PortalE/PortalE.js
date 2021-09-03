@@ -37,6 +37,7 @@ import baseMaps from '../../maps/baseMaps';
 import AdjustableColumns from '../../util/AdjustableColumns';
 import capitalize from 'react-bootstrap/lib/utils/capitalize';
 import get from 'lodash/fp/get';
+import NetworksMetadata from '../../info/NetworksMetadata';
 
 
 logger.configure({ active: true });
@@ -367,6 +368,10 @@ class Portal extends Component {
                         }
                       </ButtonToolbar>
 
+                    </Tab>
+
+                    <Tab eventKey={'Networks'} title={'Networks'}>
+                      <NetworksMetadata networks={this.state.allNetworks}/>
                     </Tab>
 
                   </Tabs>
