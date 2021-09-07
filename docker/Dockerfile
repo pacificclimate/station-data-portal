@@ -17,6 +17,7 @@ FROM node:10.16
 
 ADD . /app
 WORKDIR /app
+RUN chown node /app
 
 ENV PATH /app/node_modules/.bin:$PATH
 COPY --chown=node:node  package.json /app/package.json
