@@ -10,18 +10,19 @@ import isMatch from 'lodash/fp/isMatch';
 
 describe('stationFilterExpressionsParser', () => {
   it.each([
-    ['x = foo', [{ path: 'x', op: '=', value: 'foo' }]],
-    ['x.y = foo', [{ path: 'x.y', op: '=', value: 'foo' }]],
-    ['x[0].y = foo', [{ path: 'x[0].y', op: '=', value: 'foo' }]],
+    ['x = "foo"', [{ path: 'x', op: '=', value: 'foo' }]],
+    ['x = 42', [{ path: 'x', op: '=', value: 42 }]],
+    ['x.y = "foo"', [{ path: 'x.y', op: '=', value: 'foo' }]],
+    ['x[0].y = "foo"', [{ path: 'x[0].y', op: '=', value: 'foo' }]],
     [
-      'x = foo;y = bar',
+      'x = "foo";y = "bar"',
       [
         { path: 'x', op: '=', value: 'foo' },
         { path: 'y', op: '=', value: 'bar' },
       ]
     ],
-    ['x = foo;blork', [{ path: 'x', op: '=', value: 'foo' }]],
-    ['x = foo;y < 17', [{ path: 'x', op: '=', value: 'foo' }]],
+    ['x = "foo";blork', [{ path: 'x', op: '=', value: 'foo' }]],
+    ['x = "foo";y < 17', [{ path: 'x', op: '=', value: 'foo' }]],
   ])('works for %s', (string, expected) => {
     const expressions = filterExpressionsParser(string);
     expect(expressions.length === expected.length);
@@ -87,6 +88,18 @@ describe('stationFilterPredicate', () => {
         [{ x: 'foo', y: 'bar' }, true],
         [{ x: 'foo', y: 'baz' }, false],
         [{ x: 'baz', y: 'bar' }, false],
+      ],
+    ],
+
+    [
+      // expressions
+      [{ path: 'x', op: '!=', value: 'foo' }],
+      // trials
+      [
+        [{ x: 'foo' }, false],
+        [{ x: 'foo', y: 'bar' }, false],
+        [{ x: 'yow' }, true],
+        [{ y: 'foo' }, true],
       ],
     ],
 

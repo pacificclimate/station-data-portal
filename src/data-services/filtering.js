@@ -7,12 +7,9 @@
 // `<path> <op> <value>`, where
 //    <path> is a JS path addressing a property in a station object,
 //    <op> is a comparison operator (only = supported at the moment),
-//    <value> is any string not containing a semicolon,
-//    and the expression elements are separated by at least one space.
+//    <value> is any valid JSON expression not containing a semicolon,
+// and the filter expression components are separated by at least one space.
 // All filter expressions must be satisfied to pass a metadata item.
-//
-// A more flexible alternative would be to allow <value> to be any valid JSON
-// string, and to parse it.
 
 import flow from 'lodash/fp/flow';
 import split from 'lodash/fp/split';
@@ -37,7 +34,11 @@ export const filterExpressionsParser = flow(
     return match;
   }),
   compact,
-  map(match => match.groups),
+  map(match => ({
+    path: match.groups.path,
+    op: match.groups.op,
+    value: JSON.parse(match.groups.value),
+  })),
 );
 
 // Given an array of parsed filter expressions, returns a predicate that
