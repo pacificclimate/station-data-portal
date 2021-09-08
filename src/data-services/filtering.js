@@ -14,7 +14,7 @@ import get from 'lodash/fp/get';
 // `REACT_APP_STATION_FILTERS`, which contains zero or more semicolon-separated
 // station filter expressions. A station filter expression takes the form
 // `<path> <op> <value>`, where
-// <path> is a dot-separated path addressing a property in a station object,
+// <path> is a JS path addressing a property in a station object,
 // <op> is a comparison operator (only = supported at the moment),
 // <value> is any string not containing a semicolon.
 //
@@ -22,7 +22,7 @@ import get from 'lodash/fp/get';
 // expression to be any valid JS expression, and to evaluate it in the context
 // of `station` using `Function`.
 
-const filterExpressionPattern = /(?<path>\w[\w.]*)(?<op>=)(?<value>.*)/;
+const filterExpressionPattern = /(?<path>[^=]*)(?<op>=)(?<value>.*)/;
 
 // Converts a string to an array of parsed station filter expressions.
 // Any invalid expressions are flagged on the console and otherwise ignored.

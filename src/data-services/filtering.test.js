@@ -12,6 +12,7 @@ describe('stationFilterExpressionsParser', () => {
   it.each([
     ['x=foo', [{ path: 'x', op: '=', value: 'foo' }]],
     ['x.y=foo', [{ path: 'x.y', op: '=', value: 'foo' }]],
+    ['x[0].y=foo', [{ path: 'x[0].y', op: '=', value: 'foo' }]],
     [
       'x=foo;y=bar',
       [
@@ -58,6 +59,19 @@ describe('stationFilterPredicate', () => {
         [{ x: { a: 'foo' }, y: 'bar' }, true],
         [{ x: { a: 'yow' }  }, false],
         [{ y: { a: 'foo' }  }, false],
+      ],
+    ],
+
+    [
+      // expressions
+      [{ path: 'x[0].a', op: '=', value: 'foo' }],
+      // trials
+      [
+        [{ x: 'foo' }, false],
+        [{ x: [{ a: 'foo' }] }, true],
+        [{ x: [{ a: 'foo' }], y: 'bar' }, true],
+        [{ x: [{ a: 'yow' }]  }, false],
+        [{ y: [{ a: 'foo' }]  }, false],
       ],
     ],
 
