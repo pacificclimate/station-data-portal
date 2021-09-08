@@ -1,6 +1,6 @@
 import {
-  stationFilterExpressionsParser,
-  stationFilterPredicate,
+  filterExpressionsParser,
+  filterPredicate,
 } from './filtering';
 import every from 'lodash/fp/every';
 import flow from 'lodash/fp/flow';
@@ -23,7 +23,7 @@ describe('stationFilterExpressionsParser', () => {
     ['x=foo;blork', [{ path: 'x', op: '=', value: 'foo' }]],
     ['x=foo;y<17', [{ path: 'x', op: '=', value: 'foo' }]],
   ])('works for %s', (string, expected) => {
-    const expressions = stationFilterExpressionsParser(string);
+    const expressions = filterExpressionsParser(string);
     expect(expressions.length === expected.length);
     expect(
       flow(
@@ -91,7 +91,7 @@ describe('stationFilterPredicate', () => {
     ],
 
   ])('for expressions %p', (expressions, trials) => {
-    const predicate = stationFilterPredicate(expressions);
+    const predicate = filterPredicate(expressions);
     it.each(trials)('works for %p', (station, expected) => {
       expect(predicate(station)).toBe(expected);
     });

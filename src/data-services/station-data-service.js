@@ -6,8 +6,8 @@ import isFinite from 'lodash/fp/isFinite';
 import isString from 'lodash/fp/isString';
 import { mapDeep } from '../utils/fp';
 import {
-  stationFilterExpressionsParser,
-  stationFilterPredicate
+  filterExpressionsParser,
+  filterPredicate
 } from './filtering';
 import filter from 'lodash/fp/filter';
 
@@ -53,11 +53,11 @@ const envVarNumber = (name, fallback) =>
 
 
 const parsedStationFilterExpressions =
-  stationFilterExpressionsParser(process.env.REACT_APP_STATION_FILTERS ?? '');
+  filterExpressionsParser(process.env.REACT_APP_STATION_FILTERS ?? '');
 
 
 const filterStations =
-  filter(stationFilterPredicate(parsedStationFilterExpressions));
+  filter(filterPredicate(parsedStationFilterExpressions));
 
 
 export function getStations(config) {
