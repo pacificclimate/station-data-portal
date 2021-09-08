@@ -29,8 +29,23 @@ function transformIso8601Date(value) {
 }
 
 
+const parsedNetworkFilterExpressions =
+  filterExpressionsParser(process.env.REACT_APP_NETWORK_FILTERS ?? '');
+
+
+const filterNetworks =
+  filter(filterPredicate(parsedNetworkFilterExpressions));
+
+
 export function getNetworks() {
-  return axios.get(urljoin(SDS_URL, 'networks'));
+  return axios.get(
+    urljoin(SDS_URL, 'networks'),
+    {
+      transformResponse: axios.defaults.transformResponse.concat(
+        filterNetworks,
+      ),
+    },
+  );
 }
 
 

@@ -7,12 +7,12 @@
 // `<path> <op> <value>`, where
 //    <path> is a JS path addressing a property in a station object,
 //    <op> is a comparison operator (only = supported at the moment),
-//    <value> is any string not containing a semicolon.
+//    <value> is any string not containing a semicolon,
+//    and the expression elements are separated by at least one space.
 // All filter expressions must be satisfied to pass a metadata item.
 //
-// A more flexible (but less safe) alternative would be to allow a filter
-// expression to be any valid JS expression, and to evaluate it in the context
-// of `station` using `Function`.
+// A more flexible alternative would be to allow <value> to be any valid JSON
+// string, and to parse it.
 
 import flow from 'lodash/fp/flow';
 import split from 'lodash/fp/split';
@@ -21,7 +21,7 @@ import compact from 'lodash/fp/compact';
 import every from 'lodash/fp/every';
 import get from 'lodash/fp/get';
 
-const filterExpressionPattern = /(?<path>[^=]*)(?<op>=)(?<value>.*)/;
+const filterExpressionPattern = /(?<path>[^=]*)\s+(?<op>=|!=)\s+(?<value>.*)/;
 
 // Converts a string to an array of parsed filter expressions.
 // Any invalid expressions are flagged on the console and otherwise ignored.
@@ -45,5 +45,12 @@ export const filterExpressionsParser = flow(
 // A parsed filter expression is an object with keys 'path`, 'op', 'value'.
 export const filterPredicate = expressions => item =>
   every(
-    expression => get(expression.path, item) === expression.value
+    expression => {
+      const itemValue = get(expression.path, item);
+      switch (expression.op) {
+        case '=': return itemValue === expression.value;
+        case '!=': return itemValue !== expression.value;
+        default: return false;
+      }
+    }
   )(expressions);

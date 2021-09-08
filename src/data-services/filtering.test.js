@@ -10,18 +10,18 @@ import isMatch from 'lodash/fp/isMatch';
 
 describe('stationFilterExpressionsParser', () => {
   it.each([
-    ['x=foo', [{ path: 'x', op: '=', value: 'foo' }]],
-    ['x.y=foo', [{ path: 'x.y', op: '=', value: 'foo' }]],
-    ['x[0].y=foo', [{ path: 'x[0].y', op: '=', value: 'foo' }]],
+    ['x = foo', [{ path: 'x', op: '=', value: 'foo' }]],
+    ['x.y = foo', [{ path: 'x.y', op: '=', value: 'foo' }]],
+    ['x[0].y = foo', [{ path: 'x[0].y', op: '=', value: 'foo' }]],
     [
-      'x=foo;y=bar',
+      'x = foo;y = bar',
       [
         { path: 'x', op: '=', value: 'foo' },
         { path: 'y', op: '=', value: 'bar' },
       ]
     ],
-    ['x=foo;blork', [{ path: 'x', op: '=', value: 'foo' }]],
-    ['x=foo;y<17', [{ path: 'x', op: '=', value: 'foo' }]],
+    ['x = foo;blork', [{ path: 'x', op: '=', value: 'foo' }]],
+    ['x = foo;y < 17', [{ path: 'x', op: '=', value: 'foo' }]],
   ])('works for %s', (string, expected) => {
     const expressions = filterExpressionsParser(string);
     expect(expressions.length === expected.length);
