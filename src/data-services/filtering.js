@@ -34,11 +34,21 @@ export const filterExpressionsParser = flow(
     return match;
   }),
   compact,
-  map(match => ({
-    path: match.groups.path,
-    op: match.groups.op,
-    value: JSON.parse(match.groups.value),
-  })),
+  map(match => {
+    try {
+      return {
+        path: match.groups.path,
+        op: match.groups.op,
+        value: JSON.parse(match.groups.value),
+      };
+    } catch {
+      console.warn(
+        `Warning: Error parsing value in filter expression: ${match.groups.value}`
+      );
+      return null;
+    }
+  }),
+  compact,
 );
 
 // Given an array of parsed filter expressions, returns a predicate that
