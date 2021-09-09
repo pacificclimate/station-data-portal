@@ -8,7 +8,7 @@ import zipAll from 'lodash/fp/zipAll';
 import isMatch from 'lodash/fp/isMatch';
 
 
-describe('stationFilterExpressionsParser', () => {
+describe('filterExpressionsParser', () => {
   it.each([
     ['x = "foo"', [{ path: 'x', op: '=', value: 'foo' }]],
     ['x = 42', [{ path: 'x', op: '=', value: 42 }]],
@@ -36,7 +36,7 @@ describe('stationFilterExpressionsParser', () => {
 });
 
 
-describe('stationFilterPredicate', () => {
+describe('filterPredicate', () => {
   describe.each([
     [
       // expressions
@@ -105,8 +105,8 @@ describe('stationFilterPredicate', () => {
 
   ])('for expressions %p', (expressions, trials) => {
     const predicate = filterPredicate(expressions);
-    it.each(trials)('works for %p', (station, expected) => {
-      expect(predicate(station)).toBe(expected);
+    it.each(trials)('works for %p', (trial, expected) => {
+      expect(predicate(trial)).toBe(expected);
     });
   });
 });
