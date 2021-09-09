@@ -9,6 +9,7 @@ import FrequencySelector from '../../selectors/FrequencySelector';
 import logger from '../../../logger';
 
 import './StationPopup.css';
+import getOr from 'lodash/fp/getOr';
 
 logger.configure({ active: true });
 
@@ -25,7 +26,8 @@ class StationPopup extends Component {
   };
 
   static defaultProps = {
-    defaultNetworkColor: process.env.REACT_APP_DEFAULT_NETWORK_COLOR,
+    defaultNetworkColor:
+      process.env.REACT_APP_DEFAULT_NETWORK_COLOR ?? '#000000',
   }
 
   render() {

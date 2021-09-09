@@ -6,10 +6,10 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import ReactTable from 'react-table';
 import logger from '../../../logger';
-
+import chroma from 'chroma-js';
+import getOr from 'lodash/fp/getOr'
 import 'react-table/react-table.css';
 import './NetworksMetadata.css';
-import chroma from 'chroma-js';
 
 
 logger.configure({ active: true });
@@ -18,11 +18,16 @@ logger.configure({ active: true });
 export default class NetworksMetadata extends Component {
   static propTypes = {
     networks: PropTypes.array.isRequired,
+    defaultNetworkColor: PropTypes.string,
   };
 
+  static defaultProps = {
+    defaultNetworkColor:
+      process.env.REACT_APP_DEFAULT_NETWORK_COLOR ?? '#000000',
+  }
+
   render() {
-    const { networks, ...restProps } = this.props;
-    console.log("### NetworksMetadata", networks)
+    const { networks, defaultNetworkColor, ...restProps } = this.props;
     if (networks === null) {
       return "Loading...";
     }
@@ -39,7 +44,7 @@ export default class NetworksMetadata extends Component {
             height: "1em",
             "border-radius": "0.5em",
             "background-color": chroma(
-              network.color ?? process.env.REACT_APP_DEFAULT_NETWORK_COLOR
+              network.color ?? defaultNetworkColor
             ).css(),
           }}>&nbsp;</div>
         )
