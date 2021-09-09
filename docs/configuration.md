@@ -65,12 +65,12 @@ For more details, see the
   which includes standard web colour specs (#RRGGBB).
 - Required.
 
-`REACT_APP_STATION_FILTERS`=histories[0].province = "BC"
+`REACT_APP_STATION_FILTERS`
 - Semicolon-separated set of filter expressions applied to filter 
   (select) station metadata received from API. (See [Filtering metadata](#filtering-metadata).)
 - Optional
 
-`REACT_APP_NETWORK_FILTERS`=name != "PCIC Climate Variables"
+`REACT_APP_NETWORK_FILTERS`
 - Semicolon-separated set of filter expressions applied to filter  
   (select) network metadata received from API. (See [Filtering metadata](#filtering-metadata).)
 - Optional
