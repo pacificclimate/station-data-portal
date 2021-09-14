@@ -19,10 +19,7 @@ services:
     container_name: station-data-portal-frontend
     environment:
       - PUBLIC_URL=${SDP_PUBLIC_URL}
-      - REACT_APP_BASE_MAP=YNWT
-      - REACT_APP_BC_BASE_MAP_TILES_URL=http://142.104.230.53:30790/osm-bc-lite-test/{z}/{x}/{y}.png
-      - REACT_APP_YNWT_BASE_MAP_TILES_URL=https://services.pacificclimate.org/tiles_north/{z}/{x}/{y}.png
-      - REACT_APP_SDS_URL=http://docker-dev02.pcic.uvic.ca:30502
-      - REACT_APP_PDP_DATA_URL=http://docker-dev02.pcic.uvic.ca:30500
+    env_file:
+      - bc.env
     ports:
       - "${SDP_PORT}:8080"

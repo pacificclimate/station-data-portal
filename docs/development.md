@@ -6,6 +6,17 @@
 npm start
 ```
 
+This starts the app with environment variables taken from local `.env` 
+files. Brief summary:
+
+* `.env`: Global default settings
+* `.env.development`: Development-specific settings (`npm start`)
+* `.env.production`: Production-specific settings (`npm run build`)
+
+For more details, see the
+[CRA documentation](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables).
+
+
 For building and running a production app, see below.
 
 ## Run tests locally

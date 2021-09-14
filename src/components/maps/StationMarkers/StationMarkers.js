@@ -1,7 +1,11 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { CircleMarker } from 'react-leaflet';
-import { map, find, flow, tap } from 'lodash/fp';
+import compact from 'lodash/fp/compact';
+import map from 'lodash/fp/map';
+import find from 'lodash/fp/find';
+import flow from 'lodash/fp/flow';
+import tap from 'lodash/fp/tap';
 
 import logger from '../../../logger';
 
@@ -20,9 +24,12 @@ const network_for = (station, networks) => (
 
 
 const variables_for = (history, variables) => (
-  // history.variable_uris
-  map(
-    variable_uri => find({ uri: variable_uri })(variables)
+  flow(
+    map(variable_uri => find({ uri: variable_uri })(variables)),
+    // compacting this array should not be necessary, but the API delivers
+    // erroneous data (due ultimately to erroneous database records, I believe)
+    // that causes some of the variables to be "missing".
+    compact,
   )(history.variable_uris)
 );
 

@@ -9,6 +9,7 @@ image:
 up:
 	@SDP_TAG=$(tag) SDP_PORT=$(port) SDP_PUBLIC_URL=$(public_url) docker-compose -f docker/docker-compose.yaml up -d
 	@echo "Station Data Portal running at $(public_url)"
+	@docker logs -f station-data-portal-frontend
 
 down:
 	@SDP_TAG=$(tag) SDP_PORT=$(port) SDP_PUBLIC_URL=$(public_url) docker-compose -f docker/docker-compose.yaml down

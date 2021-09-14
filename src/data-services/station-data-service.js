@@ -5,6 +5,11 @@ import getOr from 'lodash/fp/getOr';
 import isFinite from 'lodash/fp/isFinite';
 import isString from 'lodash/fp/isString';
 import { mapDeep } from '../utils/fp';
+import {
+  filterExpressionsParser,
+  filterPredicate
+} from './filtering';
+import filter from 'lodash/fp/filter';
 
 const SDS_URL = process.env.REACT_APP_SDS_URL;
 
@@ -24,8 +29,23 @@ function transformIso8601Date(value) {
 }
 
 
+const parsedNetworkFilterExpressions =
+  filterExpressionsParser(process.env.REACT_APP_NETWORK_FILTERS ?? '');
+
+
+const filterNetworks =
+  filter(filterPredicate(parsedNetworkFilterExpressions));
+
+
 export function getNetworks() {
-  return axios.get(urljoin(SDS_URL, 'networks'));
+  return axios.get(
+    urljoin(SDS_URL, 'networks'),
+    {
+      transformResponse: axios.defaults.transformResponse.concat(
+        filterNetworks,
+      ),
+    },
+  );
 }
 
 
@@ -46,6 +66,15 @@ const envVarNumber = (name, fallback) =>
     value => isFinite(value) ? value : fallback,
   )(process.env);
 
+
+const parsedStationFilterExpressions =
+  filterExpressionsParser(process.env.REACT_APP_STATION_FILTERS ?? '');
+
+
+const filterStations =
+  filter(filterPredicate(parsedStationFilterExpressions));
+
+
 export function getStations(config) {
   return axios.get(
     urljoin(SDS_URL, 'stations'),
@@ -55,6 +84,7 @@ export function getStations(config) {
         stride: envVarNumber('REACT_APP_STATION_STRIDE', undefined),
       },
       transformResponse: axios.defaults.transformResponse.concat(
+        filterStations,
         mapDeep(transformIso8601Date)
       ),
       ...config,

@@ -17,13 +17,14 @@ FROM node:10.16
 
 ADD . /app
 WORKDIR /app
+RUN chown node /app
 
 ENV PATH /app/node_modules/.bin:$PATH
-COPY package.json /app/package.json
+COPY --chown=node:node  package.json /app/package.json
 
 RUN npm install --quiet
 RUN npm install -g serve
-COPY . /app
+COPY --chown=node:node . /app
 
 EXPOSE 8080
 

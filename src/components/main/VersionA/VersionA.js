@@ -1,12 +1,8 @@
 import React, { Component } from 'react';
-import {
-  Row, Col,
-  Button,
-  Panel,
-  Tabs, Tab
-} from 'react-bootstrap';
+import { Button, Col, Panel, Row, Tab, Tabs } from 'react-bootstrap';
 import memoize from 'memoize-one';
 import flow from 'lodash/fp/flow';
+import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 import filter from 'lodash/fp/filter';
 import join from 'lodash/fp/join';
@@ -17,12 +13,13 @@ import logger from '../../../logger';
 import NetworkSelector from '../../selectors/NetworkSelector';
 import {
   getNetworks,
-  getVariables,
   getStations,
+  getVariables,
 } from '../../../data-services/station-data-service';
 import { dataDownloadTarget } from '../../../data-services/pdp-data-service';
 import VariableSelector from '../../selectors/VariableSelector';
-import FrequencySelector from '../../selectors/FrequencySelector/FrequencySelector';
+import FrequencySelector
+  from '../../selectors/FrequencySelector/FrequencySelector';
 import DateSelector from '../../selectors/DateSelector';
 import FileFormatSelector from '../../selectors/FileFormatSelector';
 import ClipToDateControl from '../../controls/ClipToDateControl';
@@ -33,10 +30,10 @@ import StationMetadata from '../../info/StationMetadata';
 import OnlyWithClimatologyControl
   from '../../controls/OnlyWithClimatologyControl';
 import StationMap from '../../maps/StationMap';
-import baseMaps from '../../maps/baseMaps';
 import AdjustableColumns from '../../util/AdjustableColumns';
 import capitalize from 'react-bootstrap/lib/utils/capitalize';
-import get from 'lodash/fp/get';
+import baseMaps from '../../maps/baseMaps';
+import NetworksMetadata from '../../info/NetworksMetadata';
 
 
 logger.configure({ active: true });
@@ -68,7 +65,7 @@ const commonSelectorStyles = {
 };
 
 
-const defaultLgs = [2, 6, 4];
+const defaultLgs = [8, 4];
 
 
 class Portal extends Component {
@@ -76,6 +73,9 @@ class Portal extends Component {
     startDate: null,
     endDate: null,
 
+    // TODO: Rename things here to make obvious the distinction between
+    //  things (e.g., networks) proper, from the backend API, and selector
+    //  options derived from them.
     allNetworks: null,
     selectedNetworks: [],
     networkActions: null,
@@ -178,6 +178,7 @@ class Portal extends Component {
   }
 
   render() {
+    console.log("### VersionA render", this.state)
     const filteredStations = this.stationFilter(
       this.state.startDate,
       this.state.endDate,
@@ -218,82 +219,6 @@ class Portal extends Component {
           <AdjustableColumns
             defaultLgs={defaultLgs}
             contents={[
-              <Panel style={{ marginLeft: '-10px', marginRight: '-15px' }}>
-                <Panel.Heading>Station Filters</Panel.Heading>
-                <Panel.Body>
-                  <p>{`
-                    ${filteredStations.length} stations selected of
-                    ${this.state.allStations ? this.state.allStations.length : 0} available
-                  `}</p>
-                  <Row>
-                    <Col lg={6} md={6} sm={6}>
-                      {/*<Button bsSize={'small'} onClick={this.handleClickAll}>Select all criteria</Button>*/}
-                      {/*<Button bsSize={'small'} onClick={this.handleClickNone}>Clear all criteria</Button>*/}
-                      <DateSelector
-                        value={this.state.startDate}
-                        onChange={this.handleChangeStartDate}
-                        label={'Start Date'}
-                      />
-                    </Col>
-                    <Col lg={6} md={6} sm={6}>
-                      <DateSelector
-                        value={this.state.endDate}
-                        onChange={this.handleChangeEndDate}
-                        label={'End Date'}
-                      />
-                    </Col>
-                    <Col lg={12} md={12} sm={12}>
-                      <OnlyWithClimatologyControl
-                        value={this.state.onlyWithClimatology}
-                        onChange={this.toggleOnlyWithClimatology}
-                      />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col lg={12} md={12} sm={12}>
-                      <NetworkSelector
-                        allNetworks={this.state.allNetworks}
-                        onReady={this.handleNetworkSelectorReady}
-                        value={this.state.selectedNetworks}
-                        onChange={this.handleChangeNetwork}
-                        isSearchable
-                        isClearable={false}
-                        styles={commonSelectorStyles}
-                      />
-                      {/*<JSONstringify object={this.state.selectedNetworks}/>*/}
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col lg={12} md={12} sm={12}>
-                      <VariableSelector
-                        allVariables={this.state.allVariables}
-                        onReady={this.handleVariableSelectorReady}
-                        value={this.state.selectedVariables}
-                        onChange={this.handleChangeVariable}
-                        isSearchable
-                        isClearable={false}
-                        styles={commonSelectorStyles}
-                      />
-                      {/*<JSONstringify object={this.state.selectedVariables}/>*/}
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col lg={12} md={12} sm={12}>
-                      <FrequencySelector
-                        allStations={this.state.allStations}
-                        onReady={this.handleFrequencySelectorReady}
-                        value={this.state.selectedFrequencies}
-                        onChange={this.handleChangeFrequency}
-                        isClearable={false}
-                        styles={commonSelectorStyles}
-                      />
-                      {/*<JSONstringify object={this.state.selectedFrequencies}/>*/}
-                    </Col>
-                  </Row>
-                </Panel.Body>
-              </Panel>
-              ,
-
               <StationMap
                 {...baseMaps[process.env.REACT_APP_BASE_MAP]}
                 stations={filteredStations}
@@ -303,10 +228,77 @@ class Portal extends Component {
               />,
 
               <Panel style={{ marginLeft: '-15px', marginRight: '-10px' }}>
-                <Panel.Heading>Selected Stations</Panel.Heading>
                 <Panel.Body>
-                  <Tabs defaultActiveKey={'Metadata'} className={css.mainTabs}>
-                    <Tab eventKey={'Metadata'} title={'Metadata'}>
+                  <Tabs defaultActiveKey={'Filters'} className={css.mainTabs}>
+                    <Tab eventKey={'Filters'} title={'Station Filters'}>
+                      <Row>
+                        <Col lg={6} md={6} sm={6}>
+                          {/*<Button bsSize={'small'} onClick={this.handleClickAll}>Select all criteria</Button>*/}
+                          {/*<Button bsSize={'small'} onClick={this.handleClickNone}>Clear all criteria</Button>*/}
+                          <DateSelector
+                            value={this.state.startDate}
+                            onChange={this.handleChangeStartDate}
+                            label={'Start Date'}
+                          />
+                        </Col>
+                          <Col lg={6} md={6} sm={6}>
+                          <DateSelector
+                            value={this.state.endDate}
+                            onChange={this.handleChangeEndDate}
+                            label={'End Date'}
+                          />
+                        </Col>
+                        <Col lg={12} md={12} sm={12}>
+                          <OnlyWithClimatologyControl
+                            value={this.state.onlyWithClimatology}
+                            onChange={this.toggleOnlyWithClimatology}
+                          />
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col lg={12} md={12} sm={12}>
+                          <NetworkSelector
+                            allNetworks={this.state.allNetworks}
+                            onReady={this.handleNetworkSelectorReady}
+                            value={this.state.selectedNetworks}
+                            onChange={this.handleChangeNetwork}
+                            isSearchable
+                            isClearable={false}
+                            styles={commonSelectorStyles}
+                          />
+                          {/*<JSONstringify object={this.state.selectedNetworks}/>*/}
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col lg={12} md={12} sm={12}>
+                          <VariableSelector
+                            allVariables={this.state.allVariables}
+                            onReady={this.handleVariableSelectorReady}
+                            value={this.state.selectedVariables}
+                            onChange={this.handleChangeVariable}
+                            isSearchable
+                            isClearable={false}
+                            styles={commonSelectorStyles}
+                          />
+                          {/*<JSONstringify object={this.state.selectedVariables}/>*/}
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col lg={12} md={12} sm={12}>
+                          <FrequencySelector
+                            allStations={this.state.allStations}
+                            onReady={this.handleFrequencySelectorReady}
+                            value={this.state.selectedFrequencies}
+                            onChange={this.handleChangeFrequency}
+                            isClearable={false}
+                            styles={commonSelectorStyles}
+                          />
+                          {/*<JSONstringify object={this.state.selectedFrequencies}/>*/}
+                        </Col>
+                      </Row>
+                    </Tab>
+
+                    <Tab eventKey={'Metadata'} title={'Station Metadata'}>
                       <Button disabled>
                         Download Metadata
                       </Button>
@@ -319,7 +311,7 @@ class Portal extends Component {
 
                     </Tab>
 
-                    <Tab eventKey={'Data'} title={'Data'}>
+                    <Tab eventKey={'Data'} title={'Station Data'}>
                       <p>{
                         this.state.allStations ?
                           `${filteredStations.length} stations selected of
@@ -367,6 +359,10 @@ class Portal extends Component {
                         }
                       </ButtonToolbar>
 
+                    </Tab>
+
+                    <Tab eventKey={'Networks'} title={'Networks'}>
+                      <NetworksMetadata networks={this.state.allNetworks}/>
                     </Tab>
 
                   </Tabs>

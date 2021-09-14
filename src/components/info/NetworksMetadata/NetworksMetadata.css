@@ -1,0 +1,8 @@
+.ReactTable {
+    font-size: 0.80em;
+    height: 600px;
+}
+
+.ReactTable .rt-thead {
+    overflow-y: scroll;
+}
