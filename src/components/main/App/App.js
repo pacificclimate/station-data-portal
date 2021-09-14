@@ -10,14 +10,14 @@ import urjJoin from 'url-join';
 import logger from '../../../logger';
 import Header from '../Header/Header';
 
-import PortalD from '../PortalD';
-import PortalE from '../PortalE';
+import VersionA from '../VersionA';
+import VersionB from '../VersionB';
 
 import './App.css';
 
 const navSpec = [
-  { label: 'Version A', path: 'A', component: PortalD },
-  { label: 'Version B', path: 'B', component: PortalE },
+  { label: 'Version A', path: 'A', component: VersionA },
+  { label: 'Version B', path: 'B', component: VersionB },
 ];
 
 

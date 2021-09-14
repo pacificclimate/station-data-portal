@@ -178,7 +178,7 @@ class Portal extends Component {
   }
 
   render() {
-    console.log("### PortalD render", this.state)
+    console.log("### VersionA render", this.state)
     const filteredStations = this.stationFilter(
       this.state.startDate,
       this.state.endDate,
