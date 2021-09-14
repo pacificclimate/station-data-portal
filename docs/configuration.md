@@ -7,19 +7,13 @@ In a Create React App app, [environment variables are managed carefully](https:/
 Therefore, most of the environment variables below begin with `REACT_APP_`,
 as required by CRA.
 
-CRA also provides a convenient system for setting default values of
-environment variables in various contexts (development, production, etc.).
-(However, these are not how environment variables are configured for
-Docker deployments -- for production, for example.)
-
-Brief summary:
-
-* `.env`: Global default settings
-* `.env.development`: Development-specific settings (`npm start`)
-* `.env.production`: Production-specific settings (`npm run build`)
-
+For development runs of the app launched with `npm start`, the files
+`.env` and `.env.development` provide environment variable values.
 For more details, see the
 [CRA documentation](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables).
+
+For production runs, environment variables are provided by
+`docker-compose.yaml`. 
 
 ## Environment variables
 
