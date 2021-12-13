@@ -65,7 +65,7 @@ const commonSelectorStyles = {
 };
 
 
-const defaultLgs = [8, 4];
+const defaultLgs = [7, 5];
 
 
 class Portal extends Component {
