@@ -23,6 +23,12 @@ const navSpec = [
 
 export default class App extends Component {
     render() {
+      return (
+        <Grid fluid className="App">
+          <Header/>
+          <VersionA/>
+        </Grid>
+      );
       const basePath = url.parse(process.env.PUBLIC_URL).pathname || '';
       return (
         <Router basename={urjJoin(basePath, '#')}>
