@@ -6,6 +6,7 @@ import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 import filter from 'lodash/fp/filter';
 import join from 'lodash/fp/join';
+import difference from 'lodash/fp/difference';
 
 import css from '../common.module.css';
 
@@ -232,6 +233,15 @@ class Portal extends Component {
                   <Tabs defaultActiveKey={'Filters'} className={css.mainTabs}>
                     <Tab eventKey={'Filters'} title={'Station Filters'}>
                       <Row>
+                        <Col lg={12} md={12} sm={12}>
+                          <p>
+                            <b>{filteredStations?.length}</b> stations selected
+                            of <b>{this.state.allStations?.length}</b> (see
+                            Station Data tab for details)
+                          </p>
+                        </Col>
+                      </Row>
+                      <Row>
                         <Col lg={6} md={6} sm={6}>
                           {/*<Button bsSize={'small'} onClick={this.handleClickAll}>Select all criteria</Button>*/}
                           {/*<Button bsSize={'small'} onClick={this.handleClickNone}>Clear all criteria</Button>*/}
@@ -241,7 +251,7 @@ class Portal extends Component {
                             label={'Start Date'}
                           />
                         </Col>
-                          <Col lg={6} md={6} sm={6}>
+                        <Col lg={6} md={6} sm={6}>
                           <DateSelector
                             value={this.state.endDate}
                             onChange={this.handleChangeEndDate}
