@@ -90,10 +90,14 @@ export const stationDateMatch = (
   //  ... would depend in part on history.freq to distinguish too-large gaps,
   //  but we already know that attribute isn't always an accurate reflection of
   //  actual observations.
-  return flow(
+  const r = flow(
     map(hx => historyDateMatch(hx, startDate, endDate, strict)),
     some(Boolean),
-  )(station.histories)
+  )(station.histories);
+  // if (!r) {
+  //   console.log(`Station ${station.id} filtered out on date`)
+  // }
+  return r;
 };
 
 
@@ -103,23 +107,30 @@ export const atLeastOne = items => items.length > 0;
 
 
 export const stationReportsSomeVariables = (station, variableUris) => {
-  return flow(
+  const r = flow(
     map("variable_uris"),
     compact,
     unionAll,
     intersection(variableUris),
     atLeastOne,
   )(station.histories);
+  // if (!r) {
+  //   console.log(`Station ${station.id} filtered out on variables`)
+  // }
+  return r;
 };
 
 
 export const stationReportsAnyFreqs = (station, freqs) => {
-  return flow(
+  const r = flow(
     map("freq"),
-    compact,
     intersection(freqs),
     atLeastOne,
   )(station.histories);
+  // if (!r) {
+  //   console.log(`Station ${station.id} filtered out on freqs`)
+  // }
+  return r;
 };
 
 
