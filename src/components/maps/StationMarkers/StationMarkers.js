@@ -7,10 +7,12 @@ import find from 'lodash/fp/find';
 import flow from 'lodash/fp/flow';
 import tap from 'lodash/fp/tap';
 
+import StationTooltip from '../StationTooltip';
+import StationPopup from '../StationPopup';
+
 import logger from '../../../logger';
 
 import './StationMarkers.css';
-import StationPopup from '../StationPopup';
 
 logger.configure({ active: true });
 
@@ -70,6 +72,10 @@ class StationMarkers extends Component {
               {...this.props.markerOptions}
               color={network && network.color}
             >
+              <StationTooltip
+                station={station}
+                network={network}
+              />
               <StationPopup
                 station={station}
                 network={network}
