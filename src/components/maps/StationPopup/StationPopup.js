@@ -9,7 +9,6 @@ import FrequencySelector from '../../selectors/FrequencySelector';
 import logger from '../../../logger';
 
 import './StationPopup.css';
-import getOr from 'lodash/fp/getOr';
 
 logger.configure({ active: true });
 
@@ -32,12 +31,13 @@ class StationPopup extends Component {
 
   render() {
     const { station, network, variables, defaultNetworkColor } = this.props;
-    const history = station.histories[0];
+    const histories = station.histories;
+    const history0 = histories[0];
     const networkColor =
       chroma(network.color ?? defaultNetworkColor).alpha(0.5).css();
     return (
       <Popup>
-        <h1>Station: {history.station_name} <span>({network.name})</span></h1>
+        <h1>Station: {history0.station_name} <span>({network.name})</span></h1>
         <Table size={'sm'} condensed>
           <tbody>
           <tr>
@@ -58,37 +58,44 @@ class StationPopup extends Component {
           </tr>
           <tr>
             <td>Longitude</td>
-            <td>{history.lon}</td>
+            <td>{history0.lon}</td>
           </tr>
           <tr>
             <td>Latitude</td>
-            <td>{history.lat}</td>
+            <td>{history0.lat}</td>
           </tr>
           <tr>
             <td>Elevation</td>
-            <td>{history.elevation}</td>
+            <td>{history0.elevation}</td>
           </tr>
           <tr>
-            <td rowSpan={2}>Records</td>
-            <td>from {formatDate(station.min_obs_time)}</td>
-          </tr>
-          <tr>
-            <td>to {formatDate(station.max_obs_time)}</td>
+            <td>Record span (histories: {histories.length})</td>
+            <td>
+              <ul className={"histories"}>
+                {
+                  map(hx => (
+                    <li>{formatDate(hx.min_obs_time)} to {formatDate(hx.max_obs_time)}</li>
+                  ))(histories)
+                }
+              </ul>
+            </td>
           </tr>
           <tr>
             <td>Observation frequency</td>
-            <td>{FrequencySelector.valueToLabel(history.freq)}</td>
+            <td>{FrequencySelector.valueToLabel(history0.freq)}</td>
           </tr>
           <tr>
-            <td rowSpan={variables.length+1}>Recorded variables</td>
+            <td>Recorded variables</td>
+            <td>
+              <ul className={"variables"}>
+                {
+                  map(variable => (
+                    <li>{variable.display_name}</li>
+                  ))(variables)
+                }
+              </ul>
+            </td>
           </tr>
-          {
-            map(variable => (
-              <tr>
-                <td>{variable.display_name}</td>
-              </tr>
-            ))(variables)
-          }
           </tbody>
         </Table>
       </Popup>
