@@ -6,7 +6,6 @@ import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 import filter from 'lodash/fp/filter';
 import join from 'lodash/fp/join';
-import difference from 'lodash/fp/difference';
 
 import css from '../common.module.css';
 
@@ -317,6 +316,7 @@ class Portal extends Component {
                       <StationMetadata
                         stations={filteredStations}
                         allNetworks={this.state.allNetworks}
+                        allVariables={this.state.allVariables}
                       />
 
                     </Tab>
