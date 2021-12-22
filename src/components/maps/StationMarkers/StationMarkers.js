@@ -14,6 +14,7 @@ import {
   stationNetwork,
   uniqStationLocations
 } from '../../../utils/station-info';
+import chroma from 'chroma-js';
 
 logger.configure({ active: true });
 
@@ -25,6 +26,8 @@ function StationMarker({
   station, allNetworks, allVariables, markerOptions, polygonOptions
 }) {
   const network = stationNetwork(allNetworks, station);
+  const polygonColor =
+    chroma(network.color ?? polygonOptions.color).alpha(0.3).css();
 
   const uniqLatLngs = flow(
     uniqStationLocations,
@@ -67,7 +70,8 @@ function StationMarker({
       {
         uniqLatLngs.length > 1 && (
           <Polygon
-            pathOptions={polygonOptions}
+            {...polygonOptions}
+            color={polygonColor}
             positions={uniqLatLngs}
           >
             {stationTooltip}
@@ -99,7 +103,7 @@ StationMarker.defaultProps = {
     color: '#000000',
   },
   polygonOptions: {
-    color: "purple",
+    color: "green",
   },
 };
 
