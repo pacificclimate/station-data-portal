@@ -9,12 +9,14 @@ import ReactTable from 'react-table';
 import flow from 'lodash/fp/flow';
 import find from 'lodash/fp/find';
 import map from 'lodash/fp/map';
-import uniq from 'lodash/fp/uniq';
-import uniqWith from 'lodash/fp/uniqWith';
 
 import FrequencySelector from '../../selectors/FrequencySelector';
 import logger from '../../../logger';
-import { utcDateOnly } from '../../../utils/portals-common';
+import {
+  uniqStationFreqs,
+  uniqStationLocations,
+  uniqStationNames, uniqStationObsPeriods
+} from '../../../utils/station-info';
 
 import 'react-table/react-table.css';
 import './StationMetadata.css';
@@ -61,14 +63,12 @@ export default class StationMetadata extends Component {
           <ul className={"compact"}>
             {
               flow(
-                map('station_name'),
-                uniq,
+                uniqStationNames,
                 map(name => (<li>{name}</li>)),
-              )(station.histories)
+              )(station)
             }
           </ul>
         ),
-        // accessor: station => station.histories[0].station_name,
       },
       {
         id: 'Unique Location(s)',
@@ -79,65 +79,39 @@ export default class StationMetadata extends Component {
           <ul className={"compact"}>
             {
               flow(
-                uniqWith(
-                  (hx1, hx2) => hx1.lon === hx2.lon && hx1.lat === hx2.lat
-                ),
-                map(hx => (
+                uniqStationLocations,
+                map(loc => (
                   <li>
-                    {-hx.lon} W <br/>
-                    {hx.lat} N <br/>
-                    Elev. {hx.elevation} m
+                    {-loc.lon} W <br/>
+                    {loc.lat} N <br/>
+                    Elev. {loc.elevation} m
                   </li>
                 )),
-              )(station.histories)
+              )(station)
             }
           </ul>
         ),
-        // accessor: station => {
-        //   const hx = station.histories[0];
-        //   return (
-        //     <div>
-        //       {-hx.lon} W <br/>
-        //       {hx.lat} N <br/>
-        //       Elev. {hx.elevation} m
-        //     </div>
-        //   );
-        // }
       },
       {
         id: 'Unique Record(s)',
         Header: 'Unique Record(s)',
         minWidth: 100,
         maxWidth: 200,
-        // accessor: station => 'record',
         accessor: station => (
           <ul className={"compact"}>
             {
               flow(
-                uniqWith(
-                  (hx1, hx2) =>
-                    utcDateOnly(hx1.min_obs_time).getTime()
-                      === utcDateOnly(hx2.min_obs_time).getTime()
-                    && utcDateOnly(hx1.max_obs_time).getTime()
-                      === utcDateOnly(hx2.max_obs_time).getTime()
-                ),
-                map(hx => (
+                uniqStationObsPeriods,
+                map(period => (
                   <li>
-                    {formatDate(hx.min_obs_time)} to <br/>
-                    {formatDate(hx.max_obs_time)}
+                    {formatDate(period.min_obs_time)} to <br/>
+                    {formatDate(period.max_obs_time)}
                   </li>
                 )),
-              )(station.histories)
+              )(station)
             }
           </ul>
         ),
-        // accessor: station => {
-        //   return (
-        //   <div>
-        //     {formatDate(station.min_obs_time)} to <br/>
-        //     {formatDate(station.max_obs_time)}
-        //   </div>
-        // )}
       },
       {
         minWidth: 80,
@@ -148,8 +122,7 @@ export default class StationMetadata extends Component {
           <ul className={"compact"}>
             {
               flow(
-                map('freq'),
-                uniq,
+                uniqStationFreqs,
                 map(freq => (<li>{FrequencySelector.valueToLabel(freq)}</li>)),
               )(station.histories)
             }
