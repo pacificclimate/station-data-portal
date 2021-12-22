@@ -11,14 +11,17 @@ import tap from 'lodash/fp/tap';
 import sortBy from 'lodash/fp/sortBy';
 import identity from 'lodash/fp/identity';
 import sortedUniq from 'lodash/fp/sortedUniq';
+import curry from 'lodash/fp/curry';
 
-export const stationNetwork = (networks, station) =>
-  find({ uri: station.network_uri })(networks);
+export const stationNetwork = curry(
+  (networks, station) => find({ uri: station.network_uri }, networks)
+);
 
 
 export const uniqStationNames = station =>
   flow(
     map('station_name'),
+    sortBy(identity),
     uniq,
   )(station.histories);
 
@@ -48,22 +51,23 @@ export const uniqStationFreqs = station =>
   )(station.histories);
 
 
-export const uniqStationVariableNames = (variables, station) =>
-  flow(
-    map(history =>
-      map(
-        variable_uri => find({ uri: variable_uri }, variables),
-        history.variable_uris
-      )
-    ),
-    flatten,
-    // compacting this array should not be necessary, but the API delivers
-    // erroneous data (due ultimately to erroneous database records, I believe)
-    // that causes some of the variables to be "missing".
-    compact,
-    // tap(x => console.log("### compacted vars", x)),
-    map('display_name'),
-    sortBy(identity),
-    uniq,
-    sortedUniq,
-  )(station.histories)
+export const uniqStationVariableNames = curry(
+  (variables, station) =>
+    flow(
+      map(history =>
+        map(
+          variable_uri => find({ uri: variable_uri }, variables),
+          history.variable_uris
+        )
+      ),
+      flatten,
+      // compacting this array should not be necessary, but the API delivers
+      // erroneous data (due ultimately to erroneous database records, I believe)
+      // that causes some of the variables to be "missing".
+      compact,
+      // tap(x => console.log("### compacted vars", x)),
+      map('display_name'),
+      sortBy(identity),
+      sortedUniq,
+    )(station.histories)
+);
