@@ -4,6 +4,17 @@ import uniq from 'lodash/fp/uniq';
 import React from 'react';
 import uniqWith from 'lodash/fp/uniqWith';
 import { utcDateOnly } from './portals-common';
+import find from 'lodash/fp/find';
+import flatten from 'lodash/fp/flatten';
+import compact from 'lodash/fp/compact';
+import tap from 'lodash/fp/tap';
+import sortBy from 'lodash/fp/sortBy';
+import identity from 'lodash/fp/identity';
+import sortedUniq from 'lodash/fp/sortedUniq';
+
+export const stationNetwork = (networks, station) =>
+  find({ uri: station.network_uri })(networks);
+
 
 export const uniqStationNames = station =>
   flow(
@@ -35,3 +46,24 @@ export const uniqStationFreqs = station =>
     map('freq'),
     uniq,
   )(station.histories);
+
+
+export const uniqStationVariableNames = (variables, station) =>
+  flow(
+    map(history =>
+      map(
+        variable_uri => find({ uri: variable_uri }, variables),
+        history.variable_uris
+      )
+    ),
+    flatten,
+    // compacting this array should not be necessary, but the API delivers
+    // erroneous data (due ultimately to erroneous database records, I believe)
+    // that causes some of the variables to be "missing".
+    compact,
+    // tap(x => console.log("### compacted vars", x)),
+    map('display_name'),
+    sortBy(identity),
+    uniq,
+    sortedUniq,
+  )(station.histories)
