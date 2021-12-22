@@ -2,13 +2,20 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Table } from 'react-bootstrap';
 import { Popup } from 'react-leaflet'
+import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
+import join from 'lodash/fp/join';
 import chroma from 'chroma-js';
 import FrequencySelector from '../../selectors/FrequencySelector';
 
 import logger from '../../../logger';
 
 import './StationPopup.css';
+import {
+  uniqStationFreqs,
+  uniqStationLocations,
+  uniqStationNames, uniqStationObsPeriods
+} from '../../../utils/station-info';
 
 logger.configure({ active: true });
 
@@ -31,20 +38,65 @@ class StationPopup extends Component {
 
   render() {
     const { station, network, variables, defaultNetworkColor } = this.props;
-    const histories = station.histories;
-    const history0 = histories[0];
     const networkColor =
       chroma(network.color ?? defaultNetworkColor).alpha(0.5).css();
+
+
+    const stationNames = flow(
+      uniqStationNames,
+      join(", "),
+    )(station);
+
+    const stationLocations = (
+      <ul className={"compact"}>
+        {
+          flow(
+            uniqStationLocations,
+            map(loc => (
+              <li>
+                {-loc.lon} W <br/>
+                {loc.lat} N <br/>
+                Elev. {loc.elevation} m
+              </li>
+            )),
+          )(station)
+        }
+      </ul>
+    );
+
+    const stationObsPeriods = (
+      <ul className={"histories"}>
+        {
+          flow(
+            uniqStationObsPeriods,
+            map(hx => (
+              <li>{formatDate(hx.min_obs_time)} to {formatDate(hx.max_obs_time)}</li>
+            ))
+          )(station)
+        }
+      </ul>
+    );
+    const stationObsFreqs = (
+      <ul className={"compact"}>
+        {
+          flow(
+            uniqStationFreqs,
+            map(freq => (<li>{FrequencySelector.valueToLabel(freq)}</li>)),
+          )(station)
+        }
+      </ul>
+    );
+
     return (
       <Popup>
-        <h1>Station: {history0.station_name} <span>({network.name})</span></h1>
+        <h1>Station: {stationNames}</h1>
         <Table size={'sm'} condensed>
           <tbody>
           <tr>
             <td>Network</td>
             <td>
               <span style={{backgroundColor: networkColor}}>
-                {`${network.name} – ${network.long_name}`}
+                {`${network.name}`}
               </span>
             </td>
           </tr>
@@ -57,32 +109,16 @@ class StationPopup extends Component {
             <td>{station.id}</td>
           </tr>
           <tr>
-            <td>Longitude</td>
-            <td>{history0.lon}</td>
+            <td>Locations</td>
+            <td>{stationLocations}</td>
           </tr>
           <tr>
-            <td>Latitude</td>
-            <td>{history0.lat}</td>
+            <td>Record spans</td>
+            <td>{stationObsPeriods}</td>
           </tr>
           <tr>
-            <td>Elevation</td>
-            <td>{history0.elevation}</td>
-          </tr>
-          <tr>
-            <td>Record span (histories: {histories.length})</td>
-            <td>
-              <ul className={"histories"}>
-                {
-                  map(hx => (
-                    <li>{formatDate(hx.min_obs_time)} to {formatDate(hx.max_obs_time)}</li>
-                  ))(histories)
-                }
-              </ul>
-            </td>
-          </tr>
-          <tr>
-            <td>Observation frequency</td>
-            <td>{FrequencySelector.valueToLabel(history0.freq)}</td>
+            <td>Observation freqs</td>
+            <td>{stationObsFreqs}</td>
           </tr>
           <tr>
             <td>Recorded variables</td>
