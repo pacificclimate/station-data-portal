@@ -14,7 +14,7 @@ function StationTooltip({ station, allNetworks }) {
   )(station);
 
   return (
-    <Tooltip>
+    <Tooltip sticky>
       {stationNames} <span>({network.name})</span>
     </Tooltip>
   );
