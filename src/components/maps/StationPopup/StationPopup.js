@@ -39,7 +39,7 @@ function StationPopup({
   )(station);
 
   const stationLocations = (
-    <ul className={"compact"}>
+    <ul className={"compact scroll-y"}>
       {
         flow(
           uniqStationLocations,
@@ -56,7 +56,7 @@ function StationPopup({
   );
 
   const stationObsPeriods = (
-    <ul className={"histories"}>
+    <ul className={"compact scroll-y"}>
       {
         flow(
           uniqStationObsPeriods,
@@ -80,7 +80,7 @@ function StationPopup({
   );
 
   const variableNames = (
-    <ul className={"variables"}>
+    <ul className={"compact"}>
       {map(
         name => (<li>{name}</li>),
         uniqStationVariableNames(allVariables, station)

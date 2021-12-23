@@ -2,12 +2,7 @@ h1 {
     font-size: 1.2em;
 }
 
-.histories {
+.scroll-y {
     max-height: 10em;
     overflow-y: scroll;
-    padding: 0px;
-}
-
-.variables {
-    padding: 0;
 }
