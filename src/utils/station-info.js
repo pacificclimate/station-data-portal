@@ -12,10 +12,19 @@ import sortBy from 'lodash/fp/sortBy';
 import identity from 'lodash/fp/identity';
 import sortedUniq from 'lodash/fp/sortedUniq';
 import curry from 'lodash/fp/curry';
+import { unionAll } from './fp'
+
 
 export const stationNetwork = curry(
   (networks, station) => find({ uri: station.network_uri }, networks)
 );
+
+
+export const stationVariableUris = station =>
+  flow(
+    map('variable_uris'),
+    unionAll,
+  )(station.histories);
 
 
 export const uniqStationNames = station =>

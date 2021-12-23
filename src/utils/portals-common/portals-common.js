@@ -1,22 +1,62 @@
 import contains from 'lodash/fp/contains';
 import compact from 'lodash/fp/compact';
+import every from 'lodash/fp/every';
 import filter from 'lodash/fp/filter';
 import flatten from 'lodash/fp/flatten';
 import flow from 'lodash/fp/flow';
 import intersection from 'lodash/fp/intersection';
 import map from 'lodash/fp/map';
+import min from 'lodash/fp/min';
+import max from 'lodash/fp/max';
 import some from 'lodash/fp/some';
 import uniq from 'lodash/fp/uniq';
 import isNil from 'lodash/fp/isNil';
-import union from 'lodash/fp/union';
-import reduce from 'lodash/fp/reduce';
+import flattenDepth from 'lodash/fp/flattenDepth';
 import { isPointInPolygonWn } from '../geometry-algorithms';
+import { unionAll } from '../fp';
+import { stationVariableUris, uniqStationLocations } from '../station-info';
 
 
-const checkGeoJSONPolygon = geometry => {
+// GeoJSON MultiPolygon format. Taken from
+// https://conservancy.umn.edu/bitstream/handle/11299/210208/GeoJSON_Primer_2019.pdf
+//
+// {
+//   "type": "MultiPolygon",
+//   "coordinates": [
+//     // one or more Polygon coordinate array:
+//     [
+//       // one or more Linear ring coordinate arrays:
+//       [
+//          // at least four Points; first point = last point:
+//         [x0, y0],
+//         [x1, y1],
+//         [x2, y2],
+//         // ...
+//         [x0, y0]
+//       ],
+//       // ...
+//     ],
+//     // ...
+//   ],
+//   // ...
+// };
+
+
+const checkGeoJSONMultiPolygon = geometry => {
   if (geometry['type'] !== 'MultiPolygon') {
     throw new Error(`Invalid geometry type: ${geometry['type']}`)
   }
+};
+
+
+const gJMultiPolygonBoundingBox = geometry => {
+  const points = flattenDepth(3, geometry["coordinates"]);
+  const xs = map(p => p[0], points);
+  const ys = map(p => p[1], points);
+  return [
+    [min(xs), max(ys)], // top left
+    [max(xs), min(ys)], // bottom right
+  ]
 };
 
 const getX = point => point[0];
@@ -80,7 +120,7 @@ export const historyDateMatch = (
 };
 
 
-export const stationDateMatch = (
+export const stationMatchesDates = (
   station, startDate, endDate, strict = true
 ) => {
   // TODO: Coalesce adjacent histories from a station. NB: tricky.
@@ -100,8 +140,13 @@ export const stationDateMatch = (
   return r;
 };
 
+export const stationInAnyNetwork = (station, networks) => {
+  return contains(
+    station.network_uri,
+    map(nw => nw.value.uri, networks)
+  );
+};
 
-export const unionAll = reduce(union, []);
 
 export const atLeastOne = items => items.length > 0;
 
@@ -134,6 +179,61 @@ export const stationReportsAnyFreqs = (station, freqs) => {
 };
 
 
+export const stationReportsClimatologyVariable = (station, variables) => {
+  return flow(
+    // Select variables that station reports
+    filter(({ uri }) => contains(uri, stationVariableUris(station))),
+    // Test that some reported variable is a climatology -- criterion from
+    // PDP PCDS backend
+    some(({ cell_method }) => /(within|over)/.test(cell_method))
+  )(variables);
+};
+
+
+// Checker for station inside polygon. Slightly optimized.
+// Intended use is one polygon and many stations.
+// Returns a function that checks a station against the given polygon.
+export const stationInsideMultiPolygon = multiPolygon => {
+  // polygon should always be a geoJSON MultiPolygon (even if there's only
+  // one polygon)
+  if (!multiPolygon) {
+    return () => true;
+  }
+
+  checkGeoJSONMultiPolygon(multiPolygon);
+  // TODO: Is it worth checking bounding box?
+  const [[minLon, maxLat], [maxLon, minLat]] =
+    gJMultiPolygonBoundingBox(multiPolygon);
+
+  return station => {
+    const stationCoords = flow(
+      uniqStationLocations,
+      map(history => [history.lon, history.lat]),
+    )(station);
+    
+    // Check bounding box
+    if (
+      every(
+        ([lon, lat]) =>
+          lon < minLon || lon > maxLon || lat < minLat || lat > maxLat,
+        stationCoords
+      )
+    ) {
+      return false;
+    }
+
+    //return true if any station coordinate is in any selected polygon
+    return some(
+      point => some(
+        polygon => isPointInGeoJSONPolygon(polygon[0], point),
+        multiPolygon.coordinates
+      ),
+      stationCoords
+    );
+  }
+};
+
+
 export const stationFilter = (
   startDate, endDate, selectedNetworks, selectedVariables, selectedFrequencies,
   onlyWithClimatology, area, allNetworks, allVariables, allStations
@@ -151,56 +251,24 @@ export const stationFilter = (
     map(option => option.value)(selectedFrequencies);
   // console.log('filteredStations selectedVariableUris', selectedVariableUris)
 
-  console.group("stationFilter")
-  const r = flow(
-    // tap(s => console.log("all stations", s?.length)),
+  const stationInsideArea = stationInsideMultiPolygon(area);
 
+  console.group("stationFilter")
+  // TODO: Remove flow wrapper
+  const r = flow(
     filter(station => {
       return (
-        stationDateMatch(station, startDate, endDate, false)
-
-        // Station is part of one of selected networks
-        && contains(
-          station.network_uri,
-          map(nw => nw.value.uri)(selectedNetworks)
-        )
-
+        stationMatchesDates(station, startDate, endDate, false)
+        && stationInAnyNetwork(station, selectedNetworks)
         && stationReportsSomeVariables(station, selectedVariableUris)
         && stationReportsAnyFreqs(station, selectedFrequencyValues)
+        && (
+          !onlyWithClimatology ||
+          stationReportsClimatologyVariable(station, allVariables)
+        )
+        && stationInsideArea(station)
       );
     }),
-    // tap(s => console.log("after date etc filtering", s?.length)),
-
-    // Stations match `onlyWithClimatology`:
-    // If `onlyWithClimatology`, station reports a climatology variable.
-    filter(station => {
-      if (!onlyWithClimatology) {
-        return true;
-      }
-      return flow(
-        // Select variables that station reports
-        filter(({ uri }) => contains(uri, station.histories[0].variable_uris)),
-        // Test that some reported variable is a climatology -- criterion from
-        // PDP PCDS backend
-        some(({ cell_method }) => /(within|over)/.test(cell_method))
-      )(allVariables)
-    }),
-    // tap(s => console.log("after onlyWithClimatology filtering", s?.length)),
-
-    // Stations are inside `area`
-    filter(station => {
-      if (!area) {
-        return true;
-      }
-      //area will always be a geoJSON MultiPolygon (even if there's only one polygon)
-      checkGeoJSONPolygon(area);
-
-      //return true if the station is in any selected polygon
-      return some(poly => isPointInGeoJSONPolygon(poly[0],
-            [station.histories[0].lon, station.histories[0].lat] ))(area.coordinates);
-
-    }),
-    // tap(s => console.log("after area filtering", s?.length)),
   )(allStations);
 
   console.groupEnd()
