@@ -1,6 +1,14 @@
-import {
-  reduce, assign, map, mapValues, toPairs, flow, curry, groupBy, isArray, isObject,
-} from 'lodash/fp';
+import reduce from 'lodash/fp/reduce';
+import assign from 'lodash/fp/assign';
+import map from 'lodash/fp/map';
+import mapValues from 'lodash/fp/mapValues';
+import toPairs from 'lodash/fp/toPairs';
+import flow from 'lodash/fp/flow';
+import curry from 'lodash/fp/curry';
+import groupBy from 'lodash/fp/groupBy';
+import isArray from 'lodash/fp/isArray';
+import isObject from 'lodash/fp/isObject';
+import union from 'lodash/fp/union';
 
 
 // TODO: There is a better fp way to do this. Find it and do it.
@@ -59,3 +67,7 @@ export const mapWithKey = map.convert({ cap: false });
 // If a property occurs in more than one object in the list, the last
 // occurrence wins (as in `assign`).
 export const objUnion = reduce((result, value) => assign(result, value), {});
+
+
+// Return the _.union of all arrays in the (array) argument.
+export const unionAll = reduce(union, []);
