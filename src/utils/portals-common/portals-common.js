@@ -1,10 +1,8 @@
 import contains from 'lodash/fp/contains';
-import compact from 'lodash/fp/compact';
 import every from 'lodash/fp/every';
 import filter from 'lodash/fp/filter';
 import flatten from 'lodash/fp/flatten';
 import flow from 'lodash/fp/flow';
-import intersection from 'lodash/fp/intersection';
 import map from 'lodash/fp/map';
 import min from 'lodash/fp/min';
 import max from 'lodash/fp/max';
@@ -13,8 +11,11 @@ import uniq from 'lodash/fp/uniq';
 import isNil from 'lodash/fp/isNil';
 import flattenDepth from 'lodash/fp/flattenDepth';
 import { isPointInPolygonWn } from '../geometry-algorithms';
-import { unionAll } from '../fp';
 import { stationVariableUris, uniqStationLocations } from '../station-info';
+import { getTimer } from '../timing';
+
+const ft = getTimer("Station filtering timing")
+ft.log();
 
 
 // GeoJSON MultiPolygon format. Taken from
@@ -97,6 +98,7 @@ export const historyDateMatch = (
   if (strict) {
     // Allowing for nils, check that
     // minObsDate <= startDate <= endDate <= maxObsDate.
+    // TODO: Optimize
     return (
       isNilOrAscending(startDate, endDate)
       && isNilOrAscending(minObsDate, startDate, maxObsDate)
@@ -106,80 +108,80 @@ export const historyDateMatch = (
 
   // This is a variant of the looser legacy comparison. Allows nil start, end.
   return (
-    !isNil(minObsDate) && !isNil(maxObsDate)
-    && isNilOrAscending(startDate, maxObsDate)
-    && isNilOrAscending(minObsDate, endDate)
-  );
-
-  // This is the looser comparison used by the legacy PDP portal.
-  // return (
-  //   !isNil(minObsDate) && !isNil(maxObsDate)
-  //   && !isNil(startDate) && !isNil(endDate)
-  //   && maxObsDate > startDate && minObsDate < endDate
-  // );
-};
-
-
-export const stationMatchesDates = (
-  station, startDate, endDate, strict = true
-) => {
-  // TODO: Coalesce adjacent histories from a station. NB: tricky.
-  //  If we don't do this, and we use strict date matching, then a station with
-  //  several histories fully covering an interval will not be selected, even
-  //  though it should be. The question of what "adjacent" means is a bit tricky
-  //  ... would depend in part on history.freq to distinguish too-large gaps,
-  //  but we already know that attribute isn't always an accurate reflection of
-  //  actual observations.
-  const r = flow(
-    map(hx => historyDateMatch(hx, startDate, endDate, strict)),
-    some(Boolean),
-  )(station.histories);
-  // if (!r) {
-  //   console.log(`Station ${station.id} filtered out on date`)
-  // }
-  return r;
-};
-
-export const stationInAnyNetwork = (station, networks) => {
-  return contains(
-    station.network_uri,
-    map(nw => nw.value.uri, networks)
+    (isNil(startDate) || isNil(maxObsDate) || startDate <= maxObsDate)
+    && (isNil(endDate) || isNil(minObsDate) || endDate >= minObsDate)
   );
 };
+
+
+export const stationMatchesDates = ft.timeThis("stationMatchesDates")(
+  (station, startDate, endDate, strict = true) => {
+    // TODO: Coalesce adjacent histories from a station. NB: tricky.
+    //  If we don't do this, and we use strict date matching, then a station with
+    //  several histories fully covering an interval will not be selected, even
+    //  though it should be. The question of what "adjacent" means is a bit tricky
+    //  ... would depend in part on history.freq to distinguish too-large gaps,
+    //  but we already know that attribute isn't always an accurate reflection of
+    //  actual observations.
+    const r = some(
+      hx => historyDateMatch(hx, startDate, endDate, strict),
+      station.histories
+    );
+    // if (!r) {
+    //   console.log(`Station ${station.id} filtered out on date`)
+    // }
+    return r;
+  }
+);
+
+export const stationInAnyNetwork = ft.timeThis("stationInAnyNetwork")(
+    (station, networks) => {
+    return contains(
+      station.network_uri,
+      map(nw => nw.value.uri, networks)
+    );
+  }
+);
 
 
 export const atLeastOne = items => items.length > 0;
 
 
-export const stationReportsSomeVariables = (station, variableUris) => {
-  const r = flow(
-    map("variable_uris"),
-    compact,
-    unionAll,
-    intersection(variableUris),
-    atLeastOne,
-  )(station.histories);
-  // if (!r) {
-  //   console.log(`Station ${station.id} filtered out on variables`)
-  // }
-  return r;
-};
+export const stationReportsSomeVariables =
+  ft.timeThis("stationReportsSomeVariables")(
+    (station, variableUris) => {
+      const stationVariableUris = ft.timeThis("stationVariableUris")(flow(
+        map("variable_uris"),
+        flatten,
+      ))(station.histories);
+      const r = ft.timeThis("variableUri in stationVariableUris")(
+        some(uri => contains(uri, stationVariableUris))
+      )(variableUris);
+      // if (!r) {
+      //   console.log(`Station ${station.id} filtered out on variables`)
+      // }
+      return r;
+    }
+  );
 
 
-export const stationReportsAnyFreqs = (station, freqs) => {
-  const r = flow(
-    map("freq"),
-    intersection(freqs),
-    atLeastOne,
-  )(station.histories);
-  // if (!r) {
-  //   console.log(`Station ${station.id} filtered out on freqs`)
-  // }
-  return r;
-};
+export const stationReportsAnyFreqs = ft.timeThis("stationReportsAnyFreqs")(
+    (station, freqs) => {
+    const stationFreqs = ft.timeThis("stationFreqs")(
+        map("freq"),
+      )(station.histories);
+      const r = ft.timeThis("freq in stationFreqs")(
+        some(freq => contains(freq, stationFreqs))
+      )(freqs);
+      if (!r) {
+        console.log(`Station ${station.id} filtered out on freqs`)
+      }
+      return r;
+    }
+);
 
 
-export const stationReportsClimatologyVariable = (station, variables) => {
+export const stationReportsClimatologyVariable = ft.timeThis("stationReportsClimatologyVariable")((station, variables) => {
   return flow(
     // Select variables that station reports
     filter(({ uri }) => contains(uri, stationVariableUris(station))),
@@ -187,13 +189,13 @@ export const stationReportsClimatologyVariable = (station, variables) => {
     // PDP PCDS backend
     some(({ cell_method }) => /(within|over)/.test(cell_method))
   )(variables);
-};
+});
 
 
 // Checker for station inside polygon. Slightly optimized.
 // Intended use is one polygon and many stations.
 // Returns a function that checks a station against the given polygon.
-export const stationInsideMultiPolygon = multiPolygon => {
+export const stationInsideMultiPolygon = ft.timeThis("stationInsideMultiPolygon")(multiPolygon => {
   // polygon should always be a geoJSON MultiPolygon (even if there's only
   // one polygon)
   if (!multiPolygon) {
@@ -231,20 +233,21 @@ export const stationInsideMultiPolygon = multiPolygon => {
       stationCoords
     );
   }
-};
+});
 
 
 export const stationFilter = (
   startDate, endDate, selectedNetworks, selectedVariables, selectedFrequencies,
   onlyWithClimatology, area, allNetworks, allVariables, allStations
 ) => {
+  ft.resetAll();
   // console.log('filteredStations allStations', allStations)
-  const selectedVariableUris = flow(
+  const selectedVariableUris = ft.timeThis("selectedVariableUris")(flow(
     map(selectedVariable => selectedVariable.contexts),
     flatten,
     map(context => context.uri),
     uniq,
-  )(selectedVariables);
+  ))(selectedVariables);
   // console.log('filteredStations selectedVariableUris', selectedVariableUris)
 
   const selectedFrequencyValues =
@@ -271,6 +274,7 @@ export const stationFilter = (
     }),
   )(allStations);
 
+  ft.log();
   console.groupEnd()
   return r;
 };
