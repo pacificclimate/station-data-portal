@@ -44,8 +44,11 @@ import { geoJSONToLeafletLayers, layersToGeoJSONMultipolygon }
 import logger from '../../../logger';
 
 import './StationMap.css';
+import { getTimer } from '../../../utils/timing';
 
 logger.configure({ active: true });
+const smtimer = getTimer("StationMarker timing")
+smtimer.log();
 
 export default class StationMap extends Component {
   static propTypes = {
@@ -144,6 +147,7 @@ export default class StationMap extends Component {
       this.props;
     const { geometryLayers } = this.state;
     const allowGeometryDraw = true || geometryLayers.length === 0;
+    smtimer.log();
 
     return (
       <BaseMap viewport={initialViewport} preferCanvas={true}>

@@ -15,16 +15,19 @@ import {
   uniqStationLocations
 } from '../../../utils/station-info';
 import chroma from 'chroma-js';
+import { getTimer } from '../../../utils/timing';
+
 
 logger.configure({ active: true });
+const timer = getTimer("StationMarker timing");
 
 
 const noStations = [];
 
 
-function StationMarker({
+const StationMarker = timer.timeThis("StationMarker")(({
   station, allNetworks, allVariables, markerOptions, polygonOptions
-}) {
+}) => {
   const network = stationNetwork(allNetworks, station);
   const polygonColor =
     chroma(network.color ?? polygonOptions.color).alpha(0.3).css();
@@ -49,7 +52,7 @@ function StationMarker({
     />
   );
 
-  return (
+  const r = (
     <React.Fragment>
       {
         map(
@@ -81,7 +84,8 @@ function StationMarker({
       }
     </React.Fragment>
   );
-}
+  return r;
+});
 
 const commonStationMarkerPropTypes = {
   allNetworks: PropTypes.array.isRequired,
@@ -108,10 +112,10 @@ StationMarker.defaultProps = {
 };
 
 
-function StationMarkers({
+const StationMarkers = ({
   stations, ...rest
-}) {
-  return (
+}) => {
+  const r = (
     map(
       station => (
         <StationMarker station={station} {...rest}/>
@@ -119,6 +123,7 @@ function StationMarkers({
       stations || noStations
     )
   );
+  return r;
 }
 
 StationMarkers.propTypes = {
