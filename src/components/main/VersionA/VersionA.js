@@ -21,19 +21,15 @@ import VariableSelector from '../../selectors/VariableSelector';
 import FrequencySelector
   from '../../selectors/FrequencySelector/FrequencySelector';
 import DateSelector from '../../selectors/DateSelector';
-import FileFormatSelector from '../../selectors/FileFormatSelector';
-import ClipToDateControl from '../../controls/ClipToDateControl';
-import ObservationCounts from '../../info/ObservationCounts';
 import { stationFilter } from '../../../utils/portals-common';
-import ButtonToolbar from 'react-bootstrap/es/ButtonToolbar';
-import StationMetadata from '../../info/StationMetadata';
 import OnlyWithClimatologyControl
   from '../../controls/OnlyWithClimatologyControl';
 import StationMap from '../../maps/StationMap';
-import AdjustableColumns from '../../util/AdjustableColumns';
-import capitalize from 'react-bootstrap/lib/utils/capitalize';
-import baseMaps from '../../maps/baseMaps';
+import StationMetadata from '../../info/StationMetadata';
+import StationData from '../../info/StationData';
 import NetworksMetadata from '../../info/NetworksMetadata';
+import AdjustableColumns from '../../util/AdjustableColumns';
+import baseMaps from '../../maps/baseMaps';
 
 
 logger.configure({ active: true });
@@ -221,7 +217,8 @@ class Portal extends Component {
             contents={[
               <StationMap
                 {...baseMaps[process.env.REACT_APP_BASE_MAP]}
-                stations={filteredStations}
+                allStations={this.state.allStations}
+                // selectedStations={filteredStations}
                 allNetworks={this.state.allNetworks}
                 allVariables={this.state.allVariables}
                 onSetArea={this.handleSetArea}
@@ -323,52 +320,31 @@ class Portal extends Component {
 
                     <Tab eventKey={'Data'} title={'Station Data'}>
                       <p>{
-                        this.state.allStations ?
+                        this.state.allStations ?(
                           `${filteredStations.length} stations selected of
-                    ${this.state.allStations ? this.state.allStations.length : 0} available` :
-                          `Loading station info ... (this may take a couple of minutes)`
+                           ${this.state.allStations?.length} available`
+                          ) :(
+                          `Loading station info ... `
+                        )
                       }</p>
                       <p>{`
-              Available stations are filtered by
-              the network they are part of,
-              the variable(s) they observe,
-              and the frequency of obervation.
-              Stations matching selected criteria are displayed on the map.
-              `}</p>
+                        Available stations are filtered by
+                        the network they are part of,
+                        the variable(s) they observe,
+                        and the frequency of obervation.
+                        Stations matching selected criteria are displayed 
+                        on the map.
+                      `}</p>
                       {
                         unselectedThings &&
                         <p>You haven't selected any {unselectedThings}.</p>
                       }
 
-                      <ObservationCounts stations={filteredStations}/>
-
-                      <FileFormatSelector
-                        value={this.state.fileFormat}
-                        onChange={this.handleChangeFileFormat}
+                      <StationData
+                        selectedStations={filteredStations}
+                        dataDownloadUrl={this.dataDownloadUrl}
+                        dataDownloadFilename={this.dataDownloadFilename}
                       />
-
-                      <ClipToDateControl
-                        value={this.state.clipToDate}
-                        onChange={this.toggleClipToDate}
-                      />
-
-                      <ButtonToolbar>
-                        {
-                          map(
-                            id => (
-                              <a
-                                href={this.dataDownloadUrl(id)}
-                                download={this.dataDownloadFilename(id)}
-                                className="btn btn-primary"
-                              >
-                                Download {capitalize(id)}
-                              </a>
-                            ),
-                            ['timeseries', 'climatology']
-                          )
-                        }
-                      </ButtonToolbar>
-
                     </Tab>
 
                     <Tab eventKey={'Networks'} title={'Networks'}>
