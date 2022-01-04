@@ -173,9 +173,9 @@ export const stationReportsAnyFreqs = ft.timeThis("stationReportsAnyFreqs")(
       const r = ft.timeThis("freq in stationFreqs")(
         some(freq => contains(freq, stationFreqs))
       )(freqs);
-      if (!r) {
-        console.log(`Station ${station.id} filtered out on freqs`)
-      }
+      // if (!r) {
+      //   console.log(`Station ${station.id} filtered out on freqs`)
+      // }
       return r;
     }
 );
