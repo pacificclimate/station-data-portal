@@ -25,6 +25,7 @@ import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 import sum from 'lodash/fp/sum';
 import sortBy from 'lodash/fp/sortBy';
+import isNil from 'lodash/fp/isNil';
 
 export class Timer {
   constructor(name) {
@@ -33,11 +34,15 @@ export class Timer {
   }
 
   reset(key) {
+    if (isNil(key)) {
+      this.timings = {};
+      return;
+    }
     this.timings[key] = {};
   }
 
   resetAll() {
-    this.timings = {};
+    this.reset();
   }
 
   start(key, log = false) {
@@ -58,7 +63,11 @@ export class Timer {
     this.timings[key].start = null;
   }
 
-  timeThis = (key, log = false) => f => {
+  timeThis = (key, options = {}) => f => {
+    const { disable = false, log = false } = options;
+    if (disable) {
+      return f;
+    }
     return (...args) => {
       this.start(key, log);
       const r = f(...args);
