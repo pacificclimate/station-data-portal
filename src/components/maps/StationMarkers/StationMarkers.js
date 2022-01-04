@@ -30,7 +30,7 @@ const StationMarker = timer.timeThis("StationMarker")(({
 }) => {
   const network = stationNetwork(allNetworks, station);
   const polygonColor =
-    chroma(network.color ?? polygonOptions.color).alpha(0.3).css();
+    chroma(network?.color ?? polygonOptions.color).alpha(0.3).css();
 
   const uniqLatLngs = flow(
     uniqStationLocations,
@@ -61,7 +61,7 @@ const StationMarker = timer.timeThis("StationMarker")(({
               key={latLng.id}
               center={latLng}
               {...markerOptions}
-              color={network && network.color}
+              color={network?.color}
             >
               {stationTooltip}
               {stationPopup}
