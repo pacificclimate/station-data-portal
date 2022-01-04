@@ -58,7 +58,7 @@ const StationMarker = timer.timeThis("StationMarker")(({
         map(
           latLng => (
             <CircleMarker
-              key={station.id}
+              key={latLng.id}
               center={latLng}
               {...markerOptions}
               color={network && network.color}
