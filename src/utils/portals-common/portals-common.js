@@ -241,26 +241,17 @@ export const stationFilter = (
   onlyWithClimatology, area, allNetworks, allVariables, allStations
 ) => {
   ft.resetAll();
-  // console.log('filteredStations allStations', allStations)
   const selectedVariableUris = ft.timeThis("selectedVariableUris")(flow(
     map(selectedVariable => selectedVariable.contexts),
     flatten,
     map(context => context.uri),
     uniq,
   ))(selectedVariables);
-  // console.log('filteredStations selectedVariableUris', selectedVariableUris)
 
   const selectedFrequencyValues =
     map(option => option.value)(selectedFrequencies);
-  // console.log('filteredStations selectedVariableUris', selectedVariableUris)
 
-  const stationInsideArea = stationInsideMultiPolygon(area);
-
-  console.group("stationFilter")
-  // TODO: Remove flow wrapper
-  const r = flow(
-    filter(station => {
-      return (
+  const r = filter(station => (
         stationMatchesDates(station, startDate, endDate, false)
         && stationInAnyNetwork(station, selectedNetworks)
         && stationReportsSomeVariables(station, selectedVariableUris)
@@ -269,12 +260,9 @@ export const stationFilter = (
           !onlyWithClimatology ||
           stationReportsClimatologyVariable(station, allVariables)
         )
-        && stationInsideArea(station)
-      );
-    }),
-  )(allStations);
+      )
+    )(allStations);
 
   ft.log();
-  console.groupEnd()
   return r;
 };
