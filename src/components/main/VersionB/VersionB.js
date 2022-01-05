@@ -1,3 +1,6 @@
+// TODO: Components and functions used in this code have changed significantly.
+//   See VersionA for the new usages.
+
 import React, { Component } from 'react';
 import {
   Row, Col,

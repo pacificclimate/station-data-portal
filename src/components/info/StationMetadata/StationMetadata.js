@@ -27,9 +27,13 @@ import './StationMetadata.css';
 
 logger.configure({ active: true });
 
-// TODO: Put these in a util module
 const formatDate = d => d ? d.toISOString().substr(0,10) : 'unknown';
 
+// Comparator for standard lexicographic ordering of arrays of values.
+// Returns negative, zero, or positive integer as usual for comparators.
+// Uses the natural (<, >) ordering of the array elements. No guarantees if you
+// supply it with arrays with different element types (pairwise by index). You
+// have been warned.
 const lexCompare = (a, b) => {
   const n = Math.min(a.length, b.length);
   for (let i = 0; i < n; i += 1) {
