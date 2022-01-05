@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Col, Panel, Row, Tab, Tabs } from 'react-bootstrap';
+import { Col, Panel, Row, Tab, Tabs } from 'react-bootstrap';
 import memoize from 'memoize-one';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
@@ -314,11 +314,6 @@ class Portal extends Component {
                     </Tab>
 
                     <Tab eventKey={'Metadata'} title={'Station Metadata'}>
-                      {/* TODO: Button belongs in StationMetadata */}
-                      <Button disabled>
-                        Download Metadata
-                      </Button>
-
                       <SelectionCounts
                         allStations={this.state.allStations}
                         selectedStations={selectedStations}
@@ -328,7 +323,6 @@ class Portal extends Component {
                         allNetworks={this.state.allNetworks}
                         allVariables={this.state.allVariables}
                       />
-
                     </Tab>
 
                     <Tab eventKey={'Data'} title={'Station Data'}>

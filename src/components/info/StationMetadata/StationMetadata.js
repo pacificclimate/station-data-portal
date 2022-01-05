@@ -9,6 +9,7 @@ import ReactTable from 'react-table';
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 
+import DownloadMetadata from '../../controls/DownloadMetadata';
 import FrequencySelector from '../../selectors/FrequencySelector';
 import logger from '../../../logger';
 import {
@@ -153,13 +154,22 @@ function StationMetadata({
     },
   ];
 
+  // Note: Download button is placed here because it should use the same
+  // formatting as React Table, i.e., what is defined in `columns`. It's too
+  // bad that React Table doesn't provide an export feature.
   return (
-    <ReactTable
-      data={stations}
-      columns={columns}
-      defaultPageSize={100}
-      {...restProps}
-    />
+    <React.Fragment>
+      <DownloadMetadata
+        data={stations}
+        columns={columns}
+      />
+      <ReactTable
+        data={stations}
+        columns={columns}
+        defaultPageSize={100}
+        {...restProps}
+      />
+    </React.Fragment>
   );
 }
 
