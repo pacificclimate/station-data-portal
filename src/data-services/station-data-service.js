@@ -4,6 +4,7 @@ import flow from 'lodash/fp/flow';
 import getOr from 'lodash/fp/getOr';
 import isFinite from 'lodash/fp/isFinite';
 import isString from 'lodash/fp/isString';
+import tap from 'lodash/fp/tap';
 import { mapDeep } from '../utils/fp';
 import {
   filterExpressionsParser,
@@ -84,6 +85,7 @@ export function getStations(config) {
         stride: envVarNumber('REACT_APP_STATION_STRIDE', undefined),
       },
       transformResponse: axios.defaults.transformResponse.concat(
+        tap(x => console.log("raw station count", x.length)),
         filterStations,
         mapDeep(transformIso8601Date)
       ),

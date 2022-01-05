@@ -1,86 +1,136 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
-import { CircleMarker } from 'react-leaflet';
-import compact from 'lodash/fp/compact';
+import React from 'react';
+import { CircleMarker, Polygon } from 'react-leaflet';
 import map from 'lodash/fp/map';
-import find from 'lodash/fp/find';
 import flow from 'lodash/fp/flow';
-import tap from 'lodash/fp/tap';
+
+import StationTooltip from '../StationTooltip';
+import StationPopup from '../StationPopup';
 
 import logger from '../../../logger';
 
 import './StationMarkers.css';
-import StationPopup from '../StationPopup';
+import {
+  stationNetwork,
+  uniqStationLocations
+} from '../../../utils/station-info';
+import chroma from 'chroma-js';
+import { getTimer } from '../../../utils/timing';
+
 
 logger.configure({ active: true });
+const timer = getTimer("StationMarker timing");
 
 
 const noStations = [];
 
 
-const network_for = (station, networks) => (
-  find({ uri: station.network_uri })(networks)
-);
+const StationMarker = timer.timeThis("StationMarker")(({
+  station, allNetworks, allVariables, markerOptions, polygonOptions
+}) => {
+  const network = stationNetwork(allNetworks, station);
+  const polygonColor =
+    chroma(network?.color ?? polygonOptions.color).alpha(0.3).css();
 
+  const uniqLatLngs = flow(
+    uniqStationLocations,
+    map(hx => ({ lng: hx.lon, lat: hx.lat }))
+  )(station);
 
-const variables_for = (history, variables) => (
-  flow(
-    map(variable_uri => find({ uri: variable_uri })(variables)),
-    // compacting this array should not be necessary, but the API delivers
-    // erroneous data (due ultimately to erroneous database records, I believe)
-    // that causes some of the variables to be "missing".
-    compact,
-  )(history.variable_uris)
-);
+  const stationTooltip = (
+    <StationTooltip
+      station={station}
+      allNetworks={allNetworks}
+    />
+  );
 
+  const stationPopup = (
+    <StationPopup
+      station={station}
+      allNetworks={allNetworks}
+      allVariables={allVariables}
+    />
+  );
 
-class StationMarkers extends Component {
-  static propTypes = {
-    stations: PropTypes.array.isRequired,
-    allNetworks: PropTypes.array.isRequired,
-    allVariables: PropTypes.array.isRequired,
-    markerOptions: PropTypes.object,
-  };
-
-  static defaultProps = {
-    markerOptions: {
-      radius: 4,
-      weight: 1,
-      fillOpacity: 0.75,
-      color: '#000000',
-    },
-  };
-
-  render() {
-    return (
-      flow(
-        tap(stations => console.log('stations', stations)),
-        map(station => {
-          const history = station.histories[0];
-          const network = network_for(station, this.props.allNetworks);
-          const variables = variables_for(history, this.props.allVariables);
-          return (
-            history &&
+  const r = (
+    <React.Fragment>
+      {
+        map(
+          latLng => (
             <CircleMarker
-              key={station.id}
-              center={{
-                lng: history.lon,
-                lat: history.lat
-              }}
-              {...this.props.markerOptions}
-              color={network && network.color}
+              key={latLng.id}
+              center={latLng}
+              {...markerOptions}
+              color={network?.color}
             >
-              <StationPopup
-                station={station}
-                network={network}
-                variables={variables}
-              />
+              {stationTooltip}
+              {stationPopup}
             </CircleMarker>
-          )
-        })
-      )(this.props.stations || noStations)
-    );
-  }
+          ),
+          uniqLatLngs
+        )
+      }
+      {
+        uniqLatLngs.length > 1 && (
+          <Polygon
+            {...polygonOptions}
+            color={polygonColor}
+            positions={uniqLatLngs}
+          >
+            {stationTooltip}
+            {stationPopup}
+          </Polygon>
+        )
+      }
+    </React.Fragment>
+  );
+  return r;
+});
+
+const commonStationMarkerPropTypes = {
+  allNetworks: PropTypes.array.isRequired,
+  allVariables: PropTypes.array.isRequired,
+  markerOptions: PropTypes.object,
+  polygonOptions: PropTypes.object,
+};
+
+StationMarker.propTypes = {
+  station: PropTypes.object.isRequired,
+  ...commonStationMarkerPropTypes,
+};
+
+StationMarker.defaultProps = {
+  markerOptions: {
+    radius: 4,
+    weight: 1,
+    fillOpacity: 0.75,
+    color: '#000000',
+  },
+  polygonOptions: {
+    color: "green",
+  },
+};
+
+
+const StationMarkers = ({
+  stations, ...rest
+}) => {
+  const r = (
+    map(
+      station => (
+        <StationMarker station={station} {...rest}/>
+      ),
+      stations || noStations
+    )
+  );
+  return r;
 }
+
+StationMarkers.propTypes = {
+  stations: PropTypes.array.isRequired,
+  ...commonStationMarkerPropTypes,
+};
+
+StationMarkers.defaultProps = StationMarker.defaultProps;
 
 export default StationMarkers;

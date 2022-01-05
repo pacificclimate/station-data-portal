@@ -1,15 +1,23 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Table } from 'react-bootstrap';
-import { flow, map, reduce } from 'lodash/fp';
+import { reduce } from 'lodash/fp';
 import { getObservationCounts } from
     '../../../data-services/station-data-service';
 
 import logger from '../../../logger';
+import { getTimer } from '../../../utils/timing';
 
 import './ObservationCounts.css';
 
 logger.configure({ active: true });
+const timer = getTimer("Observation count timing", { disable: true })
+
+
+const totalCounts = timer.timeThis("totalCounts")(
+  (counts, stations) =>
+    reduce((sum, station) => sum + (counts[station.id] || 0), 0)(stations)
+);
 
 class ObservationCounts extends Component {
   static propTypes = {
@@ -67,14 +75,12 @@ class ObservationCounts extends Component {
       return <p>Loading counts...</p>
     }
 
-    const totalCounts = (counts, stations) => (
-      reduce((sum, station) => sum + (counts[station.id] || 0), 0)(stations)
-    );
-
+    timer.resetAll();
     const totalObservationCountsForStations =
       totalCounts(countData.observationCounts, this.props.stations);
     const totalClimatologyCountsForStations =
       totalCounts(countData.climatologyCounts, this.props.stations);
+    timer.log();
 
     return (
       <Table condensed size="sm">
@@ -104,9 +110,6 @@ class ObservationCounts extends Component {
         </tr>
         </tbody>
       </Table>
-    )
-    return (
-      <p>Total observations for selected stations: {totalObservationCountsForStations}</p>
     );
   }
 }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Col, Panel, Row, Tab, Tabs } from 'react-bootstrap';
+import { Col, Panel, Row, Tab, Tabs } from 'react-bootstrap';
 import memoize from 'memoize-one';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
@@ -21,19 +21,20 @@ import VariableSelector from '../../selectors/VariableSelector';
 import FrequencySelector
   from '../../selectors/FrequencySelector/FrequencySelector';
 import DateSelector from '../../selectors/DateSelector';
-import FileFormatSelector from '../../selectors/FileFormatSelector';
-import ClipToDateControl from '../../controls/ClipToDateControl';
-import ObservationCounts from '../../info/ObservationCounts';
-import { stationFilter } from '../../../utils/portals-common';
-import ButtonToolbar from 'react-bootstrap/es/ButtonToolbar';
-import StationMetadata from '../../info/StationMetadata';
+import {
+  stationFilter,
+  stationInsideMultiPolygon
+} from '../../../utils/station-filtering';
 import OnlyWithClimatologyControl
   from '../../controls/OnlyWithClimatologyControl';
 import StationMap from '../../maps/StationMap';
-import AdjustableColumns from '../../util/AdjustableColumns';
-import capitalize from 'react-bootstrap/lib/utils/capitalize';
-import baseMaps from '../../maps/baseMaps';
+import StationMetadata from '../../info/StationMetadata';
+import StationData from '../../info/StationData';
 import NetworksMetadata from '../../info/NetworksMetadata';
+import SelectionCounts from '../../info/SelectionCounts';
+import SelectionCriteria from '../../info/SelectionCriteria';
+import AdjustableColumns from '../../util/AdjustableColumns';
+import baseMaps from '../../maps/baseMaps';
 
 
 logger.configure({ active: true });
@@ -143,7 +144,7 @@ class Portal extends Component {
 
   stationFilter = memoize(stationFilter);
 
-  dataDownloadUrl = dataCategory => {
+  dataDownloadUrl = ({ dataCategory, clipToDate, fileFormat }) => {
     // Check whether state has settled. Each selector calls an onReady callback
     // to export information (e.g., all its options) that it has set up
     // internally. In retrospect, this is a too-clever solution to the problem
@@ -163,18 +164,18 @@ class Portal extends Component {
       variables: this.state.selectedVariables,
       frequencies: this.state.selectedFrequencies,
       polygon: this.state.area,
-      clipToDate: this.state.clipToDate,
       onlyWithClimatology: this.state.onlyWithClimatology,
-      dataCategory,
-      dataFormat: this.state.fileFormat,
       allNetworks: this.state.networkActions.getAllOptions(),
       allVariables: this.state.variableActions.getAllOptions(),
       allFrequencies: this.state.frequencyActions.getAllOptions(),
+      dataCategory,
+      clipToDate,
+      dataFormat: fileFormat,
     });
   };
 
-  dataDownloadFilename = id => {
-    return `${id}.${get('value', this.state.fileFormat)}`;
+  dataDownloadFilename = ({ dataCategory, fileFormat }) => {
+    return `${{ dataCategory, fileFormat }}.${get('value', fileFormat)}`;
   }
 
   render() {
@@ -191,6 +192,9 @@ class Portal extends Component {
       this.state.allVariables,
       this.state.allStations,
     );
+
+    const stationInsideArea = stationInsideMultiPolygon(this.state.area);
+    const selectedStations = filter(stationInsideArea, filteredStations);
 
     const selections = [
       {
@@ -232,6 +236,17 @@ class Portal extends Component {
                   <Tabs defaultActiveKey={'Filters'} className={css.mainTabs}>
                     <Tab eventKey={'Filters'} title={'Station Filters'}>
                       <Row>
+                        <Col lg={12} md={12} sm={12}>
+                          <SelectionCounts
+                            allStations={this.state.allStations}
+                            selectedStations={selectedStations}
+                          />
+                          <p>
+                            (See Station Metadata and Station Data tabs for details)
+                          </p>
+                        </Col>
+                      </Row>
+                      <Row>
                         <Col lg={6} md={6} sm={6}>
                           {/*<Button bsSize={'small'} onClick={this.handleClickAll}>Select all criteria</Button>*/}
                           {/*<Button bsSize={'small'} onClick={this.handleClickNone}>Clear all criteria</Button>*/}
@@ -241,7 +256,7 @@ class Portal extends Component {
                             label={'Start Date'}
                           />
                         </Col>
-                          <Col lg={6} md={6} sm={6}>
+                        <Col lg={6} md={6} sm={6}>
                           <DateSelector
                             value={this.state.endDate}
                             onChange={this.handleChangeEndDate}
@@ -299,66 +314,33 @@ class Portal extends Component {
                     </Tab>
 
                     <Tab eventKey={'Metadata'} title={'Station Metadata'}>
-                      <Button disabled>
-                        Download Metadata
-                      </Button>
-
-                      <p>{filteredStations.length} stations selected</p>
-                      <StationMetadata
-                        stations={filteredStations}
-                        allNetworks={this.state.allNetworks}
+                      <SelectionCounts
+                        allStations={this.state.allStations}
+                        selectedStations={selectedStations}
                       />
-
+                      <StationMetadata
+                        stations={selectedStations}
+                        allNetworks={this.state.allNetworks}
+                        allVariables={this.state.allVariables}
+                      />
                     </Tab>
 
                     <Tab eventKey={'Data'} title={'Station Data'}>
-                      <p>{
-                        this.state.allStations ?
-                          `${filteredStations.length} stations selected of
-                    ${this.state.allStations ? this.state.allStations.length : 0} available` :
-                          `Loading station info ... (this may take a couple of minutes)`
-                      }</p>
-                      <p>{`
-              Available stations are filtered by
-              the network they are part of,
-              the variable(s) they observe,
-              and the frequency of obervation.
-              Stations matching selected criteria are displayed on the map.
-              `}</p>
+                      <SelectionCounts
+                        allStations={this.state.allStations}
+                        selectedStations={selectedStations}
+                      />
+                      <SelectionCriteria/>
                       {
                         unselectedThings &&
                         <p>You haven't selected any {unselectedThings}.</p>
                       }
 
-                      <ObservationCounts stations={filteredStations}/>
-
-                      <FileFormatSelector
-                        value={this.state.fileFormat}
-                        onChange={this.handleChangeFileFormat}
+                      <StationData
+                        selectedStations={selectedStations}
+                        dataDownloadUrl={this.dataDownloadUrl}
+                        dataDownloadFilename={this.dataDownloadFilename}
                       />
-
-                      <ClipToDateControl
-                        value={this.state.clipToDate}
-                        onChange={this.toggleClipToDate}
-                      />
-
-                      <ButtonToolbar>
-                        {
-                          map(
-                            id => (
-                              <a
-                                href={this.dataDownloadUrl(id)}
-                                download={this.dataDownloadFilename(id)}
-                                className="btn btn-primary"
-                              >
-                                Download {capitalize(id)}
-                              </a>
-                            ),
-                            ['timeseries', 'climatology']
-                          )
-                        }
-                      </ButtonToolbar>
-
                     </Tab>
 
                     <Tab eventKey={'Networks'} title={'Networks'}>
