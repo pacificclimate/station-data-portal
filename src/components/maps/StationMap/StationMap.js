@@ -54,8 +54,7 @@ export default class StationMap extends Component {
   static propTypes = {
     BaseMap: PropTypes.object.isRequired,
     initialViewport: PropTypes.object.isRequired,
-    allStations: PropTypes.array.isRequired,
-    // selectedStations: PropTypes.array.isRequired,
+    stations: PropTypes.array.isRequired,
     allNetworks: PropTypes.array.isRequired,
     allVariables: PropTypes.array.isRequired,
     onSetArea: PropTypes.func.isRequired,
@@ -147,7 +146,7 @@ export default class StationMap extends Component {
     const {
       BaseMap,
       initialViewport,
-      allStations,
+      stations,
       // selectedStations,
       allNetworks,
       allVariables
@@ -156,6 +155,8 @@ export default class StationMap extends Component {
     const allowGeometryDraw = true || geometryLayers.length === 0;
     smtimer.log();
     smtimer.resetAll();
+
+    // alert("StationMap render")
 
     return (
       <BaseMap viewport={initialViewport} preferCanvas={true}>
@@ -185,7 +186,7 @@ export default class StationMap extends Component {
         </LayerControlledFeatureGroup>
         <LayerGroup>
           <StationMarkers
-            stations={allStations}
+            stations={stations}
             allNetworks={allNetworks}
             allVariables={allVariables}
           />

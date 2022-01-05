@@ -21,7 +21,10 @@ import VariableSelector from '../../selectors/VariableSelector';
 import FrequencySelector
   from '../../selectors/FrequencySelector/FrequencySelector';
 import DateSelector from '../../selectors/DateSelector';
-import { stationFilter } from '../../../utils/portals-common';
+import {
+  stationFilter,
+  stationInsideMultiPolygon
+} from '../../../utils/portals-common';
 import OnlyWithClimatologyControl
   from '../../controls/OnlyWithClimatologyControl';
 import StationMap from '../../maps/StationMap';
@@ -139,7 +142,7 @@ class Portal extends Component {
 
   stationFilter = memoize(stationFilter);
 
-  dataDownloadUrl = dataCategory => {
+  dataDownloadUrl = ({ dataCategory, clipToDate, fileFormat }) => {
     // Check whether state has settled. Each selector calls an onReady callback
     // to export information (e.g., all its options) that it has set up
     // internally. In retrospect, this is a too-clever solution to the problem
@@ -159,18 +162,18 @@ class Portal extends Component {
       variables: this.state.selectedVariables,
       frequencies: this.state.selectedFrequencies,
       polygon: this.state.area,
-      clipToDate: this.state.clipToDate,
       onlyWithClimatology: this.state.onlyWithClimatology,
-      dataCategory,
-      dataFormat: this.state.fileFormat,
       allNetworks: this.state.networkActions.getAllOptions(),
       allVariables: this.state.variableActions.getAllOptions(),
       allFrequencies: this.state.frequencyActions.getAllOptions(),
+      dataCategory,
+      clipToDate,
+      dataFormat: fileFormat,
     });
   };
 
-  dataDownloadFilename = id => {
-    return `${id}.${get('value', this.state.fileFormat)}`;
+  dataDownloadFilename = ({ dataCategory, fileFormat }) => {
+    return `${{ dataCategory, fileFormat }}.${get('value', fileFormat)}`;
   }
 
   render() {
@@ -187,6 +190,9 @@ class Portal extends Component {
       this.state.allVariables,
       this.state.allStations,
     );
+
+    const stationInsideArea = stationInsideMultiPolygon(this.state.area);
+    const selectedStations = filter(stationInsideArea, filteredStations);
 
     const selections = [
       {
@@ -217,8 +223,7 @@ class Portal extends Component {
             contents={[
               <StationMap
                 {...baseMaps[process.env.REACT_APP_BASE_MAP]}
-                allStations={this.state.allStations}
-                // selectedStations={filteredStations}
+                stations={filteredStations}
                 allNetworks={this.state.allNetworks}
                 allVariables={this.state.allVariables}
                 onSetArea={this.handleSetArea}
@@ -231,7 +236,7 @@ class Portal extends Component {
                       <Row>
                         <Col lg={12} md={12} sm={12}>
                           <p>
-                            <b>{filteredStations?.length}</b> stations selected
+                            <b>{selectedStations?.length}</b> stations selected
                             of <b>{this.state.allStations?.length}</b> (see
                             Station Data tab for details)
                           </p>
@@ -309,9 +314,9 @@ class Portal extends Component {
                         Download Metadata
                       </Button>
 
-                      <p>{filteredStations.length} stations selected</p>
+                      <p>{selectedStations.length} stations selected</p>
                       <StationMetadata
-                        stations={filteredStations}
+                        stations={selectedStations}
                         allNetworks={this.state.allNetworks}
                         allVariables={this.state.allVariables}
                       />
@@ -320,12 +325,12 @@ class Portal extends Component {
 
                     <Tab eventKey={'Data'} title={'Station Data'}>
                       <p>{
-                        this.state.allStations ?(
-                          `${filteredStations.length} stations selected of
+                        this.state.allStations ? (
+                          `${selectedStations.length} stations selected of
                            ${this.state.allStations?.length} available`
-                          ) :(
-                          `Loading station info ... `
-                        )
+                          ) : (
+                            `Loading station info ... `
+                          )
                       }</p>
                       <p>{`
                         Available stations are filtered by
@@ -341,7 +346,7 @@ class Portal extends Component {
                       }
 
                       <StationData
-                        selectedStations={filteredStations}
+                        selectedStations={selectedStations}
                         dataDownloadUrl={this.dataDownloadUrl}
                         dataDownloadFilename={this.dataDownloadFilename}
                       />
