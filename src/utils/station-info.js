@@ -3,7 +3,7 @@ import map from 'lodash/fp/map';
 import uniq from 'lodash/fp/uniq';
 import React from 'react';
 import uniqWith from 'lodash/fp/uniqWith';
-import { utcDateOnly } from './portals-common';
+import { utcDateOnly } from './dates';
 import find from 'lodash/fp/find';
 import flatten from 'lodash/fp/flatten';
 import compact from 'lodash/fp/compact';

@@ -1,6 +1,0 @@
-{
-  "name": "portals-common",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./portals-common.js"
-}

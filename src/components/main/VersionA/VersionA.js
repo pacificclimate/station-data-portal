@@ -24,7 +24,7 @@ import DateSelector from '../../selectors/DateSelector';
 import {
   stationFilter,
   stationInsideMultiPolygon
-} from '../../../utils/portals-common';
+} from '../../../utils/station-filtering';
 import OnlyWithClimatologyControl
   from '../../controls/OnlyWithClimatologyControl';
 import StationMap from '../../maps/StationMap';

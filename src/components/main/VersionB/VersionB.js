@@ -27,7 +27,7 @@ import DateSelector from '../../selectors/DateSelector';
 import FileFormatSelector from '../../selectors/FileFormatSelector';
 import ClipToDateControl from '../../controls/ClipToDateControl';
 import ObservationCounts from '../../info/ObservationCounts';
-import { stationFilter } from '../../../utils/portals-common';
+import { stationFilter } from '../../../utils/station-filtering';
 import ButtonToolbar from 'react-bootstrap/es/ButtonToolbar';
 import StationMetadata from '../../info/StationMetadata';
 import OnlyWithClimatologyControl
