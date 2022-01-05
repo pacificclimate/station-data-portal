@@ -33,13 +33,13 @@ function StationData({
       <ButtonToolbar>
         {
           map(
-            id => (
+            dataCategory => (
               <a
-                href={dataDownloadUrl(id)}
-                download={dataDownloadFilename(id)}
+                href={dataDownloadUrl({ dataCategory, clipToDate, fileFormat })}
+                download={dataDownloadFilename({ dataCategory, fileFormat })}
                 className="btn btn-primary"
               >
-                Download {capitalize(id)}
+                Download {capitalize(dataCategory)}
               </a>
             ),
             ['timeseries', 'climatology']
