@@ -5,7 +5,7 @@
 //  Terminology
 //
 //  - Leaflet uses the term 'layer' for all single polygons, markers, etc.
-//    Leaflet uses the term 'layer group' for an object (iteself also a
+//    Leaflet uses the term 'layer group' for an object (itself also a
 //    layer, i.e, a subclass of `Layer`) that groups layers together.
 //
 //  Purpose
@@ -17,8 +17,8 @@
 //  Behaviour
 //
 //  - The geometry layer group is initially empty. Geometry can be added to
-//    it by any combination of drawing (on the map), uploading (e.g., a
-//    from GeoJSON file), and editing and/or deleting existing geometry.
+//    it by any combination of drawing (on the map) and editing and/or
+//    deleting existing geometry.
 //
 //  `onSetArea` callback
 //
@@ -26,8 +26,8 @@
 //    communicated by the `DataMap` callback prop `onSetArea`. This callback
 //    is more or less the whole point of the geometry layer group.
 //
-//  - `onSetArea` is called with a single GeoJSON object representing the the
-//    contents of the layer group. But see next point.
+//  - `onSetArea` is called with a single GeoJSON object representing the
+//    contents of the layer group.
 
 
 import PropTypes from 'prop-types';
