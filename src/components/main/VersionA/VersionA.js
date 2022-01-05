@@ -31,6 +31,8 @@ import StationMap from '../../maps/StationMap';
 import StationMetadata from '../../info/StationMetadata';
 import StationData from '../../info/StationData';
 import NetworksMetadata from '../../info/NetworksMetadata';
+import SelectionCounts from '../../info/SelectionCounts';
+import SelectionCriteria from '../../info/SelectionCriteria';
 import AdjustableColumns from '../../util/AdjustableColumns';
 import baseMaps from '../../maps/baseMaps';
 
@@ -235,10 +237,12 @@ class Portal extends Component {
                     <Tab eventKey={'Filters'} title={'Station Filters'}>
                       <Row>
                         <Col lg={12} md={12} sm={12}>
+                          <SelectionCounts
+                            allStations={this.state.allStations}
+                            selectedStations={selectedStations}
+                          />
                           <p>
-                            <b>{selectedStations?.length}</b> stations selected
-                            of <b>{this.state.allStations?.length}</b> (see
-                            Station Data tab for details)
+                            (See Station Metadata and Station Data tabs for details)
                           </p>
                         </Col>
                       </Row>
@@ -310,11 +314,15 @@ class Portal extends Component {
                     </Tab>
 
                     <Tab eventKey={'Metadata'} title={'Station Metadata'}>
+                      {/* TODO: Button belongs in StationMetadata */}
                       <Button disabled>
                         Download Metadata
                       </Button>
 
-                      <p>{selectedStations.length} stations selected</p>
+                      <SelectionCounts
+                        allStations={this.state.allStations}
+                        selectedStations={selectedStations}
+                      />
                       <StationMetadata
                         stations={selectedStations}
                         allNetworks={this.state.allNetworks}
@@ -324,22 +332,11 @@ class Portal extends Component {
                     </Tab>
 
                     <Tab eventKey={'Data'} title={'Station Data'}>
-                      <p>{
-                        this.state.allStations ? (
-                          `${selectedStations.length} stations selected of
-                           ${this.state.allStations?.length} available`
-                          ) : (
-                            `Loading station info ... `
-                          )
-                      }</p>
-                      <p>{`
-                        Available stations are filtered by
-                        the network they are part of,
-                        the variable(s) they observe,
-                        and the frequency of obervation.
-                        Stations matching selected criteria are displayed 
-                        on the map.
-                      `}</p>
+                      <SelectionCounts
+                        allStations={this.state.allStations}
+                        selectedStations={selectedStations}
+                      />
+                      <SelectionCriteria/>
                       {
                         unselectedThings &&
                         <p>You haven't selected any {unselectedThings}.</p>
