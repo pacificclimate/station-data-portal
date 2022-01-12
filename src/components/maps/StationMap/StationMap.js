@@ -72,6 +72,23 @@ function StationMap({
 
   const [geometryLayers, setGeometryLayers] = useState([]);
 
+  // Set up drawing tool. This might be better done elsewhere.
+  useEffect(() => {
+    // console.log("### L.drawLocal.draw", L.drawLocal.draw)
+    L.drawLocal.edit.toolbar.buttons = {
+      edit: "Edit shapes",
+      editDisabled: "No shapes to edit",
+      remove: "Remove shapes",
+      removeDisabled: "No shapes to remove",
+    };
+    L.drawLocal.edit.handlers.remove.tooltip = "Click shape to remove";
+    L.drawLocal.edit.toolbar.actions.clearAll = {
+      title: "Remove all shapes",
+      text: "Remove all",
+    };
+    console.log("### L.drawLocal", L.drawLocal)
+  }, []);
+
   // When user-drawn layers (shapes) change, call onSetArea callback with
   // GeoJSON representation of layers.
   useEffect(() => {
