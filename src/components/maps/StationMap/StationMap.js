@@ -1,6 +1,6 @@
 // This component displays a map with a station marker for each station.
 //
-// Notes on geometry layer group:
+// Notes on user shape feature group:
 //
 //  Terminology
 //
@@ -10,41 +10,45 @@
 //
 //  Purpose
 //
-//  - The purpose of the geometry layer group is to allow the user to define
+//  - The purpose of the user shape feature group is to allow the user to define
 //    a spatial area of interest. This area drives the spatial data averaging
 //    performed by various other data display tools (graphs, tables).
 //
 //  Behaviour
 //
-//  - The geometry layer group is initially empty. Geometry can be added to
+//  - The user shape feature group is initially empty. Geometry can be added to
 //    it by any combination of drawing (on the map) and editing and/or
 //    deleting existing geometry.
 //
+//  - Previous versions of this component had some unused infrastructure for
+//    the user to upload a selection shape. That has all been removed, giving a
+//    major simplification and significant speed up of this component.
+//    The previous implementation of user upload caused double-renders of
+//    the map, which is slow. To add such a feature again, it would be best to
+//    renovate the component `LayerControlledFeatureGroup` to *add* its layers
+//    to the internally existing ones in the layer group, rather than to do a
+//    fully controlled component style implementation, which causes double
+//    updates.
+//
 //  `onSetArea` callback
 //
-//  - All changes (add, edit) to the contents of the geometry layer group are
-//    communicated by the `DataMap` callback prop `onSetArea`. This callback
-//    is more or less the whole point of the geometry layer group.
+//  - All changes (add, edit) to the contents of the user shape feature group
+//    are communicated by the `DataMap` callback prop `onSetArea`. This callback
+//    is more or less the whole point of the user shape feature group.
 //
 //  - `onSetArea` is called with a single GeoJSON object representing the
 //    contents of the layer group.
 
 
 import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
-import without from 'lodash/fp/without';
-import { forEachWithKey } from '../../../utils/fp';
+import React, { useEffect, useRef } from 'react';
 
-import { LayerGroup } from 'react-leaflet';
+import { FeatureGroup, LayerGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import L from 'leaflet';
 
 import StationMarkers from '../StationMarkers';
-import LayerControlledFeatureGroup from '../LayerControlledFeatureGroup';
-import {
-  geoJSONToLeafletLayers,
-  layersToGeoJSONMultipolygon
-} from '../../../utils/geoJSON-leaflet';
+import { layersToGeoJSONMultipolygon } from '../../../utils/geoJSON-leaflet';
 
 import logger from '../../../logger';
 
@@ -62,15 +66,14 @@ function StationMap({
   allNetworks,
   allVariables,
   onSetArea,
-  inactiveGeometryStyle = {
-    color: '#777777'
-  },
-  activeGeometryStyle = {
-    color: '#33ff36'
+  userShapeStyle = {
+    color: "#f49853",
+    weight: 1,
   },
 }) {
+  const userShapeLayerRef = useRef();
 
-  const [geometryLayers, setGeometryLayers] = useState([]);
+  // const [geometryLayers, setGeometryLayers] = useState([]);
 
   // Set up drawing tool. This might be better done elsewhere.
   useEffect(() => {
@@ -89,52 +92,8 @@ function StationMap({
     console.log("### L.drawLocal", L.drawLocal)
   }, []);
 
-  // When user-drawn layers (shapes) change, call onSetArea callback with
-  // GeoJSON representation of layers.
-  useEffect(() => {
-    onSetArea(geometryLayers && layersToGeoJSONMultipolygon(geometryLayers));
-  }, [geometryLayers]);
-
-  // When user-drawn layers (shapes) change, update their style. This is mainly
-  // useful when there is more than one layer, which there cannot be without
-  // either shape uploads (not currently enabled) or allowing multiple shapes
-  // to be drawn (currently disallowed).
-  useEffect(() => {
-    forEachWithKey(
-      (layer, i) => {
-        layer.setStyle(i > 0 ? inactiveGeometryStyle : activeGeometryStyle);
-        // The following prevents the geometry from blocking interaction with
-        // the markers, but it disables the edit and delete functions for the
-        // geometry. We don't like that any more.
-        // layer.setStyle({ interactive: false });
-      },
-      geometryLayers
-    );
-  }, [geometryLayers]);
-
-  const addGeometryLayer = layer => {
-    // TODO: Is this where double renders come from? Probably. We are doing
-    //  a controlled component, but the edit tool automatically adds the new
-    //  layer -- triggering a render, I believe -- before we receive notice
-    //  of it and update `geometryLayers` -- which triggers another render.
-    setGeometryLayers(geometryLayers.concat([layer]));
-  };
-
-  const addGeometryLayers = layers => {
-    setGeometryLayers(geometryLayers.concat(layers));
-  };
-
-  const editGeometryLayers = layers => {
-    // TODO: How to handle multiple layers? It's not clear how to
-    //  identify which layer was edited. This works for now since we don't
-    //  allow drawing multiple layers or uploading layers. The latter will
-    //  put the problem front and center.
-    // console.log("### editGeometryLayers", layers)
-    setGeometryLayers(layers)
-  };
-
-  const deleteGeometryLayers = layers => {
-    setGeometryLayers(without(layers, geometryLayers));
+  const handleChangedGeometryLayers = layers => {
+    onSetArea(layers && layersToGeoJSONMultipolygon(layers));
   };
 
   const eventLayers = e => {
@@ -144,24 +103,23 @@ function StationMap({
     // have to go through this rigmarole to get the layers.
     // The alternative of accessing the private property `e.layers._layers`
     // (a) is naughty, and (b) fails.
-    console.log("### eventLayers", e)
     let layers = [];
     e.layers.eachLayer(layer => layers.push(layer));
     return layers;
   };
 
-  const handleAreaCreated = e => addGeometryLayer(e.layer);
-  const handleAreaEdited = e => editGeometryLayers(eventLayers(e));
-  const handleAreaDeleted = e => deleteGeometryLayers(eventLayers(e));
-
-  // NOTE: This handler is not used ... yet. But all the infrastructure is
-  // in place for it should it be wanted.
-  const handleUploadArea = (geoJSON) => {
-    addGeometryLayers(geoJSONToLeafletLayers(geoJSON));
+  const handleAreaCreated = e => {
+    handleChangedGeometryLayers([e.layer]);
+  };
+  const handleAreaEdited = e => {
+    handleChangedGeometryLayers(eventLayers(e));
+  };
+  const handleAreaDeleted = () => {
+    handleChangedGeometryLayers([]);
   };
 
-  const allowGeometryDraw = geometryLayers.length === 0;
-  // const allowGeometryDraw = true;
+  const allowDraw =
+    (userShapeLayerRef?.current?.leafletElement.getLayers()?.length ?? 0) === 0;
   smtimer.log();
   smtimer.resetAll();
 
@@ -169,9 +127,7 @@ function StationMap({
 
   return (
     <BaseMap viewport={initialViewport} preferCanvas={true}>
-      <LayerControlledFeatureGroup
-        layers={geometryLayers}
-      >
+      <FeatureGroup ref={userShapeLayerRef}>
         <EditControl
           position={'topleft'}
           draw={{
@@ -179,20 +135,22 @@ function StationMap({
             circlemarker: false,
             circle: false,
             polyline: false,
-            polygon: allowGeometryDraw && {
+            polygon: allowDraw && {
               showArea: false,
               showLength: false,
+              shapeOptions: userShapeStyle,
             },
-            rectangle: allowGeometryDraw && {
+            rectangle: allowDraw && {
               showArea: false,
               showLength: false,
+              shapeOptions: userShapeStyle,
             },
           }}
           onCreated={handleAreaCreated}
           onEdited={handleAreaEdited}
           onDeleted={handleAreaDeleted}
         />
-      </LayerControlledFeatureGroup>
+      </FeatureGroup>
       <LayerGroup>
         <StationMarkers
           stations={stations}
