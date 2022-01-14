@@ -3,8 +3,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CircleMarker, Polygon } from 'react-leaflet';
 import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
-
-import StationTooltip from '../StationTooltip';
 import StationPopup from '../StationPopup';
 
 import logger from '../../../logger';
@@ -22,20 +20,14 @@ logger.configure({ active: true });
 const timer = getTimer("StationMarker timing");
 
 
-const noStations = [];
-
-
-const StationMarker = timer.timeThis("StationMarker")(({
-  station, allNetworks, allVariables, markerOptions, polygonOptions,
+const LocationMarker = ({
+  station,
+  location,
+  color,
+  allNetworks,
+  allVariables,
+  markerOptions,
 }) => {
-  // TODO: Construct and use popup (and possibly tooltip) lazily
-  // const stationTooltip = (
-  //   <StationTooltip
-  //     station={station}
-  //     allNetworks={allNetworks}
-  //   />
-  // );
-
   const [popup, setPopup] = useState(null);
   const popupRef = useRef();
   const popupInWaiting = (
@@ -59,7 +51,67 @@ const StationMarker = timer.timeThis("StationMarker")(({
     const _ = popupRef?.current?.leafletElement.openPopup();
   }, [popup]);
 
+  return (
+    <CircleMarker
+      key={location.id}
+      center={location}
+      {...markerOptions}
+      color={color}
+      onClick={addPopup}
+    >
+      {/*{stationTooltip}*/}
+      {popup}
+    </CircleMarker>
+  );
+};
+
+
+const MultiLocationMarker = ({
+  locations,
+  color,
+  polygonOptions,
+}) => {
+  if (locations.length <= 1) {
+    return null;
+  }
+  return (
+    <Polygon
+      {...polygonOptions}
+      color={color}
+      positions={locations}
+    >
+      {/*{stationTooltip}*/}
+      {/*{popup}*/}
+    </Polygon>
+  );
+};
+
+
+const StationMarkers = timer.timeThis("StationMarker")(({
+  station,
+  allNetworks,
+  allVariables,
+  markerOptions = {
+    radius: 4,
+    weight: 1,
+    fillOpacity: 0.75,
+    color: '#000000',
+  },
+  // TODO: Improve or remove
+  polygonOptions = {
+    color: "green",
+  },
+}) => {
+  // TODO: Construct and use popup (and possibly tooltip) lazily
+  // const stationTooltip = (
+  //   <StationTooltip
+  //     station={station}
+  //     allNetworks={allNetworks}
+  //   />
+  // );
+
   const network = stationNetwork(allNetworks, station);
+  const locationColor = network?.color;
   const polygonColor =
     chroma(network?.color ?? polygonOptions.color).alpha(0.3).css();
 
@@ -72,82 +124,62 @@ const StationMarker = timer.timeThis("StationMarker")(({
     <React.Fragment>
       {
         map(
-          latLng => (
-            <CircleMarker
-              key={latLng.id}
-              center={latLng}
-              {...markerOptions}
-              color={network?.color}
-              onClick={addPopup}
-            >
-              {/*{stationTooltip}*/}
-              {popup}
-            </CircleMarker>
+          location => (
+            <LocationMarker
+              station={station}
+              location={location}
+              color={locationColor}
+              allNetworks={allNetworks}
+              allVariables={allVariables}
+              markerOptions={markerOptions}
+            />
           ),
           uniqLatLngs
         )
       }
-      {
-        uniqLatLngs.length > 1 && (
-          <Polygon
-            {...polygonOptions}
-            color={polygonColor}
-            positions={uniqLatLngs}
-          >
-            {/*{stationTooltip}*/}
-            {popup}
-          </Polygon>
-        )
-      }
+      <MultiLocationMarker
+        locations={uniqLatLngs}
+        color={polygonColor}
+        polygonOptions={polygonOptions}
+      />
     </React.Fragment>
   );
   return r;
 });
 
-const commonStationMarkerPropTypes = {
+StationMarkers.propTypes = {
+  station: PropTypes.object.isRequired,
   allNetworks: PropTypes.array.isRequired,
   allVariables: PropTypes.array.isRequired,
   markerOptions: PropTypes.object,
   polygonOptions: PropTypes.object,
 };
 
-StationMarker.propTypes = {
-  station: PropTypes.object.isRequired,
-  ...commonStationMarkerPropTypes,
-};
-
-StationMarker.defaultProps = {
-  markerOptions: {
-    radius: 4,
-    weight: 1,
-    fillOpacity: 0.75,
-    color: '#000000',
-  },
-  polygonOptions: {
-    color: "green",
-  },
-};
+// StationMarkers.defaultProps = {
+//   markerOptions: {
+//     radius: 4,
+//     weight: 1,
+//     fillOpacity: 0.75,
+//     color: '#000000',
+//   },
+//   polygonOptions: {
+//     color: "green",
+//   },
+// };
 
 
-const StationMarkers = ({
-  stations, ...rest
-}) => {
-  const r = (
-    map(
-      station => (
-        <StationMarker station={station} {...rest}/>
-      ),
-      stations || noStations
-    )
-  );
-  return r;
-}
-
-StationMarkers.propTypes = {
-  stations: PropTypes.array.isRequired,
-  ...commonStationMarkerPropTypes,
-};
-
-StationMarkers.defaultProps = StationMarker.defaultProps;
+// const StationMarkers = ({
+//   stations, ...rest
+// }) => {
+//   const r = (
+//     map(
+//       station => (
+//         <StationMarker station={station} {...rest}/>
+//       ),
+//       stations || noStations
+//     )
+//   );
+//   return r;
+// }
 
 export default StationMarkers;

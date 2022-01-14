@@ -54,6 +54,7 @@ import logger from '../../../logger';
 
 import './StationMap.css';
 import { getTimer } from '../../../utils/timing';
+import map from 'lodash/fp/map';
 
 logger.configure({ active: true });
 const smtimer = getTimer("StationMarker timing")
@@ -152,11 +153,18 @@ function StationMap({
         />
       </FeatureGroup>
       <LayerGroup>
-        <StationMarkers
-          stations={stations}
-          allNetworks={allNetworks}
-          allVariables={allVariables}
-        />
+        {
+          map(
+            station => (
+              <StationMarkers
+                station={station}
+                allNetworks={allNetworks}
+                allVariables={allVariables}
+              />
+            ),
+            stations
+          )
+        }
       </LayerGroup>
     </BaseMap>
   );
