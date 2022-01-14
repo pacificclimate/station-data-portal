@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { CircleMarker, Polygon } from 'react-leaflet';
 import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
@@ -26,31 +26,47 @@ const noStations = [];
 
 
 const StationMarker = timer.timeThis("StationMarker")(({
-  station, allNetworks, allVariables, markerOptions, polygonOptions
+  station, allNetworks, allVariables, markerOptions, polygonOptions,
 }) => {
+  // TODO: Construct and use popup (and possibly tooltip) lazily
+  // const stationTooltip = (
+  //   <StationTooltip
+  //     station={station}
+  //     allNetworks={allNetworks}
+  //   />
+  // );
+
+  const [popup, setPopup] = useState(null);
+  const popupRef = useRef();
+  const popupInWaiting = (
+    <StationPopup
+      station={station}
+      allNetworks={allNetworks}
+      allVariables={allVariables}
+      ref={popupRef}
+    />
+  );
+
+  const addPopup = () => {
+    if (popup === null) {
+      console.log("Adding popup")
+      setPopup(popupInWaiting);
+    }
+  };
+
+  useEffect(() => {
+    console.log("popup effect", popupRef)
+    const _ = popupRef?.current?.leafletElement.openPopup();
+  }, [popup]);
+
   const network = stationNetwork(allNetworks, station);
   const polygonColor =
     chroma(network?.color ?? polygonOptions.color).alpha(0.3).css();
 
   const uniqLatLngs = flow(
     uniqStationLocations,
-    map(hx => ({ lng: hx.lon, lat: hx.lat }))
+    map(hx => ({ id: hx.id, lng: hx.lon, lat: hx.lat }))
   )(station);
-
-  const stationTooltip = (
-    <StationTooltip
-      station={station}
-      allNetworks={allNetworks}
-    />
-  );
-
-  const stationPopup = (
-    <StationPopup
-      station={station}
-      allNetworks={allNetworks}
-      allVariables={allVariables}
-    />
-  );
 
   const r = (
     <React.Fragment>
@@ -62,9 +78,10 @@ const StationMarker = timer.timeThis("StationMarker")(({
               center={latLng}
               {...markerOptions}
               color={network?.color}
+              onClick={addPopup}
             >
-              {stationTooltip}
-              {stationPopup}
+              {/*{stationTooltip}*/}
+              {popup}
             </CircleMarker>
           ),
           uniqLatLngs
@@ -77,8 +94,8 @@ const StationMarker = timer.timeThis("StationMarker")(({
             color={polygonColor}
             positions={uniqLatLngs}
           >
-            {stationTooltip}
-            {stationPopup}
+            {/*{stationTooltip}*/}
+            {popup}
           </Polygon>
         )
       }
