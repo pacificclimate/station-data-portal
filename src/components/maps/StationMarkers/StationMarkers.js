@@ -4,6 +4,7 @@ import { CircleMarker, Polygon } from 'react-leaflet';
 import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
 import StationPopup from '../StationPopup';
+import StationTooltip from '../StationTooltip';
 
 import logger from '../../../logger';
 
@@ -20,6 +21,42 @@ logger.configure({ active: true });
 const timer = getTimer("StationMarker timing");
 
 
+// This user hook implements lazy marker popup generation.
+// Returns an object `{ markerRef, addPopup, popup }`:
+//  `markerRef`: React ref to be attached to marker.
+//  `addPopup`: Callback to be attached to event (usually click) on marker that
+//    triggers popup. Creates the popup (once; effectively memoized).
+//  `popup`: Lazily created popup to be rendered inside marker. Value `null`
+//    until `addPopup` called; value is the popup thereafter.
+const useLazyPopup = ({ station, allNetworks, allVariables }) => {
+  const markerRef = useRef();
+  const [popup, setPopup] = useState(null);
+
+  // Callback: create popup if not already created.
+  const addPopup = () => {
+    if (popup === null) {
+      setPopup(
+        <StationPopup
+          station={station}
+          allNetworks={allNetworks}
+          allVariables={allVariables}
+        />
+      );
+    }
+  };
+
+  // Open popup on initial creation.
+  useEffect(() => {
+    const element = markerRef?.current?.leafletElement;
+    if (element) {
+      element.openPopup();
+    }
+  }, [popup]);
+
+  return { markerRef, popup, addPopup };
+};
+
+
 const LocationMarker = ({
   station,
   location,
@@ -28,38 +65,22 @@ const LocationMarker = ({
   allVariables,
   markerOptions,
 }) => {
-  const [popup, setPopup] = useState(null);
-  const popupRef = useRef();
-  const popupInWaiting = (
-    <StationPopup
-      station={station}
-      allNetworks={allNetworks}
-      allVariables={allVariables}
-      ref={popupRef}
-    />
-  );
-
-  const addPopup = () => {
-    if (popup === null) {
-      console.log("Adding popup")
-      setPopup(popupInWaiting);
-    }
-  };
-
-  useEffect(() => {
-    console.log("popup effect", popupRef)
-    const _ = popupRef?.current?.leafletElement.openPopup();
-  }, [popup]);
+  const { markerRef, popup, addPopup } =
+    useLazyPopup({ station, allNetworks, allVariables });
 
   return (
     <CircleMarker
+      ref={markerRef}
       key={location.id}
       center={location}
       {...markerOptions}
       color={color}
       onClick={addPopup}
     >
-      {/*{stationTooltip}*/}
+      <StationTooltip
+        station={station}
+        allNetworks={allNetworks}
+      />
       {popup}
     </CircleMarker>
   );
@@ -67,21 +88,32 @@ const LocationMarker = ({
 
 
 const MultiLocationMarker = ({
+  station,
   locations,
   color,
   polygonOptions,
+  allNetworks,
+  allVariables,
 }) => {
+  const { markerRef, popup, addPopup } =
+    useLazyPopup({ station, allNetworks, allVariables });
+
   if (locations.length <= 1) {
     return null;
   }
   return (
     <Polygon
+      ref={markerRef}
       {...polygonOptions}
       color={color}
       positions={locations}
+      onClick={addPopup}
     >
-      {/*{stationTooltip}*/}
-      {/*{popup}*/}
+      <StationTooltip
+        station={station}
+        allNetworks={allNetworks}
+      />
+      {popup}
     </Polygon>
   );
 };
@@ -102,14 +134,6 @@ const StationMarkers = timer.timeThis("StationMarker")(({
     color: "green",
   },
 }) => {
-  // TODO: Construct and use popup (and possibly tooltip) lazily
-  // const stationTooltip = (
-  //   <StationTooltip
-  //     station={station}
-  //     allNetworks={allNetworks}
-  //   />
-  // );
-
   const network = stationNetwork(allNetworks, station);
   const locationColor = network?.color;
   const polygonColor =
@@ -138,9 +162,12 @@ const StationMarkers = timer.timeThis("StationMarker")(({
         )
       }
       <MultiLocationMarker
+        station={station}
         locations={uniqLatLngs}
         color={polygonColor}
         polygonOptions={polygonOptions}
+        allNetworks={allNetworks}
+        allVariables={allVariables}
       />
     </React.Fragment>
   );
@@ -154,32 +181,5 @@ StationMarkers.propTypes = {
   markerOptions: PropTypes.object,
   polygonOptions: PropTypes.object,
 };
-
-// StationMarkers.defaultProps = {
-//   markerOptions: {
-//     radius: 4,
-//     weight: 1,
-//     fillOpacity: 0.75,
-//     color: '#000000',
-//   },
-//   polygonOptions: {
-//     color: "green",
-//   },
-// };
-
-
-// const StationMarkers = ({
-//   stations, ...rest
-// }) => {
-//   const r = (
-//     map(
-//       station => (
-//         <StationMarker station={station} {...rest}/>
-//       ),
-//       stations || noStations
-//     )
-//   );
-//   return r;
-// }
 
 export default StationMarkers;
