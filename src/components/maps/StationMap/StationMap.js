@@ -1,6 +1,6 @@
 // This component displays a map with a station marker for each station.
 //
-// Notes on geometry layer group:
+// Notes on user shape feature group:
 //
 //  Terminology
 //
@@ -10,189 +10,150 @@
 //
 //  Purpose
 //
-//  - The purpose of the geometry layer group is to allow the user to define
+//  - The purpose of the user shape feature group is to allow the user to define
 //    a spatial area of interest. This area drives the spatial data averaging
 //    performed by various other data display tools (graphs, tables).
 //
 //  Behaviour
 //
-//  - The geometry layer group is initially empty. Geometry can be added to
+//  - The user shape feature group is initially empty. Geometry can be added to
 //    it by any combination of drawing (on the map) and editing and/or
 //    deleting existing geometry.
 //
+//  - Previous versions of this component had some unused infrastructure for
+//    the user to upload a selection shape. That has all been removed, giving a
+//    major simplification and significant speed up of this component.
+//    The previous implementation of user upload caused double-renders of
+//    the map, which is slow. To add such a feature again, it would be best to
+//    renovate the component `LayerControlledFeatureGroup` to *add* its layers
+//    to the internally existing ones in the layer group, rather than to do a
+//    fully controlled component style implementation, which causes double
+//    updates.
+//
 //  `onSetArea` callback
 //
-//  - All changes (add, edit) to the contents of the geometry layer group are
-//    communicated by the `DataMap` callback prop `onSetArea`. This callback
-//    is more or less the whole point of the geometry layer group.
+//  - All changes (add, edit) to the contents of the user shape feature group
+//    are communicated by the `DataMap` callback prop `onSetArea`. This callback
+//    is more or less the whole point of the user shape feature group.
 //
 //  - `onSetArea` is called with a single GeoJSON object representing the
 //    contents of the layer group.
 
 
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
-import without from 'lodash/fp/without';
+import React, { useEffect, useRef } from 'react';
 
-import { LayerGroup } from 'react-leaflet';
+import { FeatureGroup, LayerGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
+import L from 'leaflet';
+
 import StationMarkers from '../StationMarkers';
-import LayerControlledFeatureGroup from '../LayerControlledFeatureGroup';
-import { geoJSONToLeafletLayers, layersToGeoJSONMultipolygon }
-  from '../../../utils/geoJSON-leaflet';
+import { layersToGeoJSONMultipolygon } from '../../../utils/geoJSON-leaflet';
 
 import logger from '../../../logger';
 
 import './StationMap.css';
 import { getTimer } from '../../../utils/timing';
+import map from 'lodash/fp/map';
 
 logger.configure({ active: true });
 const smtimer = getTimer("StationMarker timing")
 smtimer.log();
 
-export default class StationMap extends Component {
-  static propTypes = {
-    BaseMap: PropTypes.object.isRequired,
-    initialViewport: PropTypes.object.isRequired,
-    stations: PropTypes.array.isRequired,
-    allNetworks: PropTypes.array.isRequired,
-    allVariables: PropTypes.array.isRequired,
-    onSetArea: PropTypes.func.isRequired,
+function StationMap({
+  BaseMap,
+  initialViewport,
+  stations,
+  allNetworks,
+  allVariables,
+  onSetArea,
+  userShapeStyle = {
+    color: "#f49853",
+    weight: 1,
+  },
+}) {
+  const userShapeLayerRef = useRef();
+
+  // const [geometryLayers, setGeometryLayers] = useState([]);
+
+  // Set up drawing tool. This might be better done elsewhere.
+  useEffect(() => {
+    // console.log("### L.drawLocal.draw", L.drawLocal.draw)
+    L.drawLocal.edit.toolbar.buttons = {
+      edit: "Edit shapes",
+      editDisabled: "No shapes to edit",
+      remove: "Remove shapes",
+      removeDisabled: "No shapes to remove",
+    };
+    L.drawLocal.edit.handlers.remove.tooltip = "Click shape to remove";
+    L.drawLocal.edit.toolbar.actions.clearAll = {
+      title: "Remove all shapes",
+      text: "Remove all",
+    };
+    console.log("### L.drawLocal", L.drawLocal)
+  }, []);
+
+  const handleChangedGeometryLayers = () => {
+    const layers = userShapeLayerRef?.current?.leafletElement?.getLayers();
+    onSetArea(layers && layersToGeoJSONMultipolygon(layers));
   };
 
-  state = {
-    geometryLayers: [],
-  };
+  smtimer.log();
+  smtimer.resetAll();
 
-// Handlers for area selection. Converts area to GeoJSON.
+  // alert("StationMap render")
 
-  layersToArea = (layers) => {
-    //convert one or more geometry layer to a geoJSON Multipolygon
-    return layers && layersToGeoJSONMultipolygon(layers);
-  };
-
-  onSetArea = () => {
-    this.props.onSetArea(this.layersToArea(this.state.geometryLayers));
-  };
-
-  layerStyle = (index) => index > 0 ?
-    this.props.inactiveGeometryStyle :
-    this.props.activeGeometryStyle;
-
-  addGeometryLayer = layer => {
-    this.setState(prevState => {
-      // Set layer visual style.
-      layer.setStyle(this.layerStyle(prevState.geometryLayers.length));
-      // Make layer non-interactive so it doesn't block clicks on station
-      // markers.
-      layer.setStyle({ interactive: false });
-      return { geometryLayers: prevState.geometryLayers.concat([layer]) };
-    }, this.onSetArea);
-  };
-
-  addGeometryLayers = layers => {
-    for (const layer of layers) {
-      this.addGeometryLayer(layer);
-    }
-  };
-
-  editGeometryLayers = layers => {
-    // May not need to do anything to maintain `state.geometryLayers` here.
-    // The contents of the layers are changed, but the layers themselves
-    // (as identities) are not changed in number or identity.
-    // `geometryLayers` is a list of such identities, so doesn't need to change.
-    // Only need to communicate change via onSetArea.
-    // Maybe not; maybe better to create a new copy of geometryLayers. Hmmm.
-    this.onSetArea();
-  };
-
-  deleteGeometryLayers = layers => {
-    this.setState(prevState => {
-      const geometryLayers = without(layers, prevState.geometryLayers);
-      // geometryLayers.forEach((layer, i) => layer.setStyle(this.layerStyle(i)));
-      return { geometryLayers };
-    }, this.onSetArea);
-  };
-
-  eventLayers = e => {
-    // Extract the Leaflet layers from an editing event, returning them
-    // as an array of layers.
-    // Note: `e.layers` is a special class, not an array of layers, so we
-    // have to go through this rigmarole to get the layers.
-    // The alternative of accessing the private property `e.layers._layers`
-    // (a) is naughty, and (b) fails.
-    let layers = [];
-    e.layers.eachLayer(layer => layers.push(layer));
-    return layers;
-  };
-
-  handleAreaCreated = e => this.addGeometryLayer(e.layer);
-  handleAreaEdited = e => this.editGeometryLayers(this.eventLayers(e));
-  handleAreaDeleted = e => this.deleteGeometryLayers(this.eventLayers(e));
-
-  // NOTE: This handler is not used ... yet. But all the infrastructure is
-  // in place for it should it be wanted.
-  handleUploadArea = (geoJSON) => {
-    this.addGeometryLayers(geoJSONToLeafletLayers(geoJSON));
-  };
-
-  // Handler for base map selector
-  handleChangeBaseMap = BaseMap => {
-    console.log("Change base map to", BaseMap)
-    this.setState({ BaseMap });
-  };
-
-  render() {
-    const {
-      BaseMap,
-      initialViewport,
-      stations,
-      // selectedStations,
-      allNetworks,
-      allVariables
-    } = this.props;
-    const { geometryLayers } = this.state;
-    const allowGeometryDraw = true || geometryLayers.length === 0;
-    smtimer.log();
-    smtimer.resetAll();
-
-    // alert("StationMap render")
-
-    return (
-      <BaseMap viewport={initialViewport} preferCanvas={true}>
-        <LayerControlledFeatureGroup
-          layers={geometryLayers}
-        >
-          <EditControl
-            position={'topleft'}
-            draw={{
-              marker: false,
-              circlemarker: false,
-              circle: false,
-              polyline: false,
-              polygon: allowGeometryDraw && {
-                showArea: false,
-                showLength: false,
-              },
-              rectangle: allowGeometryDraw && {
-                showArea: false,
-                showLength: false,
-              },
-            }}
-            onCreated={this.handleAreaCreated}
-            onEdited={this.handleAreaEdited}
-            onDeleted={this.handleAreaDeleted}
-          />
-        </LayerControlledFeatureGroup>
-        <LayerGroup>
-          <StationMarkers
-            stations={stations}
-            allNetworks={allNetworks}
-            allVariables={allVariables}
-          />
-        </LayerGroup>
-      </BaseMap>
-    );
-  }
+  return (
+    <BaseMap viewport={initialViewport} preferCanvas={true}>
+      <FeatureGroup ref={userShapeLayerRef}>
+        <EditControl
+          position={'topleft'}
+          draw={{
+            marker: false,
+            circlemarker: false,
+            circle: false,
+            polyline: false,
+            polygon: {
+              showArea: false,
+              showLength: false,
+              shapeOptions: userShapeStyle,
+            },
+            rectangle: {
+              showArea: false,
+              showLength: false,
+              shapeOptions: userShapeStyle,
+            },
+          }}
+          onCreated={handleChangedGeometryLayers}
+          onEdited={handleChangedGeometryLayers}
+          onDeleted={handleChangedGeometryLayers}
+        />
+      </FeatureGroup>
+      <LayerGroup>
+        {
+          map(
+            station => (
+              <StationMarkers
+                station={station}
+                allNetworks={allNetworks}
+                allVariables={allVariables}
+              />
+            ),
+            stations
+          )
+        }
+      </LayerGroup>
+    </BaseMap>
+  );
 }
 
+StationMap.propTypes = {
+  BaseMap: PropTypes.object.isRequired,
+  initialViewport: PropTypes.object.isRequired,
+  stations: PropTypes.array.isRequired,
+  allNetworks: PropTypes.array.isRequired,
+  allVariables: PropTypes.array.isRequired,
+  onSetArea: PropTypes.func.isRequired,
+};
+
+export default StationMap;

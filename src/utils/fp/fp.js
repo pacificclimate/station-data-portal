@@ -1,6 +1,7 @@
 import reduce from 'lodash/fp/reduce';
 import assign from 'lodash/fp/assign';
 import map from 'lodash/fp/map';
+import forEach from 'lodash/fp/forEach';
 import mapValues from 'lodash/fp/mapValues';
 import toPairs from 'lodash/fp/toPairs';
 import flow from 'lodash/fp/flow';
@@ -16,6 +17,9 @@ export const composeWithRestArgs = curry(
   (f, g) =>
     (first, ...rest) => f(g(first, ...rest), ...rest)
 );
+
+
+export const forEachWithKey = forEach.convert({ cap: false });
 
 
 // Group a list by accumulating all items that match on `by` into a single
