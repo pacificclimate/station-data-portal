@@ -93,34 +93,11 @@ function StationMap({
     console.log("### L.drawLocal", L.drawLocal)
   }, []);
 
-  const handleChangedGeometryLayers = layers => {
+  const handleChangedGeometryLayers = () => {
+    const layers = userShapeLayerRef?.current?.leafletElement?.getLayers();
     onSetArea(layers && layersToGeoJSONMultipolygon(layers));
   };
 
-  const eventLayers = e => {
-    // Extract the Leaflet layers from an editing event, returning them
-    // as an array of layers.
-    // Note: `e.layers` is a special class, not an array of layers, so we
-    // have to go through this rigmarole to get the layers.
-    // The alternative of accessing the private property `e.layers._layers`
-    // (a) is naughty, and (b) fails.
-    let layers = [];
-    e.layers.eachLayer(layer => layers.push(layer));
-    return layers;
-  };
-
-  const handleAreaCreated = e => {
-    handleChangedGeometryLayers([e.layer]);
-  };
-  const handleAreaEdited = e => {
-    handleChangedGeometryLayers(eventLayers(e));
-  };
-  const handleAreaDeleted = () => {
-    handleChangedGeometryLayers([]);
-  };
-
-  const allowDraw =
-    (userShapeLayerRef?.current?.leafletElement.getLayers()?.length ?? 0) === 0;
   smtimer.log();
   smtimer.resetAll();
 
@@ -136,20 +113,20 @@ function StationMap({
             circlemarker: false,
             circle: false,
             polyline: false,
-            polygon: allowDraw && {
+            polygon: {
               showArea: false,
               showLength: false,
               shapeOptions: userShapeStyle,
             },
-            rectangle: allowDraw && {
+            rectangle: {
               showArea: false,
               showLength: false,
               shapeOptions: userShapeStyle,
             },
           }}
-          onCreated={handleAreaCreated}
-          onEdited={handleAreaEdited}
-          onDeleted={handleAreaDeleted}
+          onCreated={handleChangedGeometryLayers}
+          onEdited={handleChangedGeometryLayers}
+          onDeleted={handleChangedGeometryLayers}
         />
       </FeatureGroup>
       <LayerGroup>
