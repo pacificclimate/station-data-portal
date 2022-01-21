@@ -4,6 +4,9 @@ import StationMarkers from '../StationMarkers';
 
 it('renders without crashing', () => {
     const div = document.createElement('div');
-    ReactDOM.render(<StationMarkers/>, div);
+    ReactDOM.render(
+      <StationMarkers/>,
+      div
+    );
 });
 
