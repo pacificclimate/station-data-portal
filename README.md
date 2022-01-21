@@ -9,7 +9,7 @@ data from a
 - [Requirements](docs/requirements.md)
 - [Installation](docs/installation.md)
 - [Configuration](docs/configuration.md)
-- [Development](docs/development.md)
+- [Development and testing](docs/development.md)
 - [Production](docs/production.md)
 - [Project initialization](docs/Project-initialization.md)
 

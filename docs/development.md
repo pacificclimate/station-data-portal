@@ -1,4 +1,4 @@
-# Development
+# Development and testing
 
 ## Run app locally
 
@@ -19,7 +19,17 @@ For more details, see the
 
 For building and running a production app, see below.
 
-## Run tests locally
+## Testing
+
+Testing (unit) is sparse in this project. I'm still debating how much effort
+it is worth putting into tests of React components in a non-library/package
+project, but in this case the answer has come down to: very little. As always
+test setup is very effortful, and I don't see the payoff here.
+
+That said, there are some unit tests scattered throughout the code. The most
+useful and important ones are those in `src/data-services` and `src/utils`.
+
+### Run tests locally
 
 ```bash
 npm test
@@ -27,7 +37,7 @@ npm test
 
 Tests are also automatically run by a GitHub action on each commit.
 
-## Test Docker infrastructure
+### Test Docker infrastructure
 
 It can be useful to test the Docker infrastructure locally before
 deployment on a server. To do so:
