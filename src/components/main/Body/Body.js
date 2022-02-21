@@ -69,7 +69,7 @@ const commonSelectorStyles = {
 const defaultLgs = [7, 5];
 
 
-class Portal extends Component {
+class Body extends Component {
   state = {
     startDate: null,
     endDate: null,
@@ -179,7 +179,7 @@ class Portal extends Component {
   }
 
   render() {
-    console.log("### VersionA render", this.state)
+    console.log("### Body render", this.state)
     const filteredStations = this.stationFilter(
       this.state.startDate,
       this.state.endDate,
@@ -359,4 +359,4 @@ class Portal extends Component {
   }
 }
 
-export default Portal;
+export default Body;
