@@ -135,7 +135,7 @@ class Body extends Component {
       .then(response => this.setState({ allNetworks: response.data }));
     getVariables()
       .then(response => this.setState({ allVariables: response.data }));
-    getStations()
+    getStations({ compact: true })
     .then(response => this.setState({ allStations: response.data }));
   }
 
