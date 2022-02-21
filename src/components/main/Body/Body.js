@@ -74,18 +74,15 @@ class Body extends Component {
     startDate: null,
     endDate: null,
 
-    // TODO: Rename things here to make obvious the distinction between
-    //  things (e.g., networks) proper, from the backend API, and selector
-    //  options derived from them.
     allNetworks: null,
-    selectedNetworks: [],
+    selectedNetworksOptions: [],
     networkActions: null,
 
     allVariables: null,
-    selectedVariables: [],
+    selectedVariablesOptions: [],
     variableActions: null,
 
-    selectedFrequencies: [],
+    selectedFrequenciesOptions: [],
     frequencyActions: null,
 
     onlyWithClimatology: false,
@@ -105,13 +102,13 @@ class Body extends Component {
   handleChangeStartDate = this.handleChange.bind(this, 'startDate');
   handleChangeEndDate = this.handleChange.bind(this, 'endDate');
 
-  handleChangeNetwork = this.handleChange.bind(this, 'selectedNetworks');
+  handleChangeNetwork = this.handleChange.bind(this, 'selectedNetworksOptions');
   handleNetworkSelectorReady = this.handleChange.bind(this, 'networkActions');
 
-  handleChangeVariable = this.handleChange.bind(this, 'selectedVariables');
+  handleChangeVariable = this.handleChange.bind(this, 'selectedVariablesOptions');
   handleVariableSelectorReady = this.handleChange.bind(this, 'variableActions');
 
-  handleChangeFrequency = this.handleChange.bind(this, 'selectedFrequencies');
+  handleChangeFrequency = this.handleChange.bind(this, 'selectedFrequenciesOptions');
   handleFrequencySelectorReady = this.handleChange.bind(this, 'frequencyActions');
 
   handleClickAll = () => {
@@ -160,9 +157,9 @@ class Body extends Component {
     return dataDownloadTarget({
       startDate: this.state.startDate,
       endDate: this.state.endDate,
-      networks: this.state.selectedNetworks,
-      variables: this.state.selectedVariables,
-      frequencies: this.state.selectedFrequencies,
+      selectedNetworksOptions: this.state.selectedNetworksOptions,
+      selectedVariablesOptions: this.state.selectedVariablesOptions,
+      selectedFrequenciesOptions: this.state.selectedFrequenciesOptions,
       polygon: this.state.area,
       onlyWithClimatology: this.state.onlyWithClimatology,
       allNetworks: this.state.networkActions.getAllOptions(),
@@ -183,9 +180,9 @@ class Body extends Component {
     const filteredStations = this.stationFilter(
       this.state.startDate,
       this.state.endDate,
-      this.state.selectedNetworks,
-      this.state.selectedVariables,
-      this.state.selectedFrequencies,
+      this.state.selectedNetworksOptions,
+      this.state.selectedVariablesOptions,
+      this.state.selectedFrequenciesOptions,
       this.state.onlyWithClimatology,
       this.state.area,
       this.state.allNetworks,
@@ -199,15 +196,15 @@ class Body extends Component {
     const selections = [
       {
         name: 'networks',
-        items: this.state.selectedNetworks,
+        items: this.state.selectedNetworksOptions,
       },
       {
         name: 'variables',
-        items: this.state.selectedVariables,
+        items: this.state.selectedVariablesOptions,
       },
       {
         name: 'frequencies',
-        items: this.state.selectedFrequencies,
+        items: this.state.selectedFrequenciesOptions,
       },
     ];
 
@@ -275,13 +272,13 @@ class Body extends Component {
                           <NetworkSelector
                             allNetworks={this.state.allNetworks}
                             onReady={this.handleNetworkSelectorReady}
-                            value={this.state.selectedNetworks}
+                            value={this.state.selectedNetworksOptions}
                             onChange={this.handleChangeNetwork}
                             isSearchable
                             isClearable={false}
                             styles={commonSelectorStyles}
                           />
-                          {/*<JSONstringify object={this.state.selectedNetworks}/>*/}
+                          {/*<JSONstringify object={this.state.selectedNetworksOptions}/>*/}
                         </Col>
                       </Row>
                       <Row>
@@ -289,13 +286,13 @@ class Body extends Component {
                           <VariableSelector
                             allVariables={this.state.allVariables}
                             onReady={this.handleVariableSelectorReady}
-                            value={this.state.selectedVariables}
+                            value={this.state.selectedVariablesOptions}
                             onChange={this.handleChangeVariable}
                             isSearchable
                             isClearable={false}
                             styles={commonSelectorStyles}
                           />
-                          {/*<JSONstringify object={this.state.selectedVariables}/>*/}
+                          {/*<JSONstringify object={this.state.selectedVariablesOptions}/>*/}
                         </Col>
                       </Row>
                       <Row>
@@ -303,12 +300,12 @@ class Body extends Component {
                           <FrequencySelector
                             allStations={this.state.allStations}
                             onReady={this.handleFrequencySelectorReady}
-                            value={this.state.selectedFrequencies}
+                            value={this.state.selectedFrequenciesOptions}
                             onChange={this.handleChangeFrequency}
                             isClearable={false}
                             styles={commonSelectorStyles}
                           />
-                          {/*<JSONstringify object={this.state.selectedFrequencies}/>*/}
+                          {/*<JSONstringify object={this.state.selectedFrequenciesOptions}/>*/}
                         </Col>
                       </Row>
                     </Tab>
