@@ -93,9 +93,19 @@ export const frequencyOptions2pdpFormat = (options, allOptions) => flow(
 
 export const dataDownloadTarget =
   ({
-    startDate, endDate, networks, variables, frequencies, polygon,
-    clipToDate, onlyWithClimatology, dataCategory, dataFormat,
-    allNetworks = [], allVariables = [], allFrequencies = [],
+    startDate,
+    endDate,
+    selectedNetworksOptions,
+    selectedVariablesOptions,
+    selectedFrequenciesOptions,
+    polygon,
+    clipToDate,
+    onlyWithClimatology,
+    dataCategory,
+    dataFormat,
+    allNetworksOptions = [],
+    allVariablesOptions = [],
+    allFrequenciesOptions = [],
   }) =>
   makeURI(
     `${process.env.REACT_APP_PDP_DATA_URL}/pcds/agg/`,
@@ -103,9 +113,15 @@ export const dataDownloadTarget =
       {
         'from-date': date2pdpFormat(startDate),
         'to-date': date2pdpFormat(endDate),
-        'network-name': networkSelectorOptions2pdpFormat(networks, allNetworks),
-        'input-vars': variableSelectorOptions2pdpFormat(variables, allVariables),
-        'input-freq': frequencyOptions2pdpFormat(frequencies, allFrequencies),
+        'network-name': networkSelectorOptions2pdpFormat(
+          selectedNetworksOptions, allNetworksOptions
+        ),
+        'input-vars': variableSelectorOptions2pdpFormat(
+          selectedVariablesOptions, allVariablesOptions
+        ),
+        'input-freq': frequencyOptions2pdpFormat(
+          selectedFrequenciesOptions, allFrequenciesOptions
+        ),
         'input-polygon': geoJSON2WKT(polygon),
         'only-with-climatology': onlyWithClimatology ? 'only-with-climatology' : '',
         [`download-${dataCategory}`]: capitalize(dataCategory),
