@@ -20,6 +20,7 @@ import map from 'lodash/fp/map';
 import tap from 'lodash/fp/tap';
 import sortBy from 'lodash/fp/sortBy';
 import uniqBy from 'lodash/fp/uniqBy';
+import InfoPopup from '../../util/InfoPopup';
 
 import css from '../common.module.css';
 
@@ -94,7 +95,20 @@ class FrequencySelector extends Component {
   render() {
     return (
       <FormGroup>
-        <div><ControlLabel>Observation Frequency</ControlLabel></div>
+        <div>
+          <ControlLabel>Observation Frequency</ControlLabel>
+          {' '}
+          <InfoPopup title={"Observation Frequency multiselector"}>
+            <ul className={"compact"}>
+              <li>At startup, all frequencies are selected.</li>
+              <li>Use the None button to clear all frequencies from the selector.</li>
+              <li>Use the All button to add all available frequencies to the selector.</li>
+              <li>Click the dropdown and select an item to add a single
+                unselected frequency.</li>
+              <li>Click the X next to a selected frequency to remove it.</li>
+            </ul>
+          </InfoPopup>
+        </div>
         <ButtonToolbar className={css.selectorButtons}>
           <Button bsSize={'xsmall'} onClick={this.handleClickAll}>All</Button>
           <Button bsSize={'xsmall'} onClick={this.handleClickNone}>None</Button>

@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { ControlLabel, FormGroup } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import { range } from 'lodash';
+import InfoPopup from '../../util/InfoPopup';
 
 import logger from '../../../logger';
 
@@ -45,7 +46,15 @@ class DateSelector extends Component {
     const { value, onChange, label, ...restProps } = this.props;
     return (
       <FormGroup>
-        <ControlLabel>{label}</ControlLabel>{' '}
+        <ControlLabel>{label}</ControlLabel>
+        {' '}
+        <InfoPopup title={label}>
+          Only stations matching Start Date and End Date are selected.
+          A station matches if the date of any observation for a station
+          falls within the specified Start and End dates.
+          An empty Start or End date matches any observation date.
+        </InfoPopup>
+        {' '}
         <DatePicker
           selected={value}
           onChange={onChange}
