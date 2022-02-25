@@ -110,15 +110,13 @@ export const stationReportsAnyFreqs = ft.timeThis("stationReportsAnyFreqs")(
 );
 
 
-export const stationReportsClimatologyVariable = ft.timeThis("stationReportsClimatologyVariable")((station, variables) => {
-  return flow(
-    // Select variables that station reports
-    filter(({ uri }) => contains(uri, stationVariableUris(station))),
-    // Test that some reported variable is a climatology -- criterion from
-    // PDP PCDS backend
-    some(({ cell_method }) => /(within|over)/.test(cell_method))
-  )(variables);
-});
+export const stationReportsClimatologyVariable = ft.timeThis("stationReportsClimatologyVariable")(
+  (station, climatologyVariableUris) => {
+    // return stationVariableUris intersect climatologyVariableUris not empty
+    const sVUs = stationVariableUris(station);
+    return some(sVU => contains(sVU, climatologyVariableUris))(sVUs);
+  }
+);
 
 
 // Checker for station inside polygon. Slightly optimized.
@@ -180,6 +178,13 @@ export const stationFilter = (
   const selectedFrequencyValues =
     map(option => option.value)(selectedFrequencies);
 
+  const climatologyVariableUris = ft.timeThis("climatologyVariableUris")(
+    flow(
+      filter(({ cell_method }) => /(within|over)/.test(cell_method)),
+      map("uri"),
+    )
+  )(allVariables);
+
   const r = filter(station => (
         stationMatchesDates(station, startDate, endDate, false)
         && stationInAnyNetwork(station, selectedNetworks)
@@ -187,7 +192,7 @@ export const stationFilter = (
         && stationReportsAnyFreqs(station, selectedFrequencyValues)
         && (
           !onlyWithClimatology ||
-          stationReportsClimatologyVariable(station, allVariables)
+          stationReportsClimatologyVariable(station, climatologyVariableUris)
         )
       )
     )(allStations);
