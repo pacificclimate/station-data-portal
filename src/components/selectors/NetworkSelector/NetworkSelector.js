@@ -4,7 +4,7 @@ import {
   Button,
   ButtonToolbar,
   ControlLabel,
-  FormGroup
+  FormGroup,
 } from 'react-bootstrap';
 import Select from 'react-select';
 import memoize from 'memoize-one';
@@ -23,6 +23,7 @@ import chroma from 'chroma-js';
 import logger from '../../../logger';
 import { defaultValue } from '../common';
 import LocalPropTypes from '../../local-prop-types';
+import InfoPopup from '../../util/InfoPopup';
 
 import css from '../common.module.css';
 
@@ -124,7 +125,20 @@ class NetworkSelector extends Component {
 
     return (
       <FormGroup>
-        <div><ControlLabel>Network</ControlLabel></div>
+        <div>
+          <ControlLabel>Network</ControlLabel>
+          {' '}
+          <InfoPopup title={"Network multiselector"}>
+            <ul className={"compact"}>
+              <li>At startup, all networks are selected.</li>
+              <li>Use the None button to clear all networks from the selector.</li>
+              <li>Use the All button to add all available networks to the selector.</li>
+              <li>Click the dropdown and select an item to add a single
+                unselected network.</li>
+              <li>Click the X next to a selected network to remove it.</li>
+            </ul>
+          </InfoPopup>
+        </div>
         <ButtonToolbar className={css.selectorButtons}>
           <Button bsSize={'xsmall'} onClick={this.handleClickAll}>All</Button>
           <Button bsSize={'xsmall'} onClick={this.handleClickNone}>None</Button>

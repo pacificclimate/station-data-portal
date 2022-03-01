@@ -13,6 +13,7 @@ import flow from 'lodash/fp/flow';
 import tap from 'lodash/fp/tap';
 import { groupByGeneral } from '../../../utils/fp';
 import { defaultValue } from '../common';
+import InfoPopup from '../../util/InfoPopup';
 
 import logger from '../../../logger';
 
@@ -188,7 +189,22 @@ class VariableSelector extends Component {
     const options = this.getOptions();
     return (
       <FormGroup>
-        <div><ControlLabel>Variable</ControlLabel></div>
+        <div>
+          <ControlLabel>Variable</ControlLabel>
+          {' '}
+          <InfoPopup title={"Variable multiselector"}>
+            <ul className={"compact"}>
+              <li>At startup, all variables are selected.</li>
+              <li>Use the None button to clear all variables from the selector.</li>
+              <li>Use the All button to add all available variables to the selector.</li>
+              <li>Use the All <i>Category</i> button to select all (and only)
+                variables of a given category to the selector.</li>
+              <li>Click the dropdown and select an item to add a single
+                unselected variable.</li>
+              <li>Click the X next to a selected variable to remove it.</li>
+            </ul>
+          </InfoPopup>
+        </div>
         <ButtonToolbar className={css.selectorButtons}>
           <Button bsSize={'xsmall'} onClick={this.handleClickAll}>All</Button>
           {

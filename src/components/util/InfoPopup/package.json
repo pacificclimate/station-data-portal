@@ -1,0 +1,6 @@
+{
+  "name": "InfoPopup",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./InfoPopup.js"
+}
