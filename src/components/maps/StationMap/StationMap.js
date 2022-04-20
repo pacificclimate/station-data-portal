@@ -137,6 +137,7 @@ function StationMap({
                 station={station}
                 allNetworks={allNetworks}
                 allVariables={allVariables}
+                key={station.id}
               />
             ),
             stations

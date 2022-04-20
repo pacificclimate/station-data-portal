@@ -156,6 +156,7 @@ const StationMarkers = timer.timeThis("StationMarker")(({
               allNetworks={allNetworks}
               allVariables={allVariables}
               markerOptions={markerOptions}
+              key={location.id}
             />
           ),
           uniqLatLngs

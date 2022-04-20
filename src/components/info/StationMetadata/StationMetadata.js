@@ -78,7 +78,7 @@ function StationMetadata({
       sortMethod: lexCompare,
       Cell: row => (
         <ul className={"compact"}>
-          {map(name => (<li>{name}</li>), row.value)}
+          {map(name => (<li key={name}>{name}</li>), row.value)}
         </ul>
       ),
     },
@@ -92,11 +92,12 @@ function StationMetadata({
       Cell: row => (
         <ul className={"compact"}>
           {
-              map(loc => (
-                <li>
-                  {-loc.lon} W <br/>
-                  {loc.lat} N <br/>
-                  Elev. {loc.elevation} m
+              map(location => (
+                // A location is a representative history item
+                <li key={location.id}>
+                  {-location.lon} W <br/>
+                  {location.lat} N <br/>
+                  Elev. {location.elevation} m
                 </li>
               ), row.value)
           }
@@ -114,7 +115,8 @@ function StationMetadata({
         <ul className={"compact"}>
           {
               map(period => (
-                <li>
+                // A period is a representative history item
+                <li key={period.id}>
                   {formatDate(period.min_obs_time)} to <br/>
                   {formatDate(period.max_obs_time)}
                 </li>
@@ -132,7 +134,7 @@ function StationMetadata({
       sortMethod: lexCompare,
       Cell: row => (
         <ul className={"compact"}>
-          {map(freq => (<li>{freq}</li>), row.value)}
+          {map(freq => (<li key={freq}>{freq}</li>), row.value)}
         </ul>
       ),
     },
@@ -145,7 +147,7 @@ function StationMetadata({
       sortable: false,
       Cell: row => (
         <ul className={"compact"}>
-          {map(name => (<li>{name}</li>), row.value)}
+          {map(name => (<li key={name}>{name}</li>), row.value)}
         </ul>
       ),
     },
