@@ -41,8 +41,8 @@ export default class NetworksMetadata extends Component {
           <div style={{
             width: "1em",
             height: "1em",
-            "border-radius": "0.5em",
-            "background-color": chroma(
+            borderRadius: "0.5em",
+            backgroundColor: chroma(
               network.color ?? defaultNetworkColor
             ).css(),
           }}>&nbsp;</div>
