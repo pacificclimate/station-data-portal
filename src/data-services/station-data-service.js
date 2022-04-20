@@ -55,6 +55,11 @@ export function getVariables() {
 }
 
 
+export function getFrequencies() {
+  return axios.get(urljoin(SDS_URL, 'frequencies'));
+}
+
+
 export function getHistories() {
   return axios.get(urljoin(SDS_URL, 'histories'));
 }
