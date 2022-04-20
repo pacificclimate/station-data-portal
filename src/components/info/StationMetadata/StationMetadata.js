@@ -179,8 +179,8 @@ function StationMetadata({
 
 StationMetadata.propTypes = {
   stations: PropTypes.array,
-  allNetworks: PropTypes.array.isRequired,
-  allVariables: PropTypes.array.isRequired,
+  allNetworks: PropTypes.array,
+  allVariables: PropTypes.array,
 };
 
 export default StationMetadata;

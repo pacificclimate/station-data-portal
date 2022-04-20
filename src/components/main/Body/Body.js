@@ -230,7 +230,11 @@ class Body extends Component {
 
               <Panel style={{ marginLeft: '-15px', marginRight: '-10px' }}>
                 <Panel.Body>
-                  <Tabs defaultActiveKey={'Filters'} className={css.mainTabs}>
+                  <Tabs
+                    id="non-map-controls"
+                    defaultActiveKey={'Filters'}
+                    className={css.mainTabs}
+                  >
                     <Tab eventKey={'Filters'} title={'Station Filters'}>
                       <Row>
                         <Col lg={12} md={12} sm={12}>

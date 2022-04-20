@@ -148,11 +148,11 @@ function StationMap({
 }
 
 StationMap.propTypes = {
-  BaseMap: PropTypes.object.isRequired,
+  BaseMap: PropTypes.func.isRequired,
   initialViewport: PropTypes.object.isRequired,
   stations: PropTypes.array.isRequired,
-  allNetworks: PropTypes.array.isRequired,
-  allVariables: PropTypes.array.isRequired,
+  allNetworks: PropTypes.array,
+  allVariables: PropTypes.array,
   onSetArea: PropTypes.func.isRequired,
 };
 

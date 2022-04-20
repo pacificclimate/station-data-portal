@@ -7,7 +7,6 @@ import React, { Component } from 'react';
 import ReactTable from 'react-table';
 import logger from '../../../logger';
 import chroma from 'chroma-js';
-import getOr from 'lodash/fp/getOr'
 import 'react-table/react-table.css';
 import './NetworksMetadata.css';
 
@@ -17,7 +16,7 @@ logger.configure({ active: true });
 
 export default class NetworksMetadata extends Component {
   static propTypes = {
-    networks: PropTypes.array.isRequired,
+    networks: PropTypes.array,
     defaultNetworkColor: PropTypes.string,
   };
 

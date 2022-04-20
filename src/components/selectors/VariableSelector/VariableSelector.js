@@ -35,9 +35,9 @@ const flattenOptions = flow(
 
 class VariableSelector extends Component {
   static propTypes = {
-    allVariables: PropTypes.array.isRequired,
+    allVariables: PropTypes.array,
     onReady: PropTypes.func.isRequired,
-    value: PropTypes.object.isRequired,
+    value: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
     defaultValueSelector: LocalPropTypes.defaultValueSelector,
   };

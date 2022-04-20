@@ -8,7 +8,6 @@ import {
 } from 'react-bootstrap';
 import Select from 'react-select';
 import memoize from 'memoize-one';
-import find from 'lodash/fp/find';
 import { defaultValue } from '../common';
 import logger from '../../../logger';
 import LocalPropTypes from '../../local-prop-types';
@@ -17,7 +16,6 @@ import flatten from 'lodash/fp/flatten';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
-import tap from 'lodash/fp/tap';
 import sortBy from 'lodash/fp/sortBy';
 import uniqBy from 'lodash/fp/uniqBy';
 import InfoPopup from '../../util/InfoPopup';
@@ -29,9 +27,9 @@ logger.configure({ active: true });
 
 class FrequencySelector extends Component {
   static propTypes = {
-    allStations: PropTypes.array.isRequired,
+    allStations: PropTypes.array,
     onReady: PropTypes.func.isRequired,
-    value: PropTypes.object.isRequired,
+    value: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
     defaultValueSelector: LocalPropTypes.defaultValueSelector,
   };

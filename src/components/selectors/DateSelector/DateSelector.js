@@ -36,10 +36,12 @@ const CalendarContainer = ({ className, children }) => (
 
 class DateSelector extends Component {
   static propTypes = {
-    value: PropTypes.object.isRequired,
+    value: PropTypes.object,
     onChange:PropTypes.func.isRequired,
     label: PropTypes.string,
   };
+
+  // TODO: call back to onChange with new Date value every time.
 
   render() {
     // Custom header adapted from https://github.com/Hacker0x01/react-datepicker/blob/master/docs-site/src/examples/render_custom_header.jsx
