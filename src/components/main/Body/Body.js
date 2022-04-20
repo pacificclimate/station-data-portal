@@ -13,6 +13,7 @@ import css from '../common.module.css';
 import logger from '../../../logger';
 import NetworkSelector from '../../selectors/NetworkSelector';
 import {
+  getFrequencies,
   getNetworks,
   getStations,
   getVariables,
@@ -82,6 +83,7 @@ function Body() {
   const [selectedVariablesOptions, setSelectedVariablesOptions] = useState([]);
   const [variableActions, setVariableActions] = useState(null);
 
+  const [allFrequencies, setAllFrequencies] = useState(null);
   const [selectedFrequenciesOptions, setSelectedFrequenciesOptions] = useState([]);
   const [frequencyActions, setFrequencyActions] = useState(null);
 
@@ -116,6 +118,11 @@ function Body() {
   useEffect(() => {
     console.log("### getVariables start")
     getVariables().then(response => setAllVariables(response.data));
+  }, []);
+
+  useEffect(() => {
+    console.log("### getFrequencies start")
+    getFrequencies().then(response => setAllFrequencies(response.data));
   }, []);
 
   useEffect(() => {
@@ -283,7 +290,7 @@ function Body() {
                     <Row>
                       <Col lg={12} md={12} sm={12}>
                         <FrequencySelector
-                          allStations={allStations}
+                          allFrequencies={allFrequencies}
                           onReady={setFrequencyActions}
                           value={selectedFrequenciesOptions}
                           onChange={setSelectedFrequenciesOptions}

@@ -12,12 +12,10 @@ import { defaultValue } from '../common';
 import logger from '../../../logger';
 import LocalPropTypes from '../../local-prop-types';
 import capitalize from 'lodash/fp/capitalize';
-import flatten from 'lodash/fp/flatten';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 import sortBy from 'lodash/fp/sortBy';
-import uniqBy from 'lodash/fp/uniqBy';
 import InfoPopup from '../../util/InfoPopup';
 
 import css from '../common.module.css';
@@ -26,7 +24,7 @@ logger.configure({ active: true });
 
 
 function FrequencySelector({
-  allStations, onReady, value, onChange, defaultValueSelector
+  allFrequencies, onReady, value, onChange, defaultValueSelector
 }) {
   useEffect(() => {
     onReady({
@@ -38,7 +36,7 @@ function FrequencySelector({
   
   useEffect(() => {
     setDefault();
-  }, [allStations])
+  }, [allFrequencies])
 
   const setDefault = () => {
     onChange(
@@ -46,7 +44,7 @@ function FrequencySelector({
     );
   };
 
-  const getOptions = () => FrequencySelector.makeOptions(allStations);
+  const getOptions = () => FrequencySelector.makeOptions(allFrequencies);
   const handleClickAll = () => onChange(getOptions());
   const handleClickNone = () => onChange([]);
 
@@ -73,7 +71,7 @@ function FrequencySelector({
       <Select
         options={getOptions()}
         placeholder={
-          allStations ? 'Select or type to search...' : 'Loading...'
+          allFrequencies ? 'Select or type to search...' : 'Loading...'
         }
         value={value}
         onChange={onChange}
@@ -84,7 +82,7 @@ function FrequencySelector({
 }
 
 FrequencySelector.propTypes = {
-  allStations: PropTypes.array,
+  allFrequencies: PropTypes.array,
   onReady: PropTypes.func.isRequired,
   value: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
@@ -104,19 +102,16 @@ FrequencySelector.valueToLabel = freq => {
   return get(freq, labels) || capitalize(freq) || 'Unspecified';
 };
 
-FrequencySelector.makeOptions = memoize(allStations => (
-  allStations === null ?
+FrequencySelector.makeOptions = memoize(allFrequencies => (
+  allFrequencies === null ?
     [] :
     flow(
-      map('histories'),
-      flatten,
-      uniqBy('freq'),
-      map(history => ({
-        value: history.freq,
-        label: FrequencySelector.valueToLabel(history.freq),
+      map(frequency => ({
+        value: frequency,
+        label: FrequencySelector.valueToLabel(frequency),
       })),
       sortBy('label'),
-    )(allStations)
+    )(allFrequencies)
 ));
 
 export default FrequencySelector;
