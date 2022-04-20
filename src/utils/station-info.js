@@ -20,9 +20,9 @@ export const stationNetwork = curry(
 );
 
 
-export const stationVariableUris = station =>
+export const stationVariableIds = station =>
   flow(
-    map('variable_uris'),
+    map('variable_ids'),
     unionAll,
   )(station.histories);
 
@@ -65,8 +65,8 @@ export const uniqStationVariableNames = curry(
     flow(
       map(history =>
         map(
-          variable_uri => find({ uri: variable_uri }, variables),
-          history.variable_uris
+          variable_id => find({ id: variable_id }, variables),
+          history.variable_ids
         )
       ),
       flatten,
