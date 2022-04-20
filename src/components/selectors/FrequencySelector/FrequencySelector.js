@@ -29,13 +29,11 @@ function FrequencySelector({
   allStations, onReady, value, onChange, defaultValueSelector
 }) {
   useEffect(() => {
-    setDefault();  // TODO: Necessary?
-    const actions = {
+    onReady({
       getAllOptions: getOptions,
       selectAll: handleClickAll,
       selectNone: handleClickNone,
-    };
-    onReady(actions);
+    });
   }, []);
   
   useEffect(() => {
@@ -48,23 +46,7 @@ function FrequencySelector({
     );
   };
 
-  // TODO: Static?
-  const makeOptions = memoize(allStations => (
-    allStations === null ?
-      [] :
-      flow(
-        map('histories'),
-        flatten,
-        uniqBy('freq'),
-        map(history => ({
-          value: history.freq,
-          label: FrequencySelector.valueToLabel(history.freq),
-        })),
-        sortBy('label'),
-      )(allStations)
-  ));
-
-  const getOptions = () => makeOptions(allStations);
+  const getOptions = () => FrequencySelector.makeOptions(allStations);
   const handleClickAll = () => onChange(getOptions());
   const handleClickNone = () => onChange([]);
 
@@ -121,5 +103,20 @@ FrequencySelector.valueToLabel = freq => {
   };
   return get(freq, labels) || capitalize(freq) || 'Unspecified';
 };
+
+FrequencySelector.makeOptions = memoize(allStations => (
+  allStations === null ?
+    [] :
+    flow(
+      map('histories'),
+      flatten,
+      uniqBy('freq'),
+      map(history => ({
+        value: history.freq,
+        label: FrequencySelector.valueToLabel(history.freq),
+      })),
+      sortBy('label'),
+    )(allStations)
+));
 
 export default FrequencySelector;
