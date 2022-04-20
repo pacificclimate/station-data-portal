@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import {
   Button,
   ButtonToolbar,
@@ -25,51 +25,31 @@ import css from '../common.module.css';
 logger.configure({ active: true });
 
 
-class FrequencySelector extends Component {
-  static propTypes = {
-    allStations: PropTypes.array,
-    onReady: PropTypes.func.isRequired,
-    value: PropTypes.array.isRequired,
-    onChange: PropTypes.func.isRequired,
-    defaultValueSelector: LocalPropTypes.defaultValueSelector,
-  };
-
-  static defaultProps = {
-    onReady: () => null,
-    defaultValueSelector: 'all',
-  };
-
-  componentDidMount() {
-    this.setDefault();
+function FrequencySelector({
+  allStations, onReady, value, onChange, defaultValueSelector
+}) {
+  useEffect(() => {
+    setDefault();  // TODO: Necessary?
     const actions = {
-      getAllOptions: this.getOptions,
-      selectAll: this.handleClickAll,
-      selectNone: this.handleClickNone,
+      getAllOptions: getOptions,
+      selectAll: handleClickAll,
+      selectNone: handleClickNone,
     };
-    this.props.onReady(actions);
-  }
+    onReady(actions);
+  }, []);
+  
+  useEffect(() => {
+    setDefault();
+  }, [allStations])
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (this.props.allStations !== prevProps.allStations) {
-      this.setDefault();
-    }
-  }
-
-  setDefault = () => {
-    this.props.onChange(
-      defaultValue(this.props.defaultValueSelector, this.getOptions())
+  const setDefault = () => {
+    onChange(
+      defaultValue(defaultValueSelector, getOptions())
     );
   };
 
-  static valueToLabel = freq => {
-    const labels = {
-      '1-hourly': 'Hourly',
-      '12-hourly': 'Semi-daily'
-    };
-    return get(freq, labels) || capitalize(freq) || 'Unspecified';
-  };
-
-  makeOptions = memoize(allStations => (
+  // TODO: Static?
+  const makeOptions = memoize(allStations => (
     allStations === null ?
       [] :
       flow(
@@ -84,44 +64,62 @@ class FrequencySelector extends Component {
       )(allStations)
   ));
 
-  getOptions = () => this.makeOptions(this.props.allStations);
+  const getOptions = () => makeOptions(allStations);
+  const handleClickAll = () => onChange(getOptions());
+  const handleClickNone = () => onChange([]);
 
-  handleClickAll = () => this.props.onChange(this.getOptions());
-
-  handleClickNone = () => this.props.onChange([]);
-
-  render() {
-    return (
-      <FormGroup>
-        <div>
-          <ControlLabel>Observation Frequency</ControlLabel>
-          {' '}
-          <InfoPopup title={"Observation Frequency multiselector"}>
-            <ul className={"compact"}>
-              <li>At startup, all frequencies are selected.</li>
-              <li>Use the None button to clear all frequencies from the selector.</li>
-              <li>Use the All button to add all available frequencies to the selector.</li>
-              <li>Click the dropdown and select an item to add a single
-                unselected frequency.</li>
-              <li>Click the X next to a selected frequency to remove it.</li>
-            </ul>
-          </InfoPopup>
-        </div>
-        <ButtonToolbar className={css.selectorButtons}>
-          <Button bsSize={'xsmall'} onClick={this.handleClickAll}>All</Button>
-          <Button bsSize={'xsmall'} onClick={this.handleClickNone}>None</Button>
-        </ButtonToolbar>
-        <Select
-          options={this.getOptions()}
-          placeholder={
-            this.props.allStations ? 'Select or type to search...' : 'Loading...'
-          }
-          {...this.props}
-          isMulti
-        />
-      </FormGroup>
-    );
-  }
+  return (
+    <FormGroup>
+      <div>
+        <ControlLabel>Observation Frequency</ControlLabel>
+        {' '}
+        <InfoPopup title={"Observation Frequency multiselector"}>
+          <ul className={"compact"}>
+            <li>At startup, all frequencies are selected.</li>
+            <li>Use the None button to clear all frequencies from the selector.</li>
+            <li>Use the All button to add all available frequencies to the selector.</li>
+            <li>Click the dropdown and select an item to add a single
+              unselected frequency.</li>
+            <li>Click the X next to a selected frequency to remove it.</li>
+          </ul>
+        </InfoPopup>
+      </div>
+      <ButtonToolbar className={css.selectorButtons}>
+        <Button bsSize={'xsmall'} onClick={handleClickAll}>All</Button>
+        <Button bsSize={'xsmall'} onClick={handleClickNone}>None</Button>
+      </ButtonToolbar>
+      <Select
+        options={getOptions()}
+        placeholder={
+          allStations ? 'Select or type to search...' : 'Loading...'
+        }
+        value={value}
+        onChange={onChange}
+        isMulti
+      />
+    </FormGroup>
+  );
 }
+
+FrequencySelector.propTypes = {
+  allStations: PropTypes.array,
+  onReady: PropTypes.func.isRequired,
+  value: PropTypes.array.isRequired,
+  onChange: PropTypes.func.isRequired,
+  defaultValueSelector: LocalPropTypes.defaultValueSelector,
+};
+
+FrequencySelector.defaultProps = {
+  onReady: () => null,
+  defaultValueSelector: 'all',
+};
+
+FrequencySelector.valueToLabel = freq => {
+  const labels = {
+    '1-hourly': 'Hourly',
+    '12-hourly': 'Semi-daily'
+  };
+  return get(freq, labels) || capitalize(freq) || 'Unspecified';
+};
 
 export default FrequencySelector;
