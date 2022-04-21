@@ -1,17 +1,20 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, Panel, Row, Tab, Tabs } from 'react-bootstrap';
+import Select from 'react-select';
 import memoize from 'memoize-one';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 import filter from 'lodash/fp/filter';
 import join from 'lodash/fp/join';
+import tap from 'lodash/fp/tap';
 
 import css from '../common.module.css';
 
 import logger from '../../../logger';
 import NetworkSelector from '../../selectors/NetworkSelector';
 import {
+  getFrequencies,
   getNetworks,
   getStations,
   getVariables,
@@ -22,7 +25,7 @@ import FrequencySelector
   from '../../selectors/FrequencySelector/FrequencySelector';
 import DateSelector from '../../selectors/DateSelector';
 import {
-  stationFilter,
+  stationFilter as stationFilterRaw,
   stationInsideMultiPolygon
 } from '../../../utils/station-filtering';
 import OnlyWithClimatologyControl
@@ -68,292 +71,301 @@ const commonSelectorStyles = {
 
 const defaultLgs = [7, 5];
 
+const stnsLimitOptions =
+  [100, 500, 1000, 2000, 4000, 8000].map(value => ({
+    value, label: value.toString()
+  }));
 
-class Body extends Component {
-  state = {
-    startDate: null,
-    endDate: null,
 
-    allNetworks: null,
-    selectedNetworksOptions: [],
-    networkActions: null,
+const stationDebugFetchOptions =
+  (process.env.REACT_APP_DEBUG_STATION_FETCH_OPTIONS || "").toLowerCase()
+  === "true";
 
-    allVariables: null,
-    selectedVariablesOptions: [],
-    variableActions: null,
 
-    selectedFrequenciesOptions: [],
-    frequencyActions: null,
+function Body() {
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
-    onlyWithClimatology: false,
+  const [allNetworks, setAllNetworks] = useState(null);
+  const [selectedNetworksOptions, setSelectedNetworksOptions] = useState([]);
+  const [networkActions, setNetworkActions] = useState(null);
 
-    allStations: null,
+  const [allVariables, setAllVariables] = useState(null);
+  const [selectedVariablesOptions, setSelectedVariablesOptions] = useState([]);
+  const [variableActions, setVariableActions] = useState(null);
 
-    fileFormat: undefined,
-    clipToDate: false,
+  const [allFrequencies, setAllFrequencies] = useState(null);
+  const [selectedFrequenciesOptions, setSelectedFrequenciesOptions] = useState([]);
+  const [frequencyActions, setFrequencyActions] = useState(null);
 
-    area: undefined,
-  };
+  const [onlyWithClimatology, setOnlyWithClimatology] = useState(false);
 
-  handleChange = (name, value) => this.setState({ [name]: value });
-  toggleBoolean = name =>
-    this.setState(state => ({ [name]: !state[name] }));
+  const [allStations, setAllStations] = useState(null);
 
-  handleChangeStartDate = this.handleChange.bind(this, 'startDate');
-  handleChangeEndDate = this.handleChange.bind(this, 'endDate');
+  const [area, setArea] = useState(undefined);
+  const [stnsLimit, setStnsLimit] = useState(stnsLimitOptions[0]);
 
-  handleChangeNetwork = this.handleChange.bind(this, 'selectedNetworksOptions');
-  handleNetworkSelectorReady = this.handleChange.bind(this, 'networkActions');
+  // // TODO: Remove? Not presently used, but there is commented out code
+  // //  in Filters tab that uses them.
+  // const handleClickAll = () => {
+  //   networkActions.selectAll();
+  //   variableActions.selectAll();
+  //   frequencyActions.selectAll();
+  // };
+  // const handleClickNone = () => {
+  //   networkActions.selectNone();
+  //   variableActions.selectNone();
+  //   frequencyActions.selectNone();
+  // };
+  //
+  const toggleOnlyWithClimatology = () =>
+    setOnlyWithClimatology(!onlyWithClimatology);
 
-  handleChangeVariable = this.handleChange.bind(this, 'selectedVariablesOptions');
-  handleVariableSelectorReady = this.handleChange.bind(this, 'variableActions');
+  useEffect(() => {
+    getNetworks().then(response => setAllNetworks(response.data));
+  }, []);
 
-  handleChangeFrequency = this.handleChange.bind(this, 'selectedFrequenciesOptions');
-  handleFrequencySelectorReady = this.handleChange.bind(this, 'frequencyActions');
+  useEffect(() => {
+    getVariables().then(response => setAllVariables(response.data));
+  }, []);
 
-  handleClickAll = () => {
-    this.state.networkActions.selectAll();
-    this.state.variableActions.selectAll();
-    this.state.frequencyActions.selectAll();
-  };
-  handleClickNone = () => {
-    this.state.networkActions.selectNone();
-    this.state.variableActions.selectNone();
-    this.state.frequencyActions.selectNone();
-  };
+  useEffect(() => {
+    getFrequencies().then(response => setAllFrequencies(response.data));
+  }, []);
 
-  handleChangeFileFormat = this.handleChange.bind(this, 'fileFormat');
+  useEffect(() => {
+    getStations({
+      compact: true,
+      ...(stationDebugFetchOptions && { limit: stnsLimit.value } )
+    })
+      .then(response => setAllStations(response.data));
+  }, [stnsLimit]);
 
-  toggleClipToDate = this.toggleBoolean.bind(this, 'clipToDate');
-  toggleOnlyWithClimatology =
-    this.toggleBoolean.bind(this, 'onlyWithClimatology');
+  const stationFilter = memoize(stationFilterRaw);
 
-  handleSetArea = this.handleChange.bind(this, 'area');
-
-  componentDidMount() {
-    getNetworks()
-      .then(response => this.setState({ allNetworks: response.data }));
-    getVariables()
-      .then(response => this.setState({ allVariables: response.data }));
-    getStations()
-    .then(response => this.setState({ allStations: response.data }));
-  }
-
-  stationFilter = memoize(stationFilter);
-
-  dataDownloadUrl = ({ dataCategory, clipToDate, fileFormat }) => {
+  const dataDownloadUrl = ({ dataCategory, clipToDate, fileFormat }) => {
     // Check whether state has settled. Each selector calls an onReady callback
     // to export information (e.g., all its options) that it has set up
     // internally. In retrospect, this is a too-clever solution to the problem
     // of passing a pile of props around, but it's what we've got.
-    if (
-      !this.state.networkActions
-      || !this.state.variableActions
-      || !this.state.frequencyActions
-    ) {
+    if (!networkActions || !variableActions || !frequencyActions) {
       return "#";
     }
 
     return dataDownloadTarget({
-      startDate: this.state.startDate,
-      endDate: this.state.endDate,
-      selectedNetworksOptions: this.state.selectedNetworksOptions,
-      selectedVariablesOptions: this.state.selectedVariablesOptions,
-      selectedFrequenciesOptions: this.state.selectedFrequenciesOptions,
-      polygon: this.state.area,
-      onlyWithClimatology: this.state.onlyWithClimatology,
-      allNetworks: this.state.networkActions.getAllOptions(),
-      allVariables: this.state.variableActions.getAllOptions(),
-      allFrequencies: this.state.frequencyActions.getAllOptions(),
+      startDate: startDate,
+      endDate: endDate,
+      selectedNetworksOptions: selectedNetworksOptions,
+      selectedVariablesOptions: selectedVariablesOptions,
+      selectedFrequenciesOptions: selectedFrequenciesOptions,
+      polygon: area,
+      onlyWithClimatology: onlyWithClimatology,
+      allNetworks: networkActions.getAllOptions(),
+      allVariables: variableActions.getAllOptions(),
+      allFrequencies: frequencyActions.getAllOptions(),
       dataCategory,
       clipToDate,
       dataFormat: fileFormat,
     });
   };
 
-  dataDownloadFilename = ({ dataCategory, fileFormat }) => {
+  const dataDownloadFilename = ({ dataCategory, fileFormat }) => {
     return `${{ dataCategory, fileFormat }}.${get('value', fileFormat)}`;
   }
 
-  render() {
-    console.log("### Body render", this.state)
-    const filteredStations = this.stationFilter(
-      this.state.startDate,
-      this.state.endDate,
-      this.state.selectedNetworksOptions,
-      this.state.selectedVariablesOptions,
-      this.state.selectedFrequenciesOptions,
-      this.state.onlyWithClimatology,
-      this.state.area,
-      this.state.allNetworks,
-      this.state.allVariables,
-      this.state.allStations,
-    );
+  const filteredStations = stationFilter(
+    startDate,
+    endDate,
+    selectedNetworksOptions,
+    selectedVariablesOptions,
+    selectedFrequenciesOptions,
+    onlyWithClimatology,
+    area,
+    allNetworks,
+    allVariables,
+    allStations,
+  );
 
-    const stationInsideArea = stationInsideMultiPolygon(this.state.area);
-    const selectedStations = filter(stationInsideArea, filteredStations);
+  const stationInsideArea = stationInsideMultiPolygon(area);
+  const selectedStations = filter(stationInsideArea, filteredStations);
 
-    const selections = [
-      {
-        name: 'networks',
-        items: this.state.selectedNetworksOptions,
-      },
-      {
-        name: 'variables',
-        items: this.state.selectedVariablesOptions,
-      },
-      {
-        name: 'frequencies',
-        items: this.state.selectedFrequenciesOptions,
-      },
-    ];
+  const selections = [
+    {
+      name: 'networks',
+      items: selectedNetworksOptions,
+    },
+    {
+      name: 'variables',
+      items: selectedVariablesOptions,
+    },
+    {
+      name: 'frequencies',
+      items: selectedFrequenciesOptions,
+    },
+  ];
 
-    const unselectedThings = flow(
-      filter(thing => thing.items.length === 0),
-      map(thing => thing.name),
-      join(', or '),
-    )(selections);
+  const unselectedThings = flow(
+    filter(thing => thing.items.length === 0),
+    map(thing => thing.name),
+    join(', or '),
+  )(selections);
 
-    return (
-      <div className={css.portal}>
-        <Row>
-          <AdjustableColumns
-            defaultLgs={defaultLgs}
-            contents={[
-              <StationMap
-                {...baseMaps[process.env.REACT_APP_BASE_MAP]}
-                stations={filteredStations}
-                allNetworks={this.state.allNetworks}
-                allVariables={this.state.allVariables}
-                onSetArea={this.handleSetArea}
-              />,
+  return (
+    <div className={css.portal}>
+      <Row>
+        <AdjustableColumns
+          defaultLgs={defaultLgs}
+          contents={[
+            // "map" ||  // Uncomment to suppress map
+            <StationMap
+              {...baseMaps[process.env.REACT_APP_BASE_MAP]}
+              stations={filteredStations}
+              allNetworks={allNetworks}
+              allVariables={allVariables}
+              onSetArea={setArea}
+            />,
 
-              <Panel style={{ marginLeft: '-15px', marginRight: '-10px' }}>
-                <Panel.Body>
-                  <Tabs defaultActiveKey={'Filters'} className={css.mainTabs}>
-                    <Tab eventKey={'Filters'} title={'Station Filters'}>
-                      <Row>
-                        <Col lg={12} md={12} sm={12}>
-                          <SelectionCounts
-                            allStations={this.state.allStations}
-                            selectedStations={selectedStations}
-                          />
-                          <p>
-                            (See Station Metadata and Station Data tabs for details)
-                          </p>
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col lg={6} md={6} sm={6}>
-                          {/*<Button bsSize={'small'} onClick={this.handleClickAll}>Select all criteria</Button>*/}
-                          {/*<Button bsSize={'small'} onClick={this.handleClickNone}>Clear all criteria</Button>*/}
-                          <DateSelector
-                            value={this.state.startDate}
-                            onChange={this.handleChangeStartDate}
-                            label={'Start Date'}
-                          />
-                        </Col>
-                        <Col lg={6} md={6} sm={6}>
-                          <DateSelector
-                            value={this.state.endDate}
-                            onChange={this.handleChangeEndDate}
-                            label={'End Date'}
-                          />
-                        </Col>
-                        <Col lg={12} md={12} sm={12}>
-                          <OnlyWithClimatologyControl
-                            value={this.state.onlyWithClimatology}
-                            onChange={this.toggleOnlyWithClimatology}
-                          />
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col lg={12} md={12} sm={12}>
-                          <NetworkSelector
-                            allNetworks={this.state.allNetworks}
-                            onReady={this.handleNetworkSelectorReady}
-                            value={this.state.selectedNetworksOptions}
-                            onChange={this.handleChangeNetwork}
-                            isSearchable
-                            isClearable={false}
-                            styles={commonSelectorStyles}
-                          />
-                          {/*<JSONstringify object={this.state.selectedNetworksOptions}/>*/}
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col lg={12} md={12} sm={12}>
-                          <VariableSelector
-                            allVariables={this.state.allVariables}
-                            onReady={this.handleVariableSelectorReady}
-                            value={this.state.selectedVariablesOptions}
-                            onChange={this.handleChangeVariable}
-                            isSearchable
-                            isClearable={false}
-                            styles={commonSelectorStyles}
-                          />
-                          {/*<JSONstringify object={this.state.selectedVariablesOptions}/>*/}
-                        </Col>
-                      </Row>
-                      <Row>
-                        <Col lg={12} md={12} sm={12}>
-                          <FrequencySelector
-                            allStations={this.state.allStations}
-                            onReady={this.handleFrequencySelectorReady}
-                            value={this.state.selectedFrequenciesOptions}
-                            onChange={this.handleChangeFrequency}
-                            isClearable={false}
-                            styles={commonSelectorStyles}
-                          />
-                          {/*<JSONstringify object={this.state.selectedFrequenciesOptions}/>*/}
-                        </Col>
-                      </Row>
-                    </Tab>
+            <Panel style={{ marginLeft: '-15px', marginRight: '-10px' }}>
+              <Panel.Body>
+                <Tabs
+                  id="non-map-controls"
+                  defaultActiveKey={'Filters'}
+                  className={css.mainTabs}
+                >
+                  <Tab eventKey={'Filters'} title={'Station Filters'}>
+                    <Row>
+                      <Col lg={12} md={12} sm={12}>
+                        {stationDebugFetchOptions && (
+                          <Row>
+                            <Col lg={6}>Fetch limit</Col>
+                            <Col lg={6}>
+                              <Select
+                                options={stnsLimitOptions}
+                                value={stnsLimit}
+                                onChange={setStnsLimit}
+                              />
+                            </Col>
+                          </Row>
+                        )}
+                        <SelectionCounts
+                          allStations={allStations}
+                          selectedStations={selectedStations}
+                        />
+                        <p>
+                          (See Station Metadata and Station Data tabs for details)
+                        </p>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col lg={6} md={6} sm={6}>
+                        {/*<Button bsSize={'small'} onClick={handleClickAll}>Select all criteria</Button>*/}
+                        {/*<Button bsSize={'small'} onClick={handleClickNone}>Clear all criteria</Button>*/}
+                        <DateSelector
+                          value={startDate}
+                          onChange={setStartDate}
+                          label={'Start Date'}
+                        />
+                      </Col>
+                      <Col lg={6} md={6} sm={6}>
+                        <DateSelector
+                          value={endDate}
+                          onChange={setEndDate}
+                          label={'End Date'}
+                        />
+                      </Col>
+                      <Col lg={12} md={12} sm={12}>
+                        <OnlyWithClimatologyControl
+                          value={onlyWithClimatology}
+                          onChange={toggleOnlyWithClimatology}
+                        />
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col lg={12} md={12} sm={12}>
+                        <NetworkSelector
+                          allNetworks={allNetworks}
+                          onReady={setNetworkActions}
+                          value={selectedNetworksOptions}
+                          onChange={setSelectedNetworksOptions}
+                          isSearchable
+                          isClearable={false}
+                          styles={commonSelectorStyles}
+                        />
+                        {/*<JSONstringify object={selectedNetworksOptions}/>*/}
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col lg={12} md={12} sm={12}>
+                        <VariableSelector
+                          allVariables={allVariables}
+                          onReady={setVariableActions}
+                          value={selectedVariablesOptions}
+                          onChange={setSelectedVariablesOptions}
+                          isSearchable
+                          isClearable={false}
+                          styles={commonSelectorStyles}
+                        />
+                        {/*<JSONstringify object={selectedVariablesOptions}/>*/}
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col lg={12} md={12} sm={12}>
+                        <FrequencySelector
+                          allFrequencies={allFrequencies}
+                          onReady={setFrequencyActions}
+                          value={selectedFrequenciesOptions}
+                          onChange={setSelectedFrequenciesOptions}
+                          isClearable={false}
+                          styles={commonSelectorStyles}
+                        />
+                        {/*<JSONstringify object={selectedFrequenciesOptions}/>*/}
+                      </Col>
+                    </Row>
+                  </Tab>
 
-                    <Tab eventKey={'Metadata'} title={'Station Metadata'}>
-                      <SelectionCounts
-                        allStations={this.state.allStations}
-                        selectedStations={selectedStations}
-                      />
-                      <StationMetadata
-                        stations={selectedStations}
-                        allNetworks={this.state.allNetworks}
-                        allVariables={this.state.allVariables}
-                      />
-                    </Tab>
+                  <Tab eventKey={'Metadata'} title={'Station Metadata'}>
+                    <SelectionCounts
+                      allStations={allStations}
+                      selectedStations={selectedStations}
+                    />
+                    <StationMetadata
+                      stations={selectedStations}
+                      allNetworks={allNetworks}
+                      allVariables={allVariables}
+                    />
+                  </Tab>
 
-                    <Tab eventKey={'Data'} title={'Station Data'}>
-                      <SelectionCounts
-                        allStations={this.state.allStations}
-                        selectedStations={selectedStations}
-                      />
-                      <SelectionCriteria/>
-                      {
-                        unselectedThings &&
-                        <p>You haven't selected any {unselectedThings}.</p>
-                      }
+                  <Tab eventKey={'Data'} title={'Station Data'}>
+                    <SelectionCounts
+                      allStations={allStations}
+                      selectedStations={selectedStations}
+                    />
+                    <SelectionCriteria/>
+                    {
+                      unselectedThings &&
+                      <p>You haven't selected any {unselectedThings}.</p>
+                    }
 
-                      <StationData
-                        selectedStations={selectedStations}
-                        dataDownloadUrl={this.dataDownloadUrl}
-                        dataDownloadFilename={this.dataDownloadFilename}
-                      />
-                    </Tab>
+                    <StationData
+                      selectedStations={selectedStations}
+                      dataDownloadUrl={dataDownloadUrl}
+                      dataDownloadFilename={dataDownloadFilename}
+                    />
+                  </Tab>
 
-                    <Tab eventKey={'Networks'} title={'Networks'}>
-                      <NetworksMetadata networks={this.state.allNetworks}/>
-                    </Tab>
+                  <Tab eventKey={'Networks'} title={'Networks'}>
+                    <NetworksMetadata networks={allNetworks}/>
+                  </Tab>
 
-                  </Tabs>
-                </Panel.Body>
-              </Panel>
+                </Tabs>
+              </Panel.Body>
+            </Panel>
 
-            ]}
-          />
-        </Row>
-      </div>
-    );
-  }
+          ]}
+        />
+      </Row>
+    </div>
+  );
 }
 
 export default Body;

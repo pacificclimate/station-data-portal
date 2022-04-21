@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Row, Col, Badge, Button, ButtonGroup } from 'react-bootstrap';
+import { Row, Col, Button, ButtonGroup } from 'react-bootstrap';
 import clone from 'lodash/fp/clone';
 import concat from 'lodash/concat';  // Note: Not FP!
 import slice from 'lodash/fp/slice';
@@ -66,7 +66,7 @@ export default class AdjustableColumns extends Component {
       this.props.contents
     ]);
     const columns = mapWithKey(([lg, content], i) =>
-      <Col lg={lg} lgHidden={lg === 0}>
+      <Col lg={lg} lgHidden={lg === 0} key={i}>
         <Row>
           <Col lg={12} className={'text-center'} style={{
             'marginBottom': '-0.5em',

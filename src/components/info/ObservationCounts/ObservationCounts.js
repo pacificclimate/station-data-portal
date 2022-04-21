@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table } from 'react-bootstrap';
 import { reduce } from 'lodash/fp';
 import { getObservationCounts } from
@@ -19,99 +19,65 @@ const totalCounts = timer.timeThis("totalCounts")(
     reduce((sum, station) => sum + (counts[station.id] || 0), 0)(stations)
 );
 
-class ObservationCounts extends Component {
-  static propTypes = {
-    startDate: PropTypes.object,
-    endDate: PropTypes.object,
-    stations: PropTypes.array,
-  };
+function ObservationCounts({startDate, endDate, stations}) {
+  const [countData, setCountData] = useState(null);
 
-  state = {
-    countData: null,
-  };
-
-  static getDerivedStateFromProps(props, state) {
-    if (
-      props.startDate !== state.prevStartDate ||
-      props.endDate !== state.prevEndDate
-      // props.stations !== state.prevStations
-    ) {
-      return {
-        countData: null,  // Signal need for new data
-        prevStartDate: props.startDate,
-        prevEndDate: props.endDate,
-        // prevStations: props.stations,  // Request doesn't depend on stations
-      };
-    }
-
-    // No state update necessary
-    return null;
-  }
-
-  componentDidMount() {
-    this.loadObservationCounts();
-  }
-
-  componentDidUpdate() {
-    if (this.state.countData === null) {
-      this.loadObservationCounts();
-    }
-  }
-
-  loadObservationCounts() {
-    const { startDate, endDate} = this.props;
+  useEffect(() => {
     // TODO: getObservationCounts should assemble params
     getObservationCounts({
       params: {
         start_date: startDate,
         end_date: endDate,
       }
-    }).then(response => this.setState({ countData: response.data }));
+    }).then(response => setCountData(response.data));
+  }, [startDate, endDate]);
+
+  if (countData === null) {
+    return <p>Loading counts...</p>
   }
 
-  render() {
-    const { countData } = this.state;
-    if (countData === null) {
-      return <p>Loading counts...</p>
-    }
+  timer.resetAll();
+  const totalObservationCountsForStations =
+    totalCounts(countData.observationCounts, stations);
+  const totalClimatologyCountsForStations =
+    totalCounts(countData.climatologyCounts, stations);
+  timer.log();
 
-    timer.resetAll();
-    const totalObservationCountsForStations =
-      totalCounts(countData.observationCounts, this.props.stations);
-    const totalClimatologyCountsForStations =
-      totalCounts(countData.climatologyCounts, this.props.stations);
-    timer.log();
-
-    return (
-      <Table condensed size="sm">
-        <thead>
-        <tr>
-          <th colSpan={2}>Summary for selected stations</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-          <th>Number of stations</th>
-          <td className="text-right">
-            {this.props.stations.length}
-          </td>
-        </tr>
-        <tr>
-          <th>Total observations</th>
-          <td className="text-right">
-            {totalObservationCountsForStations.toLocaleString()}
-          </td>
-        </tr>
-        <tr>
-          <th>Total climatologies</th>
-          <td className="text-right">
-            {totalClimatologyCountsForStations.toLocaleString()}
-          </td>
-        </tr>
-        </tbody>
-      </Table>
-    );
-  }
+  return (
+    <Table condensed size="sm">
+      <thead>
+      <tr>
+        <th colSpan={2}>Summary for selected stations</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <th>Number of stations</th>
+        <td className="text-right">
+          {stations.length}
+        </td>
+      </tr>
+      <tr>
+        <th>Total observations</th>
+        <td className="text-right">
+          {totalObservationCountsForStations.toLocaleString()}
+        </td>
+      </tr>
+      <tr>
+        <th>Total climatologies</th>
+        <td className="text-right">
+          {totalClimatologyCountsForStations.toLocaleString()}
+        </td>
+      </tr>
+      </tbody>
+    </Table>
+  );
 }
+
+ObservationCounts.propTypes = {
+  startDate: PropTypes.object,
+  endDate: PropTypes.object,
+  stations: PropTypes.array,
+};
 
 export default ObservationCounts;

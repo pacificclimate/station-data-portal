@@ -38,6 +38,7 @@ function StationData({
                 href={dataDownloadUrl({ dataCategory, clipToDate, fileFormat })}
                 download={dataDownloadFilename({ dataCategory, fileFormat })}
                 className="btn btn-primary"
+                key={dataCategory}
               >
                 Download {capitalize(dataCategory)}
               </a>

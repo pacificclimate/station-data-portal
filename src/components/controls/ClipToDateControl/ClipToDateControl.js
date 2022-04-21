@@ -6,7 +6,7 @@ import './ClipToDateControl.css';
 
 export default class ClipToDateControl extends Component {
   static propTypes = {
-    value: PropTypes.object.isRequired,
+    value: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 

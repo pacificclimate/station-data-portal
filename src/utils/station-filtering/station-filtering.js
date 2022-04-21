@@ -11,7 +11,7 @@ import { utcDateOnly } from '../dates';
 import {
   checkGeoJSONMultiPolygon, gJMultiPolygonBoundingBox, isPointInGeoJSONPolygon,
 } from '../geoJSON';
-import { stationVariableUris, uniqStationLocations } from '../station-info';
+import { stationVariableIds, uniqStationLocations } from '../station-info';
 import { getTimer } from '../timing';
 
 const ft = getTimer("Station filtering timing")
@@ -78,14 +78,14 @@ export const atLeastOne = items => items.length > 0;
 
 export const stationReportsSomeVariables =
   ft.timeThis("stationReportsSomeVariables")(
-    (station, variableUris) => {
-      const stationVariableUris = ft.timeThis("stationVariableUris")(flow(
-        map("variable_uris"),
+    (station, variableIds) => {
+      const stationVariableIds = ft.timeThis("stationVariableIds")(flow(
+        map("variable_ids"),
         flatten,
       ))(station.histories);
-      const r = ft.timeThis("variableUri in stationVariableUris")(
-        some(uri => contains(uri, stationVariableUris))
-      )(variableUris);
+      const r = ft.timeThis("variableUri in stationVariableIds")(
+        some(uri => contains(uri, stationVariableIds))
+      )(variableIds);
       // if (!r) {
       //   console.log(`Station ${station.id} filtered out on variables`)
       // }
@@ -111,10 +111,10 @@ export const stationReportsAnyFreqs = ft.timeThis("stationReportsAnyFreqs")(
 
 
 export const stationReportsClimatologyVariable = ft.timeThis("stationReportsClimatologyVariable")(
-  (station, climatologyVariableUris) => {
-    // return stationVariableUris intersect climatologyVariableUris not empty
-    const sVUs = stationVariableUris(station);
-    return some(sVU => contains(sVU, climatologyVariableUris))(sVUs);
+  (station, climatologyVariableIds) => {
+    // return stationVariableIds intersect climatologyVariableIds not empty
+    const sVIs = stationVariableIds(station);
+    return some(sVI => contains(sVI, climatologyVariableIds))(sVIs);
   }
 );
 
@@ -168,31 +168,31 @@ export const stationFilter = (
   onlyWithClimatology, area, allNetworks, allVariables, allStations
 ) => {
   ft.resetAll();
-  const selectedVariableUris = ft.timeThis("selectedVariableUris")(flow(
+  const selectedVariableIds = ft.timeThis("selectedVariableIds")(flow(
     map(selectedVariable => selectedVariable.contexts),
     flatten,
-    map(context => context.uri),
+    map(context => context.id),
     uniq,
   ))(selectedVariables);
 
   const selectedFrequencyValues =
     map(option => option.value)(selectedFrequencies);
 
-  const climatologyVariableUris = ft.timeThis("climatologyVariableUris")(
+  const climatologyVariableIds = ft.timeThis("climatologyVariableIds")(
     flow(
       filter(({ cell_method }) => /(within|over)/.test(cell_method)),
-      map("uri"),
+      map("id"),
     )
   )(allVariables);
 
   const r = filter(station => (
         stationMatchesDates(station, startDate, endDate, false)
         && stationInAnyNetwork(station, selectedNetworks)
-        && stationReportsSomeVariables(station, selectedVariableUris)
+        && stationReportsSomeVariables(station, selectedVariableIds)
         && stationReportsAnyFreqs(station, selectedFrequencyValues)
         && (
           !onlyWithClimatology ||
-          stationReportsClimatologyVariable(station, climatologyVariableUris)
+          stationReportsClimatologyVariable(station, climatologyVariableIds)
         )
       )
     )(allStations);

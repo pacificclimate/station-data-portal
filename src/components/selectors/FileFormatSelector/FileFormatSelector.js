@@ -25,7 +25,7 @@ const options = [
 
 export default class FileFormatSelector extends Component {
   static propTypes = {
-    value: PropTypes.object.isRequired,
+    value: PropTypes.object,
     onChange: PropTypes.func.isRequired,
   };
 

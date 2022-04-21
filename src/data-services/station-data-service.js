@@ -55,6 +55,11 @@ export function getVariables() {
 }
 
 
+export function getFrequencies() {
+  return axios.get(urljoin(SDS_URL, 'frequencies'));
+}
+
+
 export function getHistories() {
   return axios.get(urljoin(SDS_URL, 'histories'));
 }
@@ -76,13 +81,15 @@ const filterStations =
   filter(filterPredicate(parsedStationFilterExpressions));
 
 
-export function getStations(config) {
+export function getStations(params, config) {
   return axios.get(
     urljoin(SDS_URL, 'stations'),
     {
       params: {
+        offset: envVarNumber('REACT_APP_STATION_OFFSET', undefined),
         limit: envVarNumber('REACT_APP_STATION_LIMIT', undefined),
         stride: envVarNumber('REACT_APP_STATION_STRIDE', undefined),
+        ...params,
       },
       transformResponse: axios.defaults.transformResponse.concat(
         tap(x => console.log("raw station count", x.length)),

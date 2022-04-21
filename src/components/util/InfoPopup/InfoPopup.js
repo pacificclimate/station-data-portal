@@ -14,6 +14,7 @@ function InfoPopup({
     <OverlayTrigger
       overlay={
         <Popover
+          id={title}
           placement={placement}
           title={title}
         >

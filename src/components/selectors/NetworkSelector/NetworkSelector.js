@@ -16,7 +16,6 @@ import toPairs from 'lodash/fp/toPairs';
 import fromPairs from 'lodash/fp/fromPairs';
 import identity from 'lodash/fp/identity';
 import assign from 'lodash/fp/assign';
-import tap from 'lodash/fp/tap';
 
 import { composeWithRestArgs } from '../../../utils/fp'
 import chroma from 'chroma-js';
@@ -32,9 +31,9 @@ logger.configure({ active: true });
 
 class NetworkSelector extends Component {
   static propTypes = {
-    allNetworks: PropTypes.array.isRequired,
+    allNetworks: PropTypes.array,
     onReady: PropTypes.func.isRequired,
-    value: PropTypes.object.isRequired,
+    value: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
     defaultValueSelector: LocalPropTypes.defaultValueSelector,
   };
