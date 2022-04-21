@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Col, Panel, Row, Tab, Tabs } from 'react-bootstrap';
+import Select from 'react-select';
 import memoize from 'memoize-one';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
@@ -70,6 +71,16 @@ const commonSelectorStyles = {
 
 const defaultLgs = [7, 5];
 
+const stnsLimitOptions =
+  [100, 500, 1000, 2000, 4000, 8000].map(value => ({
+    value, label: value.toString()
+  }));
+
+
+const stationDebugFetchOptions =
+  (process.env.REACT_APP_DEBUG_STATION_FETCH_OPTIONS || "").toLowerCase()
+  === "true";
+
 
 function Body() {
   const [startDate, setStartDate] = useState(null);
@@ -92,6 +103,7 @@ function Body() {
   const [allStations, setAllStations] = useState(null);
 
   const [area, setArea] = useState(undefined);
+  const [stnsLimit, setStnsLimit] = useState(stnsLimitOptions[0]);
 
   // // TODO: Remove? Not presently used, but there is commented out code
   // //  in Filters tab that uses them.
@@ -109,28 +121,25 @@ function Body() {
   const toggleOnlyWithClimatology = () =>
     setOnlyWithClimatology(!onlyWithClimatology);
 
-  // TODO: Bundle these together and do a single update after Promise.all?
   useEffect(() => {
-    console.log("### getNeworks start")
     getNetworks().then(response => setAllNetworks(response.data));
   }, []);
 
   useEffect(() => {
-    console.log("### getVariables start")
     getVariables().then(response => setAllVariables(response.data));
   }, []);
 
   useEffect(() => {
-    console.log("### getFrequencies start")
     getFrequencies().then(response => setAllFrequencies(response.data));
   }, []);
 
   useEffect(() => {
-    console.log("### getStations start")
-    getStations({ compact: true })
-    .then(tap(() => console.log("### getStations complete")))
-    .then(response => setAllStations(response.data));
-  }, []);
+    getStations({
+      compact: true,
+      ...(stationDebugFetchOptions && { limit: stnsLimit.value } )
+    })
+      .then(response => setAllStations(response.data));
+  }, [stnsLimit]);
 
   const stationFilter = memoize(stationFilterRaw);
 
@@ -164,7 +173,6 @@ function Body() {
     return `${{ dataCategory, fileFormat }}.${get('value', fileFormat)}`;
   }
 
-  console.log("### Body render: start")
   const filteredStations = stationFilter(
     startDate,
     endDate,
@@ -202,12 +210,13 @@ function Body() {
     join(', or '),
   )(selections);
 
-  const result = (
+  return (
     <div className={css.portal}>
       <Row>
         <AdjustableColumns
           defaultLgs={defaultLgs}
           contents={[
+            // "map" ||  // Uncomment to suppress map
             <StationMap
               {...baseMaps[process.env.REACT_APP_BASE_MAP]}
               stations={filteredStations}
@@ -226,6 +235,18 @@ function Body() {
                   <Tab eventKey={'Filters'} title={'Station Filters'}>
                     <Row>
                       <Col lg={12} md={12} sm={12}>
+                        {stationDebugFetchOptions && (
+                          <Row>
+                            <Col lg={6}>Fetch limit</Col>
+                            <Col lg={6}>
+                              <Select
+                                options={stnsLimitOptions}
+                                value={stnsLimit}
+                                onChange={setStnsLimit}
+                              />
+                            </Col>
+                          </Row>
+                        )}
                         <SelectionCounts
                           allStations={allStations}
                           selectedStations={selectedStations}
@@ -345,8 +366,6 @@ function Body() {
       </Row>
     </div>
   );
-  console.log("### Body render: end")
-  return result;
 }
 
 export default Body;
