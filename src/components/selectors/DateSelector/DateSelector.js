@@ -34,93 +34,91 @@ const CalendarContainer = ({ className, children }) => (
   </div>
 );
 
-class DateSelector extends Component {
-  static propTypes = {
-    value: PropTypes.object,
-    onChange:PropTypes.func.isRequired,
-    label: PropTypes.string,
-  };
+function DateSelector({value, onChange, label, ...restProps}) {
+  // Call back to onChange with new Date value every time.
+  const onChangeNew = date => new Date(date);
 
-  // TODO: call back to onChange with new Date value every time.
-
-  render() {
-    // Custom header adapted from https://github.com/Hacker0x01/react-datepicker/blob/master/docs-site/src/examples/render_custom_header.jsx
-    const { value, onChange, label, ...restProps } = this.props;
-    return (
-      <FormGroup>
-        <ControlLabel>{label}</ControlLabel>
-        {' '}
-        <InfoPopup title={label}>
-          Only stations matching Start Date and End Date are selected.
-          A station matches if the date of any observation for a station
-          falls within the specified Start and End dates.
-          An empty Start or End date matches any observation date.
-        </InfoPopup>
-        {' '}
-        <DatePicker
-          selected={value}
-          onChange={onChange}
-          dateFormat={'yyyy-MM-dd'}
-          isClearable
-          changeYear={true}
-          renderCustomHeader={({
-                                 date,
-                                 changeYear,
-                                 changeMonth,
-                                 decreaseMonth,
-                                 increaseMonth,
-                                 prevMonthButtonDisabled,
-                                 nextMonthButtonDisabled
-                               }) => (
-            <div
-              style={{
-                margin: 10,
-                display: "flex",
-                justifyContent: "center"
-              }}
+  // Custom header adapted from https://github.com/Hacker0x01/react-datepicker/blob/master/docs-site/src/examples/render_custom_header.jsx
+  return (
+    <FormGroup>
+      <ControlLabel>{label}</ControlLabel>
+      {' '}
+      <InfoPopup title={label}>
+        Only stations matching Start Date and End Date are selected.
+        A station matches if the date of any observation for a station
+        falls within the specified Start and End dates.
+        An empty Start or End date matches any observation date.
+      </InfoPopup>
+      {' '}
+      <DatePicker
+        selected={value}
+        onChange={onChange}
+        dateFormat={'yyyy-MM-dd'}
+        isClearable
+        changeYear={true}
+        renderCustomHeader={({
+           date,
+           changeYear,
+           changeMonth,
+           decreaseMonth,
+           increaseMonth,
+           prevMonthButtonDisabled,
+           nextMonthButtonDisabled
+         }) => (
+          <div
+            style={{
+              margin: 10,
+              display: "flex",
+              justifyContent: "center"
+            }}
+          >
+            <button
+              onClick={decreaseMonth}
+              disabled={prevMonthButtonDisabled}
             >
-              <button
-                onClick={decreaseMonth}
-                disabled={prevMonthButtonDisabled}
-              >
-                {"<"}
-              </button>
-              <select
-                value={date.getFullYear()}
-                onChange={({ target: { value } }) => changeYear(value)}
-              >
-                {years.map(option => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+              {"<"}
+            </button>
+            <select
+              value={date.getFullYear()}
+              onChange={({ target: { value } }) => changeYear(value)}
+            >
+              {years.map(option => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
 
-              <select
-                value={date.getMonth()}
-                onChange={({ target: { value } }) => changeMonth(value)}
-              >
-                {months.map((option, index) => (
-                  <option key={option} value={index}>
-                    {option}
-                  </option>
-                ))}
-              </select>
+            <select
+              value={date.getMonth()}
+              onChange={({ target: { value } }) => changeMonth(value)}
+            >
+              {months.map((option, index) => (
+                <option key={option} value={index}>
+                  {option}
+                </option>
+              ))}
+            </select>
 
-              <button
-                onClick={increaseMonth}
-                disabled={nextMonthButtonDisabled}
-              >
-                {">"}
-              </button>
-            </div>
-          )}
-          calendarContainer={CalendarContainer}
-          {...restProps}
-        />
-      </FormGroup>
-    );
-  }
+            <button
+              onClick={increaseMonth}
+              disabled={nextMonthButtonDisabled}
+            >
+              {">"}
+            </button>
+          </div>
+        )}
+        calendarContainer={CalendarContainer}
+        {...restProps}
+      />
+    </FormGroup>
+  );
 }
+
+DateSelector.propTypes = {
+  value: PropTypes.object,
+  onChange:PropTypes.func.isRequired,
+  label: PropTypes.string,
+};
 
 export default DateSelector;
