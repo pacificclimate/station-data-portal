@@ -47,7 +47,7 @@ import { FeatureGroup, LayerGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import L from 'leaflet';
 
-// import StationMarkers from '../StationMarkers';
+import StationMarkers from '../StationMarkers';
 import { layersToGeoJSONMultipolygon } from '../../../utils/geoJSON-leaflet';
 
 import logger from '../../../logger';
@@ -134,21 +134,21 @@ function StationMap({
           onDeleted={handleChangedGeometryLayers}
         />
       </FeatureGroup>
-      {/*<LayerGroup>*/}
-      {/*  {*/}
-      {/*    map(*/}
-      {/*      station => (*/}
-      {/*        <StationMarkers*/}
-      {/*          station={station}*/}
-      {/*          allNetworks={allNetworks}*/}
-      {/*          allVariables={allVariables}*/}
-      {/*          key={station.id}*/}
-      {/*        />*/}
-      {/*      ),*/}
-      {/*      stations*/}
-      {/*    )*/}
-      {/*  }*/}
-      {/*</LayerGroup>*/}
+      <LayerGroup>
+        {
+          map(
+            station => (
+              <StationMarkers
+                station={station}
+                allNetworks={allNetworks}
+                allVariables={allVariables}
+                key={station.id}
+              />
+            ),
+            stations
+          )
+        }
+      </LayerGroup>
     </BaseMap>
   );
 }
