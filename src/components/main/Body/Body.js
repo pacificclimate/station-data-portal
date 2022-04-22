@@ -85,6 +85,7 @@ logger.configure({ active: true });
 function Body() {
   const baseMap = baseMaps["BC"];
 
+  // Exp 4: StationMap with drawing tool: OK
   // Exp 3: minimal StationMap: OK
   return (
     <div className={css.portal}>
