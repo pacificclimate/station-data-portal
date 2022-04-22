@@ -7,6 +7,7 @@
     "leaflet": "^1.7.1",
     "lodash": "^4.17.11",
     "memoize-one": "^5.0.0",
+    "pcic-react-leaflet-components": "git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git#2.0.1",
     "prop-types": "^15.6.2",
     "react": "^17.0.2",
     "react-bootstrap": "^0.32.4",
