@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "axios": "^0.26.1",
     "bootstrap": "^3.4.0",
     "chroma-js": "^2.4.2",
     "leaflet": "^1.7.1",
@@ -15,7 +16,9 @@
     "react-dom": "^17.0.2",
     "react-leaflet": "3.1.0",
     "react-leaflet-draw": "^0.19.8",
-    "react-scripts": "3.0.1"
+    "react-scripts": "3.0.1",
+    "react-select": "^3.2.0",
+    "url-join": "^5.0.0"
   },
   "devDependencies": {
     "jest-each": "^24.0.0"
