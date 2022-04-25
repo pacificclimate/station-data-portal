@@ -33,7 +33,7 @@ import OnlyWithClimatologyControl
 import StationMap from '../../maps/StationMap';
 // import StationMetadata from '../../info/StationMetadata';
 // import StationData from '../../info/StationData';
-// import NetworksMetadata from '../../info/NetworksMetadata';
+import NetworksMetadata from '../../info/NetworksMetadata';
 import SelectionCounts from '../../info/SelectionCounts';
 // import SelectionCriteria from '../../info/SelectionCriteria';
 import AdjustableColumns from '../../util/AdjustableColumns';
@@ -386,9 +386,9 @@ function Body() {
                   {/*  />*/}
                   {/*</Tab>*/}
 
-                  {/*<Tab eventKey={'Networks'} title={'Networks'}>*/}
-                  {/*  <NetworksMetadata networks={allNetworks}/>*/}
-                  {/*</Tab>*/}
+                  <Tab eventKey={'Networks'} title={'Networks'}>
+                    <NetworksMetadata networks={allNetworks}/>
+                  </Tab>
 
                 </Tabs>
               </Panel.Body>
