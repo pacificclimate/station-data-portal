@@ -23,7 +23,7 @@ import {
 import VariableSelector from '../../selectors/VariableSelector';
 import FrequencySelector
   from '../../selectors/FrequencySelector/FrequencySelector';
-// import DateSelector from '../../selectors/DateSelector';
+import DateSelector from '../../selectors/DateSelector';
 import {
   stationFilter as stationFilterRaw,
   stationInsideMultiPolygon
@@ -293,18 +293,18 @@ function Body() {
                       <Col lg={6} md={6} sm={6}>
                         {/*<Button bsSize={'small'} onClick={handleClickAll}>Select all criteria</Button>*/}
                         {/*<Button bsSize={'small'} onClick={handleClickNone}>Clear all criteria</Button>*/}
-                        {/*<DateSelector*/}
-                        {/*  value={startDate}*/}
-                        {/*  onChange={setStartDate}*/}
-                        {/*  label={'Start Date'}*/}
-                        {/*/>*/}
+                        <DateSelector
+                          value={startDate}
+                          onChange={setStartDate}
+                          label={'Start Date'}
+                        />
                       </Col>
                       <Col lg={6} md={6} sm={6}>
-                        {/*<DateSelector*/}
-                        {/*  value={endDate}*/}
-                        {/*  onChange={setEndDate}*/}
-                        {/*  label={'End Date'}*/}
-                        {/*/>*/}
+                        <DateSelector
+                          value={endDate}
+                          onChange={setEndDate}
+                          label={'End Date'}
+                        />
                       </Col>
                       <Col lg={12} md={12} sm={12}>
                         <OnlyWithClimatologyControl
