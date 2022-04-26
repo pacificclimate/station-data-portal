@@ -19,7 +19,7 @@ import {
   getStations,
   getVariables,
 } from '../../../data-services/station-data-service';
-// import { dataDownloadTarget } from '../../../data-services/pdp-data-service';
+import { dataDownloadTarget } from '../../../data-services/pdp-data-service';
 import VariableSelector from '../../selectors/VariableSelector';
 import FrequencySelector
   from '../../selectors/FrequencySelector/FrequencySelector';
@@ -32,10 +32,10 @@ import OnlyWithClimatologyControl
   from '../../controls/OnlyWithClimatologyControl';
 import StationMap from '../../maps/StationMap';
 import StationMetadata from '../../info/StationMetadata';
-// import StationData from '../../info/StationData';
+import StationData from '../../info/StationData';
 import NetworksMetadata from '../../info/NetworksMetadata';
 import SelectionCounts from '../../info/SelectionCounts';
-// import SelectionCriteria from '../../info/SelectionCriteria';
+import SelectionCriteria from '../../info/SelectionCriteria';
 import AdjustableColumns from '../../util/AdjustableColumns';
 import baseMaps from '../../maps/baseMaps';
 
@@ -176,7 +176,6 @@ function Body() {
   const stationFilter = memoize(stationFilterRaw);
 
   const dataDownloadUrl = ({ dataCategory, clipToDate, fileFormat }) => {
-    return "#";
     // Check whether state has settled. Each selector calls an onReady callback
     // to export information (e.g., all its options) that it has set up
     // internally. In retrospect, this is a too-clever solution to the problem
@@ -185,21 +184,21 @@ function Body() {
       return "#";
     }
 
-    // return dataDownloadTarget({
-    //   startDate: startDate,
-    //   endDate: endDate,
-    //   selectedNetworksOptions: selectedNetworksOptions,
-    //   selectedVariablesOptions: selectedVariablesOptions,
-    //   selectedFrequenciesOptions: selectedFrequenciesOptions,
-    //   polygon: area,
-    //   onlyWithClimatology: onlyWithClimatology,
-    //   allNetworks: networkActions.getAllOptions(),
-    //   allVariables: variableActions.getAllOptions(),
-    //   allFrequencies: frequencyActions.getAllOptions(),
-    //   dataCategory,
-    //   clipToDate,
-    //   dataFormat: fileFormat,
-    // });
+    return dataDownloadTarget({
+      startDate: startDate,
+      endDate: endDate,
+      selectedNetworksOptions: selectedNetworksOptions,
+      selectedVariablesOptions: selectedVariablesOptions,
+      selectedFrequenciesOptions: selectedFrequenciesOptions,
+      polygon: area,
+      onlyWithClimatology: onlyWithClimatology,
+      allNetworks: networkActions.getAllOptions(),
+      allVariables: variableActions.getAllOptions(),
+      allFrequencies: frequencyActions.getAllOptions(),
+      dataCategory,
+      clipToDate,
+      dataFormat: fileFormat,
+    });
   };
 
   const dataDownloadFilename = ({ dataCategory, fileFormat }) => {
@@ -368,23 +367,23 @@ function Body() {
                     />
                   </Tab>
 
-                  {/*<Tab eventKey={'Data'} title={'Station Data'}>*/}
-                  {/*  <SelectionCounts*/}
-                  {/*    allStations={allStations}*/}
-                  {/*    selectedStations={selectedStations}*/}
-                  {/*  />*/}
-                  {/*  <SelectionCriteria/>*/}
-                  {/*  {*/}
-                  {/*    unselectedThings &&*/}
-                  {/*    <p>You haven't selected any {unselectedThings}.</p>*/}
-                  {/*  }*/}
+                  <Tab eventKey={'Data'} title={'Station Data'}>
+                    <SelectionCounts
+                      allStations={allStations}
+                      selectedStations={selectedStations}
+                    />
+                    <SelectionCriteria/>
+                    {
+                      unselectedThings &&
+                      <p>You haven't selected any {unselectedThings}.</p>
+                    }
 
-                  {/*  <StationData*/}
-                  {/*    selectedStations={selectedStations}*/}
-                  {/*    dataDownloadUrl={dataDownloadUrl}*/}
-                  {/*    dataDownloadFilename={dataDownloadFilename}*/}
-                  {/*  />*/}
-                  {/*</Tab>*/}
+                    <StationData
+                      selectedStations={selectedStations}
+                      dataDownloadUrl={dataDownloadUrl}
+                      dataDownloadFilename={dataDownloadFilename}
+                    />
+                  </Tab>
 
                   <Tab eventKey={'Networks'} title={'Networks'}>
                     <NetworksMetadata networks={allNetworks}/>
