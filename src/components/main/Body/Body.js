@@ -31,7 +31,7 @@ import {
 import OnlyWithClimatologyControl
   from '../../controls/OnlyWithClimatologyControl';
 import StationMap from '../../maps/StationMap';
-// import StationMetadata from '../../info/StationMetadata';
+import StationMetadata from '../../info/StationMetadata';
 // import StationData from '../../info/StationData';
 import NetworksMetadata from '../../info/NetworksMetadata';
 import SelectionCounts from '../../info/SelectionCounts';
@@ -356,17 +356,17 @@ function Body() {
                     </Row>
                   </Tab>
 
-                  {/*<Tab eventKey={'Metadata'} title={'Station Metadata'}>*/}
-                  {/*  <SelectionCounts*/}
-                  {/*    allStations={allStations}*/}
-                  {/*    selectedStations={selectedStations}*/}
-                  {/*  />*/}
-                  {/*  <StationMetadata*/}
-                  {/*    stations={selectedStations}*/}
-                  {/*    allNetworks={allNetworks}*/}
-                  {/*    allVariables={allVariables}*/}
-                  {/*  />*/}
-                  {/*</Tab>*/}
+                  <Tab eventKey={'Metadata'} title={'Station Metadata'}>
+                    <SelectionCounts
+                      allStations={allStations}
+                      selectedStations={selectedStations}
+                    />
+                    <StationMetadata
+                      stations={selectedStations}
+                      allNetworks={allNetworks}
+                      allVariables={allVariables}
+                    />
+                  </Tab>
 
                   {/*<Tab eventKey={'Data'} title={'Station Data'}>*/}
                   {/*  <SelectionCounts*/}
