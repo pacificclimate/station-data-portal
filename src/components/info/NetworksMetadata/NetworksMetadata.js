@@ -4,6 +4,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import { Table } from 'react-bootstrap';
 import { useTable } from 'react-table';
 import logger from '../../../logger';
 import chroma from 'chroma-js';
@@ -13,7 +14,7 @@ import './NetworksMetadata.css';
 logger.configure({ active: true });
 
 
-function NetworksMetadata({ networks, defaultNetworkColor, ...restProps }) {
+function NetworksMetadata({ networks, defaultNetworkColor }) {
   const columns = React.useMemo(() => [
     {
       id: 'Colour',
@@ -61,7 +62,9 @@ function NetworksMetadata({ networks, defaultNetworkColor, ...restProps }) {
   }
 
   return (
-    <table {...getTableProps()}>
+    <div>
+
+    <Table {...getTableProps()}>
       <thead>
       {
         // Header rows
@@ -103,19 +106,9 @@ function NetworksMetadata({ networks, defaultNetworkColor, ...restProps }) {
         })
       }
       </tbody>
-    </table>
-  )
-
-
-
-  // return (
-    //   <ReactTable
-    //     data={networks}
-    //     columns={columns}
-    //     defaultPageSize={100}
-    //     {...restProps}
-    //   />
-    // );
+    </Table>
+    </div>
+  );
 }
 
 NetworksMetadata.propTypes = {
