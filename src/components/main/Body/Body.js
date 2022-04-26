@@ -248,7 +248,7 @@ function Body() {
         <AdjustableColumns
           defaultLgs={defaultLgs}
           contents={[
-            "map" ||  // Uncomment to suppress map
+            // "map" ||  // Uncomment to suppress map
             <StationMap
               {...baseMaps[process.env.REACT_APP_BASE_MAP]}
               stations={filteredStations}
