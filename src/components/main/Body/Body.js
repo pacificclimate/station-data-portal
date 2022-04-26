@@ -83,38 +83,6 @@ const stationDebugFetchOptions =
 
 
 function Body() {
-  // const baseMap = baseMaps["BC"];
-  //
-  // // Exp 4: StationMap with drawing tool: OK
-  // // Exp 3: minimal StationMap: OK
-  // return (
-  //   <div className={css.portal}>
-  //     <StationMap
-  //       {...baseMap}
-  //       stations={[]}
-  //       allNetworks={[]}
-  //       allVariables={[]}
-  //     />
-  //   </div>
-  // )
-  //
-  // // Exp 2: Base map: OK
-  // const { BaseMap, initialViewport } = baseMap;
-  // return (
-  //   <div className={css.portal}>
-  //     <BaseMap
-  //       zoom={initialViewport.zoom}
-  //       center={initialViewport.center}
-  //       preferCanvas={true}
-  //     />
-  //   </div>
-  // )
-  //
-  // // Exp 1: empty: OK
-  // return (
-  //   "foo"
-  // );
-
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
@@ -185,13 +153,13 @@ function Body() {
     }
 
     return dataDownloadTarget({
-      startDate: startDate,
-      endDate: endDate,
-      selectedNetworksOptions: selectedNetworksOptions,
-      selectedVariablesOptions: selectedVariablesOptions,
-      selectedFrequenciesOptions: selectedFrequenciesOptions,
+      startDate,
+      endDate,
+      selectedNetworksOptions,
+      selectedVariablesOptions,
+      selectedFrequenciesOptions,
       polygon: area,
-      onlyWithClimatology: onlyWithClimatology,
+      onlyWithClimatology,
       allNetworks: networkActions.getAllOptions(),
       allVariables: variableActions.getAllOptions(),
       allFrequencies: frequencyActions.getAllOptions(),
@@ -200,6 +168,8 @@ function Body() {
       dataFormat: fileFormat,
     });
   };
+
+  // TODO: Check download URLs
 
   const dataDownloadFilename = ({ dataCategory, fileFormat }) => {
     return `${{ dataCategory, fileFormat }}.${get('value', fileFormat)}`;
