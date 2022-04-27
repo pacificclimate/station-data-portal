@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { CircleMarker, Polygon } from 'react-leaflet';
 import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
@@ -21,42 +21,6 @@ logger.configure({ active: true });
 const timer = getTimer("StationMarker timing");
 
 
-// This user hook implements lazy marker popup generation.
-// Returns an object `{ markerRef, addPopup, popup }`:
-//  `markerRef`: React ref to be attached to marker.
-//  `addPopup`: Callback to be attached to event (usually click) on marker that
-//    triggers popup. Creates the popup (once; effectively memoized).
-//  `popup`: Lazily created popup to be rendered inside marker. Value `null`
-//    until `addPopup` called; value is the popup thereafter.
-const useLazyPopup = ({ station, allNetworks, allVariables }) => {
-  const markerRef = useRef();
-  const [popup, setPopup] = useState(null);
-
-  // Callback: create popup if not already created.
-  const addPopup = () => {
-    if (popup === null) {
-      setPopup(
-        <StationPopup
-          station={station}
-          allNetworks={allNetworks}
-          allVariables={allVariables}
-        />
-      );
-    }
-  };
-
-  // Open popup on initial creation.
-  useEffect(() => {
-    const element = markerRef?.current?.leafletElement;
-    if (element) {
-      element.openPopup();
-    }
-  }, [popup]);
-
-  return { markerRef, popup, addPopup };
-};
-
-
 const LocationMarker = ({
   station,
   location,
@@ -65,23 +29,22 @@ const LocationMarker = ({
   allVariables,
   markerOptions,
 }) => {
-  const { markerRef, popup, addPopup } =
-    useLazyPopup({ station, allNetworks, allVariables });
-
   return (
     <CircleMarker
-      ref={markerRef}
       key={location.id}
       center={location}
       {...markerOptions}
       color={color}
-      onClick={addPopup}
     >
       <StationTooltip
         station={station}
         allNetworks={allNetworks}
       />
-      {popup}
+      <StationPopup
+        station={station}
+        allNetworks={allNetworks}
+        allVariables={allVariables}
+      />
     </CircleMarker>
   );
 };
@@ -95,25 +58,24 @@ const MultiLocationMarker = ({
   allNetworks,
   allVariables,
 }) => {
-  const { markerRef, popup, addPopup } =
-    useLazyPopup({ station, allNetworks, allVariables });
-
   if (locations.length <= 1) {
     return null;
   }
   return (
     <Polygon
-      ref={markerRef}
       {...polygonOptions}
       color={color}
       positions={locations}
-      onClick={addPopup}
     >
       <StationTooltip
         station={station}
         allNetworks={allNetworks}
       />
-      {popup}
+      <StationPopup
+        station={station}
+        allNetworks={allNetworks}
+        allVariables={allVariables}
+      />
     </Polygon>
   );
 };
@@ -144,7 +106,7 @@ const StationMarkers = timer.timeThis("StationMarker")(({
     map(hx => ({ id: hx.id, lng: hx.lon, lat: hx.lat }))
   )(station);
 
-  const r = (
+  return (
     <React.Fragment>
       {
         map(
@@ -172,7 +134,6 @@ const StationMarkers = timer.timeThis("StationMarker")(({
       />
     </React.Fragment>
   );
-  return r;
 });
 
 StationMarkers.propTypes = {
