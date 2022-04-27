@@ -26,6 +26,11 @@
   "devDependencies": {
     "jest-each": "^24.0.0"
   },
+  "jest": {
+    "transformIgnorePatterns": [
+      "<rootDir>/node_modules/(?!url-join)"
+    ]
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
