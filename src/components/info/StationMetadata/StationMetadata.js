@@ -3,13 +3,15 @@
 // passed into React Table.
 
 import PropTypes from 'prop-types';
-import React from 'react';
-import ReactTable from 'react-table';
+import React, { useMemo } from 'react';
+import { useTable, usePagination }  from 'react-table';
+import { Table } from 'react-bootstrap';
 
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 
 import DownloadMetadata from '../../controls/DownloadMetadata';
+import PaginationControls from '../../controls/PaginationControls';
 import FrequencySelector from '../../selectors/FrequencySelector';
 import logger from '../../../logger';
 import {
@@ -21,7 +23,6 @@ import {
   uniqStationVariableNames
 } from '../../../utils/station-info';
 
-import 'react-table/react-table.css';
 import './StationMetadata.css';
 
 
@@ -48,134 +49,232 @@ const lexCompare = (a, b) => {
 }
 
 
-function StationMetadata({
-  stations, allNetworks, allVariables, ...restProps
-}) {
-  const columns = [
+function StationMetadata({ stations, allNetworks, allVariables }) {
+  const columns = useMemo(
+    () => [
+      {
+        id: 'Network',
+        Header: 'Network',
+        minWidth: 80,
+        maxWidth: 100,
+        accessor: station => {
+          const network = stationNetwork(allNetworks, station);
+          return network ? network.name : '?';
+        },
+      },
+      {
+        id: 'Native ID',
+        Header: 'Native ID',
+        minWidth: 80,
+        maxWidth: 100,
+        accessor: 'native_id'
+      },
+      {
+        id: 'Unique Names',
+        Header: 'Unique Names',
+        minWidth: 120,
+        maxWidth: 200,
+        accessor: uniqStationNames,
+        sortMethod: lexCompare,
+        Cell: row => (
+          <ul className={"compact"}>
+            {map(name => (<li key={name}>{name}</li>), row.value)}
+          </ul>
+        ),
+      },
+      {
+        id: 'Unique Locations',
+        Header: 'Unique Locations',
+        minWidth: 120,
+        maxWidth: 200,
+        sortable: false,
+        accessor: uniqStationLocations,
+        Cell: row => (
+          <ul className={"compact"}>
+            {
+                map(location => (
+                  // A location is a representative history item
+                  <li key={location.id}>
+                    {-location.lon} W <br/>
+                    {location.lat} N <br/>
+                    Elev. {location.elevation} m
+                  </li>
+                ), row.value)
+            }
+          </ul>
+        ),
+      },
+      {
+        id: 'Unique Records',
+        Header: 'Unique Records',
+        minWidth: 100,
+        maxWidth: 100,
+        sortable: false,
+        accessor: uniqStationObsPeriods,
+        Cell: row => (
+          <ul className={"compact"}>
+            {
+                map(period => (
+                  // A period is a representative history item
+                  <li key={period.id}>
+                    {formatDate(period.min_obs_time)} to <br/>
+                    {formatDate(period.max_obs_time)}
+                  </li>
+                ), row.value)
+            }
+          </ul>
+        ),
+      },
+      {
+        minWidth: 80,
+        maxWidth: 100,
+        id: 'Uniq Obs Freqs',
+        Header: 'Uniq Obs Freqs',
+        accessor: flow(uniqStationFreqs, map(FrequencySelector.valueToLabel)),
+        sortMethod: lexCompare,
+        Cell: row => (
+          <ul className={"compact"}>
+            {map(freq => (<li key={freq}>{freq}</li>), row.value)}
+          </ul>
+        ),
+      },
+      {
+        minWidth: 100,
+        maxWidth: 250,
+        id: 'Variables',
+        Header: 'Variables',
+        accessor: uniqStationVariableNames(allVariables),
+        sortable: false,
+        Cell: row => (
+          <ul className={"compact"}>
+            {map(name => (<li key={name}>{name}</li>), row.value)}
+          </ul>
+        ),
+      },
+      {
+        id: '# Hx',
+        Header: '# Hx',
+        minWidth: 30,
+        maxWidth: 30,
+        accessor: station => station.histories.length,
+      },
+    ],
+    [allNetworks, allVariables]
+  );
+
+  const {
+    // Basic table functionality
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    prepareRow,
+    visibleColumns,
+
+    // Pagination
+    // Instead of using `rows`, we use `page`,
+    // which has only the rows for the active page
+    page,
+    canPreviousPage,
+    canNextPage,
+    pageCount,
+    gotoPage,
+    nextPage,
+    previousPage,
+    setPageSize,
+
+    // Know what's in state
+    state: {
+      // Pagination
+      pageIndex,
+      pageSize
+    },
+  } = useTable(
     {
-      id: 'Network',
-      Header: 'Network',
-      minWidth: 80,
-      maxWidth: 100,
-      accessor: station => {
-        const network = stationNetwork(allNetworks, station);
-        return network ? network.name : '?';
+      columns,
+      data: stations,
+      // Necessary when paging controls added?
+      initialState: {
+        pageSize: 10,
+        pageIndex: 0,
       },
     },
-    {
-      id: 'Native ID',
-      Header: 'Native ID',
-      minWidth: 80,
-      maxWidth: 100,
-      accessor: 'native_id'
-    },
-    {
-      id: 'Unique Names',
-      Header: 'Unique Names',
-      minWidth: 120,
-      maxWidth: 200,
-      accessor: uniqStationNames,
-      sortMethod: lexCompare,
-      Cell: row => (
-        <ul className={"compact"}>
-          {map(name => (<li key={name}>{name}</li>), row.value)}
-        </ul>
-      ),
-    },
-    {
-      id: 'Unique Locations',
-      Header: 'Unique Locations',
-      minWidth: 120,
-      maxWidth: 200,
-      sortable: false,
-      accessor: uniqStationLocations,
-      Cell: row => (
-        <ul className={"compact"}>
-          {
-              map(location => (
-                // A location is a representative history item
-                <li key={location.id}>
-                  {-location.lon} W <br/>
-                  {location.lat} N <br/>
-                  Elev. {location.elevation} m
-                </li>
-              ), row.value)
-          }
-        </ul>
-      ),
-    },
-    {
-      id: 'Unique Records',
-      Header: 'Unique Records',
-      minWidth: 100,
-      maxWidth: 100,
-      sortable: false,
-      accessor: uniqStationObsPeriods,
-      Cell: row => (
-        <ul className={"compact"}>
-          {
-              map(period => (
-                // A period is a representative history item
-                <li key={period.id}>
-                  {formatDate(period.min_obs_time)} to <br/>
-                  {formatDate(period.max_obs_time)}
-                </li>
-              ), row.value)
-          }
-        </ul>
-      ),
-    },
-    {
-      minWidth: 80,
-      maxWidth: 100,
-      id: 'Uniq Obs Freqs',
-      Header: 'Uniq Obs Freqs',
-      accessor: flow(uniqStationFreqs, map(FrequencySelector.valueToLabel)),
-      sortMethod: lexCompare,
-      Cell: row => (
-        <ul className={"compact"}>
-          {map(freq => (<li key={freq}>{freq}</li>), row.value)}
-        </ul>
-      ),
-    },
-    {
-      minWidth: 100,
-      maxWidth: 250,
-      id: 'Variables',
-      Header: 'Variables',
-      accessor: uniqStationVariableNames(allVariables),
-      sortable: false,
-      Cell: row => (
-        <ul className={"compact"}>
-          {map(name => (<li key={name}>{name}</li>), row.value)}
-        </ul>
-      ),
-    },
-    {
-      id: '# Hx',
-      Header: '# Hx',
-      minWidth: 30,
-      maxWidth: 30,
-      accessor: station => station.histories.length,
-    },
-  ];
+    usePagination,
+  );
 
-  // Note: Download button is placed here because it should use the same
-  // formatting as React Table, i.e., what is defined in `columns`. It's too
-  // bad that React Table doesn't provide an export feature.
+  const paginationControls = (
+    <tr>
+      <td colSpan={visibleColumns.length}>
+        <PaginationControls
+          {...{
+            canPreviousPage,
+            canNextPage,
+            pageCount,
+            pageIndex,
+            gotoPage,
+            nextPage,
+            previousPage,
+            pageSize,
+            setPageSize,
+          }}
+        />
+      </td>
+    </tr>
+  );
+
+  // Note: Download button is rendered here because it uses `columns` to
+  // control what it does.
   return (
-    <React.Fragment>
+    <div className={"StationMetadata"}>
       <DownloadMetadata
         data={stations}
         columns={columns}
       />
-      <ReactTable
-        data={stations}
-        columns={columns}
-        defaultPageSize={100}
-        {...restProps}
-      />
-    </React.Fragment>
+      <Table {...getTableProps()}>
+        <thead>{paginationControls}</thead>
+        <thead>
+        {
+          // Header rows
+          headerGroups.map(headerGroup => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {
+                // Header cells
+                headerGroup.headers.map(column => (
+                  <th {...column.getHeaderProps()}>
+                    {column.render('Header')}
+                  </th>
+                ))
+              }
+            </tr>
+          ))
+        }
+        </thead>
+
+        <tbody {...getTableBodyProps()}>
+        {
+          // Body rows
+          page.map(row => {
+            // Prepare the row for display
+            prepareRow(row)
+            return (
+              <tr {...row.getRowProps()}>
+                {
+                  // Body cells
+                  row.cells.map(cell => {
+                    return (
+                      <td {...cell.getCellProps()}>
+                        {cell.render('Cell')}
+                      </td>
+                    )
+                  })
+                }
+              </tr>
+            )
+          })
+        }
+        </tbody>
+        <tfoot>{paginationControls}</tfoot>
+      </Table>
+    </div>
   );
 }
 

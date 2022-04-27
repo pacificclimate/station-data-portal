@@ -105,8 +105,8 @@ function Body() {
   const [area, setArea] = useState(undefined);
   const [stnsLimit, setStnsLimit] = useState(stnsLimitOptions[0]);
 
-  // // TODO: Remove? Not presently used, but there is commented out code
-  // //  in Filters tab that uses them.
+  // TODO: Remove? Not presently used, but there is commented out code
+  //  in Filters tab that uses them.
   // const handleClickAll = () => {
   //   networkActions.selectAll();
   //   variableActions.selectAll();
@@ -153,21 +153,23 @@ function Body() {
     }
 
     return dataDownloadTarget({
-      startDate: startDate,
-      endDate: endDate,
-      selectedNetworksOptions: selectedNetworksOptions,
-      selectedVariablesOptions: selectedVariablesOptions,
-      selectedFrequenciesOptions: selectedFrequenciesOptions,
+      startDate,
+      endDate,
+      selectedNetworksOptions,
+      selectedVariablesOptions,
+      selectedFrequenciesOptions,
       polygon: area,
-      onlyWithClimatology: onlyWithClimatology,
-      allNetworks: networkActions.getAllOptions(),
-      allVariables: variableActions.getAllOptions(),
-      allFrequencies: frequencyActions.getAllOptions(),
+      onlyWithClimatology,
+      allNetworksOptions: networkActions.getAllOptions(),
+      allVariablesOptions: variableActions.getAllOptions(),
+      allFrequenciesOptions: frequencyActions.getAllOptions(),
       dataCategory,
       clipToDate,
       dataFormat: fileFormat,
     });
   };
+
+  // TODO: Check download URLs
 
   const dataDownloadFilename = ({ dataCategory, fileFormat }) => {
     return `${{ dataCategory, fileFormat }}.${get('value', fileFormat)}`;

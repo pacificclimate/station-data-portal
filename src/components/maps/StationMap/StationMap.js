@@ -24,11 +24,8 @@
 //    the user to upload a selection shape. That has all been removed, giving a
 //    major simplification and significant speed up of this component.
 //    The previous implementation of user upload caused double-renders of
-//    the map, which is slow. To add such a feature again, it would be best to
-//    renovate the component `LayerControlledFeatureGroup` to *add* its layers
-//    to the internally existing ones in the layer group, rather than to do a
-//    fully controlled component style implementation, which causes double
-//    updates.
+//    the map, which is slow. Any reimplementation of this feature will have
+//    to be very careful about causing double updates.
 //
 //  `onSetArea` callback
 //
@@ -66,7 +63,7 @@ function StationMap({
   stations,
   allNetworks,
   allVariables,
-  onSetArea,
+  onSetArea = () => {},
   userShapeStyle = {
     color: "#f49853",
     weight: 1,
@@ -74,6 +71,7 @@ function StationMap({
 }) {
   const userShapeLayerRef = useRef();
 
+  // TODO: Remove
   // const [geometryLayers, setGeometryLayers] = useState([]);
 
   // Set up drawing tool. This might be better done elsewhere.
@@ -94,7 +92,7 @@ function StationMap({
   }, []);
 
   const handleChangedGeometryLayers = () => {
-    const layers = userShapeLayerRef?.current?.leafletElement?.getLayers();
+    const layers = userShapeLayerRef?.current?.getLayers();
     onSetArea(layers && layersToGeoJSONMultipolygon(layers));
   };
 
@@ -104,7 +102,11 @@ function StationMap({
   // alert("StationMap render")
 
   return (
-    <BaseMap viewport={initialViewport} preferCanvas={true}>
+    <BaseMap
+      zoom={initialViewport.zoom}
+      center={initialViewport.center}
+      preferCanvas={true}
+    >
       <FeatureGroup ref={userShapeLayerRef}>
         <EditControl
           position={'topleft'}
@@ -154,7 +156,7 @@ StationMap.propTypes = {
   stations: PropTypes.array.isRequired,
   allNetworks: PropTypes.array,
   allVariables: PropTypes.array,
-  onSetArea: PropTypes.func.isRequired,
+  onSetArea: PropTypes.func,
 };
 
 export default StationMap;

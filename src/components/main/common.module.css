@@ -3,6 +3,14 @@
     width: 100%;
 }
 
+.portal :global(.leaflet-popup-content) {
+    font-size: 12px;
+}
+
+.portal :global(.leaflet-tooltip) {
+    font-size: 12px;
+}
+
 .portal .mainTabs :global(.nav-tabs) {
     margin-bottom: 15px;
 }

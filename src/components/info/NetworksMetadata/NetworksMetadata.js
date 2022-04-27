@@ -3,74 +3,122 @@
 // passed into React Table.
 
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
-import ReactTable from 'react-table';
+import React from 'react';
+import { Table } from 'react-bootstrap';
+import { useTable } from 'react-table';
 import logger from '../../../logger';
 import chroma from 'chroma-js';
-import 'react-table/react-table.css';
 import './NetworksMetadata.css';
 
 
 logger.configure({ active: true });
 
 
-export default class NetworksMetadata extends Component {
-  static propTypes = {
-    networks: PropTypes.array,
-    defaultNetworkColor: PropTypes.string,
-  };
+function NetworksMetadata({ networks, defaultNetworkColor }) {
+  const columns = React.useMemo(() => [
+    {
+      id: 'Colour',
+      Header: '',
+      minWidth: 20,
+      maxWidth: 20,
+      accessor: network => (
+        <div style={{
+          width: "1em",
+          height: "1em",
+          borderRadius: "0.5em",
+          backgroundColor: chroma(
+            network.color ?? defaultNetworkColor
+          ).css(),
+        }}>&nbsp;</div>
+      )
+    },
+    {
+      id: 'Short Name',
+      Header: 'Short Name',
+      minWidth: 80,
+      maxWidth: 100,
+      accessor: 'name'
+    },
+    {
+      id: 'Long Name',
+      Header: 'Long Name',
+      minWidth: 80,
+      maxWidth: 400,
+      accessor: 'long_name'
+    },
+  ], [defaultNetworkColor]);
 
-  static defaultProps = {
-    defaultNetworkColor:
-      process.env.REACT_APP_DEFAULT_NETWORK_COLOR ?? '#000000',
+  const tableInstance = useTable({ columns, data: networks ?? [] });
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+  } = tableInstance;
+
+  if (networks === null) {
+    return "Loading...";
   }
 
-  render() {
-    const { networks, defaultNetworkColor, ...restProps } = this.props;
-    if (networks === null) {
-      return "Loading...";
-    }
+  return (
+    <div>
 
-    const columns = [
+    <Table {...getTableProps()}>
+      <thead>
       {
-        id: 'Colour',
-        Header: '',
-        minWidth: 20,
-        maxWidth: 20,
-        accessor: network => (
-          <div style={{
-            width: "1em",
-            height: "1em",
-            borderRadius: "0.5em",
-            backgroundColor: chroma(
-              network.color ?? defaultNetworkColor
-            ).css(),
-          }}>&nbsp;</div>
-        )
-      },
-      {
-        id: 'Short Name',
-        Header: 'Short Name',
-        minWidth: 80,
-        maxWidth: 100,
-        accessor: 'name'
-      },
-      {
-        id: 'Long Name',
-        Header: 'Long Name',
-        minWidth: 80,
-        maxWidth: 400,
-        accessor: 'long_name'
-      },
-    ];
+        // Header rows
+        headerGroups.map(headerGroup => (
+          <tr {...headerGroup.getHeaderGroupProps()}>
+            {
+              // Header cells
+              headerGroup.headers.map(column => (
+                <th {...column.getHeaderProps()}>
+                  {column.render('Header')}
+                </th>
+              ))
+            }
+          </tr>
+        ))
+      }
+      </thead>
 
-    return (
-      <ReactTable
-        data={networks}
-        columns={columns}
-        defaultPageSize={100}
-        {...restProps}
-      />
-    );
-  }
+      <tbody {...getTableBodyProps()}>
+      {
+        // Body rows
+        rows.map(row => {
+          // Prepare the row for display
+          prepareRow(row)
+          return (
+            <tr {...row.getRowProps()}>
+              {
+                // Body cells
+                row.cells.map(cell => {
+                  return (
+                    <td {...cell.getCellProps()}>
+                      {cell.render('Cell')}
+                    </td>
+                  )
+                })
+              }
+            </tr>
+          )
+        })
+      }
+      </tbody>
+    </Table>
+    </div>
+  );
 }
+
+NetworksMetadata.propTypes = {
+  networks: PropTypes.array,
+  defaultNetworkColor: PropTypes.string,
+};
+
+NetworksMetadata.defaultProps = {
+  defaultNetworkColor:
+    process.env.REACT_APP_DEFAULT_NETWORK_COLOR ?? '#000000',
+}
+
+export default NetworksMetadata;
