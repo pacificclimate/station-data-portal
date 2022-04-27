@@ -95,7 +95,7 @@ function StationMap({
   }, []);
 
   const handleChangedGeometryLayers = () => {
-    const layers = userShapeLayerRef?.current?.leafletElement?.getLayers();
+    const layers = userShapeLayerRef?.current?.getLayers();
     onSetArea(layers && layersToGeoJSONMultipolygon(layers));
   };
 
