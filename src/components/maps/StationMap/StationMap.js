@@ -24,11 +24,8 @@
 //    the user to upload a selection shape. That has all been removed, giving a
 //    major simplification and significant speed up of this component.
 //    The previous implementation of user upload caused double-renders of
-//    the map, which is slow. To add such a feature again, it would be best to
-//    renovate the component `LayerControlledFeatureGroup` to *add* its layers
-//    to the internally existing ones in the layer group, rather than to do a
-//    fully controlled component style implementation, which causes double
-//    updates.
+//    the map, which is slow. Any reimplementation of this feature will have
+//    to be very careful about causing double updates.
 //
 //  `onSetArea` callback
 //
