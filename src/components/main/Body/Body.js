@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Panel, Row, Tab, Tabs } from 'react-bootstrap';
+import {
+  Checkbox,
+  Col,
+  FormGroup,
+  FormControl,
+  Panel,
+  Row,
+  Tab,
+  Tabs, ControlLabel
+} from 'react-bootstrap';
 import Select from 'react-select';
 import memoize from 'memoize-one';
 import flow from 'lodash/fp/flow';
@@ -37,6 +46,7 @@ import NetworksMetadata from '../../info/NetworksMetadata';
 import SelectionCounts from '../../info/SelectionCounts';
 import SelectionCriteria from '../../info/SelectionCriteria';
 import AdjustableColumns from '../../util/AdjustableColumns';
+import JSONstringify from '../../util/JSONstringify';
 import baseMaps from '../../maps/baseMaps';
 
 
@@ -105,6 +115,43 @@ function Body() {
   const [area, setArea] = useState(undefined);
   const [stnsLimit, setStnsLimit] = useState(stnsLimitOptions[0]);
 
+  // Marker clustering option controls. We offer a subset of all options.
+
+  const eventHandler = set => e => set(e.target.value);
+
+  const [spiderfyOnMaxZoom, setSpiderfyOnMaxZoom] = useState(false);
+  const toggleSpiderfyOnMaxZoom =
+    () => setSpiderfyOnMaxZoom(!spiderfyOnMaxZoom);
+
+  const [zoomToBoundsOnClick, setZoomToBoundsOnClick] = useState(false);
+  const toggleZoomToBoundsOnClick =
+    () => setZoomToBoundsOnClick(!zoomToBoundsOnClick);
+
+  const [enableClustering, setEnableClustering] = useState(true);
+  const toggleEnableClustering =
+    () => setEnableClustering(!enableClustering)
+
+  const [disableClusteringAtZoom, setDisableClusteringAtZoom] = useState(6);
+  const handleChangeDisableClusteringAtZoom =
+    eventHandler(setDisableClusteringAtZoom);
+
+  const [maxClusterRadius, setMaxClusterRadius] = useState(80);
+  const handleChangeMaxClusterRadius = eventHandler(setMaxClusterRadius);
+
+  const markerClusterOptions = React.useMemo(() => ({
+    spiderfyOnMaxZoom,
+    zoomToBoundsOnClick,
+    "disableClusteringAtZoom":
+      enableClustering ? disableClusteringAtZoom : undefined,
+    maxClusterRadius,
+  }), [
+    spiderfyOnMaxZoom,
+    zoomToBoundsOnClick,
+    enableClustering,
+    disableClusteringAtZoom,
+    maxClusterRadius
+  ]);
+
   // TODO: Remove? Not presently used, but there is commented out code
   //  in Filters tab that uses them.
   // const handleClickAll = () => {
@@ -117,9 +164,11 @@ function Body() {
   //   variableActions.selectNone();
   //   frequencyActions.selectNone();
   // };
-  //
+
   const toggleOnlyWithClimatology = () =>
     setOnlyWithClimatology(!onlyWithClimatology);
+
+  // Load metadata
 
   useEffect(() => {
     getNetworks().then(response => setAllNetworks(response.data));
@@ -225,15 +274,60 @@ function Body() {
               allNetworks={allNetworks}
               allVariables={allVariables}
               onSetArea={setArea}
+              markerClusterOptions={markerClusterOptions}
             />,
 
             <Panel style={{ marginLeft: '-15px', marginRight: '-10px' }}>
               <Panel.Body>
                 <Tabs
                   id="non-map-controls"
-                  defaultActiveKey={'Filters'}
+                  defaultActiveKey={'Clustering'}
                   className={css.mainTabs}
                 >
+                  <Tab eventKey={'Clustering'} title={'Marker Clustering'}>
+                    <FormGroup>
+                      <Checkbox
+                        checked={spiderfyOnMaxZoom}
+                        onChange={toggleSpiderfyOnMaxZoom}
+                      >
+                        spiderfyOnMaxZoom
+                      </Checkbox>
+
+                      <Checkbox
+                        checked={zoomToBoundsOnClick}
+                        onChange={toggleZoomToBoundsOnClick}
+                      >
+                        zoomToBoundsOnClick
+                      </Checkbox>
+
+                      <Checkbox
+                        inline
+                        checked={enableClustering}
+                        onChange={toggleEnableClustering}
+                      >
+                        Enable clustering
+                      </Checkbox>
+                      <FormControl
+                        componentClass={"input"}
+                        placeholder={"Zoom level"}
+                        type={"number"}
+                        disabled={!enableClustering}
+                        value={disableClusteringAtZoom}
+                        onChange={handleChangeDisableClusteringAtZoom}
+                      />
+
+                      <ControlLabel>Max. cluster radius</ControlLabel>
+                      <FormControl
+                        componentClass={"input"}
+                        placeholder={"Radius in pixels"}
+                        type={"number"}
+                        value={maxClusterRadius}
+                        onChange={handleChangeMaxClusterRadius}
+                      />
+                    </FormGroup>
+                    <JSONstringify object={markerClusterOptions}/>
+                  </Tab>
+
                   <Tab eventKey={'Filters'} title={'Station Filters'}>
                     <Row>
                       <Col lg={12} md={12} sm={12}>
