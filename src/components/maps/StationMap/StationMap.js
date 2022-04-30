@@ -40,8 +40,9 @@
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef } from 'react';
 
-import { FeatureGroup, LayerGroup } from 'react-leaflet';
+import { FeatureGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
+import MarkerCluster from '../MarkerCluster';
 import L from 'leaflet';
 
 import StationMarkers from '../StationMarkers';
@@ -64,6 +65,7 @@ function StationMap({
   allNetworks,
   allVariables,
   onSetArea = () => {},
+  markerClusterOptions,
   userShapeStyle = {
     color: "#f49853",
     weight: 1,
@@ -131,7 +133,8 @@ function StationMap({
           onDeleted={handleChangedGeometryLayers}
         />
       </FeatureGroup>
-      <LayerGroup>
+
+      <MarkerCluster {...markerClusterOptions}>
         {
           map(
             station => (
@@ -145,7 +148,7 @@ function StationMap({
             stations
           )
         }
-      </LayerGroup>
+      </MarkerCluster>
     </BaseMap>
   );
 }
