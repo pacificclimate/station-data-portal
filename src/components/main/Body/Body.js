@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import {
   Checkbox,
   Col,
-  FormGroup,
+  ControlLabel,
   FormControl,
+  FormGroup,
   Panel,
   Row,
   Tab,
-  Tabs, ControlLabel
+  Tabs
 } from 'react-bootstrap';
 import Select from 'react-select';
 import memoize from 'memoize-one';
@@ -119,38 +120,54 @@ function Body() {
 
   const eventHandler = set => e => set(e.target.value);
 
-  const [spiderfyOnMaxZoom, setSpiderfyOnMaxZoom] = useState(false);
-  const toggleSpiderfyOnMaxZoom =
-    () => setSpiderfyOnMaxZoom(!spiderfyOnMaxZoom);
+  const useStateWithEventHandler = init => {
+    const [state, setState] = useState(init);
+    return [state, e => setState(e.target.value)]
+  };
 
-  const [zoomToBoundsOnClick, setZoomToBoundsOnClick] = useState(false);
-  const toggleZoomToBoundsOnClick =
-    () => setZoomToBoundsOnClick(!zoomToBoundsOnClick);
+  const useBooleanStateWithToggler = init => {
+    const [state, setState] = useState(init);
+    return [state, () => setState(!state)];
+  };
 
-  const [enableClustering, setEnableClustering] = useState(true);
-  const toggleEnableClustering =
-    () => setEnableClustering(!enableClustering)
+  const [uzeMarkercluster, toggleUzeMarkercluster] =
+    useBooleanStateWithToggler(true);
+  const [removeOutsideVisibleBounds, toggleRemoveOutsideVisibleBounds] =
+    useBooleanStateWithToggler(true);
+  const [spiderfyOnMaxZoom, toggleSpiderfyOnMaxZoom] =
+    useBooleanStateWithToggler(false);
+  const [zoomToBoundsOnClick, toggleZoomToBoundsOnClick] =
+    useBooleanStateWithToggler(false);
+  const [enableClustering, toggleEnableClustering] =
+    useBooleanStateWithToggler(true);
+  const [disableClusteringAtZoom, handleChangeDisableClusteringAtZoom] =
+    useStateWithEventHandler(8);
+  const [maxClusterRadius, handleChangeMaxClusterRadius] =
+    useStateWithEventHandler(80);
+  const [chunkedLoading, toggleChunkedLoading] =
+    useBooleanStateWithToggler(true);
 
-  const [disableClusteringAtZoom, setDisableClusteringAtZoom] = useState(6);
-  const handleChangeDisableClusteringAtZoom =
-    eventHandler(setDisableClusteringAtZoom);
-
-  const [maxClusterRadius, setMaxClusterRadius] = useState(80);
-  const handleChangeMaxClusterRadius = eventHandler(setMaxClusterRadius);
-
-  const markerClusterOptions = React.useMemo(() => ({
-    spiderfyOnMaxZoom,
-    zoomToBoundsOnClick,
-    "disableClusteringAtZoom":
-      enableClustering ? disableClusteringAtZoom : undefined,
-    maxClusterRadius,
-  }), [
-    spiderfyOnMaxZoom,
-    zoomToBoundsOnClick,
-    enableClustering,
-    disableClusteringAtZoom,
-    maxClusterRadius
-  ]);
+  const markerClusterOptions = React.useMemo(
+    () => uzeMarkercluster && ({
+      removeOutsideVisibleBounds,
+      spiderfyOnMaxZoom,
+      zoomToBoundsOnClick,
+      "disableClusteringAtZoom":
+        enableClustering ? disableClusteringAtZoom : undefined,
+      maxClusterRadius,
+      chunkedLoading,
+    }),
+    [
+      removeOutsideVisibleBounds,
+      uzeMarkercluster,
+      spiderfyOnMaxZoom,
+      zoomToBoundsOnClick,
+      enableClustering,
+      disableClusteringAtZoom,
+      maxClusterRadius,
+      chunkedLoading,
+    ]
+  );
 
   // TODO: Remove? Not presently used, but there is commented out code
   //  in Filters tab that uses them.
@@ -284,8 +301,30 @@ function Body() {
                   defaultActiveKey={'Clustering'}
                   className={css.mainTabs}
                 >
-                  <Tab eventKey={'Clustering'} title={'Marker Clustering'}>
+                  <Tab
+                    eventKey={'Clustering'}
+                    title={`Marker Clustering (${uzeMarkercluster ? "on": "off"})`}
+                  >
+                    <SelectionCounts
+                      allStations={allStations}
+                      selectedStations={selectedStations}
+                    />
                     <FormGroup>
+                      <Checkbox
+                        inline
+                        checked={uzeMarkercluster}
+                        onChange={toggleUzeMarkercluster}
+                      >
+                        Use leaflet.markercluster
+                      </Checkbox>
+
+                      <Checkbox
+                        checked={removeOutsideVisibleBounds}
+                        onChange={toggleRemoveOutsideVisibleBounds}
+                      >
+                        removeOutsideVisibleBounds
+                      </Checkbox>
+
                       <Checkbox
                         checked={spiderfyOnMaxZoom}
                         onChange={toggleSpiderfyOnMaxZoom}
@@ -324,6 +363,14 @@ function Body() {
                         value={maxClusterRadius}
                         onChange={handleChangeMaxClusterRadius}
                       />
+
+                      <Checkbox
+                        checked={chunkedLoading}
+                        onChange={toggleChunkedLoading}
+                      >
+                        chunkedLoading
+                      </Checkbox>
+
                     </FormGroup>
                     <JSONstringify object={markerClusterOptions}/>
                   </Tab>
