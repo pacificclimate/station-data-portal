@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Checkbox,
   Col,
@@ -17,7 +17,6 @@ import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 import filter from 'lodash/fp/filter';
 import join from 'lodash/fp/join';
-import tap from 'lodash/fp/tap';
 
 import css from '../common.module.css';
 
@@ -116,9 +115,7 @@ function Body() {
   const [area, setArea] = useState(undefined);
   const [stnsLimit, setStnsLimit] = useState(stnsLimitOptions[0]);
 
-  // Marker clustering option controls. We offer a subset of all options.
-
-  const eventHandler = set => e => set(e.target.value);
+  // Marker clustering option controls. We offer a subset of the options.
 
   const useStateWithEventHandler = init => {
     const [state, setState] = useState(init);
@@ -241,21 +238,37 @@ function Body() {
     return `${{ dataCategory, fileFormat }}.${get('value', fileFormat)}`;
   }
 
-  const filteredStations = stationFilter(
-    startDate,
-    endDate,
-    selectedNetworksOptions,
-    selectedVariablesOptions,
-    selectedFrequenciesOptions,
-    onlyWithClimatology,
-    area,
-    allNetworks,
-    allVariables,
-    allStations,
+  const filteredStations = useMemo(
+    () => stationFilter(
+      startDate,
+      endDate,
+      selectedNetworksOptions,
+      selectedVariablesOptions,
+      selectedFrequenciesOptions,
+      onlyWithClimatology,
+      area,
+      allNetworks,
+      allVariables,
+      allStations,
+    ),
+    [
+      startDate,
+      endDate,
+      selectedNetworksOptions,
+      selectedVariablesOptions,
+      selectedFrequenciesOptions,
+      onlyWithClimatology,
+      area,
+      allNetworks,
+      allVariables,
+      allStations,
+    ]
   );
 
-  const stationInsideArea = stationInsideMultiPolygon(area);
-  const selectedStations = filter(stationInsideArea, filteredStations);
+  const selectedStations = useMemo(
+    () => filter(stationInsideMultiPolygon(area), filteredStations),
+    [area, filteredStations]
+  );
 
   const selections = [
     {
