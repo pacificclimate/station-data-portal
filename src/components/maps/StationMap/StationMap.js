@@ -40,7 +40,7 @@
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef } from 'react';
 
-import { FeatureGroup } from 'react-leaflet';
+import { FeatureGroup, LayerGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import MarkerCluster from '../MarkerCluster';
 import L from 'leaflet';
@@ -103,6 +103,24 @@ function StationMap({
 
   // alert("StationMap render")
 
+  const markers = map(
+    station => (
+      <StationMarkers
+        station={station}
+        allNetworks={allNetworks}
+        allVariables={allVariables}
+        key={station.id}
+      />
+    ),
+    stations
+  );
+
+  const markerLayerGroup = markerClusterOptions ? (
+    <MarkerCluster {...markerClusterOptions}>{markers}</MarkerCluster>
+  ) : (
+    <LayerGroup>{markers}</LayerGroup>
+  );
+
   return (
     <BaseMap
       zoom={initialViewport.zoom}
@@ -133,22 +151,7 @@ function StationMap({
           onDeleted={handleChangedGeometryLayers}
         />
       </FeatureGroup>
-
-      <MarkerCluster {...markerClusterOptions}>
-        {
-          map(
-            station => (
-              <StationMarkers
-                station={station}
-                allNetworks={allNetworks}
-                allVariables={allVariables}
-                key={station.id}
-              />
-            ),
-            stations
-          )
-        }
-      </MarkerCluster>
+      {markerLayerGroup}
     </BaseMap>
   );
 }
