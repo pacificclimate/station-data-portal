@@ -155,6 +155,7 @@ function StationMap({
     </BaseMap>
   );
 }
+StationMap = React.memo(StationMap)
 
 StationMap.propTypes = {
   BaseMap: PropTypes.func.isRequired,
