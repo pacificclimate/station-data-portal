@@ -13,7 +13,6 @@ import {
   Tabs
 } from 'react-bootstrap';
 import Select from 'react-select';
-import memoize from 'memoize-one';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
@@ -36,8 +35,8 @@ import FrequencySelector
   from '../../selectors/FrequencySelector/FrequencySelector';
 import DateSelector from '../../selectors/DateSelector';
 import {
-  stationFilter as stationFilterRaw,
-  stationInsideMultiPolygon
+  stationAreaFilter,
+  stationFilter,
 } from '../../../utils/station-filtering';
 import OnlyWithClimatologyControl
   from '../../controls/OnlyWithClimatologyControl';
@@ -93,7 +92,6 @@ const stationDebugFetchOptions =
   (process.env.REACT_APP_DEBUG_STATION_FETCH_OPTIONS || "").toLowerCase()
   === "true";
 
-
 function Body() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -118,16 +116,6 @@ function Body() {
   const [stnsLimit, setStnsLimit] = useState(stnsLimitOptions[0]);
 
   // Marker clustering option controls. We offer a subset of the options.
-
-  const useStateWithEventHandler = init => {
-    const [state, setState] = useState(init);
-    return [state, e => setState(e.target.value)]
-  };
-
-  const useBooleanStateWithToggler = init => {
-    const [state, setState] = useState(init);
-    return [state, () => setState(!state)];
-  };
 
   const [uzeMarkercluster, toggleUzeMarkercluster] =
     useBooleanStateWithToggler(true);
@@ -206,8 +194,6 @@ function Body() {
       .then(response => setAllStations(response.data));
   }, [stnsLimit]);
 
-  const stationFilter = memoize(stationFilterRaw);
-
   const dataDownloadUrl = ({ dataCategory, clipToDate, fileFormat }) => {
     // Check whether state has settled. Each selector calls an onReady callback
     // to export information (e.g., all its options) that it has set up
@@ -248,7 +234,6 @@ function Body() {
       selectedVariablesOptions,
       selectedFrequenciesOptions,
       onlyWithClimatology,
-      area,
       allNetworks,
       allVariables,
       allStations,
@@ -260,7 +245,6 @@ function Body() {
       selectedVariablesOptions,
       selectedFrequenciesOptions,
       onlyWithClimatology,
-      area,
       allNetworks,
       allVariables,
       allStations,
@@ -268,7 +252,7 @@ function Body() {
   );
 
   const selectedStations = useMemo(
-    () => filter(stationInsideMultiPolygon(area), filteredStations),
+    () => stationAreaFilter(area, filteredStations),
     [area, filteredStations]
   );
 

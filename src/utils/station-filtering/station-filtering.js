@@ -165,7 +165,7 @@ export const stationInsideMultiPolygon = ft.timeThis("stationInsideMultiPolygon"
 
 export const stationFilter = (
   startDate, endDate, selectedNetworks, selectedVariables, selectedFrequencies,
-  onlyWithClimatology, area, allNetworks, allVariables, allStations
+  onlyWithClimatology, allNetworks, allVariables, allStations
 ) => {
   ft.resetAll();
   const selectedVariableIds = ft.timeThis("selectedVariableIds")(flow(
@@ -200,3 +200,11 @@ export const stationFilter = (
   ft.log();
   return r;
 };
+
+
+export const stationAreaFilter = (area, stations) => {
+  ft.resetAll();
+  const r = filter(stationInsideMultiPolygon(area), stations);
+  ft.log();
+  return r;
+}
