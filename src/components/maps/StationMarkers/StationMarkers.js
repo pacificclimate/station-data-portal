@@ -47,7 +47,7 @@ const useLazyPopup = ({ station, allNetworks, allVariables }) => {
 
   // Open popup on initial creation.
   useEffect(() => {
-    const element = markerRef?.current?.leafletElement;
+    const element = markerRef?.current;
     if (element) {
       element.openPopup();
     }
@@ -75,7 +75,7 @@ const LocationMarker = ({
       center={location}
       {...markerOptions}
       color={color}
-      onClick={addPopup}
+      eventHandlers={{click: addPopup}}
     >
       <StationTooltip
         station={station}
