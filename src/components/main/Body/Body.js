@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useStateWithEventHandler, useBooleanStateWithToggler }
   from '../../../hooks';
 import {
+  Button,
   Checkbox,
   Col,
   ControlLabel,
@@ -18,6 +19,7 @@ import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 import filter from 'lodash/fp/filter';
 import join from 'lodash/fp/join';
+import tap from 'lodash/fp/tap';
 
 import css from '../common.module.css';
 
@@ -111,6 +113,7 @@ function Body() {
   const [onlyWithClimatology, setOnlyWithClimatology] = useState(false);
 
   const [allStations, setAllStations] = useState(null);
+  const [stationsReload, setStationsReload] = useState(0);
 
   const [area, setArea] = useState(undefined);
   const [stnsLimit, setStnsLimit] = useState(stnsLimitOptions[0]);
@@ -187,12 +190,20 @@ function Body() {
   }, []);
 
   useEffect(() => {
+    console.log("### loading stations")
+    setAllStations(null)
     getStations({
       compact: true,
       ...(stationDebugFetchOptions && { limit: stnsLimit.value } )
     })
+      .then(tap(() => console.log("### stations loaded")))
       .then(response => setAllStations(response.data));
-  }, [stnsLimit]);
+  }, [stnsLimit, stationsReload]);
+
+  const reloadStations = () => {
+    console.log("### reloadStations")
+    setStationsReload(n => n + 1)
+  };
 
   const dataDownloadUrl = ({ dataCategory, clipToDate, fileFormat }) => {
     // Check whether state has settled. Each selector calls an onReady callback
@@ -295,6 +306,9 @@ function Body() {
 
             <Panel style={{ marginLeft: '-15px', marginRight: '-10px' }}>
               <Panel.Body>
+                <Button onClick={reloadStations}>
+                  Reload stations
+                </Button>
                 <Tabs
                   id="non-map-controls"
                   defaultActiveKey={'Clustering'}
