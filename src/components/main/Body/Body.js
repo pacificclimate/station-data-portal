@@ -146,6 +146,11 @@ function Body() {
         enableClustering ? disableClusteringAtZoom : undefined,
       maxClusterRadius,
       chunkedLoading,
+      chunkProgress: (numProcessed, numTotal, elapsed) => {
+        console.log(
+          `### marker chunking progress: ${numProcessed} / ${numTotal} in ${elapsed} ms`
+        )
+      }
     }),
     [
       removeOutsideVisibleBounds,
@@ -359,6 +364,7 @@ function Body() {
                       >
                         Enable clustering
                       </Checkbox>
+                      <ControlLabel>Disable clustering at zoom level</ControlLabel>
                       <FormControl
                         componentClass={"input"}
                         placeholder={"Zoom level"}
