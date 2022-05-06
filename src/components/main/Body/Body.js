@@ -1,12 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useStateWithEventHandler, useBooleanStateWithToggler }
-  from '../../../hooks';
+import { useBooleanStateWithToggler } from '../../../hooks';
 import {
   Button,
   Checkbox,
   Col,
-  ControlLabel,
-  FormControl,
   FormGroup,
   Panel,
   Row,
@@ -42,6 +39,7 @@ import {
 } from '../../../utils/station-filtering';
 import OnlyWithClimatologyControl
   from '../../controls/OnlyWithClimatologyControl';
+import MarkerClusterOptions from '../../controls/MarkerClusterOptions'
 import StationMap from '../../maps/StationMap';
 import StationMetadata from '../../info/StationMetadata';
 import StationData from '../../info/StationData';
@@ -51,6 +49,7 @@ import SelectionCriteria from '../../info/SelectionCriteria';
 import AdjustableColumns from '../../util/AdjustableColumns';
 import JSONstringify from '../../util/JSONstringify';
 import baseMaps from '../../maps/baseMaps';
+import { useImmer } from 'use-immer';
 
 
 logger.configure({ active: true });
@@ -122,47 +121,17 @@ function Body() {
 
   const [uzeMarkercluster, toggleUzeMarkercluster] =
     useBooleanStateWithToggler(true);
-  const [removeOutsideVisibleBounds, toggleRemoveOutsideVisibleBounds] =
-    useBooleanStateWithToggler(true);
-  const [spiderfyOnMaxZoom, toggleSpiderfyOnMaxZoom] =
-    useBooleanStateWithToggler(false);
-  const [zoomToBoundsOnClick, toggleZoomToBoundsOnClick] =
-    useBooleanStateWithToggler(false);
-  const [enableClustering, toggleEnableClustering] =
-    useBooleanStateWithToggler(true);
-  const [disableClusteringAtZoom, handleChangeDisableClusteringAtZoom] =
-    useStateWithEventHandler(8);
-  const [maxClusterRadius, handleChangeMaxClusterRadius] =
-    useStateWithEventHandler(80);
-  const [chunkedLoading, toggleChunkedLoading] =
-    useBooleanStateWithToggler(true);
-
-  const markerClusterOptions = React.useMemo(
-    () => uzeMarkercluster && ({
-      removeOutsideVisibleBounds,
-      spiderfyOnMaxZoom,
-      zoomToBoundsOnClick,
-      "disableClusteringAtZoom":
-        enableClustering ? disableClusteringAtZoom : undefined,
-      maxClusterRadius,
-      chunkedLoading,
-      chunkProgress: (numProcessed, numTotal, elapsed) => {
-        console.log(
-          `### marker chunking progress: ${numProcessed} / ${numTotal} in ${elapsed} ms`
-        )
-      }
-    }),
-    [
-      removeOutsideVisibleBounds,
-      uzeMarkercluster,
-      spiderfyOnMaxZoom,
-      zoomToBoundsOnClick,
-      enableClustering,
-      disableClusteringAtZoom,
-      maxClusterRadius,
-      chunkedLoading,
-    ]
-  );
+  // TODO: Extract this and the handlers in MarkerClusterOptions into a hook?
+  //  Why? Because then everything would be in one place instead of broken
+  //  into 2 pieces like this.
+  const [markerClusterOptions, setMarkerClusterOptions] = useImmer({
+    removeOutsideVisibleBounds: true,
+    spiderfyOnMaxZoom: false,
+    zoomToBoundsOnClick: false,
+    disableClusteringAtZoom: 8,
+    maxClusterRadius: 80,
+    chunkedLoading: true,
+  });
 
   // TODO: Remove? Not presently used, but there is commented out code
   //  in Filters tab that uses them.
@@ -306,7 +275,7 @@ function Body() {
               allNetworks={allNetworks}
               allVariables={allVariables}
               onSetArea={setArea}
-              markerClusterOptions={markerClusterOptions}
+              markerClusterOptions={uzeMarkercluster && markerClusterOptions}
             />,
 
             <Panel style={{ marginLeft: '-15px', marginRight: '-10px' }}>
@@ -335,62 +304,11 @@ function Body() {
                       >
                         Use leaflet.markercluster
                       </Checkbox>
-
-                      <Checkbox
-                        checked={removeOutsideVisibleBounds}
-                        onChange={toggleRemoveOutsideVisibleBounds}
-                      >
-                        removeOutsideVisibleBounds
-                      </Checkbox>
-
-                      <Checkbox
-                        checked={spiderfyOnMaxZoom}
-                        onChange={toggleSpiderfyOnMaxZoom}
-                      >
-                        spiderfyOnMaxZoom
-                      </Checkbox>
-
-                      <Checkbox
-                        checked={zoomToBoundsOnClick}
-                        onChange={toggleZoomToBoundsOnClick}
-                      >
-                        zoomToBoundsOnClick
-                      </Checkbox>
-
-                      <Checkbox
-                        inline
-                        checked={enableClustering}
-                        onChange={toggleEnableClustering}
-                      >
-                        Enable clustering
-                      </Checkbox>
-                      <ControlLabel>Disable clustering at zoom level</ControlLabel>
-                      <FormControl
-                        componentClass={"input"}
-                        placeholder={"Zoom level"}
-                        type={"number"}
-                        disabled={!enableClustering}
-                        value={disableClusteringAtZoom}
-                        onChange={handleChangeDisableClusteringAtZoom}
-                      />
-
-                      <ControlLabel>Max. cluster radius</ControlLabel>
-                      <FormControl
-                        componentClass={"input"}
-                        placeholder={"Radius in pixels"}
-                        type={"number"}
-                        value={maxClusterRadius}
-                        onChange={handleChangeMaxClusterRadius}
-                      />
-
-                      <Checkbox
-                        checked={chunkedLoading}
-                        onChange={toggleChunkedLoading}
-                      >
-                        chunkedLoading
-                      </Checkbox>
-
                     </FormGroup>
+                    <MarkerClusterOptions
+                      value={markerClusterOptions}
+                      onChange={setMarkerClusterOptions}
+                    />
                     <JSONstringify object={markerClusterOptions}/>
                   </Tab>
 
