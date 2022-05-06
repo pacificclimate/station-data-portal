@@ -39,7 +39,8 @@ import {
 } from '../../../utils/station-filtering';
 import OnlyWithClimatologyControl
   from '../../controls/OnlyWithClimatologyControl';
-import MarkerClusterOptions from '../../controls/MarkerClusterOptions'
+import MarkerClusterOptions, { useMarkerClusterOptions}
+  from '../../controls/MarkerClusterOptions'
 import StationMap from '../../maps/StationMap';
 import StationMetadata from '../../info/StationMetadata';
 import StationData from '../../info/StationData';
@@ -49,7 +50,6 @@ import SelectionCriteria from '../../info/SelectionCriteria';
 import AdjustableColumns from '../../util/AdjustableColumns';
 import JSONstringify from '../../util/JSONstringify';
 import baseMaps from '../../maps/baseMaps';
-import { useImmer } from 'use-immer';
 
 
 logger.configure({ active: true });
@@ -121,17 +121,15 @@ function Body() {
 
   const [uzeMarkercluster, toggleUzeMarkercluster] =
     useBooleanStateWithToggler(true);
-  // TODO: Extract this and the handlers in MarkerClusterOptions into a hook?
-  //  Why? Because then everything would be in one place instead of broken
-  //  into 2 pieces like this.
-  const [markerClusterOptions, setMarkerClusterOptions] = useImmer({
-    removeOutsideVisibleBounds: true,
-    spiderfyOnMaxZoom: false,
-    zoomToBoundsOnClick: false,
-    disableClusteringAtZoom: 8,
-    maxClusterRadius: 80,
-    chunkedLoading: true,
-  });
+  const [markerClusterOptions, setMarkerClusterOptions] =
+    useMarkerClusterOptions({
+      removeOutsideVisibleBounds: true,
+      spiderfyOnMaxZoom: false,
+      zoomToBoundsOnClick: false,
+      disableClusteringAtZoom: 8,
+      maxClusterRadius: 80,
+      chunkedLoading: true,
+    });
 
   // TODO: Remove? Not presently used, but there is commented out code
   //  in Filters tab that uses them.

@@ -1,13 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
-import './MarkerClusterOptions.css';
+import { useImmer } from 'use-immer';
 import {
   Checkbox,
   ControlLabel,
   FormControl,
   FormGroup
 } from 'react-bootstrap';
+
+import './MarkerClusterOptions.css';
+
 
 const makeImmerToggleBoolProp = (immerSet, prop) =>
   () => immerSet(draft => {
@@ -19,47 +21,68 @@ const makeImmerSetPropFromEvent = (immerSet, prop) =>
     draft[prop] = e.target.value;
   });
 
-function MarkerClusterOptions({
-  value,    // an immer value
-  onChange, // a use-immer setter
-}) {
-  const toggleRemoveOutsideVisibleBounds = makeImmerToggleBoolProp(
-    onChange, "removeOutsideVisibleBounds"
-  );
-  const toggleSpiderfyOnMaxZoom = makeImmerToggleBoolProp(
-    onChange, "spiderfyOnMaxZoom"
-  );
-  const toggleZoomToBoundsOnClick = makeImmerToggleBoolProp(
-    onChange, "zoomToBoundsOnClick"
-  );
-  const toggleChunkedLoading = makeImmerToggleBoolProp(
-    onChange, "chunkedLoading"
-  );
-  const handleChangeDisableClusteringAtZoom = makeImmerSetPropFromEvent(
-    onChange, "disableClusteringAtZoom"
-  );
-  const handleChangeMaxClusterRadius = makeImmerSetPropFromEvent(
-    onChange, "maxClusterRadius"
-  );
+export const useMarkerClusterOptions = init => {
+  const [state, setState] = useImmer(init);
+  // TODO: Memoize setters?
+  const setters = {
+    toggleRemoveOutsideVisibleBounds:  makeImmerToggleBoolProp(
+      setState, "removeOutsideVisibleBounds"
+    ),
+    toggleSpiderfyOnMaxZoom:  makeImmerToggleBoolProp(
+      setState, "spiderfyOnMaxZoom"
+    ),
+    toggleZoomToBoundsOnClick:  makeImmerToggleBoolProp(
+      setState, "zoomToBoundsOnClick"
+    ),
+    handleChangeDisableClusteringAtZoom:  makeImmerSetPropFromEvent(
+      setState, "disableClusteringAtZoom"
+    ),
+    handleChangeMaxClusterRadius:  makeImmerSetPropFromEvent(
+      setState, "maxClusterRadius"
+    ),
+    toggleChunkedLoading:  makeImmerToggleBoolProp(
+      setState, "chunkedLoading"
+    ),
+  }
+  return [state, setters];
+}
 
+function MarkerClusterOptions({
+  value: {
+    removeOutsideVisibleBounds,
+    spiderfyOnMaxZoom,
+    zoomToBoundsOnClick,
+    disableClusteringAtZoom,
+    maxClusterRadius,
+    chunkedLoading,
+  },    // useMarkerCluster state
+  onChange: {
+    toggleRemoveOutsideVisibleBounds,
+    toggleSpiderfyOnMaxZoom,
+    toggleZoomToBoundsOnClick,
+    handleChangeDisableClusteringAtZoom,
+    handleChangeMaxClusterRadius,
+    toggleChunkedLoading,
+  }, // useMarkerCluster setters
+}) {
   return (
     <FormGroup>
       <Checkbox
-        checked={value.removeOutsideVisibleBounds}
+        checked={removeOutsideVisibleBounds}
         onChange={toggleRemoveOutsideVisibleBounds}
       >
         removeOutsideVisibleBounds
       </Checkbox>
 
       <Checkbox
-        checked={value.spiderfyOnMaxZoom}
+        checked={spiderfyOnMaxZoom}
         onChange={toggleSpiderfyOnMaxZoom}
       >
         spiderfyOnMaxZoom
       </Checkbox>
 
       <Checkbox
-        checked={value.zoomToBoundsOnClick}
+        checked={zoomToBoundsOnClick}
         onChange={toggleZoomToBoundsOnClick}
       >
         zoomToBoundsOnClick
@@ -70,7 +93,7 @@ function MarkerClusterOptions({
         componentClass={"input"}
         placeholder={"Zoom level"}
         type={"number"}
-        value={value.disableClusteringAtZoom}
+        value={disableClusteringAtZoom}
         onChange={handleChangeDisableClusteringAtZoom}
       />
 
@@ -79,12 +102,12 @@ function MarkerClusterOptions({
         componentClass={"input"}
         placeholder={"Radius in pixels"}
         type={"number"}
-        value={value.maxClusterRadius}
+        value={maxClusterRadius}
         onChange={handleChangeMaxClusterRadius}
       />
 
       <Checkbox
-        checked={value.chunkedLoading}
+        checked={chunkedLoading}
         onChange={toggleChunkedLoading}
       >
         chunkedLoading
