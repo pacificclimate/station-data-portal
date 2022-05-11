@@ -48,6 +48,7 @@ import StationData from '../../info/StationData';
 import NetworksMetadata from '../../info/NetworksMetadata';
 import SelectionCounts from '../../info/SelectionCounts';
 import SelectionCriteria from '../../info/SelectionCriteria';
+import UnselectedThings from '../../info/UnselectedThings';
 import AdjustableColumns from '../../util/AdjustableColumns';
 import JSONstringify from '../../util/JSONstringify';
 import baseMaps from '../../maps/baseMaps';
@@ -214,28 +215,6 @@ function Body() {
     [area, filteredStations]
   );
 
-  // TODO: Factor unselected things stuff out into a component
-  const selections = [
-    {
-      name: 'networks',
-      items: selectedNetworksOptions,
-    },
-    {
-      name: 'variables',
-      items: selectedVariablesOptions,
-    },
-    {
-      name: 'frequencies',
-      items: selectedFrequenciesOptions,
-    },
-  ];
-
-  const unselectedThings = flow(
-    filter(thing => thing.items.length === 0),
-    map(thing => thing.name),
-    join(', or '),
-  )(selections);
-
   return (
     <div className={css.portal}>
       <Row>
@@ -399,10 +378,11 @@ function Body() {
                       selectedStations={selectedStations}
                     />
                     <SelectionCriteria/>
-                    {
-                      unselectedThings &&
-                      <p>You haven't selected any {unselectedThings}.</p>
-                    }
+                    <UnselectedThings
+                      selectedNetworksOptions={selectedNetworksOptions}
+                      selectedVariablesOptions={selectedVariablesOptions}
+                      selectedFrequenciesOptions={selectedFrequenciesOptions}
+                    />
 
                     <StationData
                       selectedStations={selectedStations}
