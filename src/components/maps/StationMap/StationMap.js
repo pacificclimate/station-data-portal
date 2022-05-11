@@ -45,7 +45,7 @@ import { EditControl } from 'react-leaflet-draw';
 import MarkerCluster from '../MarkerCluster';
 import L from 'leaflet';
 
-import StationMarkers from '../StationMarkers';
+import OneStationMarkers from '../StationMarkers';
 import { layersToGeoJSONMultipolygon } from '../../../utils/geoJSON-leaflet';
 
 import logger from '../../../logger';
@@ -105,7 +105,7 @@ function StationMap({
 
   const markers = map(
     station => (
-      <StationMarkers
+      <OneStationMarkers
         station={station}
         allNetworks={allNetworks}
         allVariables={allVariables}

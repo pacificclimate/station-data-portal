@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
-import { CircleMarker, Polygon } from 'react-leaflet';
+import { CircleMarker, Polygon, useMap } from 'react-leaflet';
 import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
 import StationPopup from '../StationPopup';
@@ -18,7 +18,7 @@ import { getTimer } from '../../../utils/timing';
 
 
 logger.configure({ active: true });
-const timer = getTimer("StationMarker timing");
+const timer = getTimer("StationMarkers timing");
 
 
 // This user hook implements lazy marker popup generation.
@@ -57,14 +57,14 @@ const useLazyPopup = ({ station, allNetworks, allVariables }) => {
 };
 
 
-const LocationMarker = ({
+function LocationMarker({
   station,
   location,
   color,
   allNetworks,
   allVariables,
   markerOptions,
-}) => {
+}) {
   const { markerRef, popup, addPopup } =
     useLazyPopup({ station, allNetworks, allVariables });
 
@@ -84,17 +84,17 @@ const LocationMarker = ({
       {popup}
     </CircleMarker>
   );
-};
+}
 
 
-const MultiLocationMarker = ({
+function MultiLocationMarker ({
   station,
   locations,
   color,
   polygonOptions,
   allNetworks,
   allVariables,
-}) => {
+}) {
   const { markerRef, popup, addPopup } =
     useLazyPopup({ station, allNetworks, allVariables });
 
@@ -116,10 +116,10 @@ const MultiLocationMarker = ({
       {popup}
     </Polygon>
   );
-};
+}
 
 
-const StationMarkers = timer.timeThis("StationMarker")(({
+function OneStationMarkers({
   station,
   allNetworks,
   allVariables,
@@ -133,7 +133,7 @@ const StationMarkers = timer.timeThis("StationMarker")(({
   polygonOptions = {
     color: "green",
   },
-}) => {
+}) {
   const network = stationNetwork(allNetworks, station);
   const locationColor = network?.color;
   const polygonColor =
@@ -173,9 +173,11 @@ const StationMarkers = timer.timeThis("StationMarker")(({
     </React.Fragment>
   );
   return r;
-});
+}
+OneStationMarkers = timer.timeThis("StationMarkers")(OneStationMarkers);
 
-StationMarkers.propTypes = {
+
+OneStationMarkers.propTypes = {
   station: PropTypes.object.isRequired,
   allNetworks: PropTypes.array.isRequired,
   allVariables: PropTypes.array.isRequired,
@@ -183,4 +185,4 @@ StationMarkers.propTypes = {
   polygonOptions: PropTypes.object,
 };
 
-export default StationMarkers;
+export default OneStationMarkers;
