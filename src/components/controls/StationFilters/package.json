@@ -1,0 +1,6 @@
+{
+  "name": "StationFilters",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./StationFilters.js"
+}
