@@ -69,6 +69,26 @@ For production runs, environment variables are provided by
   (select) network metadata received from API. (See [Filtering metadata](#filtering-metadata).)
 - Optional
 
+`REACT_APP_DEBUG_STATION_FETCH_OPTIONS`
+- Add control(s) for setting station fetch debug options (e.g., limit).
+- Dev/debug only.
+- Case-insensitive string; "true" to turn on.
+- Optional, default false.
+
+`REACT_APP_MARKER_CLUSTERING_AVAILABLE`
+- Allow marker clustering.
+- When enabled, enables marker clustering by default and shows marker
+clustering control tab.
+- Semi dev/debug.
+- Case-insensitive string; "true" to turn on.
+- Optional, default false.
+
+`REACT_APP_SHOW_RELOAD_STATIONS_BUTTON`
+- Show Reload Stations button.
+- Dev/debug only.
+- Case-insensitive string; "true" to turn on.
+- Optional, default false.
+
 ## Filtering metadata
 
 The app can filter metadata to include only a desired subset of items.  
