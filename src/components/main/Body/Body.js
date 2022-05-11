@@ -11,17 +11,12 @@ import {
   Tabs
 } from 'react-bootstrap';
 import Select from 'react-select';
-import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
-import map from 'lodash/fp/map';
-import filter from 'lodash/fp/filter';
-import join from 'lodash/fp/join';
 import tap from 'lodash/fp/tap';
 
 import css from '../common.module.css';
 
 import logger from '../../../logger';
-import NetworkSelector from '../../selectors/NetworkSelector';
 import {
   getFrequencies,
   getNetworks,
@@ -29,17 +24,10 @@ import {
   getVariables,
 } from '../../../data-services/station-data-service';
 import { dataDownloadTarget } from '../../../data-services/pdp-data-service';
-import VariableSelector from '../../selectors/VariableSelector';
-import FrequencySelector
-  from '../../selectors/FrequencySelector/FrequencySelector';
-import DateSelector from '../../selectors/DateSelector';
-import { commonSelectorStyles } from '../../selectors/styles';
 import {
   stationAreaFilter,
   stationFilter,
 } from '../../../utils/station-filtering';
-import OnlyWithClimatologyControl
-  from '../../controls/OnlyWithClimatologyControl';
 import MarkerClusterOptions, { useMarkerClusterOptions}
   from '../../controls/MarkerClusterOptions'
 import StationMap from '../../maps/StationMap';
@@ -50,6 +38,8 @@ import SelectionCounts from '../../info/SelectionCounts';
 import SelectionCriteria from '../../info/SelectionCriteria';
 import UnselectedThings from '../../info/UnselectedThings';
 import AdjustableColumns from '../../util/AdjustableColumns';
+import StationFilters, { useStationFiltering }
+  from '../../controls/StationFilters';
 import JSONstringify from '../../util/JSONstringify';
 import baseMaps from '../../maps/baseMaps';
 import {
@@ -71,28 +61,31 @@ const stnsLimitOptions =
 
 
 function Body() {
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-
+  // Metadata fetched from backend
   const [allNetworks, setAllNetworks] = useState(null);
-  const [selectedNetworksOptions, setSelectedNetworksOptions] = useState([]);
-  const [networkActions, setNetworkActions] = useState(null);
-
   const [allVariables, setAllVariables] = useState(null);
-  const [selectedVariablesOptions, setSelectedVariablesOptions] = useState([]);
-  const [variableActions, setVariableActions] = useState(null);
-
   const [allFrequencies, setAllFrequencies] = useState(null);
-  const [selectedFrequenciesOptions, setSelectedFrequenciesOptions] = useState([]);
-  const [frequencyActions, setFrequencyActions] = useState(null);
-
-  const [onlyWithClimatology, setOnlyWithClimatology] = useState(false);
-
   const [allStations, setAllStations] = useState(null);
+
+  // Support for development tools
+  const [stnsLimit, setStnsLimit] = useState(stnsLimitOptions[0]);
   const [stationsReload, setStationsReload] = useState(0);
 
+  // Station filtering state and setters
+  const stationFiltering = useStationFiltering();
+  const {
+    startDate,
+    endDate,
+    selectedNetworksOptions,
+    selectedVariablesOptions,
+    selectedFrequenciesOptions,
+    onlyWithClimatology,
+    networkActions,
+    variableActions,
+    frequencyActions,
+  } = stationFiltering;
+
   const [area, setArea] = useState(undefined);
-  const [stnsLimit, setStnsLimit] = useState(stnsLimitOptions[0]);
 
   // Marker clustering option controls.
   const [uzeMarkercluster, toggleUzeMarkercluster] =
@@ -106,22 +99,6 @@ function Body() {
       maxClusterRadius: 80,
       chunkedLoading: true,
     });
-
-  // TODO: Remove? Not presently used, but there is commented out code
-  //  in Filters tab that uses them.
-  // const handleClickAll = () => {
-  //   networkActions.selectAll();
-  //   variableActions.selectAll();
-  //   frequencyActions.selectAll();
-  // };
-  // const handleClickNone = () => {
-  //   networkActions.selectNone();
-  //   variableActions.selectNone();
-  //   frequencyActions.selectNone();
-  // };
-
-  const toggleOnlyWithClimatology = () =>
-    setOnlyWithClimatology(!onlyWithClimatology);
 
   // Load metadata
 
@@ -293,71 +270,12 @@ function Body() {
                         </p>
                       </Col>
                     </Row>
-                    <Row>
-                      <Col lg={6} md={6} sm={6}>
-                        {/*<Button bsSize={'small'} onClick={handleClickAll}>Select all criteria</Button>*/}
-                        {/*<Button bsSize={'small'} onClick={handleClickNone}>Clear all criteria</Button>*/}
-                        <DateSelector
-                          value={startDate}
-                          onChange={setStartDate}
-                          label={'Start Date'}
-                        />
-                      </Col>
-                      <Col lg={6} md={6} sm={6}>
-                        <DateSelector
-                          value={endDate}
-                          onChange={setEndDate}
-                          label={'End Date'}
-                        />
-                      </Col>
-                      <Col lg={12} md={12} sm={12}>
-                        <OnlyWithClimatologyControl
-                          value={onlyWithClimatology}
-                          onChange={toggleOnlyWithClimatology}
-                        />
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col lg={12} md={12} sm={12}>
-                        <NetworkSelector
-                          allNetworks={allNetworks}
-                          onReady={setNetworkActions}
-                          value={selectedNetworksOptions}
-                          onChange={setSelectedNetworksOptions}
-                          isSearchable
-                          isClearable={false}
-                          styles={commonSelectorStyles}
-                        />
-                        {/*<JSONstringify object={selectedNetworksOptions}/>*/}
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col lg={12} md={12} sm={12}>
-                        <VariableSelector
-                          allVariables={allVariables}
-                          onReady={setVariableActions}
-                          value={selectedVariablesOptions}
-                          onChange={setSelectedVariablesOptions}
-                          isSearchable
-                          isClearable={false}
-                          styles={commonSelectorStyles}
-                        />
-                        {/*<JSONstringify object={selectedVariablesOptions}/>*/}
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col lg={12} md={12} sm={12}>
-                        <FrequencySelector
-                          allFrequencies={allFrequencies}
-                          onReady={setFrequencyActions}
-                          value={selectedFrequenciesOptions}
-                          onChange={setSelectedFrequenciesOptions}
-                          isClearable={false}
-                          styles={commonSelectorStyles}
-                        />
-                        {/*<JSONstringify object={selectedFrequenciesOptions}/>*/}
-                      </Col>
-                    </Row>
+                    <StationFilters
+                      allNetworks={allNetworks}
+                      allVariables={allVariables}
+                      allFrequencies={allFrequencies}
+                      {...stationFiltering}
+                    />
                   </Tab>
 
                   <Tab eventKey={'Metadata'} title={'Station Metadata'}>
@@ -398,7 +316,6 @@ function Body() {
                 </Tabs>
               </Panel.Body>
             </Panel>
-
           ]}
         />
       </Row>
