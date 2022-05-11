@@ -13,7 +13,7 @@
 # the size of the image by about an order of magnitude and reduce the attack surface of
 # the image as well.
 
-FROM node:10.16
+FROM node:16
 
 ADD . /app
 WORKDIR /app

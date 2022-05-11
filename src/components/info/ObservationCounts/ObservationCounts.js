@@ -11,10 +11,10 @@ import { getTimer } from '../../../utils/timing';
 import './ObservationCounts.css';
 
 logger.configure({ active: true });
-const timer = getTimer("Observation count timing", { disable: true })
+const timer = getTimer("Observation count timing")
 
 
-const totalCounts = timer.timeThis("totalCounts")(
+const totalCounts = timer.timeThis("totalCounts", { disable: true })(
   (counts, stations) =>
     reduce((sum, station) => sum + (counts[station.id] || 0), 0)(stations)
 );

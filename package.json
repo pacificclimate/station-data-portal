@@ -6,7 +6,9 @@
     "axios": "^0.26.1",
     "bootstrap": "^3.4.0",
     "chroma-js": "^2.4.2",
+    "immer": "^9.0.12",
     "leaflet": "^1.7.1",
+    "leaflet.markercluster": "^1.5.3",
     "lodash": "^4.17.11",
     "memoize-one": "^5.0.0",
     "pcic-react-leaflet-components": "git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git#2.0.1",
@@ -21,7 +23,8 @@
     "react-scripts": "3.4.4",
     "react-select": "^3.2.0",
     "react-table": "^7.7.0",
-    "url-join": "^5.0.0"
+    "url-join": "^5.0.0",
+    "use-immer": "^0.7.0"
   },
   "devDependencies": {
     "jest-each": "^24.0.0"

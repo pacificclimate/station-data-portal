@@ -42,6 +42,7 @@ import React, { useEffect, useRef } from 'react';
 
 import { FeatureGroup, LayerGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
+import MarkerCluster from '../MarkerCluster';
 import L from 'leaflet';
 
 import StationMarkers from '../StationMarkers';
@@ -64,6 +65,7 @@ function StationMap({
   allNetworks,
   allVariables,
   onSetArea = () => {},
+  markerClusterOptions,
   userShapeStyle = {
     color: "#f49853",
     weight: 1,
@@ -101,6 +103,24 @@ function StationMap({
 
   // alert("StationMap render")
 
+  const markers = map(
+    station => (
+      <StationMarkers
+        station={station}
+        allNetworks={allNetworks}
+        allVariables={allVariables}
+        key={station.id}
+      />
+    ),
+    stations
+  );
+
+  const markerLayerGroup = markerClusterOptions ? (
+    <MarkerCluster {...markerClusterOptions}>{markers}</MarkerCluster>
+  ) : (
+    <LayerGroup>{markers}</LayerGroup>
+  );
+
   return (
     <BaseMap
       zoom={initialViewport.zoom}
@@ -131,24 +151,11 @@ function StationMap({
           onDeleted={handleChangedGeometryLayers}
         />
       </FeatureGroup>
-      <LayerGroup>
-        {
-          map(
-            station => (
-              <StationMarkers
-                station={station}
-                allNetworks={allNetworks}
-                allVariables={allVariables}
-                key={station.id}
-              />
-            ),
-            stations
-          )
-        }
-      </LayerGroup>
+      {markerLayerGroup}
     </BaseMap>
   );
 }
+StationMap = React.memo(StationMap)
 
 StationMap.propTypes = {
   BaseMap: PropTypes.func.isRequired,

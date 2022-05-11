@@ -1,7 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { Col, Panel, Row, Tab, Tabs } from 'react-bootstrap';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useBooleanStateWithToggler } from '../../../hooks';
+import {
+  Button,
+  Checkbox,
+  Col,
+  FormGroup,
+  Panel,
+  Row,
+  Tab,
+  Tabs
+} from 'react-bootstrap';
 import Select from 'react-select';
-import memoize from 'memoize-one';
 import flow from 'lodash/fp/flow';
 import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
@@ -25,11 +34,13 @@ import FrequencySelector
   from '../../selectors/FrequencySelector/FrequencySelector';
 import DateSelector from '../../selectors/DateSelector';
 import {
-  stationFilter as stationFilterRaw,
-  stationInsideMultiPolygon
+  stationAreaFilter,
+  stationFilter,
 } from '../../../utils/station-filtering';
 import OnlyWithClimatologyControl
   from '../../controls/OnlyWithClimatologyControl';
+import MarkerClusterOptions, { useMarkerClusterOptions}
+  from '../../controls/MarkerClusterOptions'
 import StationMap from '../../maps/StationMap';
 import StationMetadata from '../../info/StationMetadata';
 import StationData from '../../info/StationData';
@@ -37,12 +48,18 @@ import NetworksMetadata from '../../info/NetworksMetadata';
 import SelectionCounts from '../../info/SelectionCounts';
 import SelectionCriteria from '../../info/SelectionCriteria';
 import AdjustableColumns from '../../util/AdjustableColumns';
+import JSONstringify from '../../util/JSONstringify';
 import baseMaps from '../../maps/baseMaps';
+import {
+  markerClusteringAvailable,
+  showReloadStationsButton,
+  stationDebugFetchOptions,
+} from '../../../utils/configuration';
 
 
 logger.configure({ active: true });
 
-
+// TODO: Place elsewhere
 const commonSelectorStyles = {
   menu: (provided) => {
     return {
@@ -71,15 +88,11 @@ const commonSelectorStyles = {
 
 const defaultLgs = [7, 5];
 
+// TODO: Place elsewhere
 const stnsLimitOptions =
   [100, 500, 1000, 2000, 4000, 8000].map(value => ({
     value, label: value.toString()
   }));
-
-
-const stationDebugFetchOptions =
-  (process.env.REACT_APP_DEBUG_STATION_FETCH_OPTIONS || "").toLowerCase()
-  === "true";
 
 
 function Body() {
@@ -101,9 +114,23 @@ function Body() {
   const [onlyWithClimatology, setOnlyWithClimatology] = useState(false);
 
   const [allStations, setAllStations] = useState(null);
+  const [stationsReload, setStationsReload] = useState(0);
 
   const [area, setArea] = useState(undefined);
   const [stnsLimit, setStnsLimit] = useState(stnsLimitOptions[0]);
+
+  // Marker clustering option controls.
+  const [uzeMarkercluster, toggleUzeMarkercluster] =
+    useBooleanStateWithToggler(markerClusteringAvailable);
+  const [markerClusterOptions, setMarkerClusterOptions] =
+    useMarkerClusterOptions({
+      removeOutsideVisibleBounds: true,
+      spiderfyOnMaxZoom: false,
+      zoomToBoundsOnClick: false,
+      disableClusteringAtZoom: 8,
+      maxClusterRadius: 80,
+      chunkedLoading: true,
+    });
 
   // TODO: Remove? Not presently used, but there is commented out code
   //  in Filters tab that uses them.
@@ -117,9 +144,11 @@ function Body() {
   //   variableActions.selectNone();
   //   frequencyActions.selectNone();
   // };
-  //
+
   const toggleOnlyWithClimatology = () =>
     setOnlyWithClimatology(!onlyWithClimatology);
+
+  // Load metadata
 
   useEffect(() => {
     getNetworks().then(response => setAllNetworks(response.data));
@@ -134,15 +163,22 @@ function Body() {
   }, []);
 
   useEffect(() => {
+    console.log("### loading stations")
+    setAllStations(null)
     getStations({
       compact: true,
       ...(stationDebugFetchOptions && { limit: stnsLimit.value } )
     })
+      .then(tap(() => console.log("### stations loaded")))
       .then(response => setAllStations(response.data));
-  }, [stnsLimit]);
+  }, [stnsLimit, stationsReload]);
 
-  const stationFilter = memoize(stationFilterRaw);
+  const reloadStations = () => {
+    console.log("### reloadStations")
+    setStationsReload(n => n + 1)
+  };
 
+  // TODO: Place elsewhere; refactor so that it takes all dependent args
   const dataDownloadUrl = ({ dataCategory, clipToDate, fileFormat }) => {
     // Check whether state has settled. Each selector calls an onReady callback
     // to export information (e.g., all its options) that it has set up
@@ -169,28 +205,42 @@ function Body() {
     });
   };
 
-  // TODO: Check download URLs
-
+  // TODO: Place elsewhere
   const dataDownloadFilename = ({ dataCategory, fileFormat }) => {
     return `${{ dataCategory, fileFormat }}.${get('value', fileFormat)}`;
   }
 
-  const filteredStations = stationFilter(
-    startDate,
-    endDate,
-    selectedNetworksOptions,
-    selectedVariablesOptions,
-    selectedFrequenciesOptions,
-    onlyWithClimatology,
-    area,
-    allNetworks,
-    allVariables,
-    allStations,
+  const filteredStations = useMemo(
+    () => stationFilter(
+      startDate,
+      endDate,
+      selectedNetworksOptions,
+      selectedVariablesOptions,
+      selectedFrequenciesOptions,
+      onlyWithClimatology,
+      allNetworks,
+      allVariables,
+      allStations,
+    ),
+    [
+      startDate,
+      endDate,
+      selectedNetworksOptions,
+      selectedVariablesOptions,
+      selectedFrequenciesOptions,
+      onlyWithClimatology,
+      allNetworks,
+      allVariables,
+      allStations,
+    ]
   );
 
-  const stationInsideArea = stationInsideMultiPolygon(area);
-  const selectedStations = filter(stationInsideArea, filteredStations);
+  const selectedStations = useMemo(
+    () => stationAreaFilter(area, filteredStations),
+    [area, filteredStations]
+  );
 
+  // TODO: Factor unselected things stuff out into a component
   const selections = [
     {
       name: 'networks',
@@ -225,15 +275,47 @@ function Body() {
               allNetworks={allNetworks}
               allVariables={allVariables}
               onSetArea={setArea}
+              markerClusterOptions={uzeMarkercluster && markerClusterOptions}
             />,
 
             <Panel style={{ marginLeft: '-15px', marginRight: '-10px' }}>
               <Panel.Body>
+                { showReloadStationsButton && (
+                  <Button onClick={reloadStations}>
+                    Reload stations
+                  </Button>
+                )}
                 <Tabs
                   id="non-map-controls"
                   defaultActiveKey={'Filters'}
                   className={css.mainTabs}
                 >
+                  { markerClusteringAvailable && (
+                    <Tab
+                      eventKey={'Clustering'}
+                      title={`Marker Clustering (${uzeMarkercluster ? "on": "off"})`}
+                    >
+                      <SelectionCounts
+                        allStations={allStations}
+                        selectedStations={selectedStations}
+                      />
+                      <FormGroup>
+                        <Checkbox
+                          inline
+                          checked={uzeMarkercluster}
+                          onChange={toggleUzeMarkercluster}
+                        >
+                          Use leaflet.markercluster
+                        </Checkbox>
+                      </FormGroup>
+                      <MarkerClusterOptions
+                        value={markerClusterOptions}
+                        onChange={setMarkerClusterOptions}
+                      />
+                      <JSONstringify object={markerClusterOptions}/>
+                    </Tab>
+                  )}
+
                   <Tab eventKey={'Filters'} title={'Station Filters'}>
                     <Row>
                       <Col lg={12} md={12} sm={12}>
