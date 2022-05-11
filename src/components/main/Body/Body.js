@@ -33,6 +33,7 @@ import VariableSelector from '../../selectors/VariableSelector';
 import FrequencySelector
   from '../../selectors/FrequencySelector/FrequencySelector';
 import DateSelector from '../../selectors/DateSelector';
+import { commonSelectorStyles } from '../../selectors/styles';
 import {
   stationAreaFilter,
   stationFilter,
@@ -58,33 +59,6 @@ import {
 
 
 logger.configure({ active: true });
-
-// TODO: Place elsewhere
-const commonSelectorStyles = {
-  menu: (provided) => {
-    return {
-      ...provided,
-      zIndex: 999,
-    }
-  },
-  valueContainer: (provided, state) => ({
-    ...provided,
-    maxHeight: '10em',
-    overflowY: 'auto',
-  }),
-  indicatorsContainer: (provided, state) => ({
-    ...provided,
-    width: '2em',
-  }),
-  option: (styles) => {
-    return {
-      ...styles,
-      padding: '0.5em',
-      fontSize: '0.9em',
-    }
-  }
-};
-
 
 const defaultLgs = [7, 5];
 
