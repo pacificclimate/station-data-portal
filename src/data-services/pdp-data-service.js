@@ -131,3 +131,7 @@ export const dataDownloadTarget =
     ])
   );
 
+export const dataDownloadFilename = ({ dataCategory, fileFormat }) => {
+  return `${{ dataCategory, fileFormat }}.${get('value', fileFormat)}`;
+}
+

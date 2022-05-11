@@ -11,7 +11,6 @@ import {
   Tabs
 } from 'react-bootstrap';
 import Select from 'react-select';
-import get from 'lodash/fp/get';
 import tap from 'lodash/fp/tap';
 
 import css from '../common.module.css';
@@ -23,7 +22,8 @@ import {
   getStations,
   getVariables,
 } from '../../../data-services/station-data-service';
-import { dataDownloadTarget } from '../../../data-services/pdp-data-service';
+import { dataDownloadTarget, dataDownloadFilename }
+  from '../../../data-services/pdp-data-service';
 import {
   stationAreaFilter,
   stationFilter,
@@ -130,7 +130,6 @@ function Body() {
     setStationsReload(n => n + 1)
   };
 
-  // TODO: Place elsewhere; refactor so that it takes all dependent args
   const dataDownloadUrl = ({ dataCategory, clipToDate, fileFormat }) => {
     // Check whether state has settled. Each selector calls an onReady callback
     // to export information (e.g., all its options) that it has set up
@@ -156,11 +155,6 @@ function Body() {
       dataFormat: fileFormat,
     });
   };
-
-  // TODO: Place elsewhere
-  const dataDownloadFilename = ({ dataCategory, fileFormat }) => {
-    return `${{ dataCategory, fileFormat }}.${get('value', fileFormat)}`;
-  }
 
   const filteredStations = useMemo(
     () => stationFilter(
