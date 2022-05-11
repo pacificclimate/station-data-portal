@@ -13,3 +13,6 @@ export const stationDebugFetchOptions =
 
 export const markerClusteringAvailable =
   configBool("MARKER_CLUSTERING_AVAILABLE");
+
+export const showReloadStationsButton =
+  configBool("SHOW_RELOAD_STATIONS_BUTTON");

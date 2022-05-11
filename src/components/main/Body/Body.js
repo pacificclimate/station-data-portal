@@ -52,13 +52,14 @@ import JSONstringify from '../../util/JSONstringify';
 import baseMaps from '../../maps/baseMaps';
 import {
   markerClusteringAvailable,
+  showReloadStationsButton,
   stationDebugFetchOptions,
 } from '../../../utils/configuration';
 
 
 logger.configure({ active: true });
 
-
+// TODO: Place elsewhere
 const commonSelectorStyles = {
   menu: (provided) => {
     return {
@@ -87,6 +88,7 @@ const commonSelectorStyles = {
 
 const defaultLgs = [7, 5];
 
+// TODO: Place elsewhere
 const stnsLimitOptions =
   [100, 500, 1000, 2000, 4000, 8000].map(value => ({
     value, label: value.toString()
@@ -176,6 +178,7 @@ function Body() {
     setStationsReload(n => n + 1)
   };
 
+  // TODO: Place elsewhere; refactor so that it takes all dependent args
   const dataDownloadUrl = ({ dataCategory, clipToDate, fileFormat }) => {
     // Check whether state has settled. Each selector calls an onReady callback
     // to export information (e.g., all its options) that it has set up
@@ -202,8 +205,7 @@ function Body() {
     });
   };
 
-  // TODO: Check download URLs
-
+  // TODO: Place elsewhere
   const dataDownloadFilename = ({ dataCategory, fileFormat }) => {
     return `${{ dataCategory, fileFormat }}.${get('value', fileFormat)}`;
   }
@@ -238,6 +240,7 @@ function Body() {
     [area, filteredStations]
   );
 
+  // TODO: Factor unselected things stuff out into a component
   const selections = [
     {
       name: 'networks',
@@ -277,9 +280,11 @@ function Body() {
 
             <Panel style={{ marginLeft: '-15px', marginRight: '-10px' }}>
               <Panel.Body>
-                <Button onClick={reloadStations}>
-                  Reload stations
-                </Button>
+                { showReloadStationsButton && (
+                  <Button onClick={reloadStations}>
+                    Reload stations
+                  </Button>
+                )}
                 <Tabs
                   id="non-map-controls"
                   defaultActiveKey={'Filters'}
