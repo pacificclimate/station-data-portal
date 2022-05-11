@@ -32,7 +32,7 @@ function FrequencySelector({
       selectAll: handleClickAll,
       selectNone: handleClickNone,
     });
-  }, []);
+  }, [allFrequencies]);
   
   useEffect(() => {
     setDefault();
@@ -102,16 +102,18 @@ FrequencySelector.valueToLabel = freq => {
   return get(freq, labels) || capitalize(freq) || 'Unspecified';
 };
 
-FrequencySelector.makeOptions = memoize(allFrequencies => (
-  allFrequencies === null ?
-    [] :
-    flow(
-      map(frequency => ({
-        value: frequency,
-        label: FrequencySelector.valueToLabel(frequency),
-      })),
-      sortBy('label'),
-    )(allFrequencies)
-));
+FrequencySelector.makeOptions = allFrequencies => {
+  return (
+    allFrequencies === null ?
+      [] :
+      flow(
+        map(frequency => ({
+          value: frequency,
+          label: FrequencySelector.valueToLabel(frequency),
+        })),
+        sortBy('label'),
+      )(allFrequencies)
+  )
+};
 
 export default FrequencySelector;
