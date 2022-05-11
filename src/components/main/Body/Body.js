@@ -117,10 +117,9 @@ function Body() {
   const [area, setArea] = useState(undefined);
   const [stnsLimit, setStnsLimit] = useState(stnsLimitOptions[0]);
 
-  // Marker clustering option controls. We offer a subset of the options.
-
+  // Marker clustering option controls.
   const [uzeMarkercluster, toggleUzeMarkercluster] =
-    useBooleanStateWithToggler(true);
+    useBooleanStateWithToggler(markerClusteringAvailable);
   const [markerClusterOptions, setMarkerClusterOptions] =
     useMarkerClusterOptions({
       removeOutsideVisibleBounds: true,
@@ -283,32 +282,34 @@ function Body() {
                 </Button>
                 <Tabs
                   id="non-map-controls"
-                  defaultActiveKey={'Clustering'}
+                  defaultActiveKey={'Filters'}
                   className={css.mainTabs}
                 >
-                  <Tab
-                    eventKey={'Clustering'}
-                    title={`Marker Clustering (${uzeMarkercluster ? "on": "off"})`}
-                  >
-                    <SelectionCounts
-                      allStations={allStations}
-                      selectedStations={selectedStations}
-                    />
-                    <FormGroup>
-                      <Checkbox
-                        inline
-                        checked={uzeMarkercluster}
-                        onChange={toggleUzeMarkercluster}
-                      >
-                        Use leaflet.markercluster
-                      </Checkbox>
-                    </FormGroup>
-                    <MarkerClusterOptions
-                      value={markerClusterOptions}
-                      onChange={setMarkerClusterOptions}
-                    />
-                    <JSONstringify object={markerClusterOptions}/>
-                  </Tab>
+                  { markerClusteringAvailable && (
+                    <Tab
+                      eventKey={'Clustering'}
+                      title={`Marker Clustering (${uzeMarkercluster ? "on": "off"})`}
+                    >
+                      <SelectionCounts
+                        allStations={allStations}
+                        selectedStations={selectedStations}
+                      />
+                      <FormGroup>
+                        <Checkbox
+                          inline
+                          checked={uzeMarkercluster}
+                          onChange={toggleUzeMarkercluster}
+                        >
+                          Use leaflet.markercluster
+                        </Checkbox>
+                      </FormGroup>
+                      <MarkerClusterOptions
+                        value={markerClusterOptions}
+                        onChange={setMarkerClusterOptions}
+                      />
+                      <JSONstringify object={markerClusterOptions}/>
+                    </Tab>
+                  )}
 
                   <Tab eventKey={'Filters'} title={'Station Filters'}>
                     <Row>
