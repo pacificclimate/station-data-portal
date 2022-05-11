@@ -50,6 +50,10 @@ import SelectionCriteria from '../../info/SelectionCriteria';
 import AdjustableColumns from '../../util/AdjustableColumns';
 import JSONstringify from '../../util/JSONstringify';
 import baseMaps from '../../maps/baseMaps';
+import {
+  markerClusteringAvailable,
+  stationDebugFetchOptions,
+} from '../../../utils/configuration';
 
 
 logger.configure({ active: true });
@@ -88,10 +92,6 @@ const stnsLimitOptions =
     value, label: value.toString()
   }));
 
-
-const stationDebugFetchOptions =
-  (process.env.REACT_APP_DEBUG_STATION_FETCH_OPTIONS || "").toLowerCase()
-  === "true";
 
 function Body() {
   const [startDate, setStartDate] = useState(null);
