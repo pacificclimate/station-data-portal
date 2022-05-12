@@ -69,6 +69,15 @@ For production runs, environment variables are provided by
   (select) network metadata received from API. (See [Filtering metadata](#filtering-metadata).)
 - Optional
 
+`REACT_APP_ZOOM_TO_MARKER_RADIUS`
+- Specification for zoom to marker radius conversion.
+- Semicolon-separated pairs of comma-separated numbers (ints), which are
+  interpreted as a list of pairs of `[zoom, radius]` values. Zoom values must
+  be in ascending order.
+- Optional; default `7,2;99,4` -> `[[7,2], [99,4]]`
+- If there is an error in the provided value, the default is used and an error
+  message is written to the console.
+
 `REACT_APP_DEBUG_STATION_FETCH_OPTIONS`
 - Add control(s) for setting station fetch debug options (e.g., limit).
 - Dev/debug only.
