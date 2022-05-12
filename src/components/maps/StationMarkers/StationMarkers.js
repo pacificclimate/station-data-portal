@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
-import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { CircleMarker, Polygon, useMap, useMapEvents }
-  from 'react-leaflet';
+import React, { useEffect, useRef, useState } from 'react';
+import { CircleMarker, Polygon, useMap, useMapEvents } from 'react-leaflet';
 import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
 import StationPopup from '../StationPopup';
@@ -16,6 +15,7 @@ import {
 } from '../../../utils/station-info';
 import chroma from 'chroma-js';
 import { getTimer } from '../../../utils/timing';
+import { zoomToMarkerRadiusSpec } from '../../../utils/configuration';
 
 
 logger.configure({ active: true });
@@ -186,37 +186,39 @@ OneStationMarkers.propTypes = {
   polygonOptions: PropTypes.object,
 };
 
-
+// Convert a zoom level to a marker radius according to zoomToMarkerRadiusSpec,
+// which is an array of pairs of [zoom, radius] values, in ascending order of
+// zoom. This value is set from an env var. See utils/configuration for details.
 function zoomToMarkerRadius(zoom) {
-  if (zoom < 8) {
-    return 2;
+  for (const [_zoom, radius] of zoomToMarkerRadiusSpec) {
+    if (zoom <= _zoom) {
+      return radius;
+    }
   }
-  return 4;
+  return zoomToMarkerRadiusSpec[zoomToMarkerRadiusSpec.length-1][1];
 }
 
 
 function ManyStationMarkers({
   stations, allNetworks, allVariables
 }) {
-  console.log("### ManyStationMarkers")
+  // Control marker radius as a function of zoom level.
+  const leafletMap = useMap();
   const [markerRadius, setMarkerRadius] =
-    useState(zoomToMarkerRadius(useMap().getZoom()));
-  const leafletMap = useMapEvents({
+    useState(zoomToMarkerRadius(leafletMap.getZoom()));
+  useMapEvents({
     zoomend: () => {
-      const zoom = leafletMap.getZoom();
-      console.log("### zoomend: zoom", zoom)
-      setMarkerRadius(zoomToMarkerRadius(zoom))
+      setMarkerRadius(zoomToMarkerRadius(leafletMap.getZoom()));
     }
   });
 
-  console.log("### markers", markerRadius)
   const markerOptions = {
     radius: markerRadius,
     weight: 1,
     fillOpacity: 0.75,
     color: '#000000',
   };
-  const markers = map(
+  return map(
     station => (
       <OneStationMarkers
         key={station.id}
@@ -228,8 +230,6 @@ function ManyStationMarkers({
     ),
     stations
   );
-
-  return markers;
 }
 // ManyStationMarkers = React.memo(ManyStationMarkers);
 
