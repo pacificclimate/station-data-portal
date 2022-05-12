@@ -45,14 +45,13 @@ import { EditControl } from 'react-leaflet-draw';
 import MarkerCluster from '../MarkerCluster';
 import L from 'leaflet';
 
-import OneStationMarkers from '../StationMarkers';
+import { ManyStationMarkers } from '../StationMarkers';
 import { layersToGeoJSONMultipolygon } from '../../../utils/geoJSON-leaflet';
 
 import logger from '../../../logger';
 
 import './StationMap.css';
 import { getTimer } from '../../../utils/timing';
-import map from 'lodash/fp/map';
 
 logger.configure({ active: true });
 const smtimer = getTimer("StationMarker timing")
@@ -103,16 +102,12 @@ function StationMap({
 
   // alert("StationMap render")
 
-  const markers = map(
-    station => (
-      <OneStationMarkers
-        station={station}
-        allNetworks={allNetworks}
-        allVariables={allVariables}
-        key={station.id}
-      />
-    ),
-    stations
+  const markers = (
+    <ManyStationMarkers
+      stations={stations}
+      allNetworks={allNetworks}
+      allVariables={allVariables}
+    />
   );
 
   const markerLayerGroup = markerClusterOptions ? (

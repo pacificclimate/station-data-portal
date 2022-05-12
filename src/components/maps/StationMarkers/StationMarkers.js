@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
-import React, { useEffect, useRef, useState } from 'react';
-import { CircleMarker, Polygon, useMap } from 'react-leaflet';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
+import { CircleMarker, Polygon, useMap, useMapEvents }
+  from 'react-leaflet';
 import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
 import StationPopup from '../StationPopup';
@@ -174,7 +175,7 @@ function OneStationMarkers({
   );
   return r;
 }
-OneStationMarkers = timer.timeThis("StationMarkers")(OneStationMarkers);
+OneStationMarkers = timer.timeThis("OneStationMarkers")(OneStationMarkers);
 
 
 OneStationMarkers.propTypes = {
@@ -185,4 +186,51 @@ OneStationMarkers.propTypes = {
   polygonOptions: PropTypes.object,
 };
 
-export default OneStationMarkers;
+
+function zoomToMarkerRadius(zoom) {
+  if (zoom < 8) {
+    return 2;
+  }
+  return 4;
+}
+
+
+function ManyStationMarkers({
+  stations, allNetworks, allVariables
+}) {
+  console.log("### ManyStationMarkers")
+  const [markerRadius, setMarkerRadius] =
+    useState(zoomToMarkerRadius(useMap().getZoom()));
+  const leafletMap = useMapEvents({
+    zoomend: () => {
+      const zoom = leafletMap.getZoom();
+      console.log("### zoomend: zoom", zoom)
+      setMarkerRadius(zoomToMarkerRadius(zoom))
+    }
+  });
+
+  console.log("### markers", markerRadius)
+  const markerOptions = {
+    radius: markerRadius,
+    weight: 1,
+    fillOpacity: 0.75,
+    color: '#000000',
+  };
+  const markers = map(
+    station => (
+      <OneStationMarkers
+        key={station.id}
+        station={station}
+        allNetworks={allNetworks}
+        allVariables={allVariables}
+        markerOptions={markerOptions}
+      />
+    ),
+    stations
+  );
+
+  return markers;
+}
+// ManyStationMarkers = React.memo(ManyStationMarkers);
+
+export { ManyStationMarkers };
