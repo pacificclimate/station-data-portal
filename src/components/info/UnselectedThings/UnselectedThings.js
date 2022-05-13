@@ -26,7 +26,7 @@ function UnselectedThings({
   ];
 
   const unselectedThings = flow(
-    filter(thing => thing.items.length === 0),
+    filter(thing => (thing.items?.length ?? 0) === 0),
     map(thing => thing.name),
     join(', or '),
   )(selections);
