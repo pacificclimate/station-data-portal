@@ -37,7 +37,7 @@ class VariableSelector extends Component {
   static propTypes = {
     allVariables: PropTypes.array,
     onReady: PropTypes.func.isRequired,
-    value: PropTypes.array.isRequired,
+    value: PropTypes.array,  // can be null
     onChange: PropTypes.func.isRequired,
     defaultValueSelector: LocalPropTypes.defaultValueSelector,
   };
