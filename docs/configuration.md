@@ -78,6 +78,24 @@ For production runs, environment variables are provided by
 - If there is an error in the provided value, the default is used and an error
   message is written to the console.
 
+`REACT_APP_DISCLAIMER_ENABLED`
+- Present disclaimer dialog on app startup.
+- String representing boolean value; case insensitive "true" === true, else false.
+- Optional; default empty === false.
+
+`REACT_APP_DISCLAIMER_TITLE`
+- Title content for disclaimer dialog.
+- Optional; provide if REACT_APP_DISCLAIMER_ENABLED is true.
+
+`REACT_APP_DISCLAIMER_BODY`
+- Body content for disclaimer dialog.
+- Optional; provide if REACT_APP_DISCLAIMER_ENABLED is true.
+
+`REACT_APP_DISCLAIMER_BUTTON_LABEL`
+- Close-button label for disclaimer; recommend some variant of 
+Acknowledge, Accept, ...
+- Optional; provide if REACT_APP_DISCLAIMER_ENABLED is true.
+
 `REACT_APP_DEBUG_STATION_FETCH_OPTIONS`
 - Add control(s) for setting station fetch debug options (e.g., limit).
 - Dev/debug only.
