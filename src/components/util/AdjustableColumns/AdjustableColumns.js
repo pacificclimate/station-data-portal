@@ -71,7 +71,7 @@ export default class AdjustableColumns extends Component {
           <Col lg={12} className={'text-center'} style={{
             'marginBottom': '-0.5em',
             borderRight: i < n && '1px solid #777',
-            zIndex: 99999,
+            zIndex: 1000,
           }}>
             {
               i > 0 && <ButtonGroup
