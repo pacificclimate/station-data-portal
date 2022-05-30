@@ -4,14 +4,12 @@
 
 import PropTypes from 'prop-types';
 import React, { useMemo } from 'react';
-import { useTable, usePagination }  from 'react-table';
-import { Table } from 'react-bootstrap';
 
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 
+import PaginatedTable from '../../controls/PaginatedTable';
 import DownloadMetadata from '../../controls/DownloadMetadata';
-import PaginationControls from '../../controls/PaginationControls';
 import FrequencySelector from '../../selectors/FrequencySelector';
 import logger from '../../../logger';
 import {
@@ -162,65 +160,6 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
     [allNetworks, allVariables]
   );
 
-  const {
-    // Basic table functionality
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    prepareRow,
-    visibleColumns,
-
-    // Pagination
-    // Instead of using `rows`, we use `page`,
-    // which has only the rows for the active page
-    page,
-    canPreviousPage,
-    canNextPage,
-    pageCount,
-    gotoPage,
-    nextPage,
-    previousPage,
-    setPageSize,
-
-    // Know what's in state
-    state: {
-      // Pagination
-      pageIndex,
-      pageSize
-    },
-  } = useTable(
-    {
-      columns,
-      data: stations,
-      // Necessary when paging controls added?
-      initialState: {
-        pageSize: 10,
-        pageIndex: 0,
-      },
-    },
-    usePagination,
-  );
-
-  const paginationControls = (
-    <tr>
-      <td colSpan={visibleColumns.length}>
-        <PaginationControls
-          {...{
-            canPreviousPage,
-            canNextPage,
-            pageCount,
-            pageIndex,
-            gotoPage,
-            nextPage,
-            previousPage,
-            pageSize,
-            setPageSize,
-          }}
-        />
-      </td>
-    </tr>
-  );
-
   // Note: Download button is rendered here because it uses `columns` to
   // control what it does.
   return (
@@ -229,51 +168,7 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
         data={stations}
         columns={columns}
       />
-      <Table {...getTableProps()}>
-        <thead>{paginationControls}</thead>
-        <thead>
-        {
-          // Header rows
-          headerGroups.map(headerGroup => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {
-                // Header cells
-                headerGroup.headers.map(column => (
-                  <th {...column.getHeaderProps()}>
-                    {column.render('Header')}
-                  </th>
-                ))
-              }
-            </tr>
-          ))
-        }
-        </thead>
-
-        <tbody {...getTableBodyProps()}>
-        {
-          // Body rows
-          page.map(row => {
-            // Prepare the row for display
-            prepareRow(row)
-            return (
-              <tr {...row.getRowProps()}>
-                {
-                  // Body cells
-                  row.cells.map(cell => {
-                    return (
-                      <td {...cell.getCellProps()}>
-                        {cell.render('Cell')}
-                      </td>
-                    )
-                  })
-                }
-              </tr>
-            )
-          })
-        }
-        </tbody>
-        <tfoot>{paginationControls}</tfoot>
-      </Table>
+      <PaginatedTable data={stations} columns={columns} />
     </div>
   );
 }
