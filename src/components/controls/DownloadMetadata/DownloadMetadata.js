@@ -16,12 +16,9 @@ import './DownloadMetadata.css';
 logger.configure({ active: true });
 
 function DownloadMetadata({ data, columns }) {
-  const {
-    allColumns,
-    rows,
-    prepareRow,
-  } = useTable({ columns, data });
+  const { allColumns, rows, prepareRow } = useTable({ columns, data });
   const [csvData, setCsvData] = useState([]);
+
   console.log("### allColumns", allColumns)
   const csvHeaders = map("Header", allColumns);
   console.log("### csvHeaders", csvHeaders)
@@ -49,7 +46,6 @@ function DownloadMetadata({ data, columns }) {
   return (
     <CSVLink
       headers={csvHeaders}
-      // data={makeCsvData}
       data={csvData}
       asyncOnClick={true}
       onClick={handleClick}
