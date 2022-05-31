@@ -6,7 +6,7 @@ import { usePagination, useTable } from 'react-table';
 import { Table } from 'react-bootstrap';
 import PaginationControls from '../../controls/PaginationControls';
 
-function PaginatedTable({ data, columns }) {
+function PaginatedTable({ data, columns, hiddenColumns = [] }) {
   const {
     // Basic table functionality
     getTableProps,
@@ -41,6 +41,7 @@ function PaginatedTable({ data, columns }) {
       initialState: {
         pageSize: 10,
         pageIndex: 0,
+        hiddenColumns,
       },
     },
     usePagination,
@@ -118,6 +119,7 @@ function PaginatedTable({ data, columns }) {
 PaginatedTable.propTypes = {
   data: PropTypes.array.isRequired,
   columns: PropTypes.array.isRequired,
+  hiddenColumns: PropTypes.array,
 };
 
 export default PaginatedTable;
