@@ -3,10 +3,17 @@
 // passed into React Table.
 
 import PropTypes from 'prop-types';
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
+import {
+  ButtonGroup,
+  ButtonToolbar,
+  ToggleButton,
+  ToggleButtonGroup
+} from 'react-bootstrap';
 
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
+import flatten from 'lodash/fp/flatten';
 
 import PaginatedTable from '../../controls/PaginatedTable';
 import DownloadMetadata from '../../controls/DownloadMetadata';
@@ -47,9 +54,19 @@ const lexCompare = (a, b) => {
 }
 
 
-function StationMetadata({ stations, allNetworks, allVariables }) {
-  const columns = useMemo(
-    () => [
+// Return column definitions for a tabular display of metadata.
+// There are two display types, compact and expanded.
+// The appropriate form of data (compact or expanded) must be used with the
+// column definitions. Column definitions and data (see `smtData`) are computed
+// by separate functions to make memoizing them simpler and more effective.
+function smtColumns({
+  allNetworks, allVariables, compact=true
+}) {
+  if (compact) {
+    // Column definitions for a compact display of metadata.
+    // A compact display rolls up information from the station histories.
+    // It's not very useful for processing, but it is convenient to read.
+    return [
       {
         id: 'Network',
         Header: 'Network',
@@ -90,14 +107,14 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
         Cell: row => (
           <ul className={"compact"}>
             {
-                map(location => (
-                  // A location is a representative history item
-                  <li key={location.id}>
-                    {-location.lon} W <br/>
-                    {location.lat} N <br/>
-                    Elev. {location.elevation} m
-                  </li>
-                ), row.value)
+              map(location => (
+                // A location is a representative history item
+                <li key={location.id}>
+                  {-location.lon} W <br/>
+                  {location.lat} N <br/>
+                  Elev. {location.elevation} m
+                </li>
+              ), row.value)
             }
           </ul>
         ),
@@ -112,13 +129,13 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
         Cell: row => (
           <ul className={"compact"}>
             {
-                map(period => (
-                  // A period is a representative history item
-                  <li key={period.id}>
-                    {formatDate(period.min_obs_time)} to <br/>
-                    {formatDate(period.max_obs_time)}
-                  </li>
-                ), row.value)
+              map(period => (
+                // A period is a representative history item
+                <li key={period.id}>
+                  {formatDate(period.min_obs_time)} to <br/>
+                  {formatDate(period.max_obs_time)}
+                </li>
+              ), row.value)
             }
           </ul>
         ),
@@ -156,19 +173,149 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
         maxWidth: 30,
         accessor: station => station.histories.length,
       },
-    ],
-    [allNetworks, allVariables]
+    ];
+  }
+
+  // Return column definitions for expanded display of metadata.
+  // An expanded display has one row per station history, and does not roll
+  // up data shared between histories.
+  return [
+    {
+      id: 'Network',
+      Header: 'Network',
+      minWidth: 80,
+      maxWidth: 100,
+      accessor: data => {
+        const network = stationNetwork(allNetworks, data.station);
+        return network ? network.name : '?';
+      },
+    },
+    {
+      id: 'Native ID',
+      Header: 'Native ID',
+      minWidth: 80,
+      maxWidth: 100,
+      accessor: data => data.station.native_id,
+    },
+    {
+      id: 'Station name',
+      Header: 'Station Name',
+      minWidth: 80,
+      maxWidth: 100,
+      accessor: data => data.history.station_name,
+    },
+    {
+      id: 'Longitude',
+      Header: 'Longitude',
+      minWidth: 80,
+      maxWidth: 100,
+      accessor: data => data.history.lon,
+    },
+    {
+      id: 'Latitude',
+      Header: 'Latitude',
+      minWidth: 80,
+      maxWidth: 100,
+      accessor: data => data.history.lat,
+    },
+    {
+      id: 'Elev',
+      Header: 'Elev (m)',
+      minWidth: 80,
+      maxWidth: 100,
+      accessor: data => data.history.elevation ?? "n/a",
+    },
+    {
+      id: 'Record Start',
+      Header: 'Record Start',
+      minWidth: 80,
+      maxWidth: 100,
+      accessor: data => formatDate(data.history.min_obs_time),
+    },
+    {
+      id: 'Record End',
+      Header: 'Record End',
+      minWidth: 80,
+      maxWidth: 100,
+      accessor: data => formatDate(data.history.max_obs_time),
+    },
+    {
+      id: 'Obs Freq',
+      Header: 'Obs Freq',
+      minWidth: 80,
+      maxWidth: 100,
+      accessor: data => FrequencySelector.valueToLabel(data.history.freq),
+    },
+    {
+      minWidth: 100,
+      maxWidth: 250,
+      id: 'Variables',
+      Header: 'Variables',
+      accessor: data => uniqStationVariableNames(allVariables, data.station),
+      sortable: false,
+      Cell: row => (
+        <ul className={"compact"}>
+          {map(name => (<li key={name}>{name}</li>), row.value)}
+        </ul>
+      ),
+    },
+  ];
+}
+
+
+// Return data for a tabular display of metadata.
+// There are two display types, compact and expanded.
+// The appropriate form of column definitions (compact or expanded) must be
+// used with the data. Column definitions  (see `smtColumns`) and data are
+// computed by separate functions to make memoizing them simpler and more
+// effective.
+function smtData(stations, compact) {
+  if (compact) {
+    return stations;
+  }
+  // Expanded data: one history per item.
+  return flow(
+    map(station => map(history => ({station, history}), station.histories)),
+    flatten,
+  )(stations);
+}
+
+
+function StationMetadata({ stations, allNetworks, allVariables }) {
+  const [compact, setCompact] = useState(true);
+
+  const columns = useMemo(
+    () => smtColumns({ allNetworks, allVariables, compact }),
+    [allNetworks, allVariables, compact],
+  );
+
+  const data = useMemo(
+    () => smtData(stations, compact),
+    [stations, compact],
   );
 
   // Note: Download button is rendered here because it uses `columns` to
   // control what it does.
   return (
     <div className={"StationMetadata"}>
-      <DownloadMetadata
-        data={stations}
-        columns={columns}
-      />
-      <PaginatedTable data={stations} columns={columns} />
+      <ButtonToolbar>
+        <ToggleButtonGroup
+          type={"radio"}
+          name={"compact"}
+          value={compact}
+          onChange={setCompact}
+        >
+          <ToggleButton value={true}>Compact</ToggleButton>
+          <ToggleButton value={false}>Expanded</ToggleButton>
+        </ToggleButtonGroup>
+        <ButtonGroup>
+          <DownloadMetadata
+            data={stations}
+            columns={columns}
+          />
+        </ButtonGroup>
+      </ButtonToolbar>
+      <PaginatedTable data={data} columns={columns} />
     </div>
   );
 }
