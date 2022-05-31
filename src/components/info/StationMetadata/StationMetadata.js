@@ -14,6 +14,7 @@ import {
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 import flatten from 'lodash/fp/flatten';
+import join from 'lodash/fp/join';
 
 import PaginatedTable from '../../controls/PaginatedTable';
 import DownloadMetadata from '../../controls/DownloadMetadata';
@@ -34,6 +35,8 @@ import './StationMetadata.css';
 logger.configure({ active: true });
 
 const formatDate = d => d ? d.toISOString().substr(0,10) : 'unknown';
+const csvArrayRep = (sep = "|") => join(sep);
+
 
 // Comparator for standard lexicographic ordering of arrays of values.
 // Returns negative, zero, or positive integer as usual for comparators.
@@ -96,6 +99,7 @@ function smtColumns({
             {map(name => (<li key={name}>{name}</li>), row.value)}
           </ul>
         ),
+        csv: csvArrayRep(),
       },
       {
         id: 'Unique Locations',
@@ -118,6 +122,12 @@ function smtColumns({
             }
           </ul>
         ),
+        csv: flow(
+          map(location =>
+            `${-location.lon} W, ${location.lat} N, Elev. ${location.elevation} m`
+          ),
+          csvArrayRep(),
+        ),
       },
       {
         id: 'Unique Records',
@@ -139,6 +149,10 @@ function smtColumns({
             }
           </ul>
         ),
+        csv: flow(
+          map(period => `${formatDate(period.min_obs_time)} to ${formatDate(period.max_obs_time)}`),
+          csvArrayRep()
+        ),
       },
       {
         minWidth: 80,
@@ -152,6 +166,7 @@ function smtColumns({
             {map(freq => (<li key={freq}>{freq}</li>), row.value)}
           </ul>
         ),
+        csv: csvArrayRep(),
       },
       {
         minWidth: 100,
@@ -165,6 +180,7 @@ function smtColumns({
             {map(name => (<li key={name}>{name}</li>), row.value)}
           </ul>
         ),
+        csv: csvArrayRep(),
       },
       {
         id: '# Hx',
@@ -258,6 +274,7 @@ function smtColumns({
           {map(name => (<li key={name}>{name}</li>), row.value)}
         </ul>
       ),
+      csv: csvArrayRep(),
     },
   ];
 }
@@ -309,10 +326,7 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
           <ToggleButton value={false}>Expanded</ToggleButton>
         </ToggleButtonGroup>
         <ButtonGroup>
-          <DownloadMetadata
-            data={stations}
-            columns={columns}
-          />
+          <DownloadMetadata data={data} columns={columns} />
         </ButtonGroup>
       </ButtonToolbar>
       <PaginatedTable data={data} columns={columns} />
