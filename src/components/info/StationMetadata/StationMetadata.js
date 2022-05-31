@@ -62,228 +62,276 @@ const lexCompare = (a, b) => {
 // The appropriate form of data (compact or expanded) must be used with the
 // column definitions. Column definitions and data (see `smtData`) are computed
 // by separate functions to make memoizing them simpler and more effective.
-function smtColumns({
+function smtColumnInfo({
   allNetworks, allVariables, compact=true
 }) {
+  // Columns and accessors common to both display types
+
+  const stationNetworkIdAccessor = station => {
+    const network = stationNetwork(allNetworks, station);
+    return network?.id;
+  };
+
+  const networkIdColumn = {
+    id: 'Network ID',
+    Header: 'Network ID',
+    minWidth: 80,
+    maxWidth: 100,
+  };
+
+  const stationNetworkNameAccessor = station => {
+    const network = stationNetwork(allNetworks, station);
+    return network ? network.name : '?';
+  };
+
+  const networkNameColumn = {
+    id: 'Network Name',
+    Header: 'Network Name',
+    minWidth: 80,
+    maxWidth: 100,
+  };
+
+  const nativeIdColumn = {
+    id: 'Native ID',
+    Header: 'Native ID',
+    minWidth: 80,
+    maxWidth: 100,
+  };
+
+  const stationIdColumn = {
+    id: 'Station ID',
+    Header: 'Station ID',
+    minWidth: 80,
+    maxWidth: 100,
+  };
+
+  const historyIdColumn = {
+    id: 'History ID',
+    Header: 'History ID',
+    minWidth: 80,
+    maxWidth: 100,
+  };
+
+  const provinceColumn = {
+    id: 'Province',
+    Header: 'Province',
+    minWidth: 80,
+    maxWidth: 100,
+  };
+
+  const variablesColumn = {
+    minWidth: 100,
+    maxWidth: 250,
+    id: 'Variables',
+    Header: 'Variables',
+    sortable: false,
+    Cell: row => (
+      <ul className={"compact"}>
+        {map(name => (<li key={name}>{name}</li>), row.value)}
+      </ul>
+    ),
+    csv: csvArrayRep(),
+  };
+
   if (compact) {
     // Column definitions for a compact display of metadata.
     // A compact display rolls up information from the station histories.
     // It's not very useful for processing, but it is convenient to read.
-    return [
-      {
-        id: 'Network',
-        Header: 'Network',
-        minWidth: 80,
-        maxWidth: 100,
-        accessor: station => {
-          const network = stationNetwork(allNetworks, station);
-          return network ? network.name : '?';
-        },
-      },
-      {
-        id: 'Native ID',
-        Header: 'Native ID',
-        minWidth: 80,
-        maxWidth: 100,
-        accessor: 'native_id'
-      },
-      {
-        id: 'Unique Names',
-        Header: 'Unique Names',
-        minWidth: 120,
-        maxWidth: 200,
-        accessor: uniqStationNames,
-        sortMethod: lexCompare,
-        Cell: row => (
-          <ul className={"compact"}>
-            {map(name => (<li key={name}>{name}</li>), row.value)}
-          </ul>
-        ),
-        csv: csvArrayRep(),
-      },
-      {
-        id: 'Unique Locations',
-        Header: 'Unique Locations',
-        minWidth: 120,
-        maxWidth: 200,
-        sortable: false,
-        accessor: uniqStationLocations,
-        Cell: row => (
-          <ul className={"compact"}>
-            {
-              map(location => (
-                // A location is a representative history item
-                <li key={location.id}>
-                  {-location.lon} W <br/>
-                  {location.lat} N <br/>
-                  Elev. {location.elevation} m
-                </li>
-              ), row.value)
-            }
-          </ul>
-        ),
-        csv: flow(
-          map(location =>
-            `${-location.lon} W, ${location.lat} N, Elev. ${location.elevation} m`
+    const historyIdsColumn = {
+      minWidth: 80,
+      maxWidth: 100,
+      id: 'Hx Ids',
+      Header: 'Hx Ids',
+      accessor: station => map('id', station.histories),
+      sortMethod: lexCompare,
+      Cell: row => (
+        <ul className={"compact"}>
+          {map(id => (<li key={id}>{id}</li>), row.value)}
+        </ul>
+      ),
+      csv: csvArrayRep(),
+    };
+
+    return {
+      columns: [
+        { ...networkIdColumn, accessor: stationNetworkIdAccessor },
+        { ...networkNameColumn, accessor: stationNetworkNameAccessor },
+        { ...nativeIdColumn, accessor: "native_id" },
+        { ...stationIdColumn, accessor: "id" },
+        {
+          id: 'Unique Names',
+          Header: 'Unique Names',
+          minWidth: 120,
+          maxWidth: 200,
+          accessor: uniqStationNames,
+          sortMethod: lexCompare,
+          Cell: row => (
+            <ul className={"compact"}>
+              {map(name => (<li key={name}>{name}</li>), row.value)}
+            </ul>
           ),
-          csvArrayRep(),
-        ),
-      },
-      {
-        id: 'Unique Records',
-        Header: 'Unique Records',
-        minWidth: 100,
-        maxWidth: 100,
-        sortable: false,
-        accessor: uniqStationObsPeriods,
-        Cell: row => (
-          <ul className={"compact"}>
-            {
-              map(period => (
-                // A period is a representative history item
-                <li key={period.id}>
-                  {formatDate(period.min_obs_time)} to <br/>
-                  {formatDate(period.max_obs_time)}
-                </li>
-              ), row.value)
-            }
-          </ul>
-        ),
-        csv: flow(
-          map(period => `${formatDate(period.min_obs_time)} to ${formatDate(period.max_obs_time)}`),
-          csvArrayRep()
-        ),
-      },
-      {
-        minWidth: 80,
-        maxWidth: 100,
-        id: 'Uniq Obs Freqs',
-        Header: 'Uniq Obs Freqs',
-        accessor: flow(uniqStationFreqs, map(FrequencySelector.valueToLabel)),
-        sortMethod: lexCompare,
-        Cell: row => (
-          <ul className={"compact"}>
-            {map(freq => (<li key={freq}>{freq}</li>), row.value)}
-          </ul>
-        ),
-        csv: csvArrayRep(),
-      },
-      {
-        minWidth: 100,
-        maxWidth: 250,
-        id: 'Variables',
-        Header: 'Variables',
-        accessor: uniqStationVariableNames(allVariables),
-        sortable: false,
-        Cell: row => (
-          <ul className={"compact"}>
-            {map(name => (<li key={name}>{name}</li>), row.value)}
-          </ul>
-        ),
-        csv: csvArrayRep(),
-      },
-      {
-        id: '# Hx',
-        Header: '# Hx',
-        minWidth: 30,
-        maxWidth: 30,
-        accessor: station => station.histories.length,
-      },
-    ];
+          csv: csvArrayRep(),
+        },
+        {
+          id: 'Unique Locations',
+          Header: 'Unique Locations',
+          minWidth: 120,
+          maxWidth: 200,
+          sortable: false,
+          accessor: uniqStationLocations,
+          Cell: row => (
+            <ul className={"compact"}>
+              {
+                map(location => (
+                  // A location is a representative history item
+                  <li key={location.id}>
+                    {-location.lon} W <br/>
+                    {location.lat} N <br/>
+                    Elev. {location.elevation} m
+                  </li>
+                ), row.value)
+              }
+            </ul>
+          ),
+          csv: flow(
+            map(location =>
+              `${-location.lon} W, ${location.lat} N, Elev. ${location.elevation} m`
+            ),
+            csvArrayRep(),
+          ),
+        },
+        {
+          id: 'Unique Records',
+          Header: 'Unique Records',
+          minWidth: 100,
+          maxWidth: 100,
+          sortable: false,
+          accessor: uniqStationObsPeriods,
+          Cell: row => (
+            <ul className={"compact"}>
+              {
+                map(period => (
+                  // A period is a representative history item
+                  <li key={period.id}>
+                    {formatDate(period.min_obs_time)} to <br/>
+                    {formatDate(period.max_obs_time)}
+                  </li>
+                ), row.value)
+              }
+            </ul>
+          ),
+          csv: flow(
+            map(period => `${formatDate(period.min_obs_time)} to ${formatDate(period.max_obs_time)}`),
+            csvArrayRep()
+          ),
+        },
+        {
+          minWidth: 80,
+          maxWidth: 100,
+          id: 'Uniq Obs Freqs',
+          Header: 'Uniq Obs Freqs',
+          accessor: flow(uniqStationFreqs, map(FrequencySelector.valueToLabel)),
+          sortMethod: lexCompare,
+          Cell: row => (
+            <ul className={"compact"}>
+              {map(freq => (<li key={freq}>{freq}</li>), row.value)}
+            </ul>
+          ),
+          csv: csvArrayRep(),
+        },
+        { ...variablesColumn, accessor: uniqStationVariableNames(allVariables) },
+        {
+          id: '# Hx',
+          Header: '# Hx',
+          minWidth: 30,
+          maxWidth: 30,
+          accessor: station => station.histories.length,
+        },
+        historyIdsColumn,
+      ],
+      hiddenColumns: [
+        networkIdColumn.id,
+        stationIdColumn.id,
+        historyIdsColumn.id,
+      ],
+    };
   }
 
   // Return column definitions for expanded display of metadata.
   // An expanded display has one row per station history, and does not roll
   // up data shared between histories.
-  return [
-    {
-      id: 'Network',
-      Header: 'Network',
-      minWidth: 80,
-      maxWidth: 100,
-      accessor: data => {
-        const network = stationNetwork(allNetworks, data.station);
-        return network ? network.name : '?';
+  return {
+    columns: [
+      { ...networkIdColumn, accessor: data => stationNetworkIdAccessor(data.station) },
+      { ...networkNameColumn, accessor: data => stationNetworkNameAccessor(data.station) },
+      { ...nativeIdColumn, accessor: "station.native_id" },
+      { ...stationIdColumn, accessor: "station.id" },
+      {
+        id: 'Station name',
+        Header: 'Station Name',
+        minWidth: 80,
+        maxWidth: 100,
+        accessor: data => data.history.station_name,
       },
-    },
-    {
-      id: 'Native ID',
-      Header: 'Native ID',
-      minWidth: 80,
-      maxWidth: 100,
-      accessor: data => data.station.native_id,
-    },
-    {
-      id: 'Station name',
-      Header: 'Station Name',
-      minWidth: 80,
-      maxWidth: 100,
-      accessor: data => data.history.station_name,
-    },
-    {
-      id: 'Longitude',
-      Header: 'Longitude',
-      minWidth: 80,
-      maxWidth: 100,
-      accessor: data => data.history.lon,
-    },
-    {
-      id: 'Latitude',
-      Header: 'Latitude',
-      minWidth: 80,
-      maxWidth: 100,
-      accessor: data => data.history.lat,
-    },
-    {
-      id: 'Elev',
-      Header: 'Elev (m)',
-      minWidth: 80,
-      maxWidth: 100,
-      accessor: data => data.history.elevation ?? "n/a",
-    },
-    {
-      id: 'Record Start',
-      Header: 'Record Start',
-      minWidth: 80,
-      maxWidth: 100,
-      accessor: data => formatDate(data.history.min_obs_time),
-    },
-    {
-      id: 'Record End',
-      Header: 'Record End',
-      minWidth: 80,
-      maxWidth: 100,
-      accessor: data => formatDate(data.history.max_obs_time),
-    },
-    {
-      id: 'Obs Freq',
-      Header: 'Obs Freq',
-      minWidth: 80,
-      maxWidth: 100,
-      accessor: data => FrequencySelector.valueToLabel(data.history.freq),
-    },
-    {
-      minWidth: 100,
-      maxWidth: 250,
-      id: 'Variables',
-      Header: 'Variables',
-      accessor: data => uniqStationVariableNames(allVariables, data.station),
-      sortable: false,
-      Cell: row => (
-        <ul className={"compact"}>
-          {map(name => (<li key={name}>{name}</li>), row.value)}
-        </ul>
-      ),
-      csv: csvArrayRep(),
-    },
-  ];
+      { ...historyIdColumn, accessor: "history.id" },
+      { ...provinceColumn, accessor: "history.province" },
+      {
+        id: 'Longitude',
+        Header: 'Longitude',
+        minWidth: 80,
+        maxWidth: 100,
+        accessor: data => data.history.lon,
+      },
+      {
+        id: 'Latitude',
+        Header: 'Latitude',
+        minWidth: 80,
+        maxWidth: 100,
+        accessor: data => data.history.lat,
+      },
+      {
+        id: 'Elev',
+        Header: 'Elev (m)',
+        minWidth: 80,
+        maxWidth: 100,
+        accessor: data => data.history.elevation ?? "n/a",
+      },
+      {
+        id: 'Record Start',
+        Header: 'Record Start',
+        minWidth: 80,
+        maxWidth: 100,
+        accessor: data => formatDate(data.history.min_obs_time),
+      },
+      {
+        id: 'Record End',
+        Header: 'Record End',
+        minWidth: 80,
+        maxWidth: 100,
+        accessor: data => formatDate(data.history.max_obs_time),
+      },
+      {
+        id: 'Obs Freq',
+        Header: 'Obs Freq',
+        minWidth: 80,
+        maxWidth: 100,
+        accessor: data => FrequencySelector.valueToLabel(data.history.freq),
+      },
+      { ...variablesColumn, accessor: data => uniqStationVariableNames(allVariables)(data.station) },
+    ],
+    hiddenColumns: [
+      networkIdColumn.id,
+      stationIdColumn.id,
+      historyIdColumn.id,
+    ],
+  };
 }
 
 
 // Return data for a tabular display of metadata.
 // There are two display types, compact and expanded.
 // The appropriate form of column definitions (compact or expanded) must be
-// used with the data. Column definitions  (see `smtColumns`) and data are
+// used with the data. Column definitions (see `smtColumnInfo`) and data are
 // computed by separate functions to make memoizing them simpler and more
 // effective.
 function smtData(stations, compact) {
@@ -301,8 +349,8 @@ function smtData(stations, compact) {
 function StationMetadata({ stations, allNetworks, allVariables }) {
   const [compact, setCompact] = useState(true);
 
-  const columns = useMemo(
-    () => smtColumns({ allNetworks, allVariables, compact }),
+  const columnInfo = useMemo(
+    () => smtColumnInfo({ allNetworks, allVariables, compact }),
     [allNetworks, allVariables, compact],
   );
 
@@ -311,7 +359,7 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
     [stations, compact],
   );
 
-  // Note: Download button is rendered here because it uses `columns` to
+  // Note: Download button is rendered here because it uses `columnInfo` to
   // control what it does.
   return (
     <div className={"StationMetadata"}>
@@ -326,10 +374,10 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
           <ToggleButton value={false}>Expanded</ToggleButton>
         </ToggleButtonGroup>
         <ButtonGroup>
-          <DownloadMetadata data={data} columns={columns} />
+          <DownloadMetadata data={data} columns={columnInfo.columns} />
         </ButtonGroup>
       </ButtonToolbar>
-      <PaginatedTable data={data} columns={columns} />
+      <PaginatedTable data={data} {...columnInfo} />
     </div>
   );
 }
