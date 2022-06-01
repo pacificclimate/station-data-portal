@@ -1,6 +1,8 @@
 // This component renders a table showing a selected subset of station metadata.
 // This component wraps React Table v6. All props passed to this component are
 // passed into React Table.
+// This component also renders a download button with which users can download
+// the data in the table, plus extra hidden columns, as a CSV file.
 
 import PropTypes from 'prop-types';
 import React, { useState, useMemo } from 'react';
@@ -62,6 +64,8 @@ const lexCompare = (a, b) => {
 // The appropriate form of data (compact or expanded) must be used with the
 // column definitions. Column definitions and data (see `smtData`) are computed
 // by separate functions to make memoizing them simpler and more effective.
+// Column definitions include `csv` prop for representing a row value in
+// a CSV download file.
 function smtColumnInfo({
   allNetworks, allVariables, compact=true
 }) {
@@ -221,7 +225,9 @@ function smtColumnInfo({
             </ul>
           ),
           csv: flow(
-            map(period => `${formatDate(period.min_obs_time)} to ${formatDate(period.max_obs_time)}`),
+            map(period =>
+              `${formatDate(period.min_obs_time)} to ${formatDate(period.max_obs_time)}`
+            ),
             csvArrayRep()
           ),
         },
@@ -262,8 +268,14 @@ function smtColumnInfo({
   // up data shared between histories.
   return {
     columns: [
-      { ...networkIdColumn, accessor: data => stationNetworkIdAccessor(data.station) },
-      { ...networkNameColumn, accessor: data => stationNetworkNameAccessor(data.station) },
+      {
+        ...networkIdColumn,
+        accessor: data => stationNetworkIdAccessor(data.station)
+      },
+      {
+        ...networkNameColumn, accessor:
+            data => stationNetworkNameAccessor(data.station)
+      },
       { ...nativeIdColumn, accessor: "station.native_id" },
       { ...stationIdColumn, accessor: "station.id" },
       {
@@ -317,7 +329,10 @@ function smtColumnInfo({
         maxWidth: 100,
         accessor: data => FrequencySelector.valueToLabel(data.history.freq),
       },
-      { ...variablesColumn, accessor: data => uniqStationVariableNames(allVariables)(data.station) },
+      {
+        ...variablesColumn,
+        accessor: data => uniqStationVariableNames(allVariables)(data.station)
+      },
     ],
     hiddenColumns: [
       networkIdColumn.id,
@@ -360,7 +375,7 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
   );
 
   // Note: Download button is rendered here because it uses `columnInfo` to
-  // control what it does.
+  // control what it does. We consider it an adjunct to the table.
   return (
     <div className={"StationMetadata"}>
       <ButtonToolbar>
@@ -370,11 +385,15 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
           value={compact}
           onChange={setCompact}
         >
-          <ToggleButton value={true}>Compact</ToggleButton>
-          <ToggleButton value={false}>Expanded</ToggleButton>
+          <ToggleButton value={true}>By Station</ToggleButton>
+          <ToggleButton value={false}>By History</ToggleButton>
         </ToggleButtonGroup>
         <ButtonGroup>
-          <DownloadMetadata data={data} columns={columnInfo.columns} />
+          <DownloadMetadata
+            data={data}
+            columns={columnInfo.columns}
+            filename={`station-metadata-${compact ? "by-station" : "by-history"}.csv`}
+          />
         </ButtonGroup>
       </ButtonToolbar>
       <PaginatedTable data={data} {...columnInfo} />

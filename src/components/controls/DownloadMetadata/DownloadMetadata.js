@@ -3,9 +3,7 @@
 // a CSV file.
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
-import tap from 'lodash/fp/tap';
 import { useTable } from 'react-table';
 import { CSVLink } from 'react-csv';
 
@@ -15,28 +13,32 @@ import './DownloadMetadata.css';
 
 logger.configure({ active: true });
 
-function DownloadMetadata({ data, columns }) {
+function DownloadMetadata(
+  { data, columns, filename="station-metadata.csv" }
+) {
   const { allColumns, rows, prepareRow } = useTable({ columns, data });
+
+  // Data for CSV download can be bulky, so it is generated lazily.
+  // This state value holds the generated data.
   const [csvData, setCsvData] = useState([]);
 
-  console.log("### allColumns", allColumns)
   const csvHeaders = map("Header", allColumns);
-  console.log("### csvHeaders", csvHeaders)
 
   // Convert each row to an array of values matching header array.
-  const makeCsvData = () => flow(
-    tap(() => console.log("### makeCsvData called")),
-    map(row => {
+  // Column value in row is converted using column.csv function if defined.
+  const makeCsvData = () => map(
+    row => {
       prepareRow(row);
-      return row.values;
-    }),
-    map(values =>
-      map(column => {
-        const value = values[column.id];
-        return column.csv ?  column.csv(value) : value;
-      }, allColumns)
-    ),
-  )(rows);
+      return map(
+        column => {
+          const value = row.values[column.id];
+          return column.csv ? column.csv(value) : value;
+        },
+        allColumns
+      );
+    },
+    rows
+  );
 
   const handleClick = (event, done) => {
     setCsvData(makeCsvData());
@@ -47,8 +49,10 @@ function DownloadMetadata({ data, columns }) {
     <CSVLink
       headers={csvHeaders}
       data={csvData}
+      filename={filename}
       asyncOnClick={true}
       onClick={handleClick}
+      className={"btn btn-primary"}
     >
       Download Metadata
     </CSVLink>
@@ -58,6 +62,7 @@ function DownloadMetadata({ data, columns }) {
 DownloadMetadata.propTypes = {
   data: PropTypes.array.isRequired,
   columns: PropTypes.array.isRequired,
+  filename: PropTypes.string,
 };
 
 export default DownloadMetadata;
