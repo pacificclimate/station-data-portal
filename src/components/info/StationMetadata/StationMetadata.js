@@ -18,6 +18,7 @@ import map from 'lodash/fp/map';
 import flatten from 'lodash/fp/flatten';
 import join from 'lodash/fp/join';
 
+import InfoPopup from '../../util/InfoPopup';
 import PaginatedTable from '../../controls/PaginatedTable';
 import DownloadMetadata from '../../controls/DownloadMetadata';
 import FrequencySelector from '../../selectors/FrequencySelector';
@@ -387,13 +388,37 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
         >
           <ToggleButton value={true}>By Station</ToggleButton>
           <ToggleButton value={false}>By History</ToggleButton>
+          <InfoPopup title={"Table Contents"}>
+            <p>
+              Station metadata can be displayed (and downloaded) in two formats,
+              by station and by history.
+            </p>
+            <p>
+            The by-station format presents one station per table row,
+            and rolls up information from all histories
+            for a station into a more compact and readable form. It is
+            however less easily mechanically processed.
+            </p>
+            <p>
+            The by-history format presents one history per table row, repeating
+            station information in each row as necessary. It is a less compact
+            and readable format, but more easily mechanically processed.
+            </p>
+          </InfoPopup>
         </ToggleButtonGroup>
         <ButtonGroup>
           <DownloadMetadata
             data={data}
             columns={columnInfo.columns}
             filename={`station-metadata-${compact ? "by-station" : "by-history"}.csv`}
-          />
+          >
+            Download Metadata
+          </DownloadMetadata>
+          <InfoPopup title={"Download Metadata"}>
+            Download the metadata presented in the table below (all rows, not
+            just those visible) as a CSV file. The downloaded file includes
+            extra columns not visible in the table.
+          </InfoPopup>
         </ButtonGroup>
       </ButtonToolbar>
       <PaginatedTable data={data} {...columnInfo} />

@@ -14,7 +14,7 @@ import './DownloadMetadata.css';
 logger.configure({ active: true });
 
 function DownloadMetadata(
-  { data, columns, filename="station-metadata.csv" }
+  { data, columns, filename="station-metadata.csv", children }
 ) {
   const { allColumns, rows, prepareRow } = useTable({ columns, data });
 
@@ -54,7 +54,7 @@ function DownloadMetadata(
       onClick={handleClick}
       className={"btn btn-primary"}
     >
-      Download Metadata
+      {children}
     </CSVLink>
   );
 }
