@@ -89,6 +89,7 @@ export function getStations(params, config) {
         offset: envVarNumber('REACT_APP_STATION_OFFSET', undefined),
         limit: envVarNumber('REACT_APP_STATION_LIMIT', undefined),
         stride: envVarNumber('REACT_APP_STATION_STRIDE', undefined),
+        provinces: process.env.REACT_APP_STATIONS_QP_PROVINCES,
         ...params,
       },
       transformResponse: axios.defaults.transformResponse.concat(
