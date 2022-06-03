@@ -162,6 +162,12 @@ clustering control tab.
 - Sets `stride` param in /stations request. For testing.
 - Optional.
 
+`REACT_APP_TIMING_ENABLED`
+- Enable timing of selected operations. When enabled, timings are logged to 
+console.
+- Value: string bool.
+- Default: false.
+
 ## Filtering metadata
 
 The app can filter metadata to include only a desired subset of items.  
