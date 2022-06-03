@@ -14,7 +14,7 @@ logger.configure({ active: true });
 const timer = getTimer("Observation count timing")
 
 
-const totalCounts = timer.timeThis("totalCounts", { disable: true })(
+const totalCounts = timer.timeThis("totalCounts")(
   (counts, stations) =>
     reduce((sum, station) => sum + (counts[station.id] || 0), 0)(stations)
 );

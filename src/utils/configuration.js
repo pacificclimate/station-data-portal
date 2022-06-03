@@ -5,7 +5,7 @@ import flow from 'lodash/fp/flow';
 import split from 'lodash/fp/split';
 import map from 'lodash/fp/map';
 
-const strToBool = value => value.toLowerCase() === "true";
+const strToBool = value => (value ?? "").toLowerCase() === "true";
 
 export const configString = (name, deflt = "") =>
   (process.env[`REACT_APP_${name}`] || deflt);
