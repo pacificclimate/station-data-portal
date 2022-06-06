@@ -363,7 +363,7 @@ function smtData(stations, compact) {
 
 
 function StationMetadata({ stations, allNetworks, allVariables }) {
-  const [compact, setCompact] = useState(true);
+  const [compact, setCompact] = useState(false);
 
   const columnInfo = useMemo(
     () => smtColumnInfo({ allNetworks, allVariables, compact }),
@@ -386,25 +386,28 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
           value={compact}
           onChange={setCompact}
         >
-          <ToggleButton value={true}>By Station</ToggleButton>
           <ToggleButton value={false}>By History</ToggleButton>
+          <ToggleButton value={true}>By Station</ToggleButton>
         </ToggleButtonGroup>
         <ButtonGroup>
           <InfoPopup title={"Table Contents"}>
             <p>
               Station metadata can be displayed (and downloaded) in two formats,
-              by station and by history.
+              by history and by station.
+            </p>
+            <p>
+              The by-history format presents one history per table row, repeating
+              station information in each row as necessary. It is a less compact
+              and readable format, but more easily mechanically processed, and
+              it breaks out values such as latitude and longitude into separate
+              columns.
             </p>
             <p>
               The by-station format presents one station per table row,
               and rolls up information from all histories
               for a station into a more compact and readable form. It is
-              however less easily mechanically processed.
-            </p>
-            <p>
-              The by-history format presents one history per table row, repeating
-              station information in each row as necessary. It is a less compact
-              and readable format, but more easily mechanically processed.
+              however less easily mechanically processed, and combines related
+              values such as latitude and longitude into single columns.
             </p>
           </InfoPopup>
         </ButtonGroup>
