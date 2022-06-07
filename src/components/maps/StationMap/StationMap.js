@@ -122,6 +122,7 @@ function StationMap({
       zoom={initialViewport.zoom}
       center={initialViewport.center}
       preferCanvas={true}
+      maxZoom={13}
     >
       <MapInfoDisplay
         position={"bottomleft"}
