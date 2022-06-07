@@ -26,14 +26,17 @@ import map from 'lodash/fp/map';
 import sum from 'lodash/fp/sum';
 import sortBy from 'lodash/fp/sortBy';
 import isNil from 'lodash/fp/isNil';
+import { configBool } from './configuration';
 
 export class Timer {
-  constructor(name) {
+  constructor(name, enabled = configBool("TIMING_ENABLED", "false")) {
     this.name = name;
+    this.enabled = enabled;
     this.timings = {};
   }
 
   reset(key) {
+    if (!this.enabled) return;
     if (isNil(key)) {
       this.timings = {};
       return;
@@ -46,6 +49,7 @@ export class Timer {
   }
 
   start(key, log = false) {
+    if (!this.enabled) return;
     if (log) {
       console.log(`${key} timing start`)
     }
@@ -55,6 +59,7 @@ export class Timer {
   }
 
   stop(key, log = false) {
+    if (!this.enabled) return;
     const more = Date.now() - this.timings[key].start;
     if (log) {
       console.log(`${key} timing stop: ${more}`)
@@ -64,10 +69,10 @@ export class Timer {
   }
 
   timeThis = (key, options = {}) => f => {
-    const { disable = false, log = false } = options;
-    if (disable) {
+    if (!this.enabled) {
       return f;
     }
+    const { log = false } = options;
     return (...args) => {
       this.start(key, log);
       const r = f(...args);
@@ -77,6 +82,7 @@ export class Timer {
   }
 
   log() {
+    if (!this.enabled) return;
     console.group(this.name);
     const totalDuration = flow(map('duration'), sum)(this.timings);
     console.log(`Total duration: ${totalDuration / 1000} s`)
