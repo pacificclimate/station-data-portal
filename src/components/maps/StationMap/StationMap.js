@@ -45,6 +45,7 @@ import { EditControl } from 'react-leaflet-draw';
 import MarkerCluster from '../MarkerCluster';
 import L from 'leaflet';
 
+import MapInfoDisplay from '../MapInfoDisplay';
 import { ManyStationMarkers } from '../StationMarkers';
 import { layersToGeoJSONMultipolygon } from '../../../utils/geoJSON-leaflet';
 
@@ -122,6 +123,10 @@ function StationMap({
       center={initialViewport.center}
       preferCanvas={true}
     >
+      <MapInfoDisplay
+        position={"bottomleft"}
+        what={map => `Zoom: ${map.getZoom()}`}
+      />
       <FeatureGroup ref={userShapeLayerRef}>
         <EditControl
           position={'topleft'}
