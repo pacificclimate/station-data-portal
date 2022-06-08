@@ -22,7 +22,12 @@ class Header extends Component {
                     <h1>{process.env.REACT_APP_TITLE}</h1>
                 </Col>
                 <Col lg={2} className='text-right'>
-                  <small>Version: {process.env.REACT_APP_VERSION}</small>
+                  <p>Version: {process.env.REACT_APP_VERSION}</p>
+                  <p>
+                    <a href={`${process.env.PUBLIC_URL}/user-doc.html`}>
+                      User Docs
+                    </a>
+                  </p>
                 </Col>
             </Row>
         );
