@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#000000">
+    <!--
+      manifest.json provides metadata used when your web app is added to the
+      homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
+    -->
+    <link rel="shortcut icon" href="/favicon.ico">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.1/markdown-it.min.js" integrity="sha512-SYfDUYPg5xspsG6OOpXU366G8SZsdHOhqk/icdrYJ2E/WKZxPxze7d2HD3AyXpT7U22PZ5y74xRpqZ6A2bJ+kQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <title>Station Data Portal user documentation</title>
+</head>
+<body>
+<noscript>
+    You need to enable JavaScript to view this page.
+</noscript>
+<div id="root">Body</div>
+<script>
+  (function () {
+    const markdown = window.markdownit();
+    const root = document.getElementById("root");
+    fetch("/user-doc.md")
+        .then(response => response.text())
+        .then(text => {
+          const content = markdown.render(text);
+          root.innerHTML = content;
+        });
+  })();
+</script>
+</body>
+</html>
