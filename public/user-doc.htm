@@ -13,6 +13,7 @@
       homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
     -->
     <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="user-doc.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown-it/13.0.1/markdown-it.min.js" integrity="sha512-SYfDUYPg5xspsG6OOpXU366G8SZsdHOhqk/icdrYJ2E/WKZxPxze7d2HD3AyXpT7U22PZ5y74xRpqZ6A2bJ+kQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <title>Station Data Portal user documentation</title>
 </head>
@@ -20,16 +21,15 @@
 <noscript>
     You need to enable JavaScript to view this page.
 </noscript>
-<div id="root">Loading...</div>
+<div id="content">Loading...</div>
 <script>
   (function () {
     const markdown = window.markdownit();
-    const root = document.getElementById("root");
+    const content = document.getElementById("content");
     fetch("/user-doc.md")
         .then(response => response.text())
         .then(text => {
-          const content = markdown.render(text);
-          root.innerHTML = content;
+          content.innerHTML = markdown.render(text);
         });
   })();
 </script>

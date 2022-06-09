@@ -1,0 +1,24 @@
+body {
+    background-color: #11303d;
+    font-family: sans-serif;
+}
+
+#content {
+    min-width: 450px;
+    max-width: 800px;
+    background-color: white;
+}
+
+#content {
+    padding: 0 20px;
+}
+
+#content h1, #content h2, #content h3, #content h4, #content h5 {
+    font-family: 'Trebuchet MS', sans-serif;
+    font-weight: normal;
+    background-color: #f2f2f2;
+    color: #20435c;
+    border-bottom: 1px solid #ccc;
+    margin: 20px -20px 10px -20px;
+    padding: 3px 0 3px 10px;
+}
