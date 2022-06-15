@@ -24,8 +24,8 @@ Starting the Meteorological Data Portal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To start the MDP, browse to the appropriate web page as found in the
-`Data Portal <https://pacificclimate.org/data>` section of the the PCIC website.
-The MDP app runs in your browser.
+`Data Portal <https://pacificclimate.org/data>`_ section of the the PCIC
+website. The MDP app runs in your browser.
 
 For some regions, the app presents a disclaimer that must be accepted
 before it can be used to access data. Click the **Accept** button to
@@ -35,6 +35,14 @@ The MDP’s first action is to request all data describing stations in its
 region database. This may take a few seconds. During this time, the map
 shows only the background base map. When all the descriptive data
 (metadata) has loaded, the map shows markers for each station.
+
+In-app info and help
+^^^^^^^^^^^^^^^^^^^^
+
+Throughout the app you will find info icons |info icon| next to controls
+and other elements. Hover over these icons to see an immediate explanation
+of the item it is next to. Often this will remove the need to refer to
+this documentation.
 
 Stations and histories
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -149,7 +157,8 @@ or exclude particular stations.
 Filtering stations (**Station Filters** tab)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When the app starts up (i.e., the web page is refreshed), all available
+When the app starts up (i.e., the web page is loaded or refreshed),
+all available
 stations are loaded and shown on the map. To select stations by criteria
 including date range of available observations, the network they are
 part of, the variables they report, and the frequency of observations
@@ -157,7 +166,7 @@ reported by the station, use the controls on **Station Filters** tab.
 
 .. figure:: ./images/station-filters-tab.png
 
-   Station filters tab
+   **Station Filters** tab
 
 At the top of the **Station Filters** tab is a legend that shows the
 number of stations selected by these controls (and by the map polygons,
@@ -226,7 +235,7 @@ dynamic and responsive your changes to the station filters.
 
 .. figure:: ./images/station-metadata-tab.png
 
-   Station metadata tab
+   **Station Metadata** tab
 
 The tab contains a datagrid that presents the metadata for all stations
 selected jointly by the station filters and the map polygons. As the
@@ -274,14 +283,14 @@ tab.
 
 .. figure:: ./images/station-data-tab.png
 
-   Station data tab
+   **Station Data** tab
 
 This tab shows a count of the stations selected, and of the number of
 observations and climatologies available from those selected stations.
 
 To download, select your desired output format, and then click either
-the **Download Climatology** button (if you want climatologies) or the
-**Download Timeseries** button (if you want the raw observations). The
+the **Download Timeseries** button (if you want the raw observations)
+or the **Download Climatology** button (if you want climatologies). The
 only additional option is a checkbox to optionally **Clip time series to
 filter date range**. If this is checked, your download will only include
 observations between the start date and end date that you have indicated
@@ -296,7 +305,7 @@ coding on the map. It serves as a legend to the map.
 
 .. figure:: ./images/networks-tab.png
 
-   Networks tab
+   **Networks** tab
 
 Unexpected behaviour
 ^^^^^^^^^^^^^^^^^^^^
@@ -324,14 +333,6 @@ ways.
    downloaded. To limit the data downloaded to the filter range,
    check the **Clip time series to filter date range** checkbox on the
    **Station Data** tab.
-
-.. |zoom in| image:: ./images/map-nav-zoom-in-icon.png
-.. |zoom out| image:: ./images/map-nav-zoom-out-icon.png
-.. |map pointer| image:: ./images/map-pointer.png
-.. |draw rectangle| image:: ./images/map-drawing-rectangle-icon.png
-.. |draw polygon| image:: ./images/map-drawing-polygon-icon.png
-.. |edit shapes| image:: ./images/map-drawing-edit-icon.png
-.. |remove shapes| image:: ./images/map-drawing-delete-icon.png
 
 Station Listings
 ^^^^^^^^^^^^^^^^
@@ -394,3 +395,12 @@ For example:
 becomes:
 
 `https://data.pacificclimate.org/data/pcds/lister/raw/EC_raw/145M29.rsql.ascii%3Fstation_observations.air_temperature%2Cstation_observations.time%26station_observations.time%3E%222018-01-01%2000%3A00%3A00%22%26station_o%5C%0D%0Abservations.air_temperature%3C0 <https://data.pacificclimate.org/data/pcds/lister/raw/EC_raw/145M29.rsql.ascii%3Fstation_observations.air_temperature%2Cstation_observations.time%26station_observations.time%3E%222018-01-01%2000%3A00%3A00%22%26station_o%5C%0D%0Abservations.air_temperature%3C0>`_
+
+.. |zoom in| image:: ./images/map-nav-zoom-in-icon.png
+.. |zoom out| image:: ./images/map-nav-zoom-out-icon.png
+.. |map pointer| image:: ./images/map-pointer.png
+.. |draw rectangle| image:: ./images/map-drawing-rectangle-icon.png
+.. |draw polygon| image:: ./images/map-drawing-polygon-icon.png
+.. |edit shapes| image:: ./images/map-drawing-edit-icon.png
+.. |remove shapes| image:: ./images/map-drawing-delete-icon.png
+.. |info icon| image:: ./images/info-icon.png
