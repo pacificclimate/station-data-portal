@@ -1,4 +1,17 @@
 - root.rst
 - images:
+    - column-width-controls.png
+    - map-drawing-controls.png
+    - map-drawing-delete-icon.png
+    - map-drawing-edit-icon.png
+    - map-drawing-polygon-icon.png
+    - map-drawing-rectangle-icon.png
+    - map-metadata-popup-shedin-creek.png
+    - map-nav-zoom-in-icon.png
+    - map-nav-zoom-out-icon.png
     - map-pointer.png
     - map-zoom-controls.png
+    - networks-tab.png
+    - station-data-tab.png
+    - station-filters-tab.png
+    - station-metadata-tab.png
