@@ -1,4 +1,4 @@
-- index.rst
+- root.rst
 - images:
-    - abc.png
-    - def.png
+    - map-pointer.png
+    - map-zoom-controls.png
