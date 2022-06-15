@@ -24,7 +24,10 @@ class Header extends Component {
                 <Col lg={2} className='text-right'>
                   <p>Version: {process.env.REACT_APP_VERSION}</p>
                   <p>
-                    <a href={`${process.env.PUBLIC_URL}/user-doc.htm`}>
+                    <a
+                      href="https://data.pacificclimate.org/portal/docs/"
+                      target="_blank"
+                    >
                       User Docs
                     </a>
                   </p>
