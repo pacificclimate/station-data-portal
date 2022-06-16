@@ -3,7 +3,7 @@ Meteorological Data Portal
 
 PCIC maintains databases containing observations of weather and
 climate variables (such as temperature and rainfall amounts) for various
-regions in Canada. At present there are two such databases
+regions in Canada. At present there are two such databases:
 
 * the Provincial Climate Data Set, or PCDS, containing data mainly from
   British Columbia and Alberta
@@ -12,7 +12,7 @@ regions in Canada. At present there are two such databases
 The Meteorological Data Portal (MDP) is an application that permits users to
 find and download data from these observational databases. A separate
 instance of the MDP serves data for each separate database. The MDP
-functions nearly identically for each region.
+functions nearly identically for each database.
 
 In the MDP, locations of observation stations are shown on an
 interactive map of the region, which enables a user to zoom and pan to a
@@ -31,7 +31,7 @@ For some regions, the app presents a disclaimer that must be accepted
 before it can be used to access data. Click the **Accept** button to
 accept the terms of use and enter the app proper.
 
-The MDP’s first action is to request all data describing stations in its
+The MDP’s first action is to fetch data describing all stations in its
 region database. This may take a few seconds. During this time, the map
 shows only the background base map. When all the descriptive data
 (metadata) has loaded, the map shows markers for each station.
@@ -182,7 +182,7 @@ empty (no filtering by date).
 **Only include stations with climatology**: Some stations have
 climatology variables associated with them. (These variables are
 typically computed as 30-year averages from instantaneous values reported by
-the station). To select only stations for which there are climatology
+the station.) To select only stations for which there are climatology
 variables, check the checkbox. Default is unchecked.
 
 **Network**: Each station is part of a particular operational observation
@@ -226,7 +226,7 @@ To dismiss the popup, click the **X** in the upper right corner.
 Bulk metadata
 ~~~~~~~~~~~~~
 
-Searching for stations using the map is a much easier way to find
+Searching for stations using the map is a much easier way to find a
 station than is wading through a long spreadsheet of station attributes.
 That said, there can be substantial value and many use cases for
 obtaining the list of station attributes. On the **Station Metadata**
@@ -266,9 +266,9 @@ records are in view at one time. Use the controls at the top or bottom
 of the datagrid to page through it.
 
 The data in the datagrid can be downloaded as a CSV file at any time. To
-do so, click the **Download Metadata** button. A Save As dialog comes
+do so, click the **Download Metadata** button. A **Save As** dialog comes
 up. Select the name and location of the file in which to save the CSV
-file, and click Save.
+file, and click **Save**.
 
 The data in the downloaded CSV file includes all columns shown in the
 datagrid, plus a few extra ones that are convenient for automated
@@ -337,9 +337,9 @@ ways.
 Station Listings
 ^^^^^^^^^^^^^^^^
 
-If one is interested in exploring the station offerings in a hiearchical listing format (as opposed to a map), we offer a station listings interface available at the URL https://data.pacificclimate.org/data/pcds/lister
+If you are interested in exploring the station offerings in a hierarchical listing format (as opposed to a map), we offer a station listings interface available at the URL https://data.pacificclimate.org/data/pcds/lister
 
-These listing pages lay out the stations in a hierarchy splitting on raw data vs. climatology ("raw|climo"), CRMP network, and finally station. For example, to list all of the climatologies available for the BC Hydro network, one would navigate to https://data.pacificclimate.org/data/pcds/lister/climo/BCH/
+These listing pages lay out the stations in a hierarchy, splitting on raw data vs. climatology ("raw" or "climo"), CRMP network, and finally station. For example, to list all of the climatologies available for the BC Hydro network, one would navigate to https://data.pacificclimate.org/data/pcds/lister/climo/BCH/
 
 The page for a single station includes a simple HTML page that lists all global metadata, all variables for the station, and it provides some form controls to download individual variables. Please note that you must select the checkbox for *each and every* variable that you want to download. None are selected by default, so clicking "Download" without any prior action will result in a bad request.
 
@@ -386,7 +386,7 @@ The time format is a little tricky, because:
 a) You need to specify it in YYYY-MM-DD HH:MM:SS format and
 b) You need to put the quotes around the whole time.
 
-Depending on what browser/client you are using, you *may* need to URL encode all of that syntax, but so far all of the browsers that I have used will do the translation for you.
+Depending on what browser/client you are using, you *may* need to URL encode all of that syntax, but so far all of the browsers tested will do the translation for you.
 
 For example:
 
