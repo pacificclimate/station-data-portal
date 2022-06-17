@@ -38,15 +38,15 @@
 
 
 import PropTypes from 'prop-types';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-import { FeatureGroup, LayerGroup } from 'react-leaflet';
+import { FeatureGroup, LayerGroup, useMap, useMapEvents } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import MarkerCluster from '../MarkerCluster';
 import L from 'leaflet';
 
 import MapInfoDisplay from '../MapInfoDisplay';
-import { ManyStationMarkers } from '../StationMarkers';
+import { ManyStationMarkers, zoomToMarkerRadius } from '../StationMarkers';
 import { layersToGeoJSONMultipolygon } from '../../../utils/geoJSON-leaflet';
 
 import logger from '../../../logger';
@@ -58,6 +58,18 @@ logger.configure({ active: true });
 const smtimer = getTimer("StationMarker timing")
 smtimer.log();
 
+function ReportZoom({ callback }) {
+  const eventCallback = (e) => {
+    console.log("### ReportZoom event", e)
+    callback(leafletMap.getZoom());
+  };
+  const leafletMap = useMapEvents({
+    load: eventCallback,
+    zoomend: eventCallback,
+  });
+  return null;
+}
+
 function StationMap({
   BaseMap,
   initialViewport,
@@ -65,6 +77,12 @@ function StationMap({
   allNetworks,
   allVariables,
   onSetArea = () => {},
+  markerOptions = {
+    radius: 4,
+    weight: 1,
+    fillOpacity: 0.75,
+    color: '#000000',
+  },
   markerClusterOptions,
   userShapeStyle = {
     color: "#f49853",
@@ -72,6 +90,20 @@ function StationMap({
   },
 }) {
   const userShapeLayerRef = useRef();
+  const [markerRadius, setMarkerRadius] = useState();
+  const zoomCallback = zoom => {
+    setMarkerRadius(zoomToMarkerRadius(zoom));
+  };
+
+  // Control marker radius as a function of zoom level.
+  // const leafletMap = useMap();
+  // const [markerRadius, setMarkerRadius] =
+  //   useState(zoomToMarkerRadius(leafletMap.getZoom()));
+  // useMapEvents({
+  //   zoomend: () => {
+  //     setMarkerRadius(zoomToMarkerRadius(leafletMap.getZoom()));
+  //   }
+  // });
 
   // TODO: Remove
   // const [geometryLayers, setGeometryLayers] = useState([]);
@@ -108,6 +140,7 @@ function StationMap({
       stations={stations}
       allNetworks={allNetworks}
       allVariables={allVariables}
+      markerOptions={markerOptions}
     />
   );
 
@@ -124,6 +157,7 @@ function StationMap({
       preferCanvas={true}
       maxZoom={13}
     >
+      {/*<ReportZoom callback={zoomCallback}/>*/}
       <MapInfoDisplay
         position={"bottomleft"}
         what={map => `Zoom: ${map.getZoom()}`}

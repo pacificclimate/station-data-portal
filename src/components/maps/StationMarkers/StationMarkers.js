@@ -189,7 +189,7 @@ OneStationMarkers.propTypes = {
 // Convert a zoom level to a marker radius according to zoomToMarkerRadiusSpec,
 // which is an array of pairs of [zoom, radius] values, in ascending order of
 // zoom. This value is set from an env var. See utils/configuration for details.
-function zoomToMarkerRadius(zoom) {
+export function zoomToMarkerRadius(zoom) {
   for (const [_zoom, radius] of zoomToMarkerRadiusSpec) {
     if (zoom <= _zoom) {
       return radius;
@@ -200,7 +200,7 @@ function zoomToMarkerRadius(zoom) {
 
 
 function ManyStationMarkers({
-  stations, allNetworks, allVariables
+  stations, allNetworks, allVariables, markerOptions
 }) {
   // Control marker radius as a function of zoom level.
   const leafletMap = useMap();
@@ -208,15 +208,18 @@ function ManyStationMarkers({
     useState(zoomToMarkerRadius(leafletMap.getZoom()));
   useMapEvents({
     zoomend: () => {
-      setMarkerRadius(zoomToMarkerRadius(leafletMap.getZoom()));
+      setTimeout(
+        () => {
+          setMarkerRadius(zoomToMarkerRadius(leafletMap.getZoom()))
+        },
+        1000
+      );
     }
   });
 
-  const markerOptions = {
+  const adjustedMarkerOptions = {
+    ...markerOptions,
     radius: markerRadius,
-    weight: 1,
-    fillOpacity: 0.75,
-    color: '#000000',
   };
   return map(
     station => (
@@ -225,7 +228,7 @@ function ManyStationMarkers({
         station={station}
         allNetworks={allNetworks}
         allVariables={allVariables}
-        markerOptions={markerOptions}
+        markerOptions={adjustedMarkerOptions}
       />
     ),
     stations
