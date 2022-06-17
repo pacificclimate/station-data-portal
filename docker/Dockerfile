@@ -21,6 +21,7 @@ RUN chown node /app
 
 ENV PATH /app/node_modules/.bin:$PATH
 COPY --chown=node:node  package.json /app/package.json
+COPY --chown=node:node  package-lock.json /app/package-lock.json
 
 RUN npm install --quiet
 RUN npm install -g serve
