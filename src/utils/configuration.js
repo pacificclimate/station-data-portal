@@ -21,6 +21,8 @@ export const markerClusteringAvailable =
 export const showReloadStationsButton =
   configBool("SHOW_RELOAD_STATIONS_BUTTON");
 
+export const showDevTab = configBool("SHOW_DEV_TAB");
+
 let zoomToMarkerRadiusSpec = [
   [7, 10], [99, 4],
 ];

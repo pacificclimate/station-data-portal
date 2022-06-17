@@ -3,7 +3,7 @@ import { useBooleanStateWithToggler } from '../../../hooks';
 import {
   Button,
   Checkbox,
-  Col,
+  Col, ControlLabel, FormControl,
   FormGroup,
   Panel,
   Row,
@@ -43,7 +43,7 @@ import StationFilters, { useStationFiltering }
 import JSONstringify from '../../util/JSONstringify';
 import baseMaps from '../../maps/baseMaps';
 import {
-  markerClusteringAvailable,
+  markerClusteringAvailable, showDevTab,
   showReloadStationsButton,
   stationDebugFetchOptions,
 } from '../../../utils/configuration';
@@ -186,6 +186,10 @@ function Body() {
     [area, filteredStations]
   );
 
+  ///// Dev tools state, callbacks, etc. go here. They come and go.
+  const [updateDelay, setUpdateDelay] = useState(500);
+  /////
+
   return (
     <div className={css.portal}>
       <Row>
@@ -199,6 +203,13 @@ function Body() {
               allNetworks={allNetworks}
               allVariables={allVariables}
               onSetArea={setArea}
+              markerOptions={{
+                // radius set by station markers component
+                weight: 1,
+                fillOpacity: 0.75,
+                color: '#000000',
+                updateDelay,
+              }}
               markerClusterOptions={uzeMarkercluster && markerClusterOptions}
             />,
 
@@ -211,9 +222,23 @@ function Body() {
                 )}
                 <Tabs
                   id="non-map-controls"
-                  defaultActiveKey={'Filters'}
+                  defaultActiveKey={showDevTab ? 'Dev' : 'Filters'}
                   className={css.mainTabs}
                 >
+                  { showDevTab && (
+                    <Tab eventKey={'Dev'} title={'Dev'}>
+                      <ControlLabel>Marker update delay (ms)</ControlLabel>
+                      <FormGroup>
+                        <FormControl
+                          componentClass={"input"}
+                          placeholder={"Zoom level"}
+                          type={"number"}
+                          value={updateDelay}
+                          onChange={e => setUpdateDelay(e.target.value)}
+                        />
+                      </FormGroup>
+                    </Tab>
+                  )}
                   { markerClusteringAvailable && (
                     <Tab
                       eventKey={'Clustering'}
