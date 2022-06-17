@@ -38,15 +38,15 @@
 
 
 import PropTypes from 'prop-types';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
-import { FeatureGroup, LayerGroup, useMap, useMapEvents } from 'react-leaflet';
+import { FeatureGroup, LayerGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import MarkerCluster from '../MarkerCluster';
 import L from 'leaflet';
 
 import MapInfoDisplay from '../MapInfoDisplay';
-import { ManyStationMarkers, zoomToMarkerRadius } from '../StationMarkers';
+import { ManyStationMarkers } from '../StationMarkers';
 import { layersToGeoJSONMultipolygon } from '../../../utils/geoJSON-leaflet';
 
 import logger from '../../../logger';
@@ -58,17 +58,6 @@ logger.configure({ active: true });
 const smtimer = getTimer("StationMarker timing")
 smtimer.log();
 
-function ReportZoom({ callback }) {
-  const eventCallback = (e) => {
-    console.log("### ReportZoom event", e)
-    callback(leafletMap.getZoom());
-  };
-  const leafletMap = useMapEvents({
-    load: eventCallback,
-    zoomend: eventCallback,
-  });
-  return null;
-}
 
 function StationMap({
   BaseMap,
@@ -78,10 +67,11 @@ function StationMap({
   allVariables,
   onSetArea = () => {},
   markerOptions = {
-    radius: 4,
+    // radius set by station markers component
     weight: 1,
     fillOpacity: 0.75,
     color: '#000000',
+    updateDelay: 500,  // This is our extension; Leaflet ignores
   },
   markerClusterOptions,
   userShapeStyle = {
@@ -90,20 +80,6 @@ function StationMap({
   },
 }) {
   const userShapeLayerRef = useRef();
-  const [markerRadius, setMarkerRadius] = useState();
-  const zoomCallback = zoom => {
-    setMarkerRadius(zoomToMarkerRadius(zoom));
-  };
-
-  // Control marker radius as a function of zoom level.
-  // const leafletMap = useMap();
-  // const [markerRadius, setMarkerRadius] =
-  //   useState(zoomToMarkerRadius(leafletMap.getZoom()));
-  // useMapEvents({
-  //   zoomend: () => {
-  //     setMarkerRadius(zoomToMarkerRadius(leafletMap.getZoom()));
-  //   }
-  // });
 
   // TODO: Remove
   // const [geometryLayers, setGeometryLayers] = useState([]);
@@ -132,8 +108,6 @@ function StationMap({
 
   smtimer.log();
   smtimer.resetAll();
-
-  // alert("StationMap render")
 
   const markers = (
     <ManyStationMarkers

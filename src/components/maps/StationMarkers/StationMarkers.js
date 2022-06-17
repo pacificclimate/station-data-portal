@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
-import { CircleMarker, Polygon, useMap, useMapEvents } from 'react-leaflet';
+import { CircleMarker, Polygon, useMapEvents } from 'react-leaflet';
 import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
 import StationPopup from '../StationPopup';
@@ -200,22 +200,29 @@ export function zoomToMarkerRadius(zoom) {
 
 
 function ManyStationMarkers({
-  stations, allNetworks, allVariables, markerOptions
+  stations,
+  allNetworks,
+  allVariables,
+  markerOptions,
 }) {
   // Control marker radius as a function of zoom level.
-  const leafletMap = useMap();
-  const [markerRadius, setMarkerRadius] =
-    useState(zoomToMarkerRadius(leafletMap.getZoom()));
-  useMapEvents({
+  const leafletMap = useMapEvents({
     zoomend: () => {
+      // Update marker radius asynchronously, using `setTimeout`.
+      // A sufficiently long timeout decouples the map zoom update (basemap
+      // tiles) from the marker size update. Too fast, and zoom does the two
+      // together, which gives an undesirable delay in updating the basemap
+      // when there are many markers (because rendering markers is slooooow).
+      // React is too clever sometimes.
       setTimeout(
-        () => {
-          setMarkerRadius(zoomToMarkerRadius(leafletMap.getZoom()))
-        },
-        1000
+        () => {setMarkerRadius(zoomToMarkerRadius(leafletMap.getZoom()))},
+        markerOptions.updateDelay,
       );
     }
   });
+  const [markerRadius, setMarkerRadius] =
+    useState(zoomToMarkerRadius(leafletMap.getZoom()));
+
 
   const adjustedMarkerOptions = {
     ...markerOptions,
