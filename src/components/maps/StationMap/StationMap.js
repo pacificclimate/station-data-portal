@@ -131,11 +131,7 @@ function StationMap({
       preferCanvas={true}
       maxZoom={13}
     >
-      {/*<ReportZoom callback={zoomCallback}/>*/}
-      <MapInfoDisplay
-        position={"bottomleft"}
-        what={map => `Zoom: ${map.getZoom()}`}
-      />
+      <MapInfoDisplay position={"bottomleft"}/>
       <FeatureGroup ref={userShapeLayerRef}>
         <EditControl
           position={'topleft'}
