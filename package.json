@@ -9,6 +9,7 @@
     "immer": "^9.0.12",
     "leaflet": "^1.7.1",
     "leaflet.markercluster": "^1.5.3",
+    "lethargy": "^1.0.9",
     "lodash": "^4.17.11",
     "memoize-one": "^5.0.0",
     "pcic-react-leaflet-components": "git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git#2.0.1",
