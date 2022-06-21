@@ -4,13 +4,21 @@
 import flow from 'lodash/fp/flow';
 import split from 'lodash/fp/split';
 import map from 'lodash/fp/map';
+import toNumber from 'lodash/fp/toNumber';
 
-const strToBool = value => (value ?? "").toLowerCase() === "true";
+const strToBool = value => "true".startsWith((value ?? "").toLowerCase());
 
 export const configString = (name, deflt = "") =>
   (process.env[`REACT_APP_${name}`] || deflt);
 
 export const configBool = (...args) => strToBool(configString(...args));
+
+export const configNumber = (...args) => toNumber(configString(...args));
+
+export const lethargyEnabled = configBool("LETHARGY_ENABLED");
+export const lethargyStability = configNumber("LETHARGY_STABILITY", "7");
+export const lethargySensitivity = configNumber("LETHARGY_SENSITIVITY", "50");
+export const lethargyTolerance = configNumber("LETHARGY_TOLERANCE", "0.05");
 
 export const stationDebugFetchOptions =
   configBool("DEBUG_STATION_FETCH_OPTIONS");
