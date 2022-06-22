@@ -22,7 +22,8 @@ RUN chown node /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY --chown=node:node  package.json /app/package.json
 
-RUN npm install --quiet
+# Currently, we have to force install. For details, see ./docs/installation.md
+RUN npm install --quiet --force
 RUN npm install -g serve
 COPY --chown=node:node . /app
 
