@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { FormGroup } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 
 import './OnlyWithClimatologyControl.css';
-import { Checkbox } from 'react-bootstrap';
 
 export default class OnlyWithClimatologyControl extends Component {
   static propTypes = {
@@ -14,11 +13,13 @@ export default class OnlyWithClimatologyControl extends Component {
   render() {
     const { value, ...rest } = this.props;
     return (
-      <FormGroup>
-        <Checkbox checked={value} {...rest}>
-          Only include stations with climatology
-        </Checkbox>
-      </FormGroup>
+      <Form>
+        <Form.Check
+          label={"Only include stations with climatology"}
+          checked={value}
+          {...rest}
+        />
+      </Form>
     );
   }
 }

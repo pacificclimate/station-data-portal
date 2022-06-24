@@ -13,7 +13,6 @@
 // complexity, and it places the state declarations right next to their primary
 // usage in the component, which makes it easier to maintain.
 
-import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import './StationFilters.css';
@@ -102,8 +101,8 @@ function StationFilters({
     <React.Fragment>
       <Row>
         <Col lg={6} md={6} sm={6}>
-          {/*<Button bsSize={'small'} onClick={handleClickAll}>Select all criteria</Button>*/}
-          {/*<Button bsSize={'small'} onClick={handleClickNone}>Clear all criteria</Button>*/}
+          {/*<Button size={'sm'} onClick={handleClickAll}>Select all criteria</Button>*/}
+          {/*<Button size={'sm'} onClick={handleClickNone}>Clear all criteria</Button>*/}
           <DateSelector
             value={startDate}
             onChange={setStartDate}

@@ -3,11 +3,9 @@ import React, { useEffect } from 'react';
 import {
   Button,
   ButtonToolbar,
-  ControlLabel,
-  FormGroup
+  Form,
 } from 'react-bootstrap';
 import Select from 'react-select';
-import memoize from 'memoize-one';
 import { defaultValue } from '../common';
 import logger from '../../../logger';
 import LocalPropTypes from '../../local-prop-types';
@@ -49,9 +47,9 @@ function FrequencySelector({
   const handleClickNone = () => onChange([]);
 
   return (
-    <FormGroup>
+    <Form>
       <div>
-        <ControlLabel>Observation Frequency</ControlLabel>
+        <Form.Label>Observation Frequency</Form.Label>
         {' '}
         <InfoPopup title={"Observation Frequency multiselector"}>
           <ul className={"compact"}>
@@ -65,8 +63,8 @@ function FrequencySelector({
         </InfoPopup>
       </div>
       <ButtonToolbar className={css.selectorButtons}>
-        <Button bsSize={'xsmall'} onClick={handleClickAll}>All</Button>
-        <Button bsSize={'xsmall'} onClick={handleClickNone}>None</Button>
+        <Button size={'sm'} onClick={handleClickAll}>All</Button>
+        <Button size={'sm'} onClick={handleClickNone}>None</Button>
       </ButtonToolbar>
       <Select
         options={getOptions()}
@@ -77,7 +75,7 @@ function FrequencySelector({
         onChange={onChange}
         isMulti
       />
-    </FormGroup>
+    </Form>
   );
 }
 

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import ButtonToolbar from 'react-bootstrap/lib/ButtonToolbar';
-import capitalize from 'react-bootstrap/lib/utils/capitalize';
+import { ButtonToolbar } from 'react-bootstrap';
+import capitalize from 'lodash/fp/capitalize';
 import map from 'lodash/fp/map';
 
 import FileFormatSelector from '../../selectors/FileFormatSelector';

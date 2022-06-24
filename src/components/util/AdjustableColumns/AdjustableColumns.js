@@ -66,7 +66,7 @@ export default class AdjustableColumns extends Component {
       this.props.contents
     ]);
     const columns = mapWithKey(([lg, content], i) =>
-      <Col lg={lg} lgHidden={lg === 0} key={i}>
+      <Col lg={lg} hidden={lg === 0} key={i}>
         <Row>
           <Col lg={12} className={'text-center'} style={{
             'marginBottom': '-0.5em',
@@ -82,21 +82,21 @@ export default class AdjustableColumns extends Component {
                 }}
               >
                 {lg > 1 && <Button
-                  bsSize="xsmall"
+                  size={'sm'}
                   onClick={this.handleShrinkLeftBy(1)(i)}
                   title={`(${lg}) Click to move column boundary`}
                 >
                   {'>'}
                 </Button>}
                 {lg > 2 && <Button
-                  bsSize="xsmall"
+                  size={'sm'}
                   onClick={this.handleShrinkLeftBy(2)(i)}
                   title={`(${lg}) Click to move column boundary`}
                 >
                   {'>>'}
                 </Button>}
                 <Button
-                  bsSize="xsmall"
+                  size={'sm'}
                   onClick={this.handleShrinkLeftBy(lg)(i)}
                   title={`(${lg}) Click to hide column`}
                 >
@@ -113,21 +113,21 @@ export default class AdjustableColumns extends Component {
                 }}
               >
                 <Button
-                  bsSize="xsmall"
+                  size={'sm'}
                   onClick={this.handleShrinkRightBy(lg)(i)}
                   title={`(${lg}) Click to hide column`}
                 >
                   {'!<'}
                 </Button>
                 {lg > 2 && <Button
-                  bsSize="xsmall"
+                  size={'sm'}
                   onClick={this.handleShrinkRightBy(2)(i)}
                   title={`(${lg}) Click to move column boundary`}
                 >
                   {'<<'}
                 </Button>}
                 {lg > 1 && <Button
-                  bsSize="xsmall"
+                  size={'sm'}
                   onClick={this.handleShrinkRightBy(1)(i)}
                   title={`(${lg}) Click to move column boundary`}
                 >

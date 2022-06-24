@@ -2,10 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useBooleanStateWithToggler } from '../../../hooks';
 import {
   Button,
-  Checkbox,
+  Card,
   Col,
-  FormGroup,
-  Panel,
+  Form,
   Row,
   Tab,
   Tabs
@@ -202,8 +201,8 @@ function Body() {
               markerClusterOptions={uzeMarkercluster && markerClusterOptions}
             />,
 
-            <Panel style={{ marginLeft: '-15px', marginRight: '-10px' }}>
-              <Panel.Body>
+            <Card style={{ marginLeft: '-15px', marginRight: '-10px' }}>
+              <Card.Body>
                 { showReloadStationsButton && (
                   <Button onClick={reloadStations}>
                     Reload stations
@@ -223,15 +222,14 @@ function Body() {
                         allStations={allStations}
                         selectedStations={selectedStations}
                       />
-                      <FormGroup>
-                        <Checkbox
+                      <Form>
+                        <Form.Check
                           inline
+                          label={"Use leaflet.markercluster"}
                           checked={uzeMarkercluster}
                           onChange={toggleUzeMarkercluster}
-                        >
-                          Use leaflet.markercluster
-                        </Checkbox>
-                      </FormGroup>
+                        />
+                      </Form>
                       <MarkerClusterOptions
                         value={markerClusterOptions}
                         onChange={setMarkerClusterOptions}
@@ -308,8 +306,8 @@ function Body() {
                   </Tab>
 
                 </Tabs>
-              </Panel.Body>
-            </Panel>
+              </Card.Body>
+            </Card>
           ]}
         />
       </Row>

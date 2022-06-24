@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
-import { ControlLabel, FormGroup } from 'react-bootstrap';
+import React from 'react';
+import { Form } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import { range } from 'lodash';
 import InfoPopup from '../../util/InfoPopup';
@@ -36,12 +36,13 @@ const CalendarContainer = ({ className, children }) => (
 
 function DateSelector({value, onChange, label, ...restProps}) {
   // Call back to onChange with new Date value every time.
+  // TODO: Why isn't this in use??
   const onChangeNew = date => new Date(date);
 
   // Custom header adapted from https://github.com/Hacker0x01/react-datepicker/blob/master/docs-site/src/examples/render_custom_header.jsx
   return (
-    <FormGroup>
-      <ControlLabel>{label}</ControlLabel>
+    <Form>
+      <Form.Label>{label}</Form.Label>
       {' '}
       <InfoPopup title={label}>
         Only stations matching Start Date and End Date are selected.
@@ -111,7 +112,7 @@ function DateSelector({value, onChange, label, ...restProps}) {
         calendarContainer={CalendarContainer}
         {...restProps}
       />
-    </FormGroup>
+    </Form>
   );
 }
 
