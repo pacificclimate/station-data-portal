@@ -15,6 +15,7 @@ export default class OnlyWithClimatologyControl extends Component {
     return (
       <Form>
         <Form.Check
+          className={"fw-bold"}
           label={"Only include stations with climatology"}
           checked={value}
           {...rest}

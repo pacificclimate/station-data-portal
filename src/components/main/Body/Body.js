@@ -185,6 +185,8 @@ function Body() {
     [area, filteredStations]
   );
 
+  const rowClasses = { className: "mt-3" }
+
   return (
     <div className={css.portal}>
       <Row>
@@ -239,25 +241,25 @@ function Body() {
                   )}
 
                   <Tab eventKey={'Filters'} title={'Station Filters'}>
-                    <Row>
+                    {stationDebugFetchOptions && (
+                      <Row>
+                        <Col lg={6}>Fetch limit</Col>
+                        <Col lg={6}>
+                          <Select
+                            options={stnsLimitOptions}
+                            value={stnsLimit}
+                            onChange={setStnsLimit}
+                          />
+                        </Col>
+                      </Row>
+                    )}
+                    <Row {...rowClasses}>
                       <Col lg={12} md={12} sm={12}>
-                        {stationDebugFetchOptions && (
-                          <Row>
-                            <Col lg={6}>Fetch limit</Col>
-                            <Col lg={6}>
-                              <Select
-                                options={stnsLimitOptions}
-                                value={stnsLimit}
-                                onChange={setStnsLimit}
-                              />
-                            </Col>
-                          </Row>
-                        )}
                         <SelectionCounts
                           allStations={allStations}
                           selectedStations={selectedStations}
                         />
-                        <p>
+                        <p className={"mb-0"}>
                           (See Station Metadata and Station Data tabs for details)
                         </p>
                       </Col>
@@ -267,6 +269,7 @@ function Body() {
                       allVariables={allVariables}
                       allFrequencies={allFrequencies}
                       {...stationFiltering}
+                      rowClasses={rowClasses}
                     />
                   </Tab>
 

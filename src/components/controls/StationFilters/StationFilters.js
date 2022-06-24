@@ -96,10 +96,11 @@ function StationFilters({
   setFrequencyActions,
   onlyWithClimatology,
   toggleOnlyWithClimatology,
+  rowClasses = { className: "mb-3" },
 }) {
   return (
     <React.Fragment>
-      <Row>
+      <Row {...rowClasses}>
         <Col lg={6} md={6} sm={6}>
           {/*<Button size={'sm'} onClick={handleClickAll}>Select all criteria</Button>*/}
           {/*<Button size={'sm'} onClick={handleClickNone}>Clear all criteria</Button>*/}
@@ -116,6 +117,8 @@ function StationFilters({
             label={'End Date'}
           />
         </Col>
+      </Row>
+      <Row {...rowClasses}>
         <Col lg={12} md={12} sm={12}>
           <OnlyWithClimatologyControl
             value={onlyWithClimatology}
@@ -123,7 +126,7 @@ function StationFilters({
           />
         </Col>
       </Row>
-      <Row>
+      <Row {...rowClasses}>
         <Col lg={12} md={12} sm={12}>
           <NetworkSelector
             allNetworks={allNetworks}
@@ -137,7 +140,7 @@ function StationFilters({
           {/*<JSONstringify object={selectedNetworksOptions}/>*/}
         </Col>
       </Row>
-      <Row>
+      <Row {...rowClasses}>
         <Col lg={12} md={12} sm={12}>
           <VariableSelector
             allVariables={allVariables}
@@ -151,7 +154,7 @@ function StationFilters({
           {/*<JSONstringify object={selectedVariablesOptions}/>*/}
         </Col>
       </Row>
-      <Row>
+      <Row {...rowClasses}>
         <Col lg={12} md={12} sm={12}>
           <FrequencySelector
             allFrequencies={allFrequencies}
