@@ -212,7 +212,7 @@ function Body() {
                 )}
                 <Tabs
                   id="non-map-controls"
-                  defaultActiveKey={'Filters'}
+                  defaultActiveKey={'Metadata'}
                   className={css.mainTabs}
                 >
                   { markerClusteringAvailable && (
@@ -274,10 +274,12 @@ function Body() {
                   </Tab>
 
                   <Tab eventKey={'Metadata'} title={'Station Metadata'}>
-                    <SelectionCounts
-                      allStations={allStations}
-                      selectedStations={selectedStations}
-                    />
+                    <Row {...rowClasses}>
+                      <SelectionCounts
+                        allStations={allStations}
+                        selectedStations={selectedStations}
+                      />
+                    </Row>
                     <StationMetadata
                       stations={selectedStations}
                       allNetworks={allNetworks}

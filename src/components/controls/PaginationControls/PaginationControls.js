@@ -22,10 +22,10 @@ export default function PaginationControls({
   size = 'sm',
   variant = 'light'
 }) {
-  const buttonProps = { size, variant };
+  const buttonProps = { variant };
   return (
       <ButtonToolbar>
-        <ButtonGroup className={styles.fwdBack}>
+        <ButtonGroup className={styles.fwdBack} size={size}>
           <Button
             title="Go to first page"
             {...buttonProps}
@@ -44,6 +44,7 @@ export default function PaginationControls({
           <Button
             {...buttonProps}
             variant={'outline-dark'}
+            className={"mb-1 me-1"}
             disabled
           >
             Page {pageIndex + 1} of {pageCount}
@@ -70,7 +71,6 @@ export default function PaginationControls({
         >
           <FormControl
             className={`text-primary ${styles.perPage}`}
-            size={size}
             as="select"
             value={pageSize}
             onChange={e => {
