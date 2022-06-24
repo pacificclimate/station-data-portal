@@ -7,6 +7,7 @@ import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 import { createRoot } from 'react-dom/client';
 
+import './bootstrap-extension.css';
 import './index.css';
 
 import App from './components/main/App';
