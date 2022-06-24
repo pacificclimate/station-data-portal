@@ -12,7 +12,7 @@ import sortBy from 'lodash/fp/sortBy';
 import flow from 'lodash/fp/flow';
 import tap from 'lodash/fp/tap';
 import { groupByGeneral } from '../../../utils/fp';
-import { defaultValue } from '../common';
+import { defaultValue, selectorButtonProps } from '../common';
 import InfoPopup from '../../util/InfoPopup';
 
 import logger from '../../../logger';
@@ -206,19 +206,19 @@ class VariableSelector extends Component {
           </InfoPopup>
         </div>
         <ButtonToolbar className={css.selectorButtons}>
-          <Button size={'sm'} onClick={this.handleClickAll}>All</Button>
+          <Button {...selectorButtonProps} onClick={this.handleClickAll}>All</Button>
           {
             map(group => (
               <Button
                 key={group.label}
-                size={'sm'}
+                {...selectorButtonProps}
                 onClick={this.makeHandleClickGroup(group)}
               >
                 {`All ${group.label}`}
               </Button>
             ))(options)
           }
-          <Button size={'sm'} onClick={this.handleClickNone}>None</Button>
+          <Button {...selectorButtonProps} onClick={this.handleClickNone}>None</Button>
         </ButtonToolbar>
         <Select
           options={options}

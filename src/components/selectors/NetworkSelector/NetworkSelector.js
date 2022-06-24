@@ -19,7 +19,7 @@ import assign from 'lodash/fp/assign';
 import { composeWithRestArgs } from '../../../utils/fp'
 import chroma from 'chroma-js';
 import logger from '../../../logger';
-import { defaultValue } from '../common';
+import { defaultValue, selectorButtonProps } from '../common';
 import LocalPropTypes from '../../local-prop-types';
 import InfoPopup from '../../util/InfoPopup';
 
@@ -138,8 +138,12 @@ class NetworkSelector extends Component {
           </InfoPopup>
         </div>
         <ButtonToolbar className={css.selectorButtons}>
-          <Button size={'sm'} onClick={this.handleClickAll}>All</Button>
-          <Button size={'sm'} onClick={this.handleClickNone}>None</Button>
+          <Button {...selectorButtonProps} onClick={this.handleClickAll}>
+            All
+          </Button>
+          <Button {...selectorButtonProps} onClick={this.handleClickNone}>
+            None
+          </Button>
         </ButtonToolbar>
         <Select
           options={this.getOptions()}

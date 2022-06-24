@@ -6,7 +6,7 @@ import {
   Form,
 } from 'react-bootstrap';
 import Select from 'react-select';
-import { defaultValue } from '../common';
+import { defaultValue, selectorButtonProps } from '../common';
 import logger from '../../../logger';
 import LocalPropTypes from '../../local-prop-types';
 import capitalize from 'lodash/fp/capitalize';
@@ -63,8 +63,8 @@ function FrequencySelector({
         </InfoPopup>
       </div>
       <ButtonToolbar className={css.selectorButtons}>
-        <Button size={'sm'} onClick={handleClickAll}>All</Button>
-        <Button size={'sm'} onClick={handleClickNone}>None</Button>
+        <Button {...selectorButtonProps} onClick={handleClickAll}>All</Button>
+        <Button {...selectorButtonProps} onClick={handleClickNone}>None</Button>
       </ButtonToolbar>
       <Select
         options={getOptions()}

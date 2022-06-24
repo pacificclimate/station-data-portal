@@ -11,3 +11,9 @@ export const defaultValue = (defaultValueSelector, allOptions) => cond([
   [isFunction, filter],
   [stubTrue, constant(identity)],
 ])(defaultValueSelector)(allOptions);
+
+// For styling All, None, etc. buttons in selectors
+export const selectorButtonProps = {
+  size: "xs", variant: "outline-dark", className: "ms-1"
+};
+
