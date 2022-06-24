@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Row, Col, Button, ButtonGroup } from 'react-bootstrap';
+import { Row, Col, Button, ButtonToolbar } from 'react-bootstrap';
 import clone from 'lodash/fp/clone';
 import concat from 'lodash/concat';  // Note: Not FP!
 import slice from 'lodash/fp/slice';
@@ -9,6 +9,13 @@ import zipAll from 'lodash/fp/zipAll';
 import logger from '../../../logger';
 
 import { mapWithKey } from '../../../utils/fp';
+import {
+  ChevronBarLeft,
+  ChevronBarRight, ChevronDoubleLeft,
+  ChevronDoubleRight,
+  ChevronLeft,
+  ChevronRight
+} from 'react-bootstrap-icons';
 
 logger.configure({ active: true });
 
@@ -65,75 +72,78 @@ export default class AdjustableColumns extends Component {
       this.state.lgs,
       this.props.contents
     ]);
+    const buttonProps = { size: "xs", variant: "outline-dark" }
     const columns = mapWithKey(([lg, content], i) =>
       <Col lg={lg} hidden={lg === 0} key={i}>
         <Row>
           <Col lg={12} className={'text-center'} style={{
             'marginBottom': '-0.5em',
-            borderRight: i < n && '1px solid #777',
+            borderRight: i < n && '2px solid #777',
             zIndex: 1000,
           }}>
             {
-              i > 0 && <ButtonGroup
-                className={'pull-left'}
+              i > 0 && <ButtonToolbar
+                className={'justify-content-start'}
                 style={{
-                  position: 'relative', right: '1em',
+                  position: 'relative',
+                  right: '0.5em',
                   zIndex: 99999,
                 }}
               >
                 {lg > 1 && <Button
-                  size={'sm'}
+                  {...buttonProps}
                   onClick={this.handleShrinkLeftBy(1)(i)}
                   title={`(${lg}) Click to move column boundary`}
                 >
-                  {'>'}
+                  <ChevronRight/>
                 </Button>}
                 {lg > 2 && <Button
-                  size={'sm'}
+                  {...buttonProps}
                   onClick={this.handleShrinkLeftBy(2)(i)}
                   title={`(${lg}) Click to move column boundary`}
                 >
-                  {'>>'}
+                  <ChevronDoubleRight/>
                 </Button>}
                 <Button
-                  size={'sm'}
+                  {...buttonProps}
                   onClick={this.handleShrinkLeftBy(lg)(i)}
                   title={`(${lg}) Click to hide column`}
                 >
-                  {'>!'}
+                  <ChevronBarRight/>
                 </Button>
-              </ButtonGroup>
+              </ButtonToolbar>
             }
             {
-              i < n-1 && <ButtonGroup
-                className={'pull-right'}
+              i < n-1 && <ButtonToolbar
+                className={'justify-content-end'}
                 style={{
-                  position: 'relative', left: '1em',
+                  position: 'relative',
+                  left: '0.5em',
                   zIndex: 99999,
                 }}
               >
                 <Button
-                  size={'sm'}
+                  {...buttonProps}
                   onClick={this.handleShrinkRightBy(lg)(i)}
                   title={`(${lg}) Click to hide column`}
                 >
-                  {'!<'}
+                  <ChevronBarLeft/>
                 </Button>
                 {lg > 2 && <Button
-                  size={'sm'}
+                  {...buttonProps}
                   onClick={this.handleShrinkRightBy(2)(i)}
                   title={`(${lg}) Click to move column boundary`}
                 >
-                  {'<<'}
+                  <ChevronDoubleLeft/>
                 </Button>}
                 {lg > 1 && <Button
-                  size={'sm'}
+                  {...buttonProps}
                   onClick={this.handleShrinkRightBy(1)(i)}
                   title={`(${lg}) Click to move column boundary`}
                 >
-                  {'<'}
+                  <ChevronLeft/>
                 </Button>}
-              </ButtonGroup>
+              </ButtonToolbar>
             }
           </Col>
         </Row>
