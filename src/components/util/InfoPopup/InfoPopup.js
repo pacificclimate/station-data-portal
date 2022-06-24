@@ -1,8 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import './InfoPopup.css';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
-import { InfoCircleFill } from 'react-bootstrap-icons';
+import { InfoCircle } from 'react-bootstrap-icons';
 
 
 function InfoPopup({
@@ -12,21 +13,22 @@ function InfoPopup({
 }) {
   return (
     <OverlayTrigger
+      placement={placement}
       overlay={
-        <Popover
-          id={title}
-          placement={placement}
-          title={title}
-        >
-          {children}
+        <Popover id={title}>
+          <Popover.Header>{title}</Popover.Header>
+          <Popover.Body>{children}</Popover.Body>
         </Popover>}
     >
-      <InfoCircleFill/>
+      <InfoCircle/>
     </OverlayTrigger>
   );
 }
 
 InfoPopup.propTypes = {
+  placement: PropTypes.string,
+  title: PropTypes.string,
+  children: PropTypes.any,
 };
 
 export default InfoPopup;
