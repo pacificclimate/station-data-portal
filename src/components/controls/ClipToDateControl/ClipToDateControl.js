@@ -15,6 +15,7 @@ export default class ClipToDateControl extends Component {
     return (
       <Form>
         <Form.Check
+          className={"fw-bold"}
           checked={value}
           label={"Clip time series to filter date range"}
           {...rest}

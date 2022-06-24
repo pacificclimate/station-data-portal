@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import { ButtonToolbar } from 'react-bootstrap';
+import { ButtonToolbar, Col, Row } from 'react-bootstrap';
 import capitalize from 'lodash/fp/capitalize';
 import map from 'lodash/fp/map';
 
@@ -16,7 +16,7 @@ logger.configure({ active: true });
 
 
 function StationData({
-  selectedStations, dataDownloadUrl, dataDownloadFilename
+  selectedStations, dataDownloadUrl, dataDownloadFilename, rowClasses
 }) {
   const [fileFormat, setFileFormat] = useState();
   const [clipToDate, setClipToDate] = useState(false);
@@ -24,29 +24,49 @@ function StationData({
 
   return (
     <React.Fragment>
-      <ObservationCounts stations={selectedStations}/>
+      <Row {...rowClasses}>
+        <Col lg={12} md={12} sm={12}>
+          <ObservationCounts stations={selectedStations}/>
+        </Col>
+      </Row>
 
-      <FileFormatSelector value={fileFormat} onChange={setFileFormat}/>
+      <Row {...rowClasses}>
+        <Col lg={12} md={12} sm={12}>
+          <FileFormatSelector value={fileFormat} onChange={setFileFormat}/>
+        </Col>
+      </Row>
 
-      <ClipToDateControl value={clipToDate} onChange={toggleClipToDate}/>
+      <Row {...rowClasses}>
+        <Col lg={12} md={12} sm={12}>
+          <ClipToDateControl value={clipToDate} onChange={toggleClipToDate}/>
+        </Col>
+      </Row>
 
-      <ButtonToolbar>
-        {
-          map(
-            dataCategory => (
-              <a
-                href={dataDownloadUrl({ dataCategory, clipToDate, fileFormat })}
-                download={dataDownloadFilename({ dataCategory, fileFormat })}
-                className="btn btn-primary"
-                key={dataCategory}
-              >
-                Download {capitalize(dataCategory)}
-              </a>
-            ),
-            ['timeseries', 'climatology']
-          )
-        }
-      </ButtonToolbar>
+      <Row {...rowClasses}>
+        <Col lg={12} md={12} sm={12}>
+          <ButtonToolbar>
+            {
+              map(
+                dataCategory => (
+                  <a
+                    href={dataDownloadUrl({
+                      dataCategory, clipToDate, fileFormat
+                    })}
+                    download={dataDownloadFilename({
+                      dataCategory, fileFormat
+                    })}
+                    className="btn btn-primary btn-sm me-2"
+                    key={dataCategory}
+                  >
+                    Download {capitalize(dataCategory)}
+                  </a>
+                ),
+                ['timeseries', 'climatology']
+              )
+            }
+          </ButtonToolbar>
+        </Col>
+      </Row>
 
     </React.Fragment>
   );

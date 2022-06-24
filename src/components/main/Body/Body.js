@@ -288,11 +288,13 @@ function Body() {
                   </Tab>
 
                   <Tab eventKey={'Data'} title={'Station Data'}>
-                    <SelectionCounts
-                      allStations={allStations}
-                      selectedStations={selectedStations}
-                    />
-                    <SelectionCriteria/>
+                    <Row {...rowClasses}>
+                      <SelectionCounts
+                        allStations={allStations}
+                        selectedStations={selectedStations}
+                      />
+                      <SelectionCriteria/>
+                    </Row>
                     <UnselectedThings
                       selectedNetworksOptions={selectedNetworksOptions}
                       selectedVariablesOptions={selectedVariablesOptions}
@@ -303,6 +305,7 @@ function Body() {
                       selectedStations={selectedStations}
                       dataDownloadUrl={dataDownloadUrl}
                       dataDownloadFilename={dataDownloadFilename}
+                      rowClasses={rowClasses}
                     />
                   </Tab>
 
