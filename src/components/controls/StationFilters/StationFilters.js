@@ -1,19 +1,27 @@
 // This module packages up the state, state setters, and controls needed for
 // station filtering.
 //
-// State and setters are provided by a custom hook, useStationFiltering.
+// State and setters are returned by a custom hook, `useStationFiltering`.
 //
-// Controls are provided by a functional component StationFilters. This
-// component does not invoke the hook nor have any state of its own; it
-// receives the hooks results (state and setters) from the the client component
+// Controls are provided by the component `StationFilters`. This
+// component does not invoke the hook or have any state of its own; it
+// receives the hook returns (state and setters) from the client component
 // (<Body>), which does invoke the hook. This enables the client component
-// to use the state.
+// to feed the hook outputs into `StationFilters` and to use the state for
+// other purposes, such as performing actual station filtering, which is
+// *not* done by anything in this module.
 //
-// This module does not really hide anything from the client, but it hides the
-// complexity, and it places the state declarations right next to their primary
-// usage in the component, which makes it easier to maintain.
+// Additionally, `useStationFiltering` provides an `isPending` state, which is
+// true if and only if updates due to invoking the setters are in progress.
+// It uses the new (as of React 18) concurrency hook `useTransition`, which
+// proves pretty magical.
+//
+// The hook and the component `StationFilters` are a matched pair.
+// This module does not hide much from its client(s), but it hides a bit of
+// complexity, and it places the state declarations right next to a key
+// consumer of them, the component `StationFilters`.
 
-import React, { useState } from 'react';
+import React, { useState, useTransition } from 'react';
 
 import './StationFilters.css';
 import { Col, Row } from 'react-bootstrap';
@@ -50,27 +58,32 @@ export const useStationFiltering = () => {
   //   variableActions.selectNone();
   //   frequencyActions.selectNone();
   // };
+  const [isPending, startTransition] = useTransition();
 
+  const handler = setter => value => {
+    startTransition(() => setter(value));
+  };
 
   return {
     startDate,
-    setStartDate,
+    setStartDate: handler(setStartDate),
     endDate,
-    setEndDate,
+    setEndDate: handler(setEndDate),
     selectedNetworksOptions,
-    setSelectedNetworksOptions,
+    setSelectedNetworksOptions: handler(setSelectedNetworksOptions),
     networkActions,
     setNetworkActions,
     selectedVariablesOptions,
-    setSelectedVariablesOptions,
+    setSelectedVariablesOptions: handler(setSelectedVariablesOptions),
     variableActions,
     setVariableActions,
     selectedFrequenciesOptions,
-    setSelectedFrequenciesOptions,
+    setSelectedFrequenciesOptions: handler(setSelectedFrequenciesOptions),
     frequencyActions,
     setFrequencyActions,
     onlyWithClimatology,
-    toggleOnlyWithClimatology,
+    toggleOnlyWithClimatology: handler(toggleOnlyWithClimatology),
+    isPending,
   };
 };
 
