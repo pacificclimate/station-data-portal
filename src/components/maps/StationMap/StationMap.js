@@ -53,6 +53,7 @@ import logger from '../../../logger';
 
 import './StationMap.css';
 import { getTimer } from '../../../utils/timing';
+import { MapSpinner } from 'pcic-react-leaflet-components';
 
 logger.configure({ active: true });
 const smtimer = getTimer("StationMarker timing")
@@ -70,6 +71,7 @@ function StationMap({
     color: "#f49853",
     weight: 1,
   },
+  isPending,
 }) {
   const deferredStations = useDeferredValue(stations);
   const userShapeLayerRef = useRef();
@@ -104,9 +106,12 @@ function StationMap({
 
   // alert("StationMap render")
 
+  // Splitting the `deferredStations` memoization into two steps, markers and
+  // layer group, seems to provide a more responsive UI. It's not clear why.
+
   const markers = useMemo(() =>
     <ManyStationMarkers
-      stations={stations}
+      stations={deferredStations}
       allNetworks={allNetworks}
       allVariables={allVariables}
     />,
@@ -158,6 +163,16 @@ function StationMap({
         />
       </FeatureGroup>
       {markerLayerGroup}
+      {isPending &&
+        <MapSpinner
+          spinner={"Bars"}
+          x={"40%"}
+          y={"40%"}
+          width={"80"}
+          stroke={"darkgray"}
+          fill={"lightgray"}
+        />
+      }
     </BaseMap>
   );
 }

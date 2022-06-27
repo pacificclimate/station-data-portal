@@ -82,6 +82,7 @@ function Body() {
     networkActions,
     variableActions,
     frequencyActions,
+    isPending,
   } = stationFiltering;
 
   const [area, setArea] = useState(undefined);
@@ -201,6 +202,7 @@ function Body() {
               allVariables={allVariables}
               onSetArea={setArea}
               markerClusterOptions={uzeMarkercluster && markerClusterOptions}
+              isPending={isPending}
             />,
 
             <Card style={{ marginLeft: '-15px', marginRight: '-10px' }}>
