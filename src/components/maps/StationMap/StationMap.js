@@ -38,7 +38,7 @@
 
 
 import PropTypes from 'prop-types';
-import React, { useEffect, useRef } from 'react';
+import React, { useDeferredValue, useEffect, useMemo, useRef } from 'react';
 
 import { FeatureGroup, LayerGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
@@ -71,6 +71,7 @@ function StationMap({
     weight: 1,
   },
 }) {
+  const deferredStations = useDeferredValue(stations);
   const userShapeLayerRef = useRef();
 
   // TODO: Remove
@@ -103,18 +104,22 @@ function StationMap({
 
   // alert("StationMap render")
 
-  const markers = (
+  const markers = useMemo(() =>
     <ManyStationMarkers
       stations={stations}
       allNetworks={allNetworks}
       allVariables={allVariables}
-    />
+    />,
+    [deferredStations]
   );
 
-  const markerLayerGroup = markerClusterOptions ? (
-    <MarkerCluster {...markerClusterOptions}>{markers}</MarkerCluster>
-  ) : (
-    <LayerGroup>{markers}</LayerGroup>
+  const markerLayerGroup = useMemo(() =>
+    markerClusterOptions ? (
+      <MarkerCluster {...markerClusterOptions}>{markers}</MarkerCluster>
+    ) : (
+      <LayerGroup>{markers}</LayerGroup>
+    ),
+    [markers]
   );
 
   return (
