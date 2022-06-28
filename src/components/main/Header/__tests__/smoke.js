@@ -1,8 +1,9 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import Header from '../Header';
 
 it('renders without crashing', () => {
-    const div = document.createElement('div');
-    ReactDOM.render(<Header/>, div);
+    const container = document.createElement('div');
+    const root = createRoot(container);
+    root.render(<Header/>);
 });

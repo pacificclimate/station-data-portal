@@ -58,31 +58,38 @@ export const useStationFiltering = () => {
   //   variableActions.selectNone();
   //   frequencyActions.selectNone();
   // };
+
+  // Define a transition such that updates to the filtering parameters are
+  // marked as lower priority.
   const [isPending, startTransition] = useTransition();
 
-  const handler = setter => value => {
+  // This function wraps a setter in a transition. Evidently it is OK to wrap
+  // different, independently-called setters in the same transition.
+  const handleAsTransition = setter => value => {
     startTransition(() => setter(value));
   };
 
   return {
     startDate,
-    setStartDate: handler(setStartDate),
+    setStartDate: handleAsTransition(setStartDate),
     endDate,
-    setEndDate: handler(setEndDate),
+    setEndDate: handleAsTransition(setEndDate),
     selectedNetworksOptions,
-    setSelectedNetworksOptions: handler(setSelectedNetworksOptions),
+    setSelectedNetworksOptions: handleAsTransition(setSelectedNetworksOptions),
     networkActions,
     setNetworkActions,
     selectedVariablesOptions,
-    setSelectedVariablesOptions: handler(setSelectedVariablesOptions),
+    setSelectedVariablesOptions:
+      handleAsTransition(setSelectedVariablesOptions),
     variableActions,
     setVariableActions,
     selectedFrequenciesOptions,
-    setSelectedFrequenciesOptions: handler(setSelectedFrequenciesOptions),
+    setSelectedFrequenciesOptions:
+      handleAsTransition(setSelectedFrequenciesOptions),
     frequencyActions,
     setFrequencyActions,
     onlyWithClimatology,
-    toggleOnlyWithClimatology: handler(toggleOnlyWithClimatology),
+    toggleOnlyWithClimatology: handleAsTransition(toggleOnlyWithClimatology),
     isPending,
   };
 };

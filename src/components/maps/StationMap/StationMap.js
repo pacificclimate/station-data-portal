@@ -71,7 +71,11 @@ function StationMap({
     color: "#f49853",
     weight: 1,
   },
+
   isPending,
+  // This is a transition-pending value passed in from the parent, and
+  // should be true if and only if slow updates to the map are pending.
+  // That this works so easily and well is amazing.
 }) {
   const deferredStations = useDeferredValue(stations);
   const userShapeLayerRef = useRef();
@@ -104,10 +108,15 @@ function StationMap({
   smtimer.log();
   smtimer.resetAll();
 
-  // alert("StationMap render")
-
+  // Make the markers dependent on `deferredStations`, so that updating them
+  // is lower priority than other updates (e.g., the filter controls).
+  //
   // Splitting the `deferredStations` memoization into two steps, markers and
   // layer group, seems to provide a more responsive UI. It's not clear why.
+  //
+  // TODO: It's possible that raising the deferral up to Body, so that
+  //  filtering is deferred, would make an even greater improvement in UI
+  //  responsiveness.
 
   const markers = useMemo(() =>
     <ManyStationMarkers

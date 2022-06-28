@@ -1,12 +1,10 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import OneStationMarkers from '../StationMarkers';
 
 it('renders without crashing', () => {
-    const div = document.createElement('div');
-    ReactDOM.render(
-      <OneStationMarkers/>,
-      div
-    );
+    const container = document.createElement('div');
+    const root = createRoot(container);
+    root.render(<OneStationMarkers/>);
 });
 

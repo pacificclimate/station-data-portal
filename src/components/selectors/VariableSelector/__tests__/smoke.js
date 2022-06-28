@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import VariableSelector from '../VariableSelector';
 import noop from 'lodash/noop';
 
@@ -71,16 +71,16 @@ const commonSelectorStyles = {
 
 
 it('renders without crashing', () => {
-    const div = document.createElement('div');
-    ReactDOM.render(
+    const container = document.createElement('div');
+    const root = createRoot(container);
+    root.render(
       <VariableSelector
         allVariables={allVariables}
         onReady={noop}
         onChange={noop}
         value={[]}
         styles={commonSelectorStyles}
-      />,
-      div
+      />
     );
 });
 

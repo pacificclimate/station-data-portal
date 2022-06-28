@@ -1,15 +1,15 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import AdjustableColumns from '../AdjustableColumns';
 
 it('renders without crashing', () => {
-    const div = document.createElement('div');
-    ReactDOM.render(
+    const container = document.createElement('div');
+    const root = createRoot(container);
+    root.render(
       <AdjustableColumns
         defaultLgs={[6, 6]}
-        contents={[(<div></div>), (<div></div>)]}
-      />,
-      div
+        contents={[(<div>alpha</div>), (<div>beta</div>)]}
+      />
     );
 });
 

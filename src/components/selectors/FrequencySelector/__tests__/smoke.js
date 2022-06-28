@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import FrequencySelector from '../FrequencySelector';
 import noop from 'lodash/noop';
 
@@ -66,15 +66,15 @@ const allStations = [
 ];
 
 it('renders without crashing', () => {
-    const div = document.createElement('div');
-    ReactDOM.render(
+    const container = document.createElement('div');
+    const root = createRoot(container);
+    root.render(
       <FrequencySelector
         allStations={allStations}
         onReady={noop}
         onChange={noop}
         value={[]}
-      />,
-      div
+      />
     );
 });
 
