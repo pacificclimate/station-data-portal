@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Button, ButtonToolbar, ControlLabel, FormGroup } from 'react-bootstrap';
+import { Button, ButtonToolbar, Form } from 'react-bootstrap';
 import Select from 'react-select';
 import memoize from 'memoize-one';
 import map from 'lodash/fp/map';
@@ -12,7 +12,7 @@ import sortBy from 'lodash/fp/sortBy';
 import flow from 'lodash/fp/flow';
 import tap from 'lodash/fp/tap';
 import { groupByGeneral } from '../../../utils/fp';
-import { defaultValue } from '../common';
+import { defaultValue, selectorButtonProps } from '../common';
 import InfoPopup from '../../util/InfoPopup';
 
 import logger from '../../../logger';
@@ -188,9 +188,9 @@ class VariableSelector extends Component {
   render() {
     const options = this.getOptions();
     return (
-      <FormGroup>
+      <Form>
         <div>
-          <ControlLabel>Variable</ControlLabel>
+          <Form.Label>Variable</Form.Label>
           {' '}
           <InfoPopup title={"Variable multiselector"}>
             <ul className={"compact"}>
@@ -206,19 +206,19 @@ class VariableSelector extends Component {
           </InfoPopup>
         </div>
         <ButtonToolbar className={css.selectorButtons}>
-          <Button bsSize={'xsmall'} onClick={this.handleClickAll}>All</Button>
+          <Button {...selectorButtonProps} onClick={this.handleClickAll}>All</Button>
           {
             map(group => (
               <Button
                 key={group.label}
-                bsSize={'xsmall'}
+                {...selectorButtonProps}
                 onClick={this.makeHandleClickGroup(group)}
               >
                 {`All ${group.label}`}
               </Button>
             ))(options)
           }
-          <Button bsSize={'xsmall'} onClick={this.handleClickNone}>None</Button>
+          <Button {...selectorButtonProps} onClick={this.handleClickNone}>None</Button>
         </ButtonToolbar>
         <Select
           options={options}
@@ -228,7 +228,7 @@ class VariableSelector extends Component {
           {...this.props}
           isMulti
         />
-      </FormGroup>
+      </Form>
     );
   }
 }

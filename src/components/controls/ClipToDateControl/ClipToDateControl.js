@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { Checkbox, FormGroup } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 
 import './ClipToDateControl.css';
 
@@ -13,11 +13,14 @@ export default class ClipToDateControl extends Component {
   render() {
     const { value, ...rest } = this.props;
     return (
-      <FormGroup>
-        <Checkbox checked={value} {...rest}>
-          Clip time series to filter date range
-        </Checkbox>
-      </FormGroup>
+      <Form>
+        <Form.Check
+          className={"fw-bold"}
+          checked={value}
+          label={"Clip time series to filter date range"}
+          {...rest}
+        />
+      </Form>
     );
   }
 }

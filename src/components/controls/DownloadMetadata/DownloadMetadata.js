@@ -52,7 +52,7 @@ function DownloadMetadata(
       filename={filename}
       asyncOnClick={true}
       onClick={handleClick}
-      className={"btn btn-primary"}
+      className={"btn btn-primary btn-sm"}
     >
       {children}
     </CSVLink>

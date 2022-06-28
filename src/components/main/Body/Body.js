@@ -2,10 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useBooleanStateWithToggler } from '../../../hooks';
 import {
   Button,
-  Checkbox,
+  Card,
   Col,
-  FormGroup,
-  Panel,
+  Form,
   Row,
   Tab,
   Tabs
@@ -83,6 +82,7 @@ function Body() {
     networkActions,
     variableActions,
     frequencyActions,
+    isPending,
   } = stationFiltering;
 
   const [area, setArea] = useState(undefined);
@@ -186,6 +186,8 @@ function Body() {
     [area, filteredStations]
   );
 
+  const rowClasses = { className: "mt-3" }
+
   return (
     <div className={css.portal}>
       <Row>
@@ -200,10 +202,11 @@ function Body() {
               allVariables={allVariables}
               onSetArea={setArea}
               markerClusterOptions={uzeMarkercluster && markerClusterOptions}
+              isPending={isPending}
             />,
 
-            <Panel style={{ marginLeft: '-15px', marginRight: '-10px' }}>
-              <Panel.Body>
+            <Card style={{ marginLeft: '-15px', marginRight: '-10px' }}>
+              <Card.Body>
                 { showReloadStationsButton && (
                   <Button onClick={reloadStations}>
                     Reload stations
@@ -211,7 +214,7 @@ function Body() {
                 )}
                 <Tabs
                   id="non-map-controls"
-                  defaultActiveKey={'Filters'}
+                  defaultActiveKey={'Metadata'}
                   className={css.mainTabs}
                 >
                   { markerClusteringAvailable && (
@@ -223,15 +226,14 @@ function Body() {
                         allStations={allStations}
                         selectedStations={selectedStations}
                       />
-                      <FormGroup>
-                        <Checkbox
+                      <Form>
+                        <Form.Check
                           inline
+                          label={"Use leaflet.markercluster"}
                           checked={uzeMarkercluster}
                           onChange={toggleUzeMarkercluster}
-                        >
-                          Use leaflet.markercluster
-                        </Checkbox>
-                      </FormGroup>
+                        />
+                      </Form>
                       <MarkerClusterOptions
                         value={markerClusterOptions}
                         onChange={setMarkerClusterOptions}
@@ -241,25 +243,25 @@ function Body() {
                   )}
 
                   <Tab eventKey={'Filters'} title={'Station Filters'}>
-                    <Row>
+                    {stationDebugFetchOptions && (
+                      <Row>
+                        <Col lg={6}>Fetch limit</Col>
+                        <Col lg={6}>
+                          <Select
+                            options={stnsLimitOptions}
+                            value={stnsLimit}
+                            onChange={setStnsLimit}
+                          />
+                        </Col>
+                      </Row>
+                    )}
+                    <Row {...rowClasses}>
                       <Col lg={12} md={12} sm={12}>
-                        {stationDebugFetchOptions && (
-                          <Row>
-                            <Col lg={6}>Fetch limit</Col>
-                            <Col lg={6}>
-                              <Select
-                                options={stnsLimitOptions}
-                                value={stnsLimit}
-                                onChange={setStnsLimit}
-                              />
-                            </Col>
-                          </Row>
-                        )}
                         <SelectionCounts
                           allStations={allStations}
                           selectedStations={selectedStations}
                         />
-                        <p>
+                        <p className={"mb-0"}>
                           (See Station Metadata and Station Data tabs for details)
                         </p>
                       </Col>
@@ -269,14 +271,17 @@ function Body() {
                       allVariables={allVariables}
                       allFrequencies={allFrequencies}
                       {...stationFiltering}
+                      rowClasses={rowClasses}
                     />
                   </Tab>
 
                   <Tab eventKey={'Metadata'} title={'Station Metadata'}>
-                    <SelectionCounts
-                      allStations={allStations}
-                      selectedStations={selectedStations}
-                    />
+                    <Row {...rowClasses}>
+                      <SelectionCounts
+                        allStations={allStations}
+                        selectedStations={selectedStations}
+                      />
+                    </Row>
                     <StationMetadata
                       stations={selectedStations}
                       allNetworks={allNetworks}
@@ -285,11 +290,13 @@ function Body() {
                   </Tab>
 
                   <Tab eventKey={'Data'} title={'Station Data'}>
-                    <SelectionCounts
-                      allStations={allStations}
-                      selectedStations={selectedStations}
-                    />
-                    <SelectionCriteria/>
+                    <Row {...rowClasses}>
+                      <SelectionCounts
+                        allStations={allStations}
+                        selectedStations={selectedStations}
+                      />
+                      <SelectionCriteria/>
+                    </Row>
                     <UnselectedThings
                       selectedNetworksOptions={selectedNetworksOptions}
                       selectedVariablesOptions={selectedVariablesOptions}
@@ -300,6 +307,7 @@ function Body() {
                       selectedStations={selectedStations}
                       dataDownloadUrl={dataDownloadUrl}
                       dataDownloadFilename={dataDownloadFilename}
+                      rowClasses={rowClasses}
                     />
                   </Tab>
 
@@ -308,8 +316,8 @@ function Body() {
                   </Tab>
 
                 </Tabs>
-              </Panel.Body>
-            </Panel>
+              </Card.Body>
+            </Card>
           ]}
         />
       </Row>

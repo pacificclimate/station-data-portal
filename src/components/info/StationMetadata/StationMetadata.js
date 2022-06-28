@@ -375,6 +375,8 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
     [stations, compact],
   );
 
+  const buttonProps = { size: "sm", variant: "primary" }
+
   // Note: Download button is rendered here because it uses `columnInfo` to
   // control what it does. We consider it an adjunct to the table.
   return (
@@ -385,11 +387,12 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
           name={"compact"}
           value={compact}
           onChange={setCompact}
+          className={"me-1"}
         >
-          <ToggleButton value={false}>By History</ToggleButton>
-          <ToggleButton value={true}>By Station</ToggleButton>
+          <ToggleButton {...buttonProps} value={false}>By History</ToggleButton>
+          <ToggleButton {...buttonProps} value={true}>By Station</ToggleButton>
         </ToggleButtonGroup>
-        <ButtonGroup>
+        <ButtonGroup className={"me-3"}>
           <InfoPopup title={"Table Contents"}>
             <p>
               Station metadata can be displayed (and downloaded) in two formats,
@@ -411,7 +414,7 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
             </p>
           </InfoPopup>
         </ButtonGroup>
-        <ButtonGroup>
+        <ButtonGroup className={"me-1"}>
           <DownloadMetadata
             data={data}
             columns={columnInfo.columns}

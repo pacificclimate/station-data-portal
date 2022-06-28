@@ -1,9 +1,10 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import ClipToDateControl from '../ClipToDateControl';
 
 it('renders without crashing', () => {
-    const div = document.createElement('div');
-    ReactDOM.render(<ClipToDateControl/>, div);
+    const container = document.createElement('div');
+    const root = createRoot(container);
+    root.render(<ClipToDateControl value={false} onChange={() => {}}/>);
 });
 

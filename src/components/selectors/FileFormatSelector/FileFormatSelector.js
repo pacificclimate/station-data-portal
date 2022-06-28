@@ -4,7 +4,7 @@ import Select from 'react-select';
 
 import logger from '../../../logger';
 
-import { ControlLabel, FormGroup } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 
 logger.configure({ active: true });
 
@@ -37,14 +37,14 @@ export default class FileFormatSelector extends Component {
 
   render() {
     return (
-      <FormGroup>
-        <div><ControlLabel>Output format</ControlLabel></div>
+      <Form>
+        <div><Form.Label>Output format</Form.Label></div>
         <Select
           options={options}
           value={this.props.value}
           onChange={this.props.onChange}
         />
-      </FormGroup>
+      </Form>
     );
   }
 }

@@ -1,20 +1,27 @@
 // This module packages up the state, state setters, and controls needed for
 // station filtering.
 //
-// State and setters are provided by a custom hook, useStationFiltering.
+// State and setters are returned by a custom hook, `useStationFiltering`.
 //
-// Controls are provided by a functional component StationFilters. This
-// component does not invoke the hook nor have any state of its own; it
-// receives the hooks results (state and setters) from the the client component
+// Controls are provided by the component `StationFilters`. This
+// component does not invoke the hook or have any state of its own; it
+// receives the hook returns (state and setters) from the client component
 // (<Body>), which does invoke the hook. This enables the client component
-// to use the state.
+// to feed the hook outputs into `StationFilters` and to use the state for
+// other purposes, such as performing actual station filtering, which is
+// *not* done by anything in this module.
 //
-// This module does not really hide anything from the client, but it hides the
-// complexity, and it places the state declarations right next to their primary
-// usage in the component, which makes it easier to maintain.
+// Additionally, `useStationFiltering` provides an `isPending` state, which is
+// true if and only if updates due to invoking the setters are in progress.
+// It uses the new (as of React 18) concurrency hook `useTransition`, which
+// proves pretty magical.
+//
+// The hook and the component `StationFilters` are a matched pair.
+// This module does not hide much from its client(s), but it hides a bit of
+// complexity, and it places the state declarations right next to a key
+// consumer of them, the component `StationFilters`.
 
-import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React, { useState, useTransition } from 'react';
 
 import './StationFilters.css';
 import { Col, Row } from 'react-bootstrap';
@@ -52,26 +59,38 @@ export const useStationFiltering = () => {
   //   frequencyActions.selectNone();
   // };
 
+  // Define a transition such that updates to the filtering parameters are
+  // marked as lower priority.
+  const [isPending, startTransition] = useTransition();
+
+  // This function wraps a setter in a transition. Evidently it is OK to wrap
+  // different, independently-called setters in the same transition.
+  const handleAsTransition = setter => value => {
+    startTransition(() => setter(value));
+  };
 
   return {
     startDate,
-    setStartDate,
+    setStartDate: handleAsTransition(setStartDate),
     endDate,
-    setEndDate,
+    setEndDate: handleAsTransition(setEndDate),
     selectedNetworksOptions,
-    setSelectedNetworksOptions,
+    setSelectedNetworksOptions: handleAsTransition(setSelectedNetworksOptions),
     networkActions,
     setNetworkActions,
     selectedVariablesOptions,
-    setSelectedVariablesOptions,
+    setSelectedVariablesOptions:
+      handleAsTransition(setSelectedVariablesOptions),
     variableActions,
     setVariableActions,
     selectedFrequenciesOptions,
-    setSelectedFrequenciesOptions,
+    setSelectedFrequenciesOptions:
+      handleAsTransition(setSelectedFrequenciesOptions),
     frequencyActions,
     setFrequencyActions,
     onlyWithClimatology,
-    toggleOnlyWithClimatology,
+    toggleOnlyWithClimatology: handleAsTransition(toggleOnlyWithClimatology),
+    isPending,
   };
 };
 
@@ -97,13 +116,14 @@ function StationFilters({
   setFrequencyActions,
   onlyWithClimatology,
   toggleOnlyWithClimatology,
+  rowClasses = { className: "mb-3" },
 }) {
   return (
     <React.Fragment>
-      <Row>
+      <Row {...rowClasses}>
         <Col lg={6} md={6} sm={6}>
-          {/*<Button bsSize={'small'} onClick={handleClickAll}>Select all criteria</Button>*/}
-          {/*<Button bsSize={'small'} onClick={handleClickNone}>Clear all criteria</Button>*/}
+          {/*<Button size={'sm'} onClick={handleClickAll}>Select all criteria</Button>*/}
+          {/*<Button size={'sm'} onClick={handleClickNone}>Clear all criteria</Button>*/}
           <DateSelector
             value={startDate}
             onChange={setStartDate}
@@ -117,6 +137,8 @@ function StationFilters({
             label={'End Date'}
           />
         </Col>
+      </Row>
+      <Row {...rowClasses}>
         <Col lg={12} md={12} sm={12}>
           <OnlyWithClimatologyControl
             value={onlyWithClimatology}
@@ -124,7 +146,7 @@ function StationFilters({
           />
         </Col>
       </Row>
-      <Row>
+      <Row {...rowClasses}>
         <Col lg={12} md={12} sm={12}>
           <NetworkSelector
             allNetworks={allNetworks}
@@ -138,7 +160,7 @@ function StationFilters({
           {/*<JSONstringify object={selectedNetworksOptions}/>*/}
         </Col>
       </Row>
-      <Row>
+      <Row {...rowClasses}>
         <Col lg={12} md={12} sm={12}>
           <VariableSelector
             allVariables={allVariables}
@@ -152,7 +174,7 @@ function StationFilters({
           {/*<JSONstringify object={selectedVariablesOptions}/>*/}
         </Col>
       </Row>
-      <Row>
+      <Row {...rowClasses}>
         <Col lg={12} md={12} sm={12}>
           <FrequencySelector
             allFrequencies={allFrequencies}

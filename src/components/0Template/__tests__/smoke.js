@@ -1,9 +1,10 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import Template from '../Template';
 
 it('renders without crashing', () => {
-    const div = document.createElement('div');
-    ReactDOM.render(<Template/>, div);
+    const container = document.createElement('div');
+    const root = createRoot(container);
+    root.render(<Template/>);
 });
 

@@ -1,32 +1,34 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import './InfoPopup.css';
-import { Glyphicon, OverlayTrigger, Popover } from 'react-bootstrap';
+import { OverlayTrigger, Popover } from 'react-bootstrap';
+import { InfoCircle } from 'react-bootstrap-icons';
 
 
 function InfoPopup({
   placement = "right",
-  glyph= 'info-sign',
   title,
-  children
+  children,
 }) {
   return (
     <OverlayTrigger
+      placement={placement}
       overlay={
-        <Popover
-          id={title}
-          placement={placement}
-          title={title}
-        >
-          {children}
+        <Popover id={title}>
+          <Popover.Header>{title}</Popover.Header>
+          <Popover.Body>{children}</Popover.Body>
         </Popover>}
     >
-      <Glyphicon glyph={glyph}/>
+      <InfoCircle/>
     </OverlayTrigger>
   );
 }
 
 InfoPopup.propTypes = {
+  placement: PropTypes.string,
+  title: PropTypes.string,
+  children: PropTypes.any,
 };
 
 export default InfoPopup;

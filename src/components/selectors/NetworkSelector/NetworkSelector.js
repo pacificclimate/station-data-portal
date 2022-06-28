@@ -3,8 +3,7 @@ import React, { Component } from 'react';
 import {
   Button,
   ButtonToolbar,
-  ControlLabel,
-  FormGroup,
+  Form,
 } from 'react-bootstrap';
 import Select from 'react-select';
 import memoize from 'memoize-one';
@@ -20,7 +19,7 @@ import assign from 'lodash/fp/assign';
 import { composeWithRestArgs } from '../../../utils/fp'
 import chroma from 'chroma-js';
 import logger from '../../../logger';
-import { defaultValue } from '../common';
+import { defaultValue, selectorButtonProps } from '../common';
 import LocalPropTypes from '../../local-prop-types';
 import InfoPopup from '../../util/InfoPopup';
 
@@ -123,9 +122,9 @@ class NetworkSelector extends Component {
     );
 
     return (
-      <FormGroup>
+      <Form>
         <div>
-          <ControlLabel>Network</ControlLabel>
+          <Form.Label>Network</Form.Label>
           {' '}
           <InfoPopup title={"Network multiselector"}>
             <ul className={"compact"}>
@@ -139,8 +138,12 @@ class NetworkSelector extends Component {
           </InfoPopup>
         </div>
         <ButtonToolbar className={css.selectorButtons}>
-          <Button bsSize={'xsmall'} onClick={this.handleClickAll}>All</Button>
-          <Button bsSize={'xsmall'} onClick={this.handleClickNone}>None</Button>
+          <Button {...selectorButtonProps} onClick={this.handleClickAll}>
+            All
+          </Button>
+          <Button {...selectorButtonProps} onClick={this.handleClickNone}>
+            None
+          </Button>
         </ButtonToolbar>
         <Select
           options={this.getOptions()}
@@ -151,7 +154,7 @@ class NetworkSelector extends Component {
           styles={composedStyles}
           isMulti
         />
-      </FormGroup>
+      </Form>
     );
   }
 }

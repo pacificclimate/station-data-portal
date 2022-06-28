@@ -1,12 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { useImmer } from 'use-immer';
-import {
-  Checkbox,
-  ControlLabel,
-  FormControl,
-  FormGroup
-} from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 
 import './MarkerClusterOptions.css';
 
@@ -66,53 +61,49 @@ function MarkerClusterOptions({
   }, // useMarkerCluster setters
 }) {
   return (
-    <FormGroup>
-      <Checkbox
+    <Form>
+      <Form.Check
+        label={"removeOutsideVisibleBounds"}
         checked={removeOutsideVisibleBounds}
         onChange={toggleRemoveOutsideVisibleBounds}
-      >
-        removeOutsideVisibleBounds
-      </Checkbox>
+      />
 
-      <Checkbox
+      <Form.Check
+        label={"spiderfyOnMaxZoom"}
         checked={spiderfyOnMaxZoom}
         onChange={toggleSpiderfyOnMaxZoom}
-      >
-        spiderfyOnMaxZoom
-      </Checkbox>
+      />
 
-      <Checkbox
+      <Form.Check
+        label={"zoomToBoundsOnClick"}
         checked={zoomToBoundsOnClick}
         onChange={toggleZoomToBoundsOnClick}
-      >
-        zoomToBoundsOnClick
-      </Checkbox>
+      />
 
-      <ControlLabel>Disable clustering at zoom level</ControlLabel>
-      <FormControl
-        componentClass={"input"}
-        placeholder={"Zoom level"}
+      <Form.Label>Disable clustering at zoom level</Form.Label>
+      <Form.Control
+        as={"input"}
         type={"number"}
+        placeholder={"Zoom level"}
         value={disableClusteringAtZoom}
         onChange={handleChangeDisableClusteringAtZoom}
       />
 
-      <ControlLabel>Max. cluster radius</ControlLabel>
-      <FormControl
-        componentClass={"input"}
-        placeholder={"Radius in pixels"}
+      <Form.Label>Max. cluster radius</Form.Label>
+      <Form.Control
+        as={"input"}
         type={"number"}
+        placeholder={"Radius in pixels"}
         value={maxClusterRadius}
         onChange={handleChangeMaxClusterRadius}
       />
 
-      <Checkbox
+      <Form.Check
+        label={"chunkedLoading"}
         checked={chunkedLoading}
         onChange={toggleChunkedLoading}
-      >
-        chunkedLoading
-      </Checkbox>
-    </FormGroup>
+      />
+    </Form>
   );
 }
 

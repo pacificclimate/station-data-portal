@@ -20,12 +20,12 @@ export default function PaginationControls({
   setPageSize,
   pageSizes = [10, 15, 20, 30],
   size = 'sm',
-  style = 'default'
+  variant = 'light'
 }) {
-  const buttonProps = { bsSize: size, bsStyle: style };
+  const buttonProps = { variant };
   return (
       <ButtonToolbar>
-        <ButtonGroup className={styles.fwdBack}>
+        <ButtonGroup className={styles.fwdBack} size={size}>
           <Button
             title="Go to first page"
             {...buttonProps}
@@ -44,6 +44,7 @@ export default function PaginationControls({
           <Button
             {...buttonProps}
             variant={'outline-dark'}
+            className={"mb-1 me-1"}
             disabled
           >
             Page {pageIndex + 1} of {pageCount}
@@ -70,8 +71,7 @@ export default function PaginationControls({
         >
           <FormControl
             className={`text-primary ${styles.perPage}`}
-            bsSize={size}
-            componentClass="select"
+            as="select"
             value={pageSize}
             onChange={e => {
               setPageSize(Number(e.target.value))
@@ -85,9 +85,9 @@ export default function PaginationControls({
               ))
             }
           </FormControl>
-          <InputGroup.Addon>
+          <InputGroup.Text>
             rows per page
-          </InputGroup.Addon>
+          </InputGroup.Text>
         </InputGroup>
       </ButtonToolbar>
   );

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Grid } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 
 import Disclaimer from '../../info/Disclaimer';
 import Header from '../Header/Header';
@@ -21,10 +21,10 @@ export default function App() {
   }, []);
 
   return (
-    <Grid fluid className="App">
+    <Container fluid className="App">
       <Disclaimer/>
       <Header/>
       <Body/>
-    </Grid>
+    </Container>
   );
 }

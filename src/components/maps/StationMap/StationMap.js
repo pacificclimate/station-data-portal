@@ -38,7 +38,7 @@
 
 
 import PropTypes from 'prop-types';
-import React, { useEffect, useRef } from 'react';
+import React, { useDeferredValue, useEffect, useMemo, useRef } from 'react';
 
 import { FeatureGroup, LayerGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
@@ -53,6 +53,7 @@ import logger from '../../../logger';
 
 import './StationMap.css';
 import { getTimer } from '../../../utils/timing';
+import { MapSpinner } from 'pcic-react-leaflet-components';
 
 logger.configure({ active: true });
 const smtimer = getTimer("StationMarker timing")
@@ -70,7 +71,13 @@ function StationMap({
     color: "#f49853",
     weight: 1,
   },
+
+  isPending,
+  // This is a transition-pending value passed in from the parent, and
+  // should be true if and only if slow updates to the map are pending.
+  // That this works so easily and well is amazing.
 }) {
+  const deferredStations = useDeferredValue(stations);
   const userShapeLayerRef = useRef();
 
   // TODO: Remove
@@ -101,20 +108,32 @@ function StationMap({
   smtimer.log();
   smtimer.resetAll();
 
-  // alert("StationMap render")
+  // Make the markers dependent on `deferredStations`, so that updating them
+  // is lower priority than other updates (e.g., the filter controls).
+  //
+  // Splitting the `deferredStations` memoization into two steps, markers and
+  // layer group, seems to provide a more responsive UI. It's not clear why.
+  //
+  // TODO: It's possible that raising the deferral up to Body, so that
+  //  filtering is deferred, would make an even greater improvement in UI
+  //  responsiveness.
 
-  const markers = (
+  const markers = useMemo(() =>
     <ManyStationMarkers
-      stations={stations}
+      stations={deferredStations}
       allNetworks={allNetworks}
       allVariables={allVariables}
-    />
+    />,
+    [deferredStations]
   );
 
-  const markerLayerGroup = markerClusterOptions ? (
-    <MarkerCluster {...markerClusterOptions}>{markers}</MarkerCluster>
-  ) : (
-    <LayerGroup>{markers}</LayerGroup>
+  const markerLayerGroup = useMemo(() =>
+    markerClusterOptions ? (
+      <MarkerCluster {...markerClusterOptions}>{markers}</MarkerCluster>
+    ) : (
+      <LayerGroup>{markers}</LayerGroup>
+    ),
+    [markers]
   );
 
   return (
@@ -153,6 +172,16 @@ function StationMap({
         />
       </FeatureGroup>
       {markerLayerGroup}
+      {isPending &&
+        <MapSpinner
+          spinner={"Bars"}
+          x={"40%"}
+          y={"40%"}
+          width={"80"}
+          stroke={"darkgray"}
+          fill={"lightgray"}
+        />
+      }
     </BaseMap>
   );
 }
