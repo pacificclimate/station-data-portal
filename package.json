@@ -33,7 +33,7 @@
   },
   "jest": {
     "transformIgnorePatterns": [
-      "<rootDir>/node_modules/(?!url-join)"
+      "<rootDir>/node_modules/(?!(url-join|react-leaflet|@react-leaflet/core))"
     ]
   },
   "scripts": {
