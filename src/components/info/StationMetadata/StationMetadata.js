@@ -5,7 +5,7 @@
 // the data in the table, plus extra hidden columns, as a CSV file.
 
 import PropTypes from 'prop-types';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useTransition } from 'react';
 import {
   ButtonGroup,
   ButtonToolbar,
@@ -364,6 +364,8 @@ function smtData(stations, compact) {
 
 function StationMetadata({ stations, allNetworks, allVariables }) {
   const [compact, setCompact] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const handleChangeCompact = v => startTransition(() => setCompact(v));
 
   const columnInfo = useMemo(
     () => smtColumnInfo({ allNetworks, allVariables, compact }),
@@ -375,7 +377,7 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
     [stations, compact],
   );
 
-  const buttonProps = { size: "sm", variant: "primary" }
+  const buttonProps = { size: "sm", variant: "primary" };
 
   // Note: Download button is rendered here because it uses `columnInfo` to
   // control what it does. We consider it an adjunct to the table.
@@ -386,11 +388,20 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
           type={"radio"}
           name={"compact"}
           value={compact}
-          onChange={setCompact}
+          onChange={handleChangeCompact}
           className={"me-1"}
         >
-          <ToggleButton {...buttonProps} value={false}>By History</ToggleButton>
-          <ToggleButton {...buttonProps} value={true}>By Station</ToggleButton>
+          {
+            [false, true].map(value => (
+              <ToggleButton
+                id={`stn-md-compact-${value.toString()}`}
+                {...buttonProps}
+                value={value}
+              >
+                By {value ? "Station" : "History"}
+              </ToggleButton>
+            ))
+          }
         </ToggleButtonGroup>
         <ButtonGroup className={"me-3"}>
           <InfoPopup title={"Table Contents"}>
@@ -431,7 +442,11 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
           </InfoPopup>
         </ButtonGroup>
       </ButtonToolbar>
-      <PaginatedTable data={data} {...columnInfo} />
+      {
+        isPending ? (<p>Loading...</p>) : (
+          <PaginatedTable data={data} {...columnInfo} />
+        )
+      }
     </div>
   );
 }
