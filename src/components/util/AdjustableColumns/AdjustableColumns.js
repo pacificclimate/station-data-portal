@@ -72,13 +72,15 @@ export default class AdjustableColumns extends Component {
       this.state.lgs,
       this.props.contents
     ]);
-    const buttonProps = { size: "xs", variant: "outline-dark" }
+    const buttonProps = { size: "xxs", variant: "outline-dark" }
     const columns = mapWithKey(([lg, content], i) =>
       <Col lg={lg} hidden={lg === 0} key={i}>
         <Row>
           <Col lg={12} className={'text-center'} style={{
-            'marginBottom': '-0.5em',
-            borderRight: i < n && '2px solid #777',
+            marginBottom: '-0.5em',
+            marginLeft: "-2px",
+            borderRight: '1px solid #777',
+            borderLeft: '1px solid #777',
             zIndex: 1000,
           }}>
             {
