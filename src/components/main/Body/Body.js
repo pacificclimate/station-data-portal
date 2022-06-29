@@ -214,7 +214,9 @@ function Body() {
                 )}
                 <Tabs
                   id="non-map-controls"
-                  defaultActiveKey={'Metadata'}
+                  defaultActiveKey={
+                    process.env.REACT_APP_DEFAULT_TAB ?? "Filters"
+                  }
                   className={css.mainTabs}
                 >
                   { markerClusteringAvailable && (
