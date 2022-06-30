@@ -82,7 +82,7 @@ function Body() {
     networkActions,
     variableActions,
     frequencyActions,
-    isPending,
+    isPending: stationFilteringIsPending
   } = stationFiltering;
 
   // Map polygon, used for selecting (not filtering) stations.
@@ -203,7 +203,7 @@ function Body() {
               allVariables={allVariables}
               onSetArea={setArea}
               markerClusterOptions={uzeMarkercluster && markerClusterOptions}
-              isPending={isPending}
+              externalIsPending={stationFilteringIsPending}
             />,
 
             <Card style={{ marginLeft: '-15px', marginRight: '-10px' }}>
