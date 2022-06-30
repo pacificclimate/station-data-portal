@@ -85,6 +85,7 @@ function Body() {
     isPending,
   } = stationFiltering;
 
+  // Map polygon, used for selecting (not filtering) stations.
   const [area, setArea] = useState(undefined);
 
   // Marker clustering option controls.
