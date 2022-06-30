@@ -145,7 +145,7 @@ function OneStationMarkers({
     map(hx => ({ id: hx.id, lng: hx.lon, lat: hx.lat }))
   )(station);
 
-  const r = (
+  return (
     <React.Fragment>
       {
         map(
@@ -173,7 +173,6 @@ function OneStationMarkers({
       />
     </React.Fragment>
   );
-  return r;
 }
 OneStationMarkers = timer.timeThis("OneStationMarkers")(OneStationMarkers);
 
@@ -206,9 +205,12 @@ function ManyStationMarkers({
   const leafletMap = useMap();
   const [markerRadius, setMarkerRadius] =
     useState(zoomToMarkerRadius(leafletMap.getZoom()));
+  const [isPending, startTransition] = React.useTransition();
   useMapEvents({
     zoomend: () => {
-      setMarkerRadius(zoomToMarkerRadius(leafletMap.getZoom()));
+      startTransition(() => {
+        setMarkerRadius(zoomToMarkerRadius(leafletMap.getZoom()));
+      });
     }
   });
 
