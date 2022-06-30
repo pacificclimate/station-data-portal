@@ -15,7 +15,7 @@ import {
 } from '../../../utils/station-info';
 import chroma from 'chroma-js';
 import { getTimer } from '../../../utils/timing';
-import { zoomToMarkerRadiusSpec } from '../../../utils/configuration';
+import { zoomToMarkerRadius } from '../../../utils/configuration';
 
 
 logger.configure({ active: true });
@@ -184,18 +184,6 @@ OneStationMarkers.propTypes = {
   markerOptions: PropTypes.object,
   polygonOptions: PropTypes.object,
 };
-
-// Convert a zoom level to a marker radius according to zoomToMarkerRadiusSpec,
-// which is an array of pairs of [zoom, radius] values, in ascending order of
-// zoom. This value is set from an env var. See utils/configuration for details.
-function zoomToMarkerRadius(zoom) {
-  for (const [_zoom, radius] of zoomToMarkerRadiusSpec) {
-    if (zoom <= _zoom) {
-      return radius;
-    }
-  }
-  return zoomToMarkerRadiusSpec[zoomToMarkerRadiusSpec.length-1][1];
-}
 
 
 function ManyStationMarkers({
