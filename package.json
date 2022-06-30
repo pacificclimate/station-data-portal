@@ -29,7 +29,8 @@
     "use-immer": "^0.7.0"
   },
   "devDependencies": {
-    "jest-each": "^28.1.1"
+    "jest-each": "^28.1.1",
+    "serve": "^13.0.2"
   },
   "jest": {
     "transformIgnorePatterns": [
@@ -41,7 +42,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "reinstall": "rm -rf ./node_modules; npm install"
+    "reinstall": "rm -rf ./node_modules; npm install --dev"
   },
   "browserslist": {
     "production": [

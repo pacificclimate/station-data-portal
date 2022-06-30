@@ -82,9 +82,10 @@ function Body() {
     networkActions,
     variableActions,
     frequencyActions,
-    isPending,
+    isPending: stationFilteringIsPending
   } = stationFiltering;
 
+  // Map polygon, used for selecting (not filtering) stations.
   const [area, setArea] = useState(undefined);
 
   // Marker clustering option controls.
@@ -202,7 +203,9 @@ function Body() {
               allVariables={allVariables}
               onSetArea={setArea}
               markerClusterOptions={uzeMarkercluster && markerClusterOptions}
-              isPending={isPending}
+              externalIsPending={
+                (allStations === null) || stationFilteringIsPending
+              }
             />,
 
             <Card style={{ marginLeft: '-15px', marginRight: '-10px' }}>

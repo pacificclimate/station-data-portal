@@ -38,7 +38,13 @@
 
 
 import PropTypes from 'prop-types';
-import React, { useDeferredValue, useEffect, useMemo, useRef } from 'react';
+import React, {
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useTransition
+} from 'react';
 
 import { FeatureGroup, LayerGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
@@ -46,7 +52,7 @@ import MarkerCluster from '../MarkerCluster';
 import L from 'leaflet';
 
 import MapInfoDisplay from '../MapInfoDisplay';
-import { ManyStationMarkers } from '../StationMarkers';
+import { defaultMarkerOptions, ManyStationMarkers } from '../StationMarkers';
 import { layersToGeoJSONMultipolygon } from '../../../utils/geoJSON-leaflet';
 
 import logger from '../../../logger';
@@ -54,6 +60,8 @@ import logger from '../../../logger';
 import './StationMap.css';
 import { getTimer } from '../../../utils/timing';
 import { MapSpinner } from 'pcic-react-leaflet-components';
+import { zoomToMarkerRadius } from '../../../utils/configuration';
+import { useImmer } from 'use-immer';
 
 logger.configure({ active: true });
 const smtimer = getTimer("StationMarker timing")
@@ -72,12 +80,16 @@ function StationMap({
     weight: 1,
   },
 
-  isPending,
+  externalIsPending,
   // This is a transition-pending value passed in from the parent, and
-  // should be true if and only if slow updates to the map are pending.
-  // That this works so easily and well is amazing.
+  // should be true if and only if slow updates to the map are pending
+  // due to an external update.
 }) {
+  // TODO: It's possible that raising this deferral up to Body, so that
+  //  filtering is deferred, would make an even greater improvement in UI
+  //  responsiveness.
   const deferredStations = useDeferredValue(stations);
+
   const userShapeLayerRef = useRef();
 
   // TODO: Remove
@@ -97,13 +109,32 @@ function StationMap({
       title: "Remove all shapes",
       text: "Remove all",
     };
-    console.log("### L.drawLocal", L.drawLocal)
   }, []);
 
   const handleChangedGeometryLayers = () => {
     const layers = userShapeLayerRef?.current?.getLayers();
     onSetArea(layers && layersToGeoJSONMultipolygon(layers));
   };
+
+  // Manage marker radius as a function of zoom. Use a transition so that it
+  // doesn't interrupt other UI activity (including updating the base map).
+  // An immutable value makes setting `markerOptions` nice. To slightly improve
+  // performance, we use memoization in setting initial state and defining the
+  // map events.
+  const [markerOptions, setMarkerOptions] = useImmer(() => ({
+    ...defaultMarkerOptions,
+    radius: zoomToMarkerRadius(initialViewport.zoom),
+  }));
+  const [markerUpdateIsPending, markerUpdateStartTransition] = useTransition();
+  const markerMapEvents = useMemo(() => ({
+    zoomend: (leafletMap) => {
+      markerUpdateStartTransition(() => {
+        setMarkerOptions(draft => {
+          draft.radius = zoomToMarkerRadius(leafletMap.getZoom());
+        });
+      });
+    }
+  }), []);
 
   smtimer.log();
   smtimer.resetAll();
@@ -113,18 +144,16 @@ function StationMap({
   //
   // Splitting the `deferredStations` memoization into two steps, markers and
   // layer group, seems to provide a more responsive UI. It's not clear why.
-  //
-  // TODO: It's possible that raising the deferral up to Body, so that
-  //  filtering is deferred, would make an even greater improvement in UI
-  //  responsiveness.
 
   const markers = useMemo(() =>
     <ManyStationMarkers
       stations={deferredStations}
       allNetworks={allNetworks}
       allVariables={allVariables}
+      markerOptions={markerOptions}
+      mapEvents={markerMapEvents}
     />,
-    [deferredStations]
+    [deferredStations, markerOptions]
   );
 
   const markerLayerGroup = useMemo(() =>
@@ -135,6 +164,8 @@ function StationMap({
     ),
     [markers]
   );
+
+  const isPending = externalIsPending || markerUpdateIsPending;
 
   return (
     <BaseMap

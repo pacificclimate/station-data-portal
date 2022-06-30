@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CircleMarker, Polygon, useMap, useMapEvents } from 'react-leaflet';
 import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
+import mapValues from 'lodash/fp/mapValues';
 import StationPopup from '../StationPopup';
 import StationTooltip from '../StationTooltip';
 
@@ -15,7 +16,6 @@ import {
 } from '../../../utils/station-info';
 import chroma from 'chroma-js';
 import { getTimer } from '../../../utils/timing';
-import { zoomToMarkerRadiusSpec } from '../../../utils/configuration';
 
 
 logger.configure({ active: true });
@@ -58,13 +58,21 @@ const useLazyPopup = ({ station, allNetworks, allVariables }) => {
 };
 
 
+export const defaultMarkerOptions = {
+  radius: 4,
+  weight: 1,
+  fillOpacity: 0.75,
+  color: '#000000',
+};
+
+
 function LocationMarker({
   station,
-  location,
-  color,
+  location,     // One location of the station (there may be several)
+  color,        // Station colour; overrides default color in markerOptions
+  markerOptions = defaultMarkerOptions,
   allNetworks,
   allVariables,
-  markerOptions,
 }) {
   const { markerRef, popup, addPopup } =
     useLazyPopup({ station, allNetworks, allVariables });
@@ -86,13 +94,21 @@ function LocationMarker({
     </CircleMarker>
   );
 }
+LocationMarker.propTypes = {
+  station: PropTypes.object.isRequired,
+  location: PropTypes.object.isRequired,
+  color: PropTypes.string.isRequired,
+  allNetworks: PropTypes.array.isRequired,
+  allVariables: PropTypes.array.isRequired,
+  markerOptions: PropTypes.object,
+};
 
 
 function MultiLocationMarker ({
   station,
-  locations,
-  color,
-  polygonOptions,
+  locations,      // Unique locations for station.
+  color,          // Station colour; applied to all location markers
+  polygonOptions, // Multi-location marker is a polygon; this is its format
   allNetworks,
   allVariables,
 }) {
@@ -118,18 +134,21 @@ function MultiLocationMarker ({
     </Polygon>
   );
 }
+MultiLocationMarker.propTypes = {
+  station: PropTypes.object.isRequired,
+  locations: PropTypes.array.isRequired,
+  color: PropTypes.string.isRequired,
+  allNetworks: PropTypes.array.isRequired,
+  allVariables: PropTypes.array.isRequired,
+  polygonOptions: PropTypes.object,
+}
 
 
 function OneStationMarkers({
   station,
   allNetworks,
   allVariables,
-  markerOptions = {
-    radius: 4,
-    weight: 1,
-    fillOpacity: 0.75,
-    color: '#000000',
-  },
+  markerOptions = defaultMarkerOptions,
   // TODO: Improve or remove
   polygonOptions = {
     color: "green",
@@ -145,7 +164,7 @@ function OneStationMarkers({
     map(hx => ({ id: hx.id, lng: hx.lon, lat: hx.lat }))
   )(station);
 
-  const r = (
+  return (
     <React.Fragment>
       {
         map(
@@ -173,11 +192,8 @@ function OneStationMarkers({
       />
     </React.Fragment>
   );
-  return r;
 }
 OneStationMarkers = timer.timeThis("OneStationMarkers")(OneStationMarkers);
-
-
 OneStationMarkers.propTypes = {
   station: PropTypes.object.isRequired,
   allNetworks: PropTypes.array.isRequired,
@@ -186,38 +202,23 @@ OneStationMarkers.propTypes = {
   polygonOptions: PropTypes.object,
 };
 
-// Convert a zoom level to a marker radius according to zoomToMarkerRadiusSpec,
-// which is an array of pairs of [zoom, radius] values, in ascending order of
-// zoom. This value is set from an env var. See utils/configuration for details.
-function zoomToMarkerRadius(zoom) {
-  for (const [_zoom, radius] of zoomToMarkerRadiusSpec) {
-    if (zoom <= _zoom) {
-      return radius;
-    }
-  }
-  return zoomToMarkerRadiusSpec[zoomToMarkerRadiusSpec.length-1][1];
-}
-
 
 function ManyStationMarkers({
-  stations, allNetworks, allVariables
+  stations,
+  allNetworks,
+  allVariables,
+  markerOptions = defaultMarkerOptions,
+  mapEvents = {},
 }) {
-  // Control marker radius as a function of zoom level.
+  // Add map events passed in from outside. The callbacks are called
+  // with the map as the first argument.
+  // TODO: This might be worth making into a custom hook.
   const leafletMap = useMap();
-  const [markerRadius, setMarkerRadius] =
-    useState(zoomToMarkerRadius(leafletMap.getZoom()));
-  useMapEvents({
-    zoomend: () => {
-      setMarkerRadius(zoomToMarkerRadius(leafletMap.getZoom()));
-    }
-  });
+  const mapEventsWithMap = mapValues(
+    eventCallback => (...eventArgs) => eventCallback(leafletMap, ...eventArgs)
+  )(mapEvents);
+  useMapEvents(mapEventsWithMap);
 
-  const markerOptions = {
-    radius: markerRadius,
-    weight: 1,
-    fillOpacity: 0.75,
-    color: '#000000',
-  };
   return map(
     station => (
       <OneStationMarkers
@@ -232,5 +233,11 @@ function ManyStationMarkers({
   );
 }
 // ManyStationMarkers = React.memo(ManyStationMarkers);
-
+ManyStationMarkers.propTypes = {
+  stations: PropTypes.arrayOf(PropTypes.object).isRequired,
+  allNetworks: PropTypes.array.isRequired,
+  allVariables: PropTypes.array.isRequired,
+  markerOptions: PropTypes.object,
+  mapEvents: PropTypes.object,
+}
 export { ManyStationMarkers };

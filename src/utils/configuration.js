@@ -29,6 +29,8 @@ export const markerClusteringAvailable =
 export const showReloadStationsButton =
   configBool("SHOW_RELOAD_STATIONS_BUTTON");
 
+
+// Convert zoomToMarkerRadius string value to nested array.
 let zoomToMarkerRadiusSpec = [
   [7, 10], [99, 4],
 ];
@@ -53,4 +55,16 @@ try {
     `Error: ZOOM_TO_MARKER_RADIUS value '${configString("ZOOM_TO_MARKER_RADIUS")}' not valid: ${e}`
   )
 }
-export { zoomToMarkerRadiusSpec }
+export { zoomToMarkerRadiusSpec };  // Probably not necessary.
+
+// Convert a zoom level to a marker radius according to zoomToMarkerRadiusSpec,
+// which is an array of pairs of [zoom, radius] values, in ascending order of
+// zoom. This value is set from an env var.
+export function zoomToMarkerRadius(zoom) {
+  for (const [_zoom, radius] of zoomToMarkerRadiusSpec) {
+    if (zoom <= _zoom) {
+      return radius;
+    }
+  }
+  return zoomToMarkerRadiusSpec[zoomToMarkerRadiusSpec.length-1][1];
+}
