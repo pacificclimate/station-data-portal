@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CircleMarker, Polygon, useMap, useMapEvents } from 'react-leaflet';
 import map from 'lodash/fp/map';
 import flow from 'lodash/fp/flow';
+import mapValues from 'lodash/fp/mapValues';
 import StationPopup from '../StationPopup';
 import StationTooltip from '../StationTooltip';
 
@@ -15,7 +16,6 @@ import {
 } from '../../../utils/station-info';
 import chroma from 'chroma-js';
 import { getTimer } from '../../../utils/timing';
-import { zoomToMarkerRadius } from '../../../utils/configuration';
 
 
 logger.configure({ active: true });
@@ -187,27 +187,22 @@ OneStationMarkers.propTypes = {
 
 
 function ManyStationMarkers({
-  stations, allNetworks, allVariables
+  stations,
+  allNetworks,
+  allVariables,
+  markerOptions,
+  mapEvents = {},
 }) {
-  // Control marker radius as a function of zoom level.
+  // Add map events passed in from outside. The callbacks are called
+  // with the map as the first argument.
+  // TODO: This might be worth making into a custom hook.
   const leafletMap = useMap();
-  const [markerRadius, setMarkerRadius] =
-    useState(zoomToMarkerRadius(leafletMap.getZoom()));
-  const [isPending, startTransition] = React.useTransition();
-  useMapEvents({
-    zoomend: () => {
-      startTransition(() => {
-        setMarkerRadius(zoomToMarkerRadius(leafletMap.getZoom()));
-      });
-    }
-  });
+  const mapEventsWithMap = mapValues(
+    eventCallback => (...eventArgs) => eventCallback(leafletMap, ...eventArgs)
+  )(mapEvents);
+  console.log("### ManyStationMarkers, mapEventsWithMap", mapEventsWithMap)
+  useMapEvents(mapEventsWithMap);
 
-  const markerOptions = {
-    radius: markerRadius,
-    weight: 1,
-    fillOpacity: 0.75,
-    color: '#000000',
-  };
   return map(
     station => (
       <OneStationMarkers
