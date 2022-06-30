@@ -203,7 +203,9 @@ function Body() {
               allVariables={allVariables}
               onSetArea={setArea}
               markerClusterOptions={uzeMarkercluster && markerClusterOptions}
-              externalIsPending={stationFilteringIsPending}
+              externalIsPending={
+                (allStations === null) || stationFilteringIsPending
+              }
             />,
 
             <Card style={{ marginLeft: '-15px', marginRight: '-10px' }}>
