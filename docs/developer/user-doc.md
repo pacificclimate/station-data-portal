@@ -16,7 +16,7 @@ must also be coded in rST. This is a bit foreign to a JS project, but
 it gives an excellent result.
 
 All user documentation is contained in the directory 
-[`user-doc`](../user-doc) in this repo.
+[`./docs/user`](../user) in this repo.
 Briefly, that directory contains one or more rST files, 
 any accompanying images or other supporting files, and a manifest 
 (`manifest.yaml`) that tells PDP what files to copy. For more details,
