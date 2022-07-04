@@ -54,7 +54,7 @@ Each station has one or more history items associated with it.
 A station history item describes a particular configuration of a station,
 including its name, location, and the variables it reports (which relate
 to the sensors installed in the station hardware). Many stations have
-only one history item, but some have several, reflecting changes of
+only one history item, but some have several, reflecting *small* changes of
 location or equipment.
 
 The distinction between station and history is often glossed over, but
