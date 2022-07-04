@@ -71,19 +71,12 @@ function Body() {
   const [stationsReload, setStationsReload] = useState(0);
 
   // Station filtering state and setters
-  const stationFiltering = useStationFiltering();
   const {
-    startDate,
-    endDate,
-    selectedNetworksOptions,
-    selectedVariablesOptions,
-    selectedFrequenciesOptions,
-    onlyWithClimatology,
-    networkActions,
-    variableActions,
-    frequencyActions,
-    isPending: stationFilteringIsPending
-  } = stationFiltering;
+    normal: filterValuesNormal,
+    transitional: filterValuesTransitional,
+    isPending: filteringIsPending,
+    setState: filterValuesSetState,
+  } = useStationFiltering();
 
   // Map polygon, used for selecting (not filtering) stations.
   const [area, setArea] = useState(undefined);
@@ -136,46 +129,38 @@ function Body() {
     // to export information (e.g., all its options) that it has set up
     // internally. In retrospect, this is a too-clever solution to the problem
     // of passing a pile of props around, but it's what we've got.
-    if (!networkActions || !variableActions || !frequencyActions) {
+    if (
+      !filterValuesNormal.networkActions
+      || !filterValuesNormal.variableActions
+      || !filterValuesNormal.frequencyActions
+    ) {
       return "#";
     }
 
     return dataDownloadTarget({
-      startDate,
-      endDate,
-      selectedNetworksOptions,
-      selectedVariablesOptions,
-      selectedFrequenciesOptions,
+      ...filterValuesNormal,
+      allNetworksOptions: filterValuesNormal.networkActions.getAllOptions(),
+      allVariablesOptions: filterValuesNormal.variableActions.getAllOptions(),
+      allFrequenciesOptions: filterValuesNormal.frequencyActions.getAllOptions(),
       polygon: area,
-      onlyWithClimatology,
-      allNetworksOptions: networkActions.getAllOptions(),
-      allVariablesOptions: variableActions.getAllOptions(),
-      allFrequenciesOptions: frequencyActions.getAllOptions(),
       dataCategory,
       clipToDate,
       dataFormat: fileFormat,
     });
   };
 
+  // The key to a responsive UI is here: station filtering and all updates
+  // based on it are done in a transition. The filter values state reflecting
+  // this is `filterValuesTransitional`, used here.
   const filteredStations = useMemo(
-    () => stationFilter(
-      startDate,
-      endDate,
-      selectedNetworksOptions,
-      selectedVariablesOptions,
-      selectedFrequenciesOptions,
-      onlyWithClimatology,
+    () => stationFilter({
+      ...filterValuesTransitional,
       allNetworks,
       allVariables,
       allStations,
-    ),
+    }),
     [
-      startDate,
-      endDate,
-      selectedNetworksOptions,
-      selectedVariablesOptions,
-      selectedFrequenciesOptions,
-      onlyWithClimatology,
+      filterValuesTransitional,
       allNetworks,
       allVariables,
       allStations,
@@ -204,7 +189,7 @@ function Body() {
               onSetArea={setArea}
               markerClusterOptions={uzeMarkercluster && markerClusterOptions}
               externalIsPending={
-                (allStations === null) || stationFilteringIsPending
+                (allStations === null) || filteringIsPending
               }
             />,
 
@@ -272,10 +257,11 @@ function Body() {
                       </Col>
                     </Row>
                     <StationFilters
+                      state={filterValuesNormal}
+                      setState={filterValuesSetState}
                       allNetworks={allNetworks}
                       allVariables={allVariables}
                       allFrequencies={allFrequencies}
-                      {...stationFiltering}
                       rowClasses={rowClasses}
                     />
                   </Tab>
@@ -303,9 +289,9 @@ function Body() {
                       <SelectionCriteria/>
                     </Row>
                     <UnselectedThings
-                      selectedNetworksOptions={selectedNetworksOptions}
-                      selectedVariablesOptions={selectedVariablesOptions}
-                      selectedFrequenciesOptions={selectedFrequenciesOptions}
+                      selectedNetworksOptions={filterValuesNormal.selectedNetworksOptions}
+                      selectedVariablesOptions={filterValuesNormal.selectedVariablesOptions}
+                      selectedFrequenciesOptions={filterValuesNormal.selectedFrequenciesOptions}
                     />
 
                     <StationData
