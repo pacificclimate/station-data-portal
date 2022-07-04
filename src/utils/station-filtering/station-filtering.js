@@ -163,20 +163,26 @@ export const stationInsideMultiPolygon = ft.timeThis("stationInsideMultiPolygon"
 });
 
 
-export const stationFilter = (
-  startDate, endDate, selectedNetworks, selectedVariables, selectedFrequencies,
-  onlyWithClimatology, allNetworks, allVariables, allStations
-) => {
+export const stationFilter = ({
+  startDate,
+  endDate,
+  selectedNetworksOptions,
+  selectedVariablesOptions,
+  selectedFrequenciesOptions,
+  onlyWithClimatology,
+  allVariables,
+  allStations,
+}) => {
   ft.resetAll();
   const selectedVariableIds = ft.timeThis("selectedVariableIds")(flow(
     map(selectedVariable => selectedVariable.contexts),
     flatten,
     map(context => context.id),
     uniq,
-  ))(selectedVariables);
+  ))(selectedVariablesOptions);
 
   const selectedFrequencyValues =
-    map(option => option.value)(selectedFrequencies);
+    map(option => option.value)(selectedFrequenciesOptions);
 
   const climatologyVariableIds = ft.timeThis("climatologyVariableIds")(
     flow(
@@ -187,7 +193,7 @@ export const stationFilter = (
 
   const r = filter(station => (
         stationMatchesDates(station, startDate, endDate, false)
-        && stationInAnyNetwork(station, selectedNetworks)
+        && stationInAnyNetwork(station, selectedNetworksOptions)
         && stationReportsSomeVariables(station, selectedVariableIds)
         && stationReportsAnyFreqs(station, selectedFrequencyValues)
         && (
