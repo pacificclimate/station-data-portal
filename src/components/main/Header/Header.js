@@ -2,6 +2,11 @@ import React, {Component} from 'react';
 import { Row, Col } from 'react-bootstrap';
 
 import './Header.css';
+import {
+  userDocsShowLink,
+  userDocsText,
+  userDocsUrl
+} from '../../../utils/configuration';
 
 class Header extends Component {
 
@@ -23,14 +28,13 @@ class Header extends Component {
                 </Col>
                 <Col lg={2} className='text-right'>
                   <p>Version: {process.env.REACT_APP_VERSION}</p>
-                  <p>
-                    <a
-                      href="https://data.pacificclimate.org/portal/docs/"
-                      target="_blank"
-                    >
-                      User Docs
-                    </a>
-                  </p>
+                  {userDocsShowLink && (
+                    <p>
+                      <a href={userDocsUrl} target="_blank">
+                        {userDocsText}
+                      </a>
+                    </p>
+                  )}
                 </Col>
             </Row>
         );
