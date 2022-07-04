@@ -21,10 +21,11 @@
 // complexity, and it places the state declarations right next to a key
 // consumer of them, the component `StationFilters`.
 
-import React, { useState, useTransition } from 'react';
+import React from 'react';
 
 import './StationFilters.css';
 import { Col, Row } from 'react-bootstrap';
+
 import NetworkSelector from '../../selectors/NetworkSelector';
 import VariableSelector from '../../selectors/VariableSelector';
 import FrequencySelector
@@ -33,89 +34,31 @@ import DateSelector from '../../selectors/DateSelector';
 import OnlyWithClimatologyControl
   from '../../controls/OnlyWithClimatologyControl';
 import { commonSelectorStyles } from '../../selectors/styles';
+import { usePairedImmerByKey } from '../../../hooks';
 
 export const useStationFiltering = () => {
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const [selectedNetworksOptions, setSelectedNetworksOptions] = useState([]);
-  const [networkActions, setNetworkActions] = useState(null);
-  const [selectedVariablesOptions, setSelectedVariablesOptions] = useState([]);
-  const [variableActions, setVariableActions] = useState(null);
-  const [selectedFrequenciesOptions, setSelectedFrequenciesOptions] = useState([]);
-  const [frequencyActions, setFrequencyActions] = useState(null);
-  const [onlyWithClimatology, setOnlyWithClimatology] = useState(false);
-  const toggleOnlyWithClimatology = () =>
-    setOnlyWithClimatology(!onlyWithClimatology);
-  // TODO: Remove? Not presently used, but there is commented out code
-  //  in StationFilters that uses these.
-  // const handleClickAll = () => {
-  //   networkActions.selectAll();
-  //   variableActions.selectAll();
-  //   frequencyActions.selectAll();
-  // };
-  // const handleClickNone = () => {
-  //   networkActions.selectNone();
-  //   variableActions.selectNone();
-  //   frequencyActions.selectNone();
-  // };
-
-  // Define a transition such that updates to the filtering parameters are
-  // marked as lower priority.
-  const [isPending, startTransition] = useTransition();
-
-  // This function wraps a setter in a transition. Evidently it is OK to wrap
-  // different, independently-called setters in the same transition.
-  const handleAsTransition = setter => value => {
-    startTransition(() => setter(value));
-  };
-
-  return {
-    startDate,
-    setStartDate: handleAsTransition(setStartDate),
-    endDate,
-    setEndDate: handleAsTransition(setEndDate),
-    selectedNetworksOptions,
-    setSelectedNetworksOptions: handleAsTransition(setSelectedNetworksOptions),
-    networkActions,
-    setNetworkActions,
-    selectedVariablesOptions,
-    setSelectedVariablesOptions:
-      handleAsTransition(setSelectedVariablesOptions),
-    variableActions,
-    setVariableActions,
-    selectedFrequenciesOptions,
-    setSelectedFrequenciesOptions:
-      handleAsTransition(setSelectedFrequenciesOptions),
-    frequencyActions,
-    setFrequencyActions,
-    onlyWithClimatology,
-    toggleOnlyWithClimatology: handleAsTransition(toggleOnlyWithClimatology),
-    isPending,
-  };
+  const { normal, transitional, isPending, setState } = usePairedImmerByKey({
+    startDate: null,
+    endDate: null,
+    selectedNetworksOptions: [],
+    networkActions: null,
+    selectedVariablesOptions: [],
+    variableActions: null,
+    selectedFrequenciesOptions: [],
+    frequencyActions: null,
+    onlyWithClimatology: false,
+  });
+  setState.toggleOnlyWithClimatology = () =>
+    setState.onlyWithClimatology(!normal.onlyWithClimatology);
+  return { normal, transitional, isPending, setState };
 };
 
 function StationFilters({
-  startDate,
-  setStartDate,
-  endDate,
-  setEndDate,
+  state,
+  setState,
   allNetworks,
-  selectedNetworksOptions,
-  setSelectedNetworksOptions,
-  networkActions,
-  setNetworkActions,
   allVariables,
-  selectedVariablesOptions,
-  setSelectedVariablesOptions,
-  variableActions,
-  setVariableActions,
   allFrequencies,
-  selectedFrequenciesOptions,
-  setSelectedFrequenciesOptions,
-  frequencyActions,
-  setFrequencyActions,
-  onlyWithClimatology,
-  toggleOnlyWithClimatology,
   rowClasses = { className: "mb-3" },
 }) {
   return (
@@ -125,15 +68,15 @@ function StationFilters({
           {/*<Button size={'sm'} onClick={handleClickAll}>Select all criteria</Button>*/}
           {/*<Button size={'sm'} onClick={handleClickNone}>Clear all criteria</Button>*/}
           <DateSelector
-            value={startDate}
-            onChange={setStartDate}
+            value={state.startDate}
+            onChange={setState.startDate}
             label={'Start Date'}
           />
         </Col>
         <Col lg={6} md={6} sm={6}>
           <DateSelector
-            value={endDate}
-            onChange={setEndDate}
+            value={state.endDate}
+            onChange={setState.endDate}
             label={'End Date'}
           />
         </Col>
@@ -141,8 +84,8 @@ function StationFilters({
       <Row {...rowClasses}>
         <Col lg={12} md={12} sm={12}>
           <OnlyWithClimatologyControl
-            value={onlyWithClimatology}
-            onChange={toggleOnlyWithClimatology}
+            value={state.onlyWithClimatology}
+            onChange={setState.toggleOnlyWithClimatology}
           />
         </Col>
       </Row>
@@ -150,9 +93,9 @@ function StationFilters({
         <Col lg={12} md={12} sm={12}>
           <NetworkSelector
             allNetworks={allNetworks}
-            onReady={setNetworkActions}
-            value={selectedNetworksOptions}
-            onChange={setSelectedNetworksOptions}
+            onReady={setState.networkActions}
+            value={state.selectedNetworksOptions}
+            onChange={setState.selectedNetworksOptions}
             isSearchable
             isClearable={false}
             styles={commonSelectorStyles}
@@ -164,9 +107,9 @@ function StationFilters({
         <Col lg={12} md={12} sm={12}>
           <VariableSelector
             allVariables={allVariables}
-            onReady={setVariableActions}
-            value={selectedVariablesOptions}
-            onChange={setSelectedVariablesOptions}
+            onReady={setState.variableActions}
+            value={state.selectedVariablesOptions}
+            onChange={setState.selectedVariablesOptions}
             isSearchable
             isClearable={false}
             styles={commonSelectorStyles}
@@ -178,9 +121,9 @@ function StationFilters({
         <Col lg={12} md={12} sm={12}>
           <FrequencySelector
             allFrequencies={allFrequencies}
-            onReady={setFrequencyActions}
-            value={selectedFrequenciesOptions}
-            onChange={setSelectedFrequenciesOptions}
+            onReady={setState.frequencyActions}
+            value={state.selectedFrequenciesOptions}
+            onChange={setState.selectedFrequenciesOptions}
             isClearable={false}
             styles={commonSelectorStyles}
           />

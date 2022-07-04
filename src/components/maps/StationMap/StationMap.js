@@ -39,7 +39,6 @@
 
 import PropTypes from 'prop-types';
 import React, {
-  useDeferredValue,
   useEffect,
   useMemo,
   useRef,
@@ -85,11 +84,6 @@ function StationMap({
   // should be true if and only if slow updates to the map are pending
   // due to an external update.
 }) {
-  // TODO: It's possible that raising this deferral up to Body, so that
-  //  filtering is deferred, would make an even greater improvement in UI
-  //  responsiveness.
-  const deferredStations = useDeferredValue(stations);
-
   const userShapeLayerRef = useRef();
 
   // TODO: Remove
@@ -139,21 +133,19 @@ function StationMap({
   smtimer.log();
   smtimer.resetAll();
 
-  // Make the markers dependent on `deferredStations`, so that updating them
-  // is lower priority than other updates (e.g., the filter controls).
-  //
-  // Splitting the `deferredStations` memoization into two steps, markers and
+  // Splitting the `stations` memoization into two steps, markers and
   // layer group, seems to provide a more responsive UI. It's not clear why.
+  // Or I might just be seeing ghosts.
 
   const markers = useMemo(() =>
     <ManyStationMarkers
-      stations={deferredStations}
+      stations={stations}
       allNetworks={allNetworks}
       allVariables={allVariables}
       markerOptions={markerOptions}
       mapEvents={markerMapEvents}
     />,
-    [deferredStations, markerOptions]
+    [stations, markerOptions]
   );
 
   const markerLayerGroup = useMemo(() =>
