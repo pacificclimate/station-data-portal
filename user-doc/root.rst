@@ -20,6 +20,8 @@ region of interest, learn about the stations that are there, filter the
 displayed stations based on observation date, weather element, observing
 agency, spatial location, and more.
 
+.. figure:: ./images/app.png
+
 Starting the Meteorological Data Portal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

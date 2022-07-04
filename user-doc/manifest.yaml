@@ -1,5 +1,6 @@
 - root.rst
 - images:
+    - app.png
     - column-width-controls.png
     - info-icon.png
     - map-drawing-controls.png
