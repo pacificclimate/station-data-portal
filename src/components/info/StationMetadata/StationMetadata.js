@@ -377,8 +377,6 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
     [stations, compact],
   );
 
-  const buttonProps = { size: "sm", variant: "primary" };
-
   // Note: Download button is rendered here because it uses `columnInfo` to
   // control what it does. We consider it an adjunct to the table.
   return (
@@ -395,7 +393,8 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
             [false, true].map(value => (
               <ToggleButton
                 id={`stn-md-compact-${value.toString()}`}
-                {...buttonProps}
+                size={"sm"}
+                variant={"outline-dark"}
                 value={value}
               >
                 By {value ? "Station" : "History"}
