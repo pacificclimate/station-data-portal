@@ -68,16 +68,18 @@ function StationFilters({
           {/*<Button size={'sm'} onClick={handleClickAll}>Select all criteria</Button>*/}
           {/*<Button size={'sm'} onClick={handleClickNone}>Clear all criteria</Button>*/}
           <DateSelector
+            label={'Start Date'}
             value={state.startDate}
             onChange={setState.startDate}
-            label={'Start Date'}
+            maxDate={state.endDate}
           />
         </Col>
         <Col lg={6} md={6} sm={6}>
           <DateSelector
+            label={'End Date'}
             value={state.endDate}
             onChange={setState.endDate}
-            label={'End Date'}
+            minDate={state.startDate}
           />
         </Col>
       </Row>
