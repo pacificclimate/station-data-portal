@@ -2,6 +2,11 @@ import React, {Component} from 'react';
 import { Row, Col } from 'react-bootstrap';
 
 import './Header.css';
+import {
+  userDocsShowLink,
+  userDocsText,
+  userDocsUrl
+} from '../../../utils/configuration';
 
 class Header extends Component {
 
@@ -22,7 +27,14 @@ class Header extends Component {
                     <h1>{process.env.REACT_APP_TITLE}</h1>
                 </Col>
                 <Col lg={2} className='text-right'>
-                  <small>Version: {process.env.REACT_APP_VERSION}</small>
+                  <p>Version: {process.env.REACT_APP_VERSION}</p>
+                  {userDocsShowLink && (
+                    <p>
+                      <a href={userDocsUrl} target="_blank">
+                        {userDocsText}
+                      </a>
+                    </p>
+                  )}
                 </Col>
             </Row>
         );

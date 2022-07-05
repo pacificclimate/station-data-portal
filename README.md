@@ -6,13 +6,14 @@ data from a
 
 ## Documentation
 
-- [Functionality](docs/functionality.md)
-- [Dependencies](docs/dependencies.md)
-- [Installation](docs/installation.md)
-- [Configuration](docs/configuration.md)
-- [Development and testing](docs/development.md)
-- [Production](docs/production.md)
-- [Project initialization](docs/Project-initialization.md)
+- [Functionality](docs/developer/functionality.md)
+- [Dependencies](docs/developer/dependencies.md)
+- [Installation](docs/developer/installation.md)
+- [Configuration](docs/developer/configuration.md)
+- [Development and testing](docs/developer/development.md)
+- [Production](docs/developer/production.md)
+- [User documentation](docs/developer/user-doc.md)
+- [Project initialization](docs/developer/Project-initialization.md)
 
 ## Releasing
 
@@ -28,3 +29,8 @@ git commit -m"Bump to version x.x.x"
 git tag -a -m"x.x.x" x.x.x
 git push --follow-tags
   ```
+
+**Note**: When a new release of this portal is deployed, also create a new 
+release of the PDP and deploy it. This will cause the updated documentation 
+for this portal to be included in the PDP
+documentation. For more details, see [User documentation](docs/developer/user-doc.md).

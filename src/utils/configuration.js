@@ -6,6 +6,8 @@ import split from 'lodash/fp/split';
 import map from 'lodash/fp/map';
 import toNumber from 'lodash/fp/toNumber';
 
+console.log("### process.env", process.env)
+
 const strToBool = value => "true".startsWith((value ?? "").toLowerCase());
 
 export const configString = (name, deflt = "") =>
@@ -14,6 +16,14 @@ export const configString = (name, deflt = "") =>
 export const configBool = (...args) => strToBool(configString(...args));
 
 export const configNumber = (...args) => toNumber(configString(...args));
+
+export const userDocsShowLink = configBool("USER_DOCS_SHOW_LINK", "false");
+export const userDocsUrl = configString(
+  "USER_DOCS_URL", "https://data.pacificclimate.org/portal/docs/"
+);
+export const userDocsText = configString(
+  "USER_DOCS_TEXT", "User Docs"
+);
 
 export const lethargyEnabled = configBool("LETHARGY_ENABLED");
 export const lethargyStability = configNumber("LETHARGY_STABILITY", "7");
