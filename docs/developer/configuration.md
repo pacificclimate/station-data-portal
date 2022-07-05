@@ -62,6 +62,28 @@ For production runs, environment variables are provided by
 - URL template (includes x, y, z) for YNWT base map tiles.
 - Required if `REACT_APP_BASE_MAP=YNWT`
 
+### User docs link config
+
+`REACT_APP_USER_DOCS_SHOW_LINK`
+- Show user docs hyperlink? Don't want to until they are built on PDP.
+- String rep of boolean.
+- Default: false
+
+`REACT_APP_USER_DOCS_URL`
+- URL for user docs hyperlink
+- Default: https://data.pacificclimate.org/portal/docs/
+
+`REACT_APP_USER_DOCS_TEXT`
+- Text for user docs hyperlink
+- Default: User Docs
+
+### Default tab
+
+`REACT_APP_DEFAULT_TAB`
+- Default tab in UI
+- Valid values: Clustering | Filters | Metadata | Data | Networks
+- Default: Filters
+
 ### Metadata request options
 
 `REACT_APP_STATIONS_QP_PROVINCES`
@@ -70,7 +92,7 @@ to `/stations`.
 - Value: Comma-separated list of province codes (e.g., `BC,AB`)
 - Optional.
 
-# Client-side station filtering options
+### Client-side station filtering options
 
 `REACT_APP_STATION_FILTERS`
 - Semicolon-separated set of filter expressions applied to filter 
