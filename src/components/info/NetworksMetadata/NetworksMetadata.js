@@ -9,12 +9,16 @@ import { useTable } from 'react-table';
 import logger from '../../../logger';
 import chroma from 'chroma-js';
 import './NetworksMetadata.css';
+import { config } from '../../../utils/configuration';
 
 
 logger.configure({ active: true });
 
 
-function NetworksMetadata({ networks, defaultNetworkColor }) {
+function NetworksMetadata({
+  networks,
+  defaultNetworkColor = config.defaultNetworkColor,
+}) {
   const columns = React.useMemo(() => [
     {
       id: 'Colour',
@@ -115,10 +119,5 @@ NetworksMetadata.propTypes = {
   networks: PropTypes.array,
   defaultNetworkColor: PropTypes.string,
 };
-
-NetworksMetadata.defaultProps = {
-  defaultNetworkColor:
-    process.env.REACT_APP_DEFAULT_NETWORK_COLOR ?? '#000000',
-}
 
 export default NetworksMetadata;

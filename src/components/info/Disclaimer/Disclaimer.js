@@ -1,18 +1,13 @@
 import React, { useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import './Disclaimer.css';
-import { configBool, configString } from '../../../utils/configuration';
+import { config } from '../../../utils/configuration';
 
 
-const disclaimerEnabled = configBool("DISCLAIMER_ENABLED")
-const disclaimerTitle = configString("DISCLAIMER_TITLE", "Disclaimer Title")
-const disclaimerBody = configString("DISCLAIMER_BODY", "Disclaimer body ...")
-const disclaimerButtonLabel =
-  configString("DISCLAIMER_BUTTON_LABEL", "Acknowledge")
 
 
 function Disclaimer() {
-  const [acknowledged, setAcknowledged] = useState(!disclaimerEnabled);
+  const [acknowledged, setAcknowledged] = useState(!config.disclaimerEnabled);
   const acknowledge = () => setAcknowledged(true);
 
   return (
@@ -23,12 +18,12 @@ function Disclaimer() {
       style={{ zIndex: 2000 }}
     >
       <Modal.Header>
-        <Modal.Title>{disclaimerTitle}</Modal.Title>
+        <Modal.Title>{config.disclaimerTitle}</Modal.Title>
       </Modal.Header>
-      <Modal.Body>{disclaimerBody}</Modal.Body>
+      <Modal.Body>{config.disclaimerBody}</Modal.Body>
       <Modal.Footer>
         <Button bsStyle={"primary"} onClick={acknowledge}>
-          {disclaimerButtonLabel}
+          {config.disclaimerButtonLabel}
         </Button>
       </Modal.Footer>
     </Modal>

@@ -5,17 +5,17 @@ import Disclaimer from '../../info/Disclaimer';
 import Header from '../Header/Header';
 import Body from '../Body';
 import { setLethargicMapScrolling } from '../../../utils/leaflet-extensions';
-import {
-  lethargyEnabled, lethargyStability, lethargySensitivity, lethargyTolerance
-} from '../../../utils/configuration';
+import { config } from '../../../utils/configuration';
 
 import './App.css';
 
 export default function App() {
   useEffect(() => {
-    if (lethargyEnabled) {
+    if (config.lethargyEnabled) {
       setLethargicMapScrolling(
-        lethargyStability, lethargySensitivity, lethargyTolerance
+        config.lethargyStability,
+        config.lethargySensitivity,
+        config.lethargyTolerance,
       );
     }
   }, []);

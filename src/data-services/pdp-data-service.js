@@ -11,6 +11,7 @@ import padCharsStart from 'lodash/fp/padCharsStart';
 import tap from 'lodash/fp/tap';
 import uniq from 'lodash/fp/uniq';
 import { geoJSON2WKT } from '../utils/geographic-encodings';
+import { config } from '../utils/configuration';
 
 
 const pad2 = padCharsStart('0', 2);
@@ -108,7 +109,7 @@ export const dataDownloadTarget =
     allFrequenciesOptions = [],
   }) =>
   makeURI(
-    `${process.env.REACT_APP_PDP_DATA_URL}/pcds/agg/`,
+    `${config.pdpDataUrl}/pcds/agg/`,
     assignAll([
       {
         'from-date': date2pdpFormat(startDate),
@@ -134,4 +135,3 @@ export const dataDownloadTarget =
 export const dataDownloadFilename = ({ dataCategory, fileFormat }) => {
   return `${{ dataCategory, fileFormat }}.${get('value', fileFormat)}`;
 }
-

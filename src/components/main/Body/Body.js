@@ -41,11 +41,7 @@ import StationFilters, { useStationFiltering }
   from '../../controls/StationFilters';
 import JSONstringify from '../../util/JSONstringify';
 import baseMaps from '../../maps/baseMaps';
-import {
-  markerClusteringAvailable,
-  showReloadStationsButton,
-  stationDebugFetchOptions,
-} from '../../../utils/configuration';
+import { config } from '../../../utils/configuration';
 
 
 logger.configure({ active: true });
@@ -83,7 +79,7 @@ function Body() {
 
   // Marker clustering option controls.
   const [uzeMarkercluster, toggleUzeMarkercluster] =
-    useBooleanStateWithToggler(markerClusteringAvailable);
+    useBooleanStateWithToggler(config.markerClusteringAvailable);
   const [markerClusterOptions, setMarkerClusterOptions] =
     useMarkerClusterOptions({
       removeOutsideVisibleBounds: true,
@@ -113,7 +109,7 @@ function Body() {
     setAllStations(null)
     getStations({
       compact: true,
-      ...(stationDebugFetchOptions && { limit: stnsLimit.value } )
+      ...(config.stationDebugFetchOptions && { limit: stnsLimit.value } )
     })
       .then(tap(() => console.log("### stations loaded")))
       .then(response => setAllStations(response.data));
@@ -182,7 +178,7 @@ function Body() {
           contents={[
             // "map" ||  // Uncomment to suppress map
             <StationMap
-              {...baseMaps[process.env.REACT_APP_BASE_MAP]}
+              {...baseMaps[config.baseMap]}
               stations={filteredStations}
               allNetworks={allNetworks}
               allVariables={allVariables}
@@ -195,19 +191,17 @@ function Body() {
 
             <Card style={{ marginLeft: '-15px', marginRight: '-10px' }}>
               <Card.Body>
-                { showReloadStationsButton && (
+                { config.showReloadStationsButton && (
                   <Button onClick={reloadStations}>
                     Reload stations
                   </Button>
                 )}
                 <Tabs
                   id="non-map-controls"
-                  defaultActiveKey={
-                    process.env.REACT_APP_DEFAULT_TAB ?? "Filters"
-                  }
+                  defaultActiveKey={config.defaultTab}
                   className={css.mainTabs}
                 >
-                  { markerClusteringAvailable && (
+                  { config.markerClusteringAvailable && (
                     <Tab
                       eventKey={'Clustering'}
                       title={`Marker Clustering (${uzeMarkercluster ? "on": "off"})`}
@@ -233,7 +227,7 @@ function Body() {
                   )}
 
                   <Tab eventKey={'Filters'} title={'Station Filters'}>
-                    {stationDebugFetchOptions && (
+                    {config.stationDebugFetchOptions && (
                       <Row>
                         <Col lg={6}>Fetch limit</Col>
                         <Col lg={6}>

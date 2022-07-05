@@ -19,6 +19,7 @@ import {
   uniqStationObsPeriods,
   uniqStationVariableNames,
 } from '../../../utils/station-info';
+import { config } from '../../../utils/configuration';
 
 logger.configure({ active: true });
 
@@ -27,7 +28,10 @@ const formatDate = d => d ? d.toISOString().substr(0,10) : 'unknown';
 
 
 function StationPopup({
-  station, allNetworks, allVariables, defaultNetworkColor
+  station,
+  defaultNetworkColor = config.defaultNetworkColor,
+  allNetworks,
+  allVariables,
 }) {
   const network = stationNetwork(allNetworks, station);
   const networkColor =
@@ -141,10 +145,5 @@ StationPopup.propTypes = {
   allVariables: PropTypes.array.isRequired,
   defaultNetworkColor: PropTypes.string,
 };
-
-StationPopup.defaultProps = {
-  defaultNetworkColor:
-    process.env.REACT_APP_DEFAULT_NETWORK_COLOR ?? '#000000',
-}
 
 export default StationPopup;

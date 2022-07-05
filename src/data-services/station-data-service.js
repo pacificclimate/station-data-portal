@@ -1,8 +1,5 @@
 import axios from 'axios';
 import urljoin from 'url-join';
-import flow from 'lodash/fp/flow';
-import getOr from 'lodash/fp/getOr';
-import isFinite from 'lodash/fp/isFinite';
 import isString from 'lodash/fp/isString';
 import tap from 'lodash/fp/tap';
 import { mapDeep } from '../utils/fp';
@@ -11,9 +8,7 @@ import {
   filterPredicate
 } from './filtering';
 import filter from 'lodash/fp/filter';
-
-const SDS_URL = process.env.REACT_APP_SDS_URL;
-
+import { config as appConfig } from '../utils/configuration';
 
 // Regex for ISO 8601 date strings; allows YYYY-MM-DD with optional T spec.
 // Now you've got two problems :)
@@ -31,8 +26,7 @@ function transformIso8601Date(value) {
 
 
 const parsedNetworkFilterExpressions =
-  filterExpressionsParser(process.env.REACT_APP_NETWORK_FILTERS ?? '');
-
+  filterExpressionsParser(appConfig.networkFilters);
 
 const filterNetworks =
   filter(filterPredicate(parsedNetworkFilterExpressions));
@@ -40,7 +34,7 @@ const filterNetworks =
 
 export function getNetworks() {
   return axios.get(
-    urljoin(SDS_URL, 'networks'),
+    urljoin(appConfig.sdsUrl, 'networks'),
     {
       transformResponse: axios.defaults.transformResponse.concat(
         filterNetworks,
@@ -51,31 +45,22 @@ export function getNetworks() {
 
 
 export function getVariables() {
-  return axios.get(urljoin(SDS_URL, 'variables'));
+  return axios.get(urljoin(appConfig.sdsUrl, 'variables'));
 }
 
 
 export function getFrequencies() {
-  return axios.get(urljoin(SDS_URL, 'frequencies'));
+  return axios.get(urljoin(appConfig.sdsUrl, 'frequencies'));
 }
 
 
 export function getHistories() {
-  return axios.get(urljoin(SDS_URL, 'histories'));
+  return axios.get(urljoin(appConfig.sdsUrl, 'histories'));
 }
 
 
-const envVarNumber = (name, fallback) =>
-  flow(
-    getOr(fallback, name),
-    string => +string,
-    value => isFinite(value) ? value : fallback,
-  )(process.env);
-
-
 const parsedStationFilterExpressions =
-  filterExpressionsParser(process.env.REACT_APP_STATION_FILTERS ?? '');
-
+  filterExpressionsParser(appConfig.stationFilters);
 
 const filterStations =
   filter(filterPredicate(parsedStationFilterExpressions));
@@ -83,13 +68,13 @@ const filterStations =
 
 export function getStations(params, config) {
   return axios.get(
-    urljoin(SDS_URL, 'stations'),
+    urljoin(appConfig.sdsUrl, 'stations'),
     {
       params: {
-        offset: envVarNumber('REACT_APP_STATION_OFFSET', undefined),
-        limit: envVarNumber('REACT_APP_STATION_LIMIT', undefined),
-        stride: envVarNumber('REACT_APP_STATION_STRIDE', undefined),
-        provinces: process.env.REACT_APP_STATIONS_QP_PROVINCES,
+        offset: appConfig.stationOffset,
+        limit: appConfig.stationLimit,
+        stride: appConfig.stationStride,
+        provinces: appConfig.stationsQpProvinces,
         ...params,
       },
       transformResponse: axios.defaults.transformResponse.concat(
@@ -105,7 +90,7 @@ export function getStations(params, config) {
 
 export function getObservationCounts(config) {
   return axios.get(
-    urljoin(SDS_URL, 'observations', 'counts'),
+    urljoin(appConfig.sdsUrl, 'observations', 'counts'),
     config,
   );
 }

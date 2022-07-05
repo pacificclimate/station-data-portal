@@ -1,72 +1,79 @@
 // This module provides configuration values for consumption throughout
 // the app. Currently, config values are defined only by env vars.
 
+import isNil from 'lodash/fp/isNil';
 import flow from 'lodash/fp/flow';
-import split from 'lodash/fp/split';
 import map from 'lodash/fp/map';
+import fromPairs from 'lodash/fp/fromPairs';
+import toPairs from 'lodash/fp/toPairs';
 import toNumber from 'lodash/fp/toNumber';
+const strToBool = value => "true".startsWith(value.toLowerCase());
 
 console.log("### process.env", process.env)
 
-const strToBool = value => "true".startsWith((value ?? "").toLowerCase());
+// Utility functions
 
-export const configString = (name, deflt = "") =>
-  (process.env[`REACT_APP_${name}`] || deflt);
+const getEnvVar = (name, prefix = "REACT_APP_") =>
+  process.env[`${prefix}${name}`];
 
-export const configBool = (...args) => strToBool(configString(...args));
-
-export const configNumber = (...args) => toNumber(configString(...args));
-
-export const userDocsShowLink = configBool("USER_DOCS_SHOW_LINK", "false");
-export const userDocsUrl = configString(
-  "USER_DOCS_URL", "https://data.pacificclimate.org/portal/docs/"
-);
-export const userDocsText = configString(
-  "USER_DOCS_TEXT", "User Docs"
-);
-
-export const lethargyEnabled = configBool("LETHARGY_ENABLED");
-export const lethargyStability = configNumber("LETHARGY_STABILITY", "7");
-export const lethargySensitivity = configNumber("LETHARGY_SENSITIVITY", "50");
-export const lethargyTolerance = configNumber("LETHARGY_TOLERANCE", "0.05");
-
-export const stationDebugFetchOptions =
-  configBool("DEBUG_STATION_FETCH_OPTIONS");
-
-export const markerClusteringAvailable =
-  configBool("MARKER_CLUSTERING_AVAILABLE");
-
-export const showReloadStationsButton =
-  configBool("SHOW_RELOAD_STATIONS_BUTTON");
-
-
-// Convert zoomToMarkerRadius string value to nested array.
-let zoomToMarkerRadiusSpec = [
-  [7, 10], [99, 4],
-];
-try {
-  zoomToMarkerRadiusSpec = flow(
-    split(";"),
-    map(
-      flow(
-        split(","),
-        map(s => {
-          const n = +s;
-          if (isNaN(n)) {
-            throw `'${s}' is not a number`;
-          }
-          return n;
-        }),
-      )
-    ),
-  )(configString("ZOOM_TO_MARKER_RADIUS", "7,2;99,4"));
-} catch (e) {
-  console.error(
-    `Error: ZOOM_TO_MARKER_RADIUS value '${configString("ZOOM_TO_MARKER_RADIUS")}' not valid: ${e}`
-  )
+const makeConfig = convert => (name, deflt) => {
+  const val = getEnvVar(name);
+  return isNil(val) ? deflt : convert(val);
 }
-export { zoomToMarkerRadiusSpec };  // Probably not necessary.
 
+export const configString = makeConfig(v => v);
+export const configBool = makeConfig(strToBool);
+export const configNumber = makeConfig(toNumber);
+export const configJson = makeConfig(JSON.parse);
+
+const camelToSnakeCase = str =>
+  str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+
+const getConfigValues = flow(
+  toPairs,
+  map(([key, [convert, deflt]]) =>
+    [key, convert(camelToSnakeCase(key).toUpperCase(), deflt)]),
+  fromPairs,
+);
+
+
+// Configuration values
+
+export const config = getConfigValues({
+  defaultNetworkColor: [configString, "#000000"],
+  baseMap: [configString, "BC"],
+  defaultTab: [configString, "Filters"],
+  appTitle: [configString, ""],
+  appVersion: [configString, ""],
+  pdpDataUrl: [configString, ""],
+  sdsUrl: [configString, ""],
+  networkFilters: [configString, ""],
+  stationFilters: [configString, ""],
+  stationOffset: [configNumber, undefined],
+  stationLimit: [configNumber, undefined],
+  stationStride: [configNumber, undefined],
+  stationsQpProvinces: [configString, undefined],
+  userDocsShowLink: [configBool, false],
+  userDocsUrl: [configString, "https://data.pacificclimate.org/portal/docs/"],
+  userDocsText: [configString, "User Docs"],
+  lethargyEnabled: [configBool, false],
+  lethargyStability: [configNumber, 7],
+  lethargySensitivity: [configNumber, 50],
+  lethargyTolerance: [configNumber, 0.05],
+  disclaimerEnabled: [configBool, false],
+  disclaimerTitle: [configString, "Disclaimer Title"],
+  disclaimerBody: [configString, "Disclaimer body ..."],
+  disclaimerButtonLabel: [configString, "Acknowledge"],
+  stationDebugFetchOptions: [configBool, false],
+  markerClusteringAvailable: [configBool, false],
+  showReloadStationsButton: [configBool, false],
+  timingEnabled: [configBool, false],
+});
+// console.log("### config", config)
+
+const zoomToMarkerRadiusSpec = configJson(
+  "ZOOM_TO_MARKER_RADIUS", [ [7,2], [99,4] ]
+)
 // Convert a zoom level to a marker radius according to zoomToMarkerRadiusSpec,
 // which is an array of pairs of [zoom, radius] values, in ascending order of
 // zoom. This value is set from an env var.
