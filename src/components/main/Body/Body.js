@@ -46,15 +46,6 @@ import { config } from '../../../utils/configuration';
 
 logger.configure({ active: true });
 
-const defaultLgs = [7, 5];
-
-// TODO: Place elsewhere
-const stnsLimitOptions =
-  [100, 500, 1000, 2000, 4000, 8000].map(value => ({
-    value, label: value.toString()
-  }));
-
-
 function Body() {
   // Metadata fetched from backend
   const [allNetworks, setAllNetworks] = useState(null);
@@ -63,7 +54,9 @@ function Body() {
   const [allStations, setAllStations] = useState(null);
 
   // Support for development tools
-  const [stnsLimit, setStnsLimit] = useState(stnsLimitOptions[0]);
+  const [stnsLimit, setStnsLimit] = useState(
+    config.stationDebugFetchLimitsOptions[0]
+  );
   const [stationsReload, setStationsReload] = useState(0);
 
   // Station filtering state and setters
@@ -149,7 +142,7 @@ function Body() {
     <div className={css.portal}>
       <Row>
         <AdjustableColumns
-          defaultLgs={defaultLgs}
+          defaultLgs={config.adjustableColumnWidthsDefault}
           contents={[
             // "map" ||  // Uncomment to suppress map
             <StationMap
@@ -207,7 +200,7 @@ function Body() {
                         <Col lg={6}>Fetch limit</Col>
                         <Col lg={6}>
                           <Select
-                            options={stnsLimitOptions}
+                            options={config.stationDebugFetchLimitsOptions}
                             value={stnsLimit}
                             onChange={setStnsLimit}
                           />

@@ -9,7 +9,7 @@ import toPairs from 'lodash/fp/toPairs';
 import toNumber from 'lodash/fp/toNumber';
 const strToBool = value => "true".startsWith(value.toLowerCase());
 
-console.log("### process.env", process.env)
+// console.log("### process.env", process.env)
 
 // Utility functions
 
@@ -47,16 +47,17 @@ const getConfigValues = flow(
 // Configuration values
 
 export const config = getConfigValues({
-  defaultNetworkColor: [configString, "#000000"],
-  baseMap: [configString, "BC"],
-  defaultTab: [configString, "Filters"],
   appTitle: [configString, ""],
   appVersion: [configString, ""],
+  adjustableColumnWidthsDefault: [configJson, [7, 5]],
+  defaultTab: [configString, "Filters"],
   pdpDataUrl: [configString, ""],
   sdsUrl: [configString, ""],
   networkFilters: [configString, ""],
   stationFilters: [configString, ""],
   stationsQpProvinces: [configString, undefined],
+  baseMap: [configString, "BC"],
+  defaultNetworkColor: [configString, "#000000"],
   userDocsShowLink: [configBool, false],
   userDocsUrl: [configString, "https://data.pacificclimate.org/portal/docs/"],
   userDocsText: [configString, "User Docs"],
@@ -77,6 +78,7 @@ export const config = getConfigValues({
     fill: "lightgray",
   }],
   stationDebugFetchOptions: [configBool, false],
+  stationDebugFetchLimits: [configJson, [100, 500, 1000, 2000, 4000, 8000]],
   stationOffset: [configNumber, undefined],
   stationLimit: [configNumber, undefined],
   stationStride: [configNumber, undefined],
@@ -84,7 +86,12 @@ export const config = getConfigValues({
   showReloadStationsButton: [configBool, false],
   timingEnabled: [configBool, false],
 });
-// console.log("### config", config)
+
+config.stationDebugFetchLimitsOptions = config.stationDebugFetchLimits.map(
+  value => ({ value, label: value.toString() })
+);
+
+console.log("### config", config)
 
 const zoomToMarkerRadiusSpec = configJson(
   "ZOOM_TO_MARKER_RADIUS", [ [7,2], [99,4] ]
