@@ -39,7 +39,6 @@
 
 import PropTypes from 'prop-types';
 import React, {
-  useEffect,
   useMemo,
   useRef,
   useTransition
@@ -48,7 +47,6 @@ import React, {
 import { FeatureGroup, LayerGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
 import MarkerCluster from '../MarkerCluster';
-import L from 'leaflet';
 
 import MapInfoDisplay from '../MapInfoDisplay';
 import { defaultMarkerOptions, ManyStationMarkers } from '../StationMarkers';
@@ -88,22 +86,6 @@ function StationMap({
 
   // TODO: Remove
   // const [geometryLayers, setGeometryLayers] = useState([]);
-
-  // Set up drawing tool. This might be better done elsewhere.
-  useEffect(() => {
-    // console.log("### L.drawLocal.draw", L.drawLocal.draw)
-    L.drawLocal.edit.toolbar.buttons = {
-      edit: "Edit shapes",
-      editDisabled: "No shapes to edit",
-      remove: "Remove shapes",
-      removeDisabled: "No shapes to remove",
-    };
-    L.drawLocal.edit.handlers.remove.tooltip = "Click shape to remove";
-    L.drawLocal.edit.toolbar.actions.clearAll = {
-      title: "Remove all shapes",
-      text: "Remove all",
-    };
-  }, []);
 
   const handleChangedGeometryLayers = () => {
     const layers = userShapeLayerRef?.current?.getLayers();
