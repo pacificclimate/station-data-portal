@@ -24,7 +24,14 @@ const makeConfig = convert => (name, deflt) => {
 export const configString = makeConfig(v => v);
 export const configBool = makeConfig(strToBool);
 export const configNumber = makeConfig(toNumber);
-export const configJson = makeConfig(JSON.parse);
+export const configJson = makeConfig(v => {
+  try {
+    return JSON.parse(v);
+  } catch (e) {
+    console.error("Error parsing JSON from config variable", e);
+    return undefined;
+  }
+});
 
 const camelToSnakeCase = str =>
   str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
