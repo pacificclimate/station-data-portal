@@ -92,45 +92,73 @@ export const frequencyOptions2pdpFormat = (options, allOptions) => flow(
 )(options);
 
 
-export const dataDownloadTarget =
-  ({
-    startDate,
-    endDate,
-    selectedNetworksOptions,
-    selectedVariablesOptions,
-    selectedFrequenciesOptions,
-    polygon,
-    clipToDate,
-    onlyWithClimatology,
-    dataCategory,
-    dataFormat,
-    allNetworksOptions = [],
-    allVariablesOptions = [],
-    allFrequenciesOptions = [],
-  }) =>
-  makeURI(
-    `${config.pdpDataUrl}/pcds/agg/`,
-    assignAll([
-      {
-        'from-date': date2pdpFormat(startDate),
-        'to-date': date2pdpFormat(endDate),
-        'network-name': networkSelectorOptions2pdpFormat(
-          selectedNetworksOptions, allNetworksOptions
-        ),
-        'input-vars': variableSelectorOptions2pdpFormat(
-          selectedVariablesOptions, allVariablesOptions
-        ),
-        'input-freq': frequencyOptions2pdpFormat(
-          selectedFrequenciesOptions, allFrequenciesOptions
-        ),
-        'input-polygon': geoJSON2WKT(polygon),
-        'only-with-climatology': onlyWithClimatology ? 'only-with-climatology' : '',
-        [`download-${dataCategory}`]: capitalize(dataCategory),
-        'data-format': get('value')(dataFormat),
-      },
-      clipToDate && { 'cliptodate': 'cliptodate' },
-    ])
-  );
+export const dataDownloadTarget = ({
+  startDate,
+  endDate,
+  selectedNetworksOptions,
+  selectedVariablesOptions,
+  selectedFrequenciesOptions,
+  polygon,
+  clipToDate,
+  onlyWithClimatology,
+  dataCategory,
+  dataFormat,
+  allNetworksOptions = [],
+  allVariablesOptions = [],
+  allFrequenciesOptions = [],
+}) =>
+makeURI(
+  `${config.pdpDataUrl}/pcds/agg/`,
+  assignAll([
+    {
+      'from-date': date2pdpFormat(startDate),
+      'to-date': date2pdpFormat(endDate),
+      'network-name': networkSelectorOptions2pdpFormat(
+        selectedNetworksOptions, allNetworksOptions
+      ),
+      'input-vars': variableSelectorOptions2pdpFormat(
+        selectedVariablesOptions, allVariablesOptions
+      ),
+      'input-freq': frequencyOptions2pdpFormat(
+        selectedFrequenciesOptions, allFrequenciesOptions
+      ),
+      'input-polygon': geoJSON2WKT(polygon),
+      'only-with-climatology': onlyWithClimatology ? 'only-with-climatology' : '',
+      [`download-${dataCategory}`]: capitalize(dataCategory),
+      'data-format': get('value')(dataFormat),
+    },
+    clipToDate && { 'cliptodate': 'cliptodate' },
+  ])
+);
+
+
+export const dataDownloadUrl =
+  ({ filterValues, polygon }) =>
+  ({ dataCategory, clipToDate, fileFormat }) => {
+    // Check whether state has settled. Each selector calls an onReady callback
+    // to export information (e.g., all its options) that it has set up
+    // internally. In retrospect, this is a too-clever solution to the problem
+    // of passing a pile of props around, but it's what we've got.
+    if (
+      !filterValues.networkActions
+      || !filterValues.variableActions
+      || !filterValues.frequencyActions
+    ) {
+      return "#";
+    }
+
+    return dataDownloadTarget({
+      ...filterValues,
+      allNetworksOptions: filterValues.networkActions.getAllOptions(),
+      allVariablesOptions: filterValues.variableActions.getAllOptions(),
+      allFrequenciesOptions: filterValues.frequencyActions.getAllOptions(),
+      polygon,
+      dataCategory,
+      clipToDate,
+      dataFormat: fileFormat,
+    });
+  };
+
 
 export const dataDownloadFilename = ({ dataCategory, fileFormat }) => {
   return `${{ dataCategory, fileFormat }}.${get('value', fileFormat)}`;

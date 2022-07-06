@@ -21,7 +21,7 @@ import {
   getStations,
   getVariables,
 } from '../../../data-services/station-data-service';
-import { dataDownloadTarget, dataDownloadFilename }
+import { dataDownloadFilename, dataDownloadUrl }
   from '../../../data-services/pdp-data-service';
 import {
   stationAreaFilter,
@@ -118,31 +118,6 @@ function Body() {
   const reloadStations = () => {
     console.log("### reloadStations")
     setStationsReload(n => n + 1)
-  };
-
-  const dataDownloadUrl = ({ dataCategory, clipToDate, fileFormat }) => {
-    // Check whether state has settled. Each selector calls an onReady callback
-    // to export information (e.g., all its options) that it has set up
-    // internally. In retrospect, this is a too-clever solution to the problem
-    // of passing a pile of props around, but it's what we've got.
-    if (
-      !filterValuesNormal.networkActions
-      || !filterValuesNormal.variableActions
-      || !filterValuesNormal.frequencyActions
-    ) {
-      return "#";
-    }
-
-    return dataDownloadTarget({
-      ...filterValuesNormal,
-      allNetworksOptions: filterValuesNormal.networkActions.getAllOptions(),
-      allVariablesOptions: filterValuesNormal.variableActions.getAllOptions(),
-      allFrequenciesOptions: filterValuesNormal.frequencyActions.getAllOptions(),
-      polygon: area,
-      dataCategory,
-      clipToDate,
-      dataFormat: fileFormat,
-    });
   };
 
   // The key to a responsive UI is here: station filtering and all updates
@@ -290,7 +265,12 @@ function Body() {
 
                     <StationData
                       selectedStations={selectedStations}
-                      dataDownloadUrl={dataDownloadUrl}
+                      dataDownloadUrl={
+                        dataDownloadUrl({
+                          filterValues: filterValuesNormal,
+                          polygon: area
+                        })
+                      }
                       dataDownloadFilename={dataDownloadFilename}
                       rowClasses={rowClasses}
                     />
