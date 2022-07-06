@@ -57,7 +57,7 @@ import logger from '../../../logger';
 import './StationMap.css';
 import { getTimer } from '../../../utils/timing';
 import { MapSpinner } from 'pcic-react-leaflet-components';
-import { zoomToMarkerRadius } from '../../../utils/configuration';
+import { config, zoomToMarkerRadius } from '../../../utils/configuration';
 import { useImmer } from 'use-immer';
 
 logger.configure({ active: true });
@@ -177,16 +177,7 @@ function StationMap({
         />
       </FeatureGroup>
       {markerLayerGroup}
-      {isPending &&
-        <MapSpinner
-          spinner={"Bars"}
-          x={"40%"}
-          y={"40%"}
-          width={"80"}
-          stroke={"darkgray"}
-          fill={"lightgray"}
-        />
-      }
+      {isPending && <MapSpinner {...config.mapSpinner}/>}
     </BaseMap>
   );
 }
