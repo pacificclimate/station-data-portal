@@ -399,6 +399,7 @@ function StationMetadata({
             [false, true].map(value => (
               <ToggleButton
                 id={`stn-md-compact-${value.toString()}`}
+                key={value.toString()}
                 size={"sm"}
                 variant={"outline-dark"}
                 value={value}

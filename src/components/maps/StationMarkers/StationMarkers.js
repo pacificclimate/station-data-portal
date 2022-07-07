@@ -86,7 +86,7 @@ function LocationMarker({
 LocationMarker.propTypes = {
   station: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
-  color: PropTypes.string.isRequired,
+  color: PropTypes.string,
   metadata: PropTypes.object.isRequired,
   markerOptions: PropTypes.object,
 };
