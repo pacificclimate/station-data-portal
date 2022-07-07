@@ -14,6 +14,30 @@ export const useBooleanStateWithToggler = init => {
 };
 
 
+// This hook provides an immer state as in `useImmer`, with some
+// added conveniences. The initial state is expected to be hash object. The
+// returned `setState` is extended with convenience value setters for each
+// top-level key of the initial object. Note: The convenience setters take a
+// plain value, not an immer update function as `setState` does.
+//
+// This arrangement makes it easy to treat a single immutable state as a group
+// of named (by key) states, each with its own easy-to-use value setter.
+//
+// This hook returns the state and setter in the conventional array pair.
+export const useImmerByKey = (initial) => {
+  const [state, setState] = useImmer(initial);
+  for (const key of Object.keys(state)) {
+    setState[key] = value => {
+      setState(draft => {
+        draft[key] = value;
+      });
+    };
+  }
+  return [state, setState];
+};
+
+
+
 // This hook provides a pair of immutable (immer) states, `normal` and
 // `transitional`, that are updated together by a single setter. The normal
 // state is updated normally -- that is directly, urgently. The transitional
