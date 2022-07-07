@@ -8,7 +8,6 @@
     "chroma-js": "^2.4.2",
     "immer": "^9.0.15",
     "leaflet": "^1.8.0",
-    "leaflet.markercluster": "^1.5.3",
     "lethargy": "^1.0.9",
     "lodash": "^4.17.21",
     "memoize-one": "^6.0.0",
