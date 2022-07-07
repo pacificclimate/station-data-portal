@@ -20,10 +20,10 @@ L.drawLocal.edit.toolbar.actions.clearAll = {
 };
 
 // Initialize Lethargy, which fixes scrolling problems with Mac computers.
-if (config.lethargyEnabled) {
+if (config.lethargy.enabled) {
   setLethargicMapScrolling(
-    config.lethargyStability,
-    config.lethargySensitivity,
-    config.lethargyTolerance,
+    config.lethargy.stability,
+    config.lethargy.sensitivity,
+    config.lethargy.tolerance,
   );
 }
