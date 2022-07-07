@@ -82,7 +82,6 @@ export const config = getConfigValues({
   stationOffset: [configNumber, undefined],
   stationLimit: [configNumber, undefined],
   stationStride: [configNumber, undefined],
-  markerClusteringAvailable: [configBool, false],
   showReloadStationsButton: [configBool, false],
   timingEnabled: [configBool, false],
   test: [configString, "NO DICE"],

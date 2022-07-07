@@ -46,7 +46,6 @@ import React, {
 
 import { FeatureGroup, LayerGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
-import MarkerCluster from '../MarkerCluster';
 
 import MapInfoDisplay from '../MapInfoDisplay';
 import { defaultMarkerOptions, ManyStationMarkers } from '../StationMarkers';
@@ -70,7 +69,6 @@ function StationMap({
   stations,
   metadata,
   onSetArea = () => {},
-  markerClusterOptions,
   userShapeStyle = {
     color: "#f49853",
     weight: 1,
@@ -128,12 +126,8 @@ function StationMap({
     [stations, markerOptions]
   );
 
-  const markerLayerGroup = useMemo(() =>
-    markerClusterOptions ? (
-      <MarkerCluster {...markerClusterOptions}>{markers}</MarkerCluster>
-    ) : (
-      <LayerGroup>{markers}</LayerGroup>
-    ),
+  const markerLayerGroup = useMemo(
+    () => (<LayerGroup>{markers}</LayerGroup>),
     [markers]
   );
 

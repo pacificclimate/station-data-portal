@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useBooleanStateWithToggler, useImmerByKey } from '../../../hooks';
+import { useImmerByKey } from '../../../hooks';
 import {
   Button,
   Card,
   Col,
-  Form,
   Row,
   Tab,
   Tabs
@@ -27,8 +26,6 @@ import {
   stationAreaFilter,
   stationFilter,
 } from '../../../utils/station-filtering';
-import MarkerClusterOptions, { useMarkerClusterOptions}
-  from '../../controls/MarkerClusterOptions'
 import StationMap from '../../maps/StationMap';
 import StationMetadata from '../../info/StationMetadata';
 import StationData from '../../info/StationData';
@@ -39,7 +36,6 @@ import UnselectedThings from '../../info/UnselectedThings';
 import AdjustableColumns from '../../util/AdjustableColumns';
 import StationFilters, { useStationFiltering }
   from '../../controls/StationFilters';
-import JSONstringify from '../../util/JSONstringify';
 import baseMaps from '../../maps/baseMaps';
 import { config } from '../../../utils/configuration';
 
@@ -114,20 +110,6 @@ function Body() {
   // Map polygon, used for selecting (not filtering) stations.
   const [area, setArea] = useState(undefined);
 
-  // TODO: Remove marker clustering
-  // Marker clustering option controls.
-  const [uzeMarkercluster, toggleUzeMarkercluster] =
-    useBooleanStateWithToggler(config.markerClusteringAvailable);
-  const [markerClusterOptions, setMarkerClusterOptions] =
-    useMarkerClusterOptions({
-      removeOutsideVisibleBounds: true,
-      spiderfyOnMaxZoom: false,
-      zoomToBoundsOnClick: false,
-      disableClusteringAtZoom: 8,
-      maxClusterRadius: 80,
-      chunkedLoading: true,
-    });
-
   // The key to a responsive UI is here: station filtering and all updates
   // based on it are done in a transition. The filter values state reflecting
   // this is `filterValuesTransitional`, used here.
@@ -158,7 +140,6 @@ function Body() {
               stations={filteredStations}
               metadata={metadata}
               onSetArea={setArea}
-              markerClusterOptions={uzeMarkercluster && markerClusterOptions}
               externalIsPending={
                 (metadata.stations === null) || filteringIsPending
               }
@@ -176,31 +157,6 @@ function Body() {
                   defaultActiveKey={config.defaultTab}
                   className={css.mainTabs}
                 >
-                  { config.markerClusteringAvailable && (
-                    <Tab
-                      eventKey={'Clustering'}
-                      title={`Marker Clustering (${uzeMarkercluster ? "on": "off"})`}
-                    >
-                      <SelectionCounts
-                        allStations={metadata.stations}
-                        selectedStations={selectedStations}
-                      />
-                      <Form>
-                        <Form.Check
-                          inline
-                          label={"Use leaflet.markercluster"}
-                          checked={uzeMarkercluster}
-                          onChange={toggleUzeMarkercluster}
-                        />
-                      </Form>
-                      <MarkerClusterOptions
-                        value={markerClusterOptions}
-                        onChange={setMarkerClusterOptions}
-                      />
-                      <JSONstringify object={markerClusterOptions}/>
-                    </Tab>
-                  )}
-
                   <Tab eventKey={'Filters'} title={'Station Filters'}>
                     {config.stationDebugFetchOptions && (
                       <Row>
