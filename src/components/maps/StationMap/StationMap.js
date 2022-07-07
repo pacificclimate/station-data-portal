@@ -68,8 +68,7 @@ function StationMap({
   BaseMap,
   initialViewport,
   stations,
-  allNetworks,
-  allVariables,
+  metadata,
   onSetArea = () => {},
   markerClusterOptions,
   userShapeStyle = {
@@ -122,8 +121,7 @@ function StationMap({
   const markers = useMemo(() =>
     <ManyStationMarkers
       stations={stations}
-      allNetworks={allNetworks}
-      allVariables={allVariables}
+      metadata={metadata}
       markerOptions={markerOptions}
       mapEvents={markerMapEvents}
     />,
@@ -187,8 +185,7 @@ StationMap.propTypes = {
   BaseMap: PropTypes.func.isRequired,
   initialViewport: PropTypes.object.isRequired,
   stations: PropTypes.array.isRequired,
-  allNetworks: PropTypes.array,
-  allVariables: PropTypes.array,
+  metadata: PropTypes.object,
   onSetArea: PropTypes.func,
 };
 

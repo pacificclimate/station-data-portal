@@ -29,20 +29,14 @@ const timer = getTimer("StationMarkers timing");
 //    triggers popup. Creates the popup (once; effectively memoized).
 //  `popup`: Lazily created popup to be rendered inside marker. Value `null`
 //    until `addPopup` called; value is the popup thereafter.
-const useLazyPopup = ({ station, allNetworks, allVariables }) => {
+const useLazyPopup = ({ station, metadata }) => {
   const markerRef = useRef();
   const [popup, setPopup] = useState(null);
 
   // Callback: create popup if not already created.
   const addPopup = () => {
     if (popup === null) {
-      setPopup(
-        <StationPopup
-          station={station}
-          allNetworks={allNetworks}
-          allVariables={allVariables}
-        />
-      );
+      setPopup(<StationPopup station={station} metadata={metadata}/>);
     }
   };
 
@@ -71,11 +65,9 @@ function LocationMarker({
   location,     // One location of the station (there may be several)
   color,        // Station colour; overrides default color in markerOptions
   markerOptions = defaultMarkerOptions,
-  allNetworks,
-  allVariables,
+  metadata,
 }) {
-  const { markerRef, popup, addPopup } =
-    useLazyPopup({ station, allNetworks, allVariables });
+  const { markerRef, popup, addPopup } = useLazyPopup({ station, metadata });
 
   return (
     <CircleMarker
@@ -86,10 +78,7 @@ function LocationMarker({
       color={color}
       eventHandlers={{click: addPopup}}
     >
-      <StationTooltip
-        station={station}
-        allNetworks={allNetworks}
-      />
+      <StationTooltip station={station} metadata={metadata}/>
       {popup}
     </CircleMarker>
   );
@@ -98,8 +87,7 @@ LocationMarker.propTypes = {
   station: PropTypes.object.isRequired,
   location: PropTypes.object.isRequired,
   color: PropTypes.string.isRequired,
-  allNetworks: PropTypes.array.isRequired,
-  allVariables: PropTypes.array.isRequired,
+  metadata: PropTypes.object.isRequired,
   markerOptions: PropTypes.object,
 };
 
@@ -109,11 +97,9 @@ function MultiLocationMarker ({
   locations,      // Unique locations for station.
   color,          // Station colour; applied to all location markers
   polygonOptions, // Multi-location marker is a polygon; this is its format
-  allNetworks,
-  allVariables,
+  metadata,
 }) {
-  const { markerRef, popup, addPopup } =
-    useLazyPopup({ station, allNetworks, allVariables });
+  const { markerRef, popup, addPopup } = useLazyPopup({ station, metadata });
 
   if (locations.length <= 1) {
     return null;
@@ -126,10 +112,7 @@ function MultiLocationMarker ({
       positions={locations}
       onClick={addPopup}
     >
-      <StationTooltip
-        station={station}
-        allNetworks={allNetworks}
-      />
+      <StationTooltip station={station} metadata={metadata}/>
       {popup}
     </Polygon>
   );
@@ -138,23 +121,21 @@ MultiLocationMarker.propTypes = {
   station: PropTypes.object.isRequired,
   locations: PropTypes.array.isRequired,
   color: PropTypes.string.isRequired,
-  allNetworks: PropTypes.array.isRequired,
-  allVariables: PropTypes.array.isRequired,
+  metadata: PropTypes.object.isRequired,
   polygonOptions: PropTypes.object,
 }
 
 
 function OneStationMarkers({
   station,
-  allNetworks,
-  allVariables,
+  metadata,
   markerOptions = defaultMarkerOptions,
   // TODO: Improve or remove
   polygonOptions = {
     color: "green",
   },
 }) {
-  const network = stationNetwork(allNetworks, station);
+  const network = stationNetwork(metadata.networks, station);
   const locationColor = network?.color;
   const polygonColor =
     chroma(network?.color ?? polygonOptions.color).alpha(0.3).css();
@@ -173,8 +154,7 @@ function OneStationMarkers({
               station={station}
               location={location}
               color={locationColor}
-              allNetworks={allNetworks}
-              allVariables={allVariables}
+              metadata={metadata}
               markerOptions={markerOptions}
               key={location.id}
             />
@@ -187,8 +167,7 @@ function OneStationMarkers({
         locations={uniqLatLngs}
         color={polygonColor}
         polygonOptions={polygonOptions}
-        allNetworks={allNetworks}
-        allVariables={allVariables}
+        metadata={metadata}
       />
     </React.Fragment>
   );
@@ -196,8 +175,7 @@ function OneStationMarkers({
 OneStationMarkers = timer.timeThis("OneStationMarkers")(OneStationMarkers);
 OneStationMarkers.propTypes = {
   station: PropTypes.object.isRequired,
-  allNetworks: PropTypes.array.isRequired,
-  allVariables: PropTypes.array.isRequired,
+  metadata: PropTypes.object.isRequired,
   markerOptions: PropTypes.object,
   polygonOptions: PropTypes.object,
 };
@@ -205,8 +183,7 @@ OneStationMarkers.propTypes = {
 
 function ManyStationMarkers({
   stations,
-  allNetworks,
-  allVariables,
+  metadata,
   markerOptions = defaultMarkerOptions,
   mapEvents = {},
 }) {
@@ -224,8 +201,7 @@ function ManyStationMarkers({
       <OneStationMarkers
         key={station.id}
         station={station}
-        allNetworks={allNetworks}
-        allVariables={allVariables}
+        metadata={metadata}
         markerOptions={markerOptions}
       />
     ),
@@ -235,8 +211,7 @@ function ManyStationMarkers({
 // ManyStationMarkers = React.memo(ManyStationMarkers);
 ManyStationMarkers.propTypes = {
   stations: PropTypes.arrayOf(PropTypes.object).isRequired,
-  allNetworks: PropTypes.array.isRequired,
-  allVariables: PropTypes.array.isRequired,
+  metadata: PropTypes.object.isRequired,
   markerOptions: PropTypes.object,
   mapEvents: PropTypes.object,
 }

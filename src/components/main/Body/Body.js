@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useBooleanStateWithToggler } from '../../../hooks';
+import { useBooleanStateWithToggler, useImmerByKey } from '../../../hooks';
 import {
   Button,
   Card,
@@ -46,18 +46,62 @@ import { config } from '../../../utils/configuration';
 
 logger.configure({ active: true });
 
+// This hook wraps up all the metadata variables and fetching in one function,
+// exporting only the metadata state (an immer immutable) and a couple
+// of debug callbacks for controlling station fetches. This hook is used only
+// by component Body; it's a way of clarifying and simplifying its code.
+function useMetadata() {
+  // Fetched metadata
+  const [metadata, setMetadata] = useImmerByKey({
+    networks: null,
+    variables: null,
+    frequencies: null,
+    stations: null,
+  });
+
+  // Debugging support
+  const [debug, setDebug] = useImmerByKey({
+    stnsLimit: config.stationDebugFetchLimitsOptions[0],
+    stationsReload: 0,
+  });
+  const setStnsLimit = setDebug.stnsLimit;
+  const reloadStations = () => {
+    console.log("### reloadStations")
+    setDebug.stationsReload(debug.stationsReload + 1);
+  };
+
+  // Fetch data from backend
+
+  useEffect(() => {
+    getNetworks().then(response => setMetadata.networks(response.data));
+  }, []);
+
+  useEffect(() => {
+    getVariables().then(response => setMetadata.variables(response.data));
+  }, []);
+
+  useEffect(() => {
+    getFrequencies().then(response => setMetadata.frequencies(response.data));
+  }, []);
+
+  useEffect(() => {
+    console.log("### loading stations")
+    setMetadata.stations(null);
+    getStations({
+      compact: true,
+      ...(config.stationDebugFetchOptions && { limit: debug.stnsLimit.value } )
+    })
+    .then(tap(() => console.log("### stations loaded")))
+    .then(response => setMetadata.stations(response.data));
+  }, [debug]);
+
+  return { metadata, setStnsLimit, reloadStations };
+}
+
+
 function Body() {
   // Metadata fetched from backend
-  const [allNetworks, setAllNetworks] = useState(null);
-  const [allVariables, setAllVariables] = useState(null);
-  const [allFrequencies, setAllFrequencies] = useState(null);
-  const [allStations, setAllStations] = useState(null);
-
-  // Support for development tools
-  const [stnsLimit, setStnsLimit] = useState(
-    config.stationDebugFetchLimitsOptions[0]
-  );
-  const [stationsReload, setStationsReload] = useState(0);
+  const { metadata, setStnsLimit, reloadStations } = useMetadata();
 
   // Station filtering state and setters
   const {
@@ -70,6 +114,7 @@ function Body() {
   // Map polygon, used for selecting (not filtering) stations.
   const [area, setArea] = useState(undefined);
 
+  // TODO: Remove marker clustering
   // Marker clustering option controls.
   const [uzeMarkercluster, toggleUzeMarkercluster] =
     useBooleanStateWithToggler(config.markerClusteringAvailable);
@@ -83,52 +128,15 @@ function Body() {
       chunkedLoading: true,
     });
 
-  // Load metadata
-
-  useEffect(() => {
-    getNetworks().then(response => setAllNetworks(response.data));
-  }, []);
-
-  useEffect(() => {
-    getVariables().then(response => setAllVariables(response.data));
-  }, []);
-
-  useEffect(() => {
-    getFrequencies().then(response => setAllFrequencies(response.data));
-  }, []);
-
-  useEffect(() => {
-    console.log("### loading stations")
-    setAllStations(null)
-    getStations({
-      compact: true,
-      ...(config.stationDebugFetchOptions && { limit: stnsLimit.value } )
-    })
-      .then(tap(() => console.log("### stations loaded")))
-      .then(response => setAllStations(response.data));
-  }, [stnsLimit, stationsReload]);
-
-  const reloadStations = () => {
-    console.log("### reloadStations")
-    setStationsReload(n => n + 1)
-  };
-
   // The key to a responsive UI is here: station filtering and all updates
   // based on it are done in a transition. The filter values state reflecting
   // this is `filterValuesTransitional`, used here.
   const filteredStations = useMemo(
     () => stationFilter({
-      ...filterValuesTransitional,
-      allNetworks,
-      allVariables,
-      allStations,
+      filterValues: filterValuesTransitional,
+      metadata,
     }),
-    [
-      filterValuesTransitional,
-      allNetworks,
-      allVariables,
-      allStations,
-    ]
+    [filterValuesTransitional, metadata]
   );
 
   const selectedStations = useMemo(
@@ -148,12 +156,11 @@ function Body() {
             <StationMap
               {...baseMaps[config.baseMap]}
               stations={filteredStations}
-              allNetworks={allNetworks}
-              allVariables={allVariables}
+              metadata={metadata}
               onSetArea={setArea}
               markerClusterOptions={uzeMarkercluster && markerClusterOptions}
               externalIsPending={
-                (allStations === null) || filteringIsPending
+                (metadata.stations === null) || filteringIsPending
               }
             />,
 
@@ -175,7 +182,7 @@ function Body() {
                       title={`Marker Clustering (${uzeMarkercluster ? "on": "off"})`}
                     >
                       <SelectionCounts
-                        allStations={allStations}
+                        allStations={metadata.stations}
                         selectedStations={selectedStations}
                       />
                       <Form>
@@ -210,7 +217,7 @@ function Body() {
                     <Row {...rowClasses}>
                       <Col lg={12} md={12} sm={12}>
                         <SelectionCounts
-                          allStations={allStations}
+                          allStations={metadata.stations}
                           selectedStations={selectedStations}
                         />
                         <p className={"mb-0"}>
@@ -221,9 +228,7 @@ function Body() {
                     <StationFilters
                       state={filterValuesNormal}
                       setState={filterValuesSetState}
-                      allNetworks={allNetworks}
-                      allVariables={allVariables}
-                      allFrequencies={allFrequencies}
+                      metadata={metadata}
                       rowClasses={rowClasses}
                     />
                   </Tab>
@@ -231,21 +236,20 @@ function Body() {
                   <Tab eventKey={'Metadata'} title={'Station Metadata'}>
                     <Row {...rowClasses}>
                       <SelectionCounts
-                        allStations={allStations}
+                        allStations={metadata.stations}
                         selectedStations={selectedStations}
                       />
                     </Row>
                     <StationMetadata
                       stations={selectedStations}
-                      allNetworks={allNetworks}
-                      allVariables={allVariables}
+                      metadata={metadata}
                     />
                   </Tab>
 
                   <Tab eventKey={'Data'} title={'Station Data'}>
                     <Row {...rowClasses}>
                       <SelectionCounts
-                        allStations={allStations}
+                        allStations={metadata.stations}
                         selectedStations={selectedStations}
                       />
                       <SelectionCriteria/>
@@ -270,7 +274,7 @@ function Body() {
                   </Tab>
 
                   <Tab eventKey={'Networks'} title={'Networks'}>
-                    <NetworksMetadata networks={allNetworks}/>
+                    <NetworksMetadata networks={metadata.networks}/>
                   </Tab>
 
                 </Tabs>

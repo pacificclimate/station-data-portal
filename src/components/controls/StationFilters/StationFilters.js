@@ -56,9 +56,11 @@ export const useStationFiltering = () => {
 function StationFilters({
   state,
   setState,
-  allNetworks,
-  allVariables,
-  allFrequencies,
+  metadata: {
+    networks: allNetworks,
+    variables: allVariables,
+    frequencies: allFrequencies,
+  },
   rowClasses = { className: "mb-3" },
 }) {
   return (

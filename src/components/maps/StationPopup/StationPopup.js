@@ -30,10 +30,9 @@ const formatDate = d => d ? d.toISOString().substr(0,10) : 'unknown';
 function StationPopup({
   station,
   defaultNetworkColor = config.defaultNetworkColor,
-  allNetworks,
-  allVariables,
+  metadata,
 }) {
-  const network = stationNetwork(allNetworks, station);
+  const network = stationNetwork(metadata.networks, station);
   const networkColor =
     chroma(network.color ?? defaultNetworkColor).alpha(0.5).css();
 
@@ -87,7 +86,7 @@ function StationPopup({
     <ul className={"compact"}>
       {map(
         name => (<li>{name}</li>),
-        uniqStationVariableNames(allVariables, station)
+        uniqStationVariableNames(metadata.variables, station)
       )}
     </ul>
   );
@@ -141,8 +140,7 @@ function StationPopup({
 
 StationPopup.propTypes = {
   station: PropTypes.object.isRequired,
-  allNetworks: PropTypes.array.isRequired,
-  allVariables: PropTypes.array.isRequired,
+  metadata: PropTypes.object.isRequired,
   defaultNetworkColor: PropTypes.string,
 };
 

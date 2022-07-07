@@ -6,8 +6,8 @@ import flow from 'lodash/fp/flow';
 import join from 'lodash/fp/join';
 import './StationTooltip.css';
 
-function StationTooltip({ station, allNetworks }) {
-  const network = stationNetwork(allNetworks, station);
+function StationTooltip({ station, metadata }) {
+  const network = stationNetwork(metadata.networks, station);
   const stationNames = flow(
     uniqStationNames,
     join(", "),
@@ -22,7 +22,7 @@ function StationTooltip({ station, allNetworks }) {
 
 StationTooltip.propTypes = {
   station: PropTypes.object.isRequired,
-  allNetworks: PropTypes.array.isRequired,
+  metadata: PropTypes.object.isRequired,
 };
 
 export default StationTooltip;

@@ -164,14 +164,18 @@ export const stationInsideMultiPolygon = ft.timeThis("stationInsideMultiPolygon"
 
 
 export const stationFilter = ({
-  startDate,
-  endDate,
-  selectedNetworksOptions,
-  selectedVariablesOptions,
-  selectedFrequenciesOptions,
-  onlyWithClimatology,
-  allVariables,
-  allStations,
+  filterValues: {
+    startDate,
+    endDate,
+    selectedNetworksOptions,
+    selectedVariablesOptions,
+    selectedFrequenciesOptions,
+    onlyWithClimatology,
+  },
+  metadata: {
+    variables: allVariables,
+    stations: allStations,
+  },
 }) => {
   ft.resetAll();
   const selectedVariableIds = ft.timeThis("selectedVariableIds")(flow(

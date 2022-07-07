@@ -362,7 +362,13 @@ function smtData(stations, compact) {
 }
 
 
-function StationMetadata({ stations, allNetworks, allVariables }) {
+function StationMetadata({
+  stations,
+  metadata: {
+    networks: allNetworks,
+    variables: allVariables
+  },
+}) {
   const [compact, setCompact] = useState(false);
   const [isPending, startTransition] = useTransition();
   const handleChangeCompact = v => startTransition(() => setCompact(v));
@@ -452,8 +458,7 @@ function StationMetadata({ stations, allNetworks, allVariables }) {
 
 StationMetadata.propTypes = {
   stations: PropTypes.array,
-  allNetworks: PropTypes.array,
-  allVariables: PropTypes.array,
+  metadata: PropTypes.object,
 };
 
 export default StationMetadata;

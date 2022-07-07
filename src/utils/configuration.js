@@ -85,6 +85,7 @@ export const config = getConfigValues({
   markerClusteringAvailable: [configBool, false],
   showReloadStationsButton: [configBool, false],
   timingEnabled: [configBool, false],
+  test: [configString, "NO DICE"],
 });
 
 config.stationDebugFetchLimitsOptions = config.stationDebugFetchLimits.map(
