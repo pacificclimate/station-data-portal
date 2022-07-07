@@ -7,7 +7,7 @@ import { config } from '../../../utils/configuration';
 
 
 function Disclaimer() {
-  const [acknowledged, setAcknowledged] = useState(!config.disclaimerEnabled);
+  const [acknowledged, setAcknowledged] = useState(!config.disclaimer.enabled);
   const acknowledge = () => setAcknowledged(true);
 
   return (
@@ -18,12 +18,12 @@ function Disclaimer() {
       style={{ zIndex: 2000 }}
     >
       <Modal.Header>
-        <Modal.Title>{config.disclaimerTitle}</Modal.Title>
+        <Modal.Title>{config.disclaimer.title}</Modal.Title>
       </Modal.Header>
-      <Modal.Body>{config.disclaimerBody}</Modal.Body>
+      <Modal.Body>{config.disclaimer.body}</Modal.Body>
       <Modal.Footer>
         <Button bsStyle={"primary"} onClick={acknowledge}>
-          {config.disclaimerButtonLabel}
+          {config.disclaimer.buttonLabel}
         </Button>
       </Modal.Footer>
     </Modal>

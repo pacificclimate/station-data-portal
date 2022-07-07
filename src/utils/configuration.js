@@ -67,10 +67,12 @@ export const config = getConfigValues({
     sensitivity: 50,
     tolerance: 0.05,
   }],
-  disclaimerEnabled: [configBool, false],
-  disclaimerTitle: [configString, "Disclaimer Title"],
-  disclaimerBody: [configString, "Disclaimer body ..."],
-  disclaimerButtonLabel: [configString, "Acknowledge"],
+  disclaimer: [configJson, {
+    enabled: false,
+    title: "Disclaimer Title",
+    body: "Disclaimer body ...",
+    buttonLabel: "Acknowledge",
+  }],
   mapSpinner: [configJson, {
     spinner: "Bars",
     x: "40%",
