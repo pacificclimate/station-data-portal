@@ -88,7 +88,6 @@ export const config = getConfigValues({
   stationStride: [configNumber, undefined],
   showReloadStationsButton: [configBool, false],
   timingEnabled: [configBool, false],
-  test: [configString, "NO DICE"],
 });
 
 config.stationDebugFetchLimitsOptions = config.stationDebugFetchLimits.map(
