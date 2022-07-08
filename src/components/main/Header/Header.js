@@ -20,10 +20,10 @@ function Header() {
           <Col lg={7}><h1>{config.appTitle}</h1></Col>
           <Col lg={2} className='text-right'>
             <p>Version: {config.appVersion}</p>
-            {config.userDocsShowLink && (
+            {config.userDocs.showLink && (
               <p>
-                <a href={config.userDocsUrl} target="_blank">
-                  {config.userDocsText}
+                <a href={config.userDocs.url} target="_blank">
+                  {config.userDocs.text}
                 </a>
               </p>
             )}

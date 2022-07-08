@@ -58,9 +58,11 @@ const config = getConfigValues({
   stationsQpProvinces: [configString, undefined],
   baseMap: [configString, "BC"],
   defaultNetworkColor: [configString, "#000000"],
-  userDocsShowLink: [configBool, false],
-  userDocsUrl: [configString, "https://data.pacificclimate.org/portal/docs/"],
-  userDocsText: [configString, "User Docs"],
+  userDocs: [configJson, {
+    showLink: false,
+    url: "https://data.pacificclimate.org/portal/docs/",
+    text: "User Docs",
+  }],
   lethargy: [configJson, {
     enabled: true,
     stability: 7,
