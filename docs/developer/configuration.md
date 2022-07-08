@@ -32,7 +32,7 @@ For production runs, environment variables are provided by
 
 ### Dataset config
 
-`REACT_APP_TITLE`
+`REACT_APP_APP_TITLE`
 - Title of portal (appears in header)
 
 `REACT_APP_SDS_URL`
