@@ -24,22 +24,22 @@ const makeConfig = convert => (name, deflt) => {
 export const configString = makeConfig(v => v);
 export const configBool = makeConfig(strToBool);
 export const configNumber = makeConfig(toNumber);
-export const configJson = makeConfig(v => {
-  try {
-    return JSON.parse(v);
-  } catch (e) {
-    console.error("Error parsing JSON from config variable", e);
-    return undefined;
-  }
-});
+export const configJson = makeConfig(JSON.parse);
 
 const camelToSnakeCase = str =>
   str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
 
 const getConfigValues = flow(
   toPairs,
-  map(([key, [convert, deflt]]) =>
-    [key, convert(camelToSnakeCase(key).toUpperCase(), deflt)]),
+  map(([key, [convert, deflt]]) => {
+    const skKey = camelToSnakeCase(key).toUpperCase();
+    try {
+      return [key, convert(skKey, deflt)];
+    } catch(e) {
+      console.error(`Error converting config variable ${skKey}:`, e);
+      return [key, undefined];
+    }
+  }),
   fromPairs,
 );
 
