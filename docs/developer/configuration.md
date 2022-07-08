@@ -24,7 +24,7 @@ For production runs, environment variables are provided by
 - For production, set this to the URL configured in our proxy server.
 - Required.
 
-`REACT_APP_VERSION`
+`REACT_APP_APP_VERSION`
 - Current version of the app.
 - This value should be set using `generate-commitish.sh` when the Docker image is built.
 - It is not recommended to manually override the automatically generated value when the image is run.

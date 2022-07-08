@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Export REACT_APP_VERSION env var
+      - name: Export REACT_APP_APP_VERSION env var
         run: |
           git fetch --prune --unshallow
-          echo "REACT_APP_VERSION=$(git describe --tags --abbrev=0) ($(git rev-parse --abbrev-ref HEAD):$(git log -1 --format=%h))" >> $GITHUB_ENV
+          echo "REACT_APP_APP_VERSION=$(git describe --tags --abbrev=0) ($(git rev-parse --abbrev-ref HEAD):$(git log -1 --format=%h))" >> $GITHUB_ENV
       - name: Publish to Registry
         uses: docker/build-push-action@v1
         with:
@@ -26,4 +26,4 @@ jobs:
           dockerfile: docker/Dockerfile
           repository: pcic/station-data-portal-frontend
           tag_with_ref: true
-          build_args: REACT_APP_VERSION=${{ env.REACT_APP_VERSION }}
+          build_args: REACT_APP_APP_VERSION=${{ env.REACT_APP_APP_VERSION }}

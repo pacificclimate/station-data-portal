@@ -62,12 +62,12 @@ to run the SDP Docker image. The [Makefile](Makefile) shows how to run the
 image using `docker-compose`. You may wish to copy and modify
 `docker-compose.yaml` to construct a production deployment.
 
-Note: All **deployment environment variables**, except `REACT_APP_VERSION`,
+Note: All **deployment environment variables**, except `REACT_APP_APP_VERSION`,
 are provided by `docker/docker-compose.yaml` (and any `*.env` files it 
-names). `REACT_APP_VERSION` is set during image build (see 
+names). `REACT_APP_APP_VERSION` is set during image build (see 
 `.github/workflows/docker-publish.yml`), and it should not be set 
 otherwise.
 
 This is different from **development environment variables**, which are 
 provided by the `.env.*` files found in the project root directory.
-(Also, `REACT_APP_VERSION` is not set for development.)
+(Also, `REACT_APP_APP_VERSION` is not set for development.)

@@ -48,7 +48,7 @@ const getConfigValues = flow(
 
 const config = getConfigValues({
   appTitle: [configString, ""],
-  appVersion: [configString, ""],
+  appVersion: [configString, "unknown"],
   adjustableColumnWidthsDefault: [configJson, [7, 5]],
   defaultTab: [configString, "Filters"],
   pdpDataUrl: [configString, ""],
