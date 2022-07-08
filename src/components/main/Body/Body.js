@@ -37,7 +37,7 @@ import AdjustableColumns from '../../util/AdjustableColumns';
 import StationFilters, { useStationFiltering }
   from '../../controls/StationFilters';
 import baseMaps from '../../maps/baseMaps';
-import { config } from '../../../utils/configuration';
+import config from '../../../utils/configuration';
 
 
 logger.configure({ active: true });

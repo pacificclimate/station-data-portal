@@ -56,7 +56,7 @@ import logger from '../../../logger';
 import './StationMap.css';
 import { getTimer } from '../../../utils/timing';
 import { MapSpinner } from 'pcic-react-leaflet-components';
-import { config, zoomToMarkerRadius } from '../../../utils/configuration';
+import config, { zoomToMarkerRadius } from '../../../utils/configuration';
 import { useImmer } from 'use-immer';
 
 logger.configure({ active: true });

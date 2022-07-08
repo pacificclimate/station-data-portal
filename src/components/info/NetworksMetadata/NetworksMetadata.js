@@ -9,7 +9,7 @@ import { useTable } from 'react-table';
 import logger from '../../../logger';
 import chroma from 'chroma-js';
 import './NetworksMetadata.css';
-import { config } from '../../../utils/configuration';
+import config from '../../../utils/configuration';
 
 
 logger.configure({ active: true });

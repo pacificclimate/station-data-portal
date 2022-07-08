@@ -2,7 +2,7 @@ import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 
 import './Header.css';
-import { config } from '../../../utils/configuration';
+import config from '../../../utils/configuration';
 
 function Header() {
   return (

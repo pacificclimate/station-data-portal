@@ -46,7 +46,7 @@ const getConfigValues = flow(
 
 // Configuration values
 
-export const config = getConfigValues({
+const config = getConfigValues({
   appTitle: [configString, ""],
   appVersion: [configString, ""],
   adjustableColumnWidthsDefault: [configJson, [7, 5]],
@@ -94,7 +94,9 @@ config.stationDebugFetchLimitsOptions = config.stationDebugFetchLimits.map(
   value => ({ value, label: value.toString() })
 );
 
-console.log("### config", config)
+// console.log("### config", config)
+
+export default config;
 
 const zoomToMarkerRadiusSpec = configJson(
   "ZOOM_TO_MARKER_RADIUS", [ [7,2], [99,4] ]

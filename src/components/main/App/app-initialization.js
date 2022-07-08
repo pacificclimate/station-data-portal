@@ -3,7 +3,7 @@
 
 import L from 'leaflet';
 import { setLethargicMapScrolling } from '../../../utils/leaflet-extensions';
-import { config } from '../../../utils/configuration';
+import config from '../../../utils/configuration';
 
 
 // Set up (polygon) drawing tool in Leaflet.

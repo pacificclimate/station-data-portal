@@ -26,7 +26,7 @@ import map from 'lodash/fp/map';
 import sum from 'lodash/fp/sum';
 import sortBy from 'lodash/fp/sortBy';
 import isNil from 'lodash/fp/isNil';
-import { config } from './configuration';
+import config from './configuration';
 
 export class Timer {
   constructor(name, enabled = config.timingEnabled) {

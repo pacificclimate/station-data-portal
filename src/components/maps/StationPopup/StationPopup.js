@@ -19,7 +19,7 @@ import {
   uniqStationObsPeriods,
   uniqStationVariableNames,
 } from '../../../utils/station-info';
-import { config } from '../../../utils/configuration';
+import config from '../../../utils/configuration';
 
 logger.configure({ active: true });
 

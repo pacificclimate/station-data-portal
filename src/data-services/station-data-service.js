@@ -8,7 +8,7 @@ import {
   filterPredicate
 } from './filtering';
 import filter from 'lodash/fp/filter';
-import { config as appConfig } from '../utils/configuration';
+import appConfig from '../utils/configuration';
 
 // Regex for ISO 8601 date strings; allows YYYY-MM-DD with optional T spec.
 // Now you've got two problems :)

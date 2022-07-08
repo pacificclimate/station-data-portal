@@ -11,7 +11,7 @@ import padCharsStart from 'lodash/fp/padCharsStart';
 import tap from 'lodash/fp/tap';
 import uniq from 'lodash/fp/uniq';
 import { geoJSON2WKT } from '../utils/geographic-encodings';
-import { config } from '../utils/configuration';
+import config from '../utils/configuration';
 
 
 const pad2 = padCharsStart('0', 2);
