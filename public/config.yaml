@@ -1,11 +1,11 @@
 appTitle: "BC Station Data - PCDS"
 adjustableColumnWidthsDefault: [7, 5]
-defaultTab: "Filters"
-pdpDataUrl: ""
-sdsUrl: ""
-networkFilters: ""
-stationFilters: ""
-#stationsQpProvinces: undefined
+defaultTab: Filters
+pdpDataUrl: "https://services.pacificclimate.org/data"
+sdsUrl: "http://localhost:5000"
+networkFilters: name != "PCIC Climate Variables"
+#stationFilters: histories[0].province = "BC"
+stationsQpProvinces: BC
 baseMap: "BC"
 defaultNetworkColor: "#000000"
 userDocs:

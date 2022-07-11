@@ -8,7 +8,6 @@ import {
   filterPredicate
 } from './filtering';
 import filter from 'lodash/fp/filter';
-import appConfig from '../utils/configuration';
 
 // Regex for ISO 8601 date strings; allows YYYY-MM-DD with optional T spec.
 // Now you've got two problems :)
@@ -25,16 +24,14 @@ function transformIso8601Date(value) {
 }
 
 
-const parsedNetworkFilterExpressions =
-  filterExpressionsParser(appConfig.networkFilters);
+export function getNetworks({ config }) {
+  const parsedNetworkFilterExpressions =
+    filterExpressionsParser(config.networkFilters);
+  const filterNetworks =
+    filter(filterPredicate(parsedNetworkFilterExpressions));
 
-const filterNetworks =
-  filter(filterPredicate(parsedNetworkFilterExpressions));
-
-
-export function getNetworks() {
   return axios.get(
-    urljoin(appConfig.sdsUrl, 'networks'),
+    urljoin(config.sdsUrl, 'networks'),
     {
       transformResponse: axios.defaults.transformResponse.concat(
         filterNetworks,
@@ -44,53 +41,51 @@ export function getNetworks() {
 }
 
 
-export function getVariables() {
-  return axios.get(urljoin(appConfig.sdsUrl, 'variables'));
+export function getVariables({ config }) {
+  return axios.get(urljoin(config.sdsUrl, 'variables'));
 }
 
 
-export function getFrequencies() {
-  return axios.get(urljoin(appConfig.sdsUrl, 'frequencies'));
+export function getFrequencies({ config }) {
+  return axios.get(urljoin(config.sdsUrl, 'frequencies'));
 }
 
 
-export function getHistories() {
-  return axios.get(urljoin(appConfig.sdsUrl, 'histories'));
+export function getHistories({ config }) {
+  return axios.get(urljoin(config.sdsUrl, 'histories'));
 }
 
 
-const parsedStationFilterExpressions =
-  filterExpressionsParser(appConfig.stationFilters);
+export function getStations({ config, getParams, getConfig }) {
+  const parsedStationFilterExpressions =
+    filterExpressionsParser(config.stationFilters);
+  const filterStations =
+    filter(filterPredicate(parsedStationFilterExpressions));
 
-const filterStations =
-  filter(filterPredicate(parsedStationFilterExpressions));
-
-
-export function getStations(params, config) {
   return axios.get(
-    urljoin(appConfig.sdsUrl, 'stations'),
+    urljoin(config.sdsUrl, 'stations'),
     {
       params: {
-        offset: appConfig.stationOffset,
-        limit: appConfig.stationLimit,
-        stride: appConfig.stationStride,
-        provinces: appConfig.stationsQpProvinces,
-        ...params,
+        offset: config.stationOffset,
+        limit: config.stationLimit,
+        stride: config.stationStride,
+        provinces: config.stationsQpProvinces,
+        ...getParams,
       },
       transformResponse: axios.defaults.transformResponse.concat(
         tap(x => console.log("raw station count", x.length)),
         filterStations,
         mapDeep(transformIso8601Date)
       ),
-      ...config,
+      ...getConfig,
     },
   );
 }
 
 
-export function getObservationCounts(config) {
+export function getObservationCounts({ config, getConfig }) {
   return axios.get(
-    urljoin(appConfig.sdsUrl, 'observations', 'counts'),
-    config,
+    urljoin(config.sdsUrl, 'observations', 'counts'),
+    getConfig,
   );
 }
