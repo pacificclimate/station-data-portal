@@ -1,0 +1,39 @@
+appTitle: "BC Station Data - PCDS"
+adjustableColumnWidthsDefault: [7, 5]
+defaultTab: "Filters"
+pdpDataUrl: ""
+sdsUrl: ""
+networkFilters: ""
+stationFilters: ""
+#stationsQpProvinces: undefined
+baseMap: "BC"
+defaultNetworkColor: "#000000"
+userDocs:
+  showLink: false
+  url: "https://data.pacificclimate.org/portal/docs/"
+  text: "User Docs"
+lethargy:
+  enabled: true
+  stability: 7
+  sensitivity: 50
+  tolerance: 0.05
+disclaimer:
+  enabled: false
+  title: "Disclaimer Title"
+  body: "Disclaimer body ..."
+  buttonLabel: "Acknowledge"
+mapSpinner:
+  spinner: "Bars"
+  x: "40%"
+  y: "40%"
+  width: "80"
+  stroke: "darkgray"
+  fill: "lightgray"
+stationDebugFetchOptions: false
+stationDebugFetchLimits: [100, 500, 1000, 2000, 4000, 8000]
+#stationOffset: undefined
+#stationLimit: undefined
+#stationStride: undefined
+showReloadStationsButton: false
+timingEnabled: false
+zoomToMarkerRadiusSpec: [ [7,2], [99,4] ]
