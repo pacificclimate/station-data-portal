@@ -1,10 +1,10 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
-
+import { useConfigContext } from '../ConfigContext';
 import './Header.css';
-import config from '../../../utils/configuration';
 
 function Header() {
+  const config = useConfigContext();
   return (
       <Row className={'Header'}>
           <Col lg={3} className="text-left">

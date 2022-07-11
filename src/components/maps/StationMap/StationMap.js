@@ -56,8 +56,8 @@ import logger from '../../../logger';
 import './StationMap.css';
 import { getTimer } from '../../../utils/timing';
 import { MapSpinner } from 'pcic-react-leaflet-components';
-import config, { zoomToMarkerRadius } from '../../../utils/configuration';
 import { useImmer } from 'use-immer';
+import { useConfigContext } from '../../main/ConfigContext';
 
 logger.configure({ active: true });
 const smtimer = getTimer("StationMarker timing")
@@ -79,6 +79,7 @@ function StationMap({
   // should be true if and only if slow updates to the map are pending
   // due to an external update.
 }) {
+  const config = useConfigContext();
   const userShapeLayerRef = useRef();
 
   // TODO: Remove
@@ -96,14 +97,14 @@ function StationMap({
   // map events.
   const [markerOptions, setMarkerOptions] = useImmer(() => ({
     ...defaultMarkerOptions,
-    radius: zoomToMarkerRadius(initialViewport.zoom),
+    radius: config.zoomToMarkerRadius(initialViewport.zoom),
   }));
   const [markerUpdateIsPending, markerUpdateStartTransition] = useTransition();
   const markerMapEvents = useMemo(() => ({
     zoomend: (leafletMap) => {
       markerUpdateStartTransition(() => {
         setMarkerOptions(draft => {
-          draft.radius = zoomToMarkerRadius(leafletMap.getZoom());
+          draft.radius = config.zoomToMarkerRadius(leafletMap.getZoom());
         });
       });
     }

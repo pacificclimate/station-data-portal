@@ -37,7 +37,7 @@ import AdjustableColumns from '../../util/AdjustableColumns';
 import StationFilters, { useStationFiltering }
   from '../../controls/StationFilters';
 import baseMaps from '../../maps/baseMaps';
-import config from '../../../utils/configuration';
+import { useConfigContext } from '../ConfigContext';
 
 
 logger.configure({ active: true });
@@ -47,6 +47,8 @@ logger.configure({ active: true });
 // of debug callbacks for controlling station fetches. This hook is used only
 // by component Body; it's a way of clarifying and simplifying its code.
 function useMetadata() {
+  const config = useConfigContext();
+
   // Fetched metadata
   const [metadata, setMetadata] = useImmerByKey({
     networks: null,
@@ -96,6 +98,7 @@ function useMetadata() {
 
 
 function Body() {
+  const config = useConfigContext();
   // Metadata fetched from backend
   const { metadata, setStnsLimit, reloadStations } = useMetadata();
 
