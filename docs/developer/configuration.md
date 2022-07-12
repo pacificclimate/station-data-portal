@@ -259,6 +259,12 @@ For example, in your docker-compose.yaml, include the following mount:
         read_only: true
 ```
 
+Note: We mount to this target because the app is built in the
+Docker container, and the file is picked up in the build. 
+If we move to a system in which the app is built in the
+Docker image, then the target will change, likely to 
+`/app/build/static/config.yaml`.
+
 ## Environment variables
 
 A small number of configuration parameters must be provided via environment
