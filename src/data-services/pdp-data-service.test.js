@@ -155,7 +155,7 @@ describe('dataDownloadTarget', () => {
       dataCategory: 'category',
       dataFormat: dataFormatOption('format'),
     });
-    expect(target).toMatch(regex(`${PDP_DATA_URL}/pcds/agg/?`));
+    expect(target).toMatch(regex(`PDP_DATA_URL/pcds/agg/?`));
     expect(target).toMatch(regex('from-date=2000%2F01%2F01'));
     expect(target).toMatch(regex('to-date=2010%2F12%2F31'));
     expect(target).toMatch(regex('network-name=nw1%2Cnw2'));
@@ -182,7 +182,7 @@ describe('dataDownloadTarget', () => {
       dataCategory: 'category',
       dataFormat: dataFormatOption('format'),
     });
-    expect(target).toMatch(regex(`${process.env.REACT_APP_PDP_DATA_URL}/pcds/agg/?`));
+    expect(target).toMatch(regex(`PDP_DATA_URL/pcds/agg/?`));
     expect(target).toMatch(regex('from-date=2000%2F01%2F01'));
     expect(target).toMatch(regex('to-date=2010%2F12%2F31'));
     expect(target).toMatch(regex('network-name=nw1%2Cnw2'));
