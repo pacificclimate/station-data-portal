@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useBooleanStateWithToggler } from '../../../hooks';
+import { useImmerByKey } from '../../../hooks';
 import {
   Button,
   Card,
   Col,
-  Form,
   Row,
   Tab,
   Tabs
@@ -21,14 +20,12 @@ import {
   getStations,
   getVariables,
 } from '../../../data-services/station-data-service';
-import { dataDownloadTarget, dataDownloadFilename }
+import { dataDownloadFilename, dataDownloadUrl }
   from '../../../data-services/pdp-data-service';
 import {
   stationAreaFilter,
   stationFilter,
 } from '../../../utils/station-filtering';
-import MarkerClusterOptions, { useMarkerClusterOptions}
-  from '../../controls/MarkerClusterOptions'
 import StationMap from '../../maps/StationMap';
 import StationMetadata from '../../info/StationMetadata';
 import StationData from '../../info/StationData';
@@ -39,36 +36,68 @@ import UnselectedThings from '../../info/UnselectedThings';
 import AdjustableColumns from '../../util/AdjustableColumns';
 import StationFilters, { useStationFiltering }
   from '../../controls/StationFilters';
-import JSONstringify from '../../util/JSONstringify';
 import baseMaps from '../../maps/baseMaps';
-import {
-  markerClusteringAvailable,
-  showReloadStationsButton,
-  stationDebugFetchOptions,
-} from '../../../utils/configuration';
+import config from '../../../utils/configuration';
 
 
 logger.configure({ active: true });
 
-const defaultLgs = [7, 5];
+// This hook wraps up all the metadata variables and fetching in one function,
+// exporting only the metadata state (an immer immutable) and a couple
+// of debug callbacks for controlling station fetches. This hook is used only
+// by component Body; it's a way of clarifying and simplifying its code.
+function useMetadata() {
+  // Fetched metadata
+  const [metadata, setMetadata] = useImmerByKey({
+    networks: null,
+    variables: null,
+    frequencies: null,
+    stations: null,
+  });
 
-// TODO: Place elsewhere
-const stnsLimitOptions =
-  [100, 500, 1000, 2000, 4000, 8000].map(value => ({
-    value, label: value.toString()
-  }));
+  // Debugging support
+  const [debug, setDebug] = useImmerByKey({
+    stnsLimit: config.stationDebugFetchLimitsOptions[0],
+    stationsReload: 0,
+  });
+  const setStnsLimit = setDebug.stnsLimit;
+  const reloadStations = () => {
+    console.log("### reloadStations")
+    setDebug.stationsReload(debug.stationsReload + 1);
+  };
+
+  // Fetch data from backend
+
+  useEffect(() => {
+    getNetworks().then(response => setMetadata.networks(response.data));
+  }, []);
+
+  useEffect(() => {
+    getVariables().then(response => setMetadata.variables(response.data));
+  }, []);
+
+  useEffect(() => {
+    getFrequencies().then(response => setMetadata.frequencies(response.data));
+  }, []);
+
+  useEffect(() => {
+    console.log("### loading stations")
+    setMetadata.stations(null);
+    getStations({
+      compact: true,
+      ...(config.stationDebugFetchOptions && { limit: debug.stnsLimit.value } )
+    })
+    .then(tap(() => console.log("### stations loaded")))
+    .then(response => setMetadata.stations(response.data));
+  }, [debug]);
+
+  return { metadata, setStnsLimit, reloadStations };
+}
 
 
 function Body() {
   // Metadata fetched from backend
-  const [allNetworks, setAllNetworks] = useState(null);
-  const [allVariables, setAllVariables] = useState(null);
-  const [allFrequencies, setAllFrequencies] = useState(null);
-  const [allStations, setAllStations] = useState(null);
-
-  // Support for development tools
-  const [stnsLimit, setStnsLimit] = useState(stnsLimitOptions[0]);
-  const [stationsReload, setStationsReload] = useState(0);
+  const { metadata, setStnsLimit, reloadStations } = useMetadata();
 
   // Station filtering state and setters
   const {
@@ -81,90 +110,15 @@ function Body() {
   // Map polygon, used for selecting (not filtering) stations.
   const [area, setArea] = useState(undefined);
 
-  // Marker clustering option controls.
-  const [uzeMarkercluster, toggleUzeMarkercluster] =
-    useBooleanStateWithToggler(markerClusteringAvailable);
-  const [markerClusterOptions, setMarkerClusterOptions] =
-    useMarkerClusterOptions({
-      removeOutsideVisibleBounds: true,
-      spiderfyOnMaxZoom: false,
-      zoomToBoundsOnClick: false,
-      disableClusteringAtZoom: 8,
-      maxClusterRadius: 80,
-      chunkedLoading: true,
-    });
-
-  // Load metadata
-
-  useEffect(() => {
-    getNetworks().then(response => setAllNetworks(response.data));
-  }, []);
-
-  useEffect(() => {
-    getVariables().then(response => setAllVariables(response.data));
-  }, []);
-
-  useEffect(() => {
-    getFrequencies().then(response => setAllFrequencies(response.data));
-  }, []);
-
-  useEffect(() => {
-    console.log("### loading stations")
-    setAllStations(null)
-    getStations({
-      compact: true,
-      ...(stationDebugFetchOptions && { limit: stnsLimit.value } )
-    })
-      .then(tap(() => console.log("### stations loaded")))
-      .then(response => setAllStations(response.data));
-  }, [stnsLimit, stationsReload]);
-
-  const reloadStations = () => {
-    console.log("### reloadStations")
-    setStationsReload(n => n + 1)
-  };
-
-  const dataDownloadUrl = ({ dataCategory, clipToDate, fileFormat }) => {
-    // Check whether state has settled. Each selector calls an onReady callback
-    // to export information (e.g., all its options) that it has set up
-    // internally. In retrospect, this is a too-clever solution to the problem
-    // of passing a pile of props around, but it's what we've got.
-    if (
-      !filterValuesNormal.networkActions
-      || !filterValuesNormal.variableActions
-      || !filterValuesNormal.frequencyActions
-    ) {
-      return "#";
-    }
-
-    return dataDownloadTarget({
-      ...filterValuesNormal,
-      allNetworksOptions: filterValuesNormal.networkActions.getAllOptions(),
-      allVariablesOptions: filterValuesNormal.variableActions.getAllOptions(),
-      allFrequenciesOptions: filterValuesNormal.frequencyActions.getAllOptions(),
-      polygon: area,
-      dataCategory,
-      clipToDate,
-      dataFormat: fileFormat,
-    });
-  };
-
   // The key to a responsive UI is here: station filtering and all updates
   // based on it are done in a transition. The filter values state reflecting
   // this is `filterValuesTransitional`, used here.
   const filteredStations = useMemo(
     () => stationFilter({
-      ...filterValuesTransitional,
-      allNetworks,
-      allVariables,
-      allStations,
+      filterValues: filterValuesTransitional,
+      metadata,
     }),
-    [
-      filterValuesTransitional,
-      allNetworks,
-      allVariables,
-      allStations,
-    ]
+    [filterValuesTransitional, metadata]
   );
 
   const selectedStations = useMemo(
@@ -178,67 +132,38 @@ function Body() {
     <div className={css.portal}>
       <Row>
         <AdjustableColumns
-          defaultLgs={defaultLgs}
+          defaultLgs={config.adjustableColumnWidthsDefault}
           contents={[
             // "map" ||  // Uncomment to suppress map
             <StationMap
-              {...baseMaps[process.env.REACT_APP_BASE_MAP]}
+              {...baseMaps[config.baseMap]}
               stations={filteredStations}
-              allNetworks={allNetworks}
-              allVariables={allVariables}
+              metadata={metadata}
               onSetArea={setArea}
-              markerClusterOptions={uzeMarkercluster && markerClusterOptions}
               externalIsPending={
-                (allStations === null) || filteringIsPending
+                (metadata.stations === null) || filteringIsPending
               }
             />,
 
             <Card style={{ marginLeft: '-15px', marginRight: '-10px' }}>
               <Card.Body>
-                { showReloadStationsButton && (
+                { config.showReloadStationsButton && (
                   <Button onClick={reloadStations}>
                     Reload stations
                   </Button>
                 )}
                 <Tabs
                   id="non-map-controls"
-                  defaultActiveKey={
-                    process.env.REACT_APP_DEFAULT_TAB ?? "Filters"
-                  }
+                  defaultActiveKey={config.defaultTab}
                   className={css.mainTabs}
                 >
-                  { markerClusteringAvailable && (
-                    <Tab
-                      eventKey={'Clustering'}
-                      title={`Marker Clustering (${uzeMarkercluster ? "on": "off"})`}
-                    >
-                      <SelectionCounts
-                        allStations={allStations}
-                        selectedStations={selectedStations}
-                      />
-                      <Form>
-                        <Form.Check
-                          inline
-                          label={"Use leaflet.markercluster"}
-                          checked={uzeMarkercluster}
-                          onChange={toggleUzeMarkercluster}
-                        />
-                      </Form>
-                      <MarkerClusterOptions
-                        value={markerClusterOptions}
-                        onChange={setMarkerClusterOptions}
-                      />
-                      <JSONstringify object={markerClusterOptions}/>
-                    </Tab>
-                  )}
-
                   <Tab eventKey={'Filters'} title={'Station Filters'}>
-                    {stationDebugFetchOptions && (
+                    {config.stationDebugFetchOptions && (
                       <Row>
                         <Col lg={6}>Fetch limit</Col>
                         <Col lg={6}>
                           <Select
-                            options={stnsLimitOptions}
+                            options={config.stationDebugFetchLimitsOptions}
                             value={stnsLimit}
                             onChange={setStnsLimit}
                           />
@@ -248,7 +173,7 @@ function Body() {
                     <Row {...rowClasses}>
                       <Col lg={12} md={12} sm={12}>
                         <SelectionCounts
-                          allStations={allStations}
+                          allStations={metadata.stations}
                           selectedStations={selectedStations}
                         />
                         <p className={"mb-0"}>
@@ -259,9 +184,7 @@ function Body() {
                     <StationFilters
                       state={filterValuesNormal}
                       setState={filterValuesSetState}
-                      allNetworks={allNetworks}
-                      allVariables={allVariables}
-                      allFrequencies={allFrequencies}
+                      metadata={metadata}
                       rowClasses={rowClasses}
                     />
                   </Tab>
@@ -269,21 +192,20 @@ function Body() {
                   <Tab eventKey={'Metadata'} title={'Station Metadata'}>
                     <Row {...rowClasses}>
                       <SelectionCounts
-                        allStations={allStations}
+                        allStations={metadata.stations}
                         selectedStations={selectedStations}
                       />
                     </Row>
                     <StationMetadata
                       stations={selectedStations}
-                      allNetworks={allNetworks}
-                      allVariables={allVariables}
+                      metadata={metadata}
                     />
                   </Tab>
 
                   <Tab eventKey={'Data'} title={'Station Data'}>
                     <Row {...rowClasses}>
                       <SelectionCounts
-                        allStations={allStations}
+                        allStations={metadata.stations}
                         selectedStations={selectedStations}
                       />
                       <SelectionCriteria/>
@@ -296,14 +218,19 @@ function Body() {
 
                     <StationData
                       selectedStations={selectedStations}
-                      dataDownloadUrl={dataDownloadUrl}
+                      dataDownloadUrl={
+                        dataDownloadUrl({
+                          filterValues: filterValuesNormal,
+                          polygon: area
+                        })
+                      }
                       dataDownloadFilename={dataDownloadFilename}
                       rowClasses={rowClasses}
                     />
                   </Tab>
 
                   <Tab eventKey={'Networks'} title={'Networks'}>
-                    <NetworksMetadata networks={allNetworks}/>
+                    <NetworksMetadata networks={metadata.networks}/>
                   </Tab>
 
                 </Tabs>

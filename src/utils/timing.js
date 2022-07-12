@@ -26,10 +26,10 @@ import map from 'lodash/fp/map';
 import sum from 'lodash/fp/sum';
 import sortBy from 'lodash/fp/sortBy';
 import isNil from 'lodash/fp/isNil';
-import { configBool } from './configuration';
+import config from './configuration';
 
 export class Timer {
-  constructor(name, enabled = configBool("TIMING_ENABLED", "false")) {
+  constructor(name, enabled = config.timingEnabled) {
     this.name = name;
     this.enabled = enabled;
     this.timings = {};

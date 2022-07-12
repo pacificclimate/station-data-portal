@@ -39,7 +39,6 @@
 
 import PropTypes from 'prop-types';
 import React, {
-  useEffect,
   useMemo,
   useRef,
   useTransition
@@ -47,8 +46,6 @@ import React, {
 
 import { FeatureGroup, LayerGroup } from 'react-leaflet';
 import { EditControl } from 'react-leaflet-draw';
-import MarkerCluster from '../MarkerCluster';
-import L from 'leaflet';
 
 import MapInfoDisplay from '../MapInfoDisplay';
 import { defaultMarkerOptions, ManyStationMarkers } from '../StationMarkers';
@@ -59,7 +56,7 @@ import logger from '../../../logger';
 import './StationMap.css';
 import { getTimer } from '../../../utils/timing';
 import { MapSpinner } from 'pcic-react-leaflet-components';
-import { zoomToMarkerRadius } from '../../../utils/configuration';
+import config, { zoomToMarkerRadius } from '../../../utils/configuration';
 import { useImmer } from 'use-immer';
 
 logger.configure({ active: true });
@@ -70,10 +67,8 @@ function StationMap({
   BaseMap,
   initialViewport,
   stations,
-  allNetworks,
-  allVariables,
+  metadata,
   onSetArea = () => {},
-  markerClusterOptions,
   userShapeStyle = {
     color: "#f49853",
     weight: 1,
@@ -88,22 +83,6 @@ function StationMap({
 
   // TODO: Remove
   // const [geometryLayers, setGeometryLayers] = useState([]);
-
-  // Set up drawing tool. This might be better done elsewhere.
-  useEffect(() => {
-    // console.log("### L.drawLocal.draw", L.drawLocal.draw)
-    L.drawLocal.edit.toolbar.buttons = {
-      edit: "Edit shapes",
-      editDisabled: "No shapes to edit",
-      remove: "Remove shapes",
-      removeDisabled: "No shapes to remove",
-    };
-    L.drawLocal.edit.handlers.remove.tooltip = "Click shape to remove";
-    L.drawLocal.edit.toolbar.actions.clearAll = {
-      title: "Remove all shapes",
-      text: "Remove all",
-    };
-  }, []);
 
   const handleChangedGeometryLayers = () => {
     const layers = userShapeLayerRef?.current?.getLayers();
@@ -140,20 +119,15 @@ function StationMap({
   const markers = useMemo(() =>
     <ManyStationMarkers
       stations={stations}
-      allNetworks={allNetworks}
-      allVariables={allVariables}
+      metadata={metadata}
       markerOptions={markerOptions}
       mapEvents={markerMapEvents}
     />,
     [stations, markerOptions]
   );
 
-  const markerLayerGroup = useMemo(() =>
-    markerClusterOptions ? (
-      <MarkerCluster {...markerClusterOptions}>{markers}</MarkerCluster>
-    ) : (
-      <LayerGroup>{markers}</LayerGroup>
-    ),
+  const markerLayerGroup = useMemo(
+    () => (<LayerGroup>{markers}</LayerGroup>),
     [markers]
   );
 
@@ -195,16 +169,7 @@ function StationMap({
         />
       </FeatureGroup>
       {markerLayerGroup}
-      {isPending &&
-        <MapSpinner
-          spinner={"Bars"}
-          x={"40%"}
-          y={"40%"}
-          width={"80"}
-          stroke={"darkgray"}
-          fill={"lightgray"}
-        />
-      }
+      {isPending && <MapSpinner {...config.mapSpinner}/>}
     </BaseMap>
   );
 }
@@ -214,8 +179,7 @@ StationMap.propTypes = {
   BaseMap: PropTypes.func.isRequired,
   initialViewport: PropTypes.object.isRequired,
   stations: PropTypes.array.isRequired,
-  allNetworks: PropTypes.array,
-  allVariables: PropTypes.array,
+  metadata: PropTypes.object,
   onSetArea: PropTypes.func,
 };
 

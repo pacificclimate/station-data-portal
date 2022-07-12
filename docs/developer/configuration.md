@@ -17,35 +17,51 @@ For production runs, environment variables are provided by
 
 ## Environment variables
 
+The content of environment variables is interpreted into JavaScript objects
+in a number of ways: as a string, as a number, as a Boolean value, as a
+JSON encoded object. The interpretation (type) of each env var is indicated
+by a line item "Type: <type>". The default type is string, in case it is
+not specified.
+
+Note: Only JSON objects require quotes around strings.
+
 ### Deployment
 
 `PUBLIC_URL`
 - Base URL for Station Data Portal frontend.
+- Type: string.
 - For production, set this to the URL configured in our proxy server.
 - Required.
 
-`REACT_APP_VERSION`
+`REACT_APP_APP_VERSION`
 - Current version of the app.
+- Type: string.
 - This value should be set using `generate-commitish.sh` when the Docker image is built.
 - It is not recommended to manually override the automatically generated value when the image is run.
-- No default value for this variable is provided in any `.env` file.
+- Note doubled `APP`_ in name.
 
 ### Dataset config
 
-`REACT_APP_TITLE`
+`REACT_APP_APP_TITLE`
 - Title of portal (appears in header)
+- Type: string.
+- Note doubled `APP`_ in name.
 
 `REACT_APP_SDS_URL`
 - URL for station data portal metadata backend (Station Data Service; SDS).
+- Type: string.
 - Required.
 
 `REACT_APP_PDP_DATA_URL`
 - URL for PDP PCDS data download service.
+- Type: string.
 - Required.
 
 `REACT_APP_BASE_MAP`
 - Selects which base map (and thus which projection) to use for station
-  map. Valid values:
+  map. 
+- Type: string.
+- Valid values:
     - `BC`: BC OSM Lite (or similar) base map; BC Albers projection.
     - `YNWT`: YNWT OSM Lite (or similar) base map; Yukon Albers projection.
 - Required.
@@ -54,41 +70,72 @@ For production runs, environment variables are provided by
 
 `REACT_APP_BC_BASE_MAP_TILES_URL`
 - URL template (includes x, y, z) for BC base map tiles.
+- Type: string.
 - Required if `REACT_APP_BASE_MAP=BC`
 
 ### YNWT dataset config
 
 `REACT_APP_YNWT_BASE_MAP_TILES_URL`
 - URL template (includes x, y, z) for YNWT base map tiles.
+- Type: string.
 - Required if `REACT_APP_BASE_MAP=YNWT`
 
-### User docs link config
+### Misc UI config
 
-`REACT_APP_USER_DOCS_SHOW_LINK`
-- Show user docs hyperlink? Don't want to until they are built on PDP.
-- String rep of boolean.
-- Default: false
-
-`REACT_APP_USER_DOCS_URL`
-- URL for user docs hyperlink
-- Default: https://data.pacificclimate.org/portal/docs/
-
-`REACT_APP_USER_DOCS_TEXT`
-- Text for user docs hyperlink
-- Default: User Docs
-
-### Default tab
+`REACT_APP_ADJUSTABLE_COLUMN_WIDTHS_DEFAULT`
+- Default setting for adjustable column widths (between map and tabs).
+- Type: JSON array, length 2.
+- Default: `[7, 5]`
 
 `REACT_APP_DEFAULT_TAB`
 - Default tab in UI
+- Type: string.
 - Valid values: Clustering | Filters | Metadata | Data | Networks
 - Default: Filters
+
+`REACT_APP_LETHARGY`
+- Configuration for Lethargy (tool that improves map behaviour with mouse
+  scrolling on Macs).
+- Type: JSON object
+- Default:
+  ```json
+  {
+    "enabled": true,
+    "stability": 7,
+    "sensitivity": 50,
+    "tolerance": 0.05
+  }
+  ```
+- Properties:
+  - `enabled`: Activate Lethargy? Type: JSON Boolean.
+  - `stability`: Lethargy param.
+  - `sensitivity`: Lethargy param.
+  - `tolerance`: Lethargy param.
+
+### User docs link config
+
+`REACT_APP_USER_DOCS`
+- Configuration for user docs link (in app header)
+- Type: JSON object
+- Default: 
+  ```json
+  {
+    "showLink": false,
+    "url": "https://data.pacificclimate.org/portal/docs/",
+    "text": "User Docs"
+  }
+  ```
+- Properties:
+  - `showLink`: Show user docs hyperlink? Don't want to until they are built on PDP. Type: JSON Boolean.
+  - `url`: URL for user docs hyperlink. Type: JSON string.
+  - `text`: Text for user docs hyperlink. Type: JSON string.
 
 ### Metadata request options
 
 `REACT_APP_STATIONS_QP_PROVINCES`
 - Sets the `provinces` query parameter in the request sent by the client
 to `/stations`.
+- Type: string.
 - Value: Comma-separated list of province codes (e.g., `BC,AB`)
 - Optional.
 
@@ -97,6 +144,7 @@ to `/stations`.
 `REACT_APP_STATION_FILTERS`
 - Semicolon-separated set of filter expressions applied to filter 
   (select) station metadata received from API. (See [Filtering metadata](#filtering-metadata).)
+- Type: string.
 - Optional.
 - Station filtering may not be required if metadata request options (e.g., 
 `REACT_APP_STATIONS_QP_PROVINCES`) are set.
@@ -104,52 +152,80 @@ to `/stations`.
 `REACT_APP_NETWORK_FILTERS`
 - Semicolon-separated set of filter expressions applied to filter  
   (select) network metadata received from API. (See [Filtering metadata](#filtering-metadata).)
+- Type: string.
 - Optional.
 
-### Misc config
+### Map config
 
 `REACT_APP_DEFAULT_NETWORK_COLOR`
 - Default color for networks with unspecified color.
-- Default value `#000000`.
+- Type: string.
+- Default: `#000000`.
 - Must be a value accepted by
   [Chroma.js](https://www.npmjs.com/package/chroma-js),
   which includes standard web colour specs (#RRGGBB).
-- Required.
 
 `REACT_APP_ZOOM_TO_MARKER_RADIUS`
 - Specification for zoom to marker radius conversion.
-- Semicolon-separated pairs of comma-separated numbers (ints), which are
-  interpreted as a list of pairs of `[zoom, radius]` values. Zoom values must
-  be in ascending order.
-- Optional; default `7,2;99,4` -> `[[7,2], [99,4]]`
-- If there is an error in the provided value, the default is used and an error
-  message is written to the console.
+- Type: JSON array.
+- List of pairs (length-2 lists) of numbers (ints), which are
+  interpreted as a list of pairs of `[zoom, radius]` values. 
+  Zoom values must be in ascending order.
+- Default `[ [7, 2], [99, 4] ]`
+
+`REACT_APP_MAP_SPINNER`
+- Configuration for map spinner.
+- Type: JSON
+- Default:
+  ```json
+  {
+    "spinner": "Bars",
+    "x": "40%",
+    "y": "40%",
+    "width": "80",
+    "stroke": "darkgray",
+    "fill": "lightgray"
+  }
+  ```
+- Properties
+  - `spinner`: Name of the spinner, one of the 
+    [`svg-loaders-react`](https://www.npmjs.com/package/svg-loaders-react) spinners. Type: JSON string.
+  - `x`: x-position of spinner on map. Type: JSON string.
+  - `y`: y-position of spinner on map. Type: JSON string.
+  - `width`: Size of spinner on map. Type: JSON string.
+  - `stroke`: Stroke colour of spinner graphic. Type: JSON string.
+  - `fill`: Fill colour of spinner graphic. Type: JSON string.
+  - For additional info, see
+    [`MapSpinner`](https://github.com/pacificclimate/pcic-react-leaflet-components/blob/master/docs/package-contents.md#component-mapspinner).
 
 ### Disclaimer dialog config
 
-`REACT_APP_DISCLAIMER_ENABLED`
-- Present disclaimer dialog on app startup.
-- String representing boolean value; case insensitive "true" === true, else false.
-- Optional; default empty === false.
-
-`REACT_APP_DISCLAIMER_TITLE`
-- Title content for disclaimer dialog.
-- Optional; provide if REACT_APP_DISCLAIMER_ENABLED is true.
-
-`REACT_APP_DISCLAIMER_BODY`
-- Body content for disclaimer dialog.
-- Optional; provide if REACT_APP_DISCLAIMER_ENABLED is true.
-
-`REACT_APP_DISCLAIMER_BUTTON_LABEL`
-- Close-button label for disclaimer; recommend some variant of 
-Acknowledge, Accept, ...
-- Optional; provide if REACT_APP_DISCLAIMER_ENABLED is true.
-
-`REACT_APP_DEBUG_STATION_FETCH_OPTIONS`
-- Add control(s) for setting station fetch debug options (e.g., limit).
-- Dev/debug only.
-- Case-insensitive string; "true" to turn on.
-- Optional, default false.
+`REACT_APP_DISCLAIMER`
+- Disclaimer dialog configuration.
+- Type: JSON. Note: MUST be all on one line. This is awkward.
+- Default (formatted on multiple lines; see note above):
+  ```json
+  {
+    "enabled": false,
+    "title": "Disclaimer Title",
+    "body": "Disclaimer body ...",
+    "buttonLabel": "Acknowledge"
+  } 
+  ```
+- Properties:
+  - `enabled`
+    - Present disclaimer dialog on app startup?
+    - Type: JSON Boolean.
+  - `title`
+    - Title content for disclaimer dialog.
+    - Type: JSON string
+  - `body`
+    - Body content for disclaimer dialog.
+    - Type: JSON string
+  - `buttonLabel`
+    - **Close** button label for disclaimer; recommend some variant of 
+    Acknowledge, Accept, ...
+    - Type: JSON string
 
 ### Debug/dev config
 

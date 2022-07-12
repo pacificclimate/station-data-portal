@@ -44,7 +44,7 @@ function ObservationCounts({startDate, endDate, stations}) {
   timer.log();
 
   return (
-    <Table condensed size="sm">
+    <Table size="sm">
       <thead>
       <tr>
         <th colSpan={2}>Summary for selected stations</th>

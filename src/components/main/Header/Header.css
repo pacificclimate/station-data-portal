@@ -8,3 +8,7 @@
     color: hsl(198, 100%, 19%);
     font-size: 2.5em;
 }
+
+.Header p {
+    margin: 0;
+}
