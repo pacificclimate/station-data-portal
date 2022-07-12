@@ -32,13 +32,6 @@ in `public/config.yaml`. They are critical to the functioning of the app.
 - Value: string.
 - Required; no default.
 
-`stationsQpProvinces`
-- Sets the `provinces` query parameter in the request sent by the app
-  to `/stations`.
-- Type: string.
-- Valid values: Comma-separated list of province codes (e.g., `BC,AB`)
-- Optional.
-
 `pdpDataUrl`
 - URL for PDP data download service.
 - Value: string.
@@ -135,6 +128,13 @@ value types. Typically, these values configure basic UI functionality.
 These values default to `undefined`. They may be overridden with values
 of the correct type.
 
+`stationsQpProvinces`
+- Sets the `provinces` query parameter in the request sent by the app
+  to `/stations`.
+- Type: string.
+- Valid values: Comma-separated list of province codes (e.g., `BC,AB`)
+- Optional.
+
 `stationFilters`
 - Semicolon-separated set of filter expressions applied to pre-filter
   (select) station metadata received from API. 
@@ -143,6 +143,7 @@ of the correct type.
 - Optional.
 - Note: Station filtering may not be required if metadata request options 
   (e.g., `stationsQpProvinces`) are set.
+- Optional.
 
 `networkFilters`
 - Semicolon-separated set of filter expressions applied to filter  
@@ -290,14 +291,10 @@ For production runs, environment variables are provided by
 - It is not recommended to manually override the automatically generated value when the image is run.
 - Note doubled `APP_` in name.
 
-### BC (PCDS) dataset config
-
 `REACT_APP_BC_BASE_MAP_TILES_URL`
 - URL template (includes x, y, z) for BC base map tiles.
 - Type: string.
 - Required if YAML config.baseMap === "BC"
-
-### YNWT dataset config
 
 `REACT_APP_YNWT_BASE_MAP_TILES_URL`
 - URL template (includes x, y, z) for YNWT base map tiles.

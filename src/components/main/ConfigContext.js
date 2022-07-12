@@ -67,7 +67,6 @@ export function useFetchConfigContext({
     // Absolutely required values
     "appTitle",
     "sdsUrl",
-    "stationsQpProvinces",
     "pdpDataUrl",
     "baseMap",
 
