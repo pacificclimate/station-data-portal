@@ -1,7 +1,267 @@
 # Configuration
 
-Main configuration of the Station Data Portal frontend is done via
+Most configuration of the Station Data Portal frontend is done via a YAML
+file, `public/config.yaml`. For details, see below.
+
+For technical reasons, a few configuration parameters must be supplied via 
 environment variables.
+
+## Configuration via `public/config.yaml`
+
+This file must be a key-value map. It overrides the default configuration 
+values, which are given below. Certain keys do not have default values and
+_must_ be specified in `public/config.yaml`. The others are optional.
+
+
+### Configuration options
+
+For default values see [Default configuration](#default-configuration).
+
+#### Absolutely required values
+
+These values do not have defaults and must be specified 
+in `public/config.yaml`. They are critical to the functioning of the app.
+
+`appTitle`
+- Title of portal (appears in header).
+- Value: string.
+- Required; no default.
+
+`sdsUrl`
+- URL for station data portal metadata backend (Station Data Service; SDS).
+- Value: string.
+- Required; no default.
+
+`stationsQpProvinces`
+- Sets the `provinces` query parameter in the request sent by the app
+  to `/stations`.
+- Type: string.
+- Valid values: Comma-separated list of province codes (e.g., `BC,AB`)
+- Optional.
+
+`pdpDataUrl`
+- URL for PDP data download service.
+- Value: string.
+- Required; no default.
+
+`baseMap`
+- Selects which base map (and thus which projection) to use for station
+  map.
+- Type: string.
+- Valid values:
+  - `BC`: BC OSM Lite (or similar) base map; BC Albers projection.
+  - `YNWT`: YNWT OSM Lite (or similar) base map; Yukon Albers projection.
+- Required; no default.
+
+#### Required values with defaults
+
+These values may be overridden, but not with `undefined` or with invalid
+value types. Typically, these values configure basic UI functionality.
+
+`adjustableColumnWidthsDefault`
+- Default setting for adjustable column widths (between map and tabs).
+- Type: array, length 2.
+- Required.
+
+`defaultTab`
+- Default tab in UI
+- Type: string.
+- Valid values: Filters | Metadata | Data | Networks
+- Required.
+
+`defaultNetworkColor`
+- Default color for networks with unspecified color.
+- Type: string.
+- Valid values: Must be a value accepted by
+  [Chroma.js](https://www.npmjs.com/package/chroma-js),
+  which includes standard web colour specs (`#RRGGBB`).
+- Required.
+
+`zoomToMarkerRadiusSpec`
+- Specification for zoom to marker radius conversion.
+- Type: array.
+- Valid values: List of pairs (length-2 lists) of numbers (ints), which are
+  interpreted as a list of pairs of `[zoom, radius]` values.
+  Zoom values must be in ascending order.
+- Required.
+
+`lethargy`
+- Configuration for Lethargy (tool that improves map behaviour with mouse
+  scrolling on Macs).
+- Type: key-value map
+- Properties:
+  - `enabled`: Activate Lethargy? Type: Boolean.
+  - `stability`: Lethargy param. Type: number.
+  - `sensitivity`: Lethargy param. Type: number.
+  - `tolerance`: Lethargy param. Type: number.
+- Required.
+
+`userDocs`
+- Configuration for user docs link (in app header)
+- Type: key-value map
+- Properties:
+  - `showLink`: Show user docs hyperlink? Don't want to until they are built on PDP. Type: Boolean.
+  - `url`: URL for user docs hyperlink. Type: string.
+  - `text`: Text for user docs hyperlink. Type: string.
+- Required.
+
+`mapSpinner`
+- Configuration for map spinner.
+- Type: key-value map
+- Important properties
+  - `spinner`: Name of the spinner, one of the
+    [`svg-loaders-react`](https://www.npmjs.com/package/svg-loaders-react) spinners. Type: string.
+  - `x`: x-position of spinner on map. Type: string.
+  - `y`: y-position of spinner on map. Type: string.
+  - `width`: Size of spinner on map. Type: string.
+  - `stroke`: Stroke colour of spinner graphic. Type: string.
+  - `fill`: Fill colour of spinner graphic. Type: string.
+  - For additional info, see
+    [`MapSpinner`](https://github.com/pacificclimate/pcic-react-leaflet-components/blob/master/docs/package-contents.md#component-mapspinner).
+- Required.
+
+`disclaimer`
+- Disclaimer dialog configuration.
+- Type: key-value map
+- Properties:
+  - `enabled`: Present disclaimer dialog on app startup? Type: Boolean.
+  - `title`: Title content for disclaimer dialog. Type: string
+  - `body`: Body content for disclaimer dialog. Type: string
+  - `buttonLabel`: Label of **Close** button. Type: string
+- Required.
+
+#### Optional values
+
+These values default to `undefined`. They may be overridden with values
+of the correct type.
+
+`stationFilters`
+- Semicolon-separated set of filter expressions applied to pre-filter
+  (select) station metadata received from API. 
+  (See [Filtering metadata](#filtering-metadata).)
+- Type: string.
+- Optional.
+- Note: Station filtering may not be required if metadata request options 
+  (e.g., `stationsQpProvinces`) are set.
+
+`networkFilters`
+- Semicolon-separated set of filter expressions applied to filter  
+  (select) network metadata received from API. (See [Filtering metadata](#filtering-metadata).)
+- Type: string.
+- Optional.
+
+`stationDebugFetchOptions`
+- Show/hide station fetch options controls for experimenting.
+- Value: Boolean
+- Optional.
+
+`stationDebugFetchLimits`
+- Items for debug fetch dropdown.
+- Type: array.
+- Optional.
+
+`showReloadStationsButton`
+- Show Reload Stations button.
+- Type: Boolean.
+- Optional.
+
+`stationOffset`
+- Sets `offset` param in /stations request. For testing.
+- Optional.
+
+`stationLimit`
+- Sets `limit` param in /stations request. For testing.
+- Optional.
+
+`stationStride`
+- Sets `stride` param in /stations request. For testing.
+- Optional.
+
+`timingEnabled`
+- Enable timing of selected operations. When enabled, timings are logged to
+  console.
+- Value: Boolean.
+- Optional.
+
+### Default configuration
+
+```yaml
+adjustableColumnWidthsDefault: [7, 5]
+defaultTab: Filters
+defaultNetworkColor: "#000000"
+zoomToMarkerRadiusSpec: [ [7,2], [99,4] ]
+userDocs:
+  showLink: false
+  url: "https://data.pacificclimate.org/portal/docs/"
+  text: "User Docs"
+lethargy:
+  enabled: true
+  stability: 7
+  sensitivity: 50
+  tolerance: 0.05
+disclaimer:
+  enabled: false
+  title: "Disclaimer Title"
+  body: "Disclaimer body ..."
+  buttonLabel: "Acknowledge"
+mapSpinner:
+  spinner: "Bars"
+  x: "40%"
+  y: "40%"
+  width: "80"
+  stroke: "darkgray"
+  fill: "lightgray"
+stationDebugFetchOptions: false
+stationDebugFetchLimits: [100, 500, 1000, 2000, 4000, 8000]
+showReloadStationsButton: false
+timingEnabled: false
+```
+
+### Example custom configuration files
+
+#### PCDS data portal
+
+Note: TBD items will be updated when production deployments are ready.
+
+```yaml
+appTitle: BC Station Data - PCDS
+pdpDataUrl: https://services.pacificclimate.org/data
+sdsUrl: TBD!!
+baseMap: BC
+stationsQpProvinces: BC
+networkFilters: name != "PCIC Climate Variables"
+```
+
+#### YNWT data portal
+
+Note: TBD items will be updated when production deployments are ready.
+
+```yaml
+appTitle: YNWT Station Data
+pdpDataUrl: TBD!!
+sdsUrl: TBD!!
+baseMap: YNWT
+stationsQpProvinces: TBD!!
+```
+
+### Custom configuration and Docker deployment
+
+To use a custom configuration in a Docker deployment, mount
+a custom config file to `/app/public/config.yaml`.
+For example, in your docker-compose.yaml, include the following mount:
+
+```yaml
+    volumes:
+      - type: bind
+        source: /path/to/custom/config.yaml
+        target: /app/public/config.yaml
+        read_only: true
+```
+
+## Environment variables
+
+A small number of configuration parameters must be provided via environment
+variables.
 
 In a Create React App app, [environment variables are managed carefully](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables).
 Therefore, most of the environment variables below begin with `REACT_APP_`,
@@ -13,17 +273,7 @@ For more details, see the
 [CRA documentation](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables).
 
 For production runs, environment variables are provided by
-`docker-compose.yaml`. 
-
-## Environment variables
-
-The content of environment variables is interpreted into JavaScript objects
-in a number of ways: as a string, as a number, as a Boolean value, as a
-JSON encoded object. The interpretation (type) of each env var is indicated
-by a line item "Type: <type>". The default type is string, in case it is
-not specified.
-
-Note: Only JSON objects require quotes around strings.
+`docker-compose.yaml`.
 
 ### Deployment
 
@@ -38,233 +288,21 @@ Note: Only JSON objects require quotes around strings.
 - Type: string.
 - This value should be set using `generate-commitish.sh` when the Docker image is built.
 - It is not recommended to manually override the automatically generated value when the image is run.
-- Note doubled `APP`_ in name.
-
-### Dataset config
-
-`REACT_APP_APP_TITLE`
-- Title of portal (appears in header)
-- Type: string.
-- Note doubled `APP`_ in name.
-
-`REACT_APP_SDS_URL`
-- URL for station data portal metadata backend (Station Data Service; SDS).
-- Type: string.
-- Required.
-
-`REACT_APP_PDP_DATA_URL`
-- URL for PDP PCDS data download service.
-- Type: string.
-- Required.
-
-`REACT_APP_BASE_MAP`
-- Selects which base map (and thus which projection) to use for station
-  map. 
-- Type: string.
-- Valid values:
-    - `BC`: BC OSM Lite (or similar) base map; BC Albers projection.
-    - `YNWT`: YNWT OSM Lite (or similar) base map; Yukon Albers projection.
-- Required.
+- Note doubled `APP_` in name.
 
 ### BC (PCDS) dataset config
 
 `REACT_APP_BC_BASE_MAP_TILES_URL`
 - URL template (includes x, y, z) for BC base map tiles.
 - Type: string.
-- Required if `REACT_APP_BASE_MAP=BC`
+- Required if YAML config.baseMap === "BC"
 
 ### YNWT dataset config
 
 `REACT_APP_YNWT_BASE_MAP_TILES_URL`
 - URL template (includes x, y, z) for YNWT base map tiles.
 - Type: string.
-- Required if `REACT_APP_BASE_MAP=YNWT`
-
-### Misc UI config
-
-`REACT_APP_ADJUSTABLE_COLUMN_WIDTHS_DEFAULT`
-- Default setting for adjustable column widths (between map and tabs).
-- Type: JSON array, length 2.
-- Default: `[7, 5]`
-
-`REACT_APP_DEFAULT_TAB`
-- Default tab in UI
-- Type: string.
-- Valid values: Clustering | Filters | Metadata | Data | Networks
-- Default: Filters
-
-`REACT_APP_LETHARGY`
-- Configuration for Lethargy (tool that improves map behaviour with mouse
-  scrolling on Macs).
-- Type: JSON object
-- Default:
-  ```json
-  {
-    "enabled": true,
-    "stability": 7,
-    "sensitivity": 50,
-    "tolerance": 0.05
-  }
-  ```
-- Properties:
-  - `enabled`: Activate Lethargy? Type: JSON Boolean.
-  - `stability`: Lethargy param.
-  - `sensitivity`: Lethargy param.
-  - `tolerance`: Lethargy param.
-
-### User docs link config
-
-`REACT_APP_USER_DOCS`
-- Configuration for user docs link (in app header)
-- Type: JSON object
-- Default: 
-  ```json
-  {
-    "showLink": false,
-    "url": "https://data.pacificclimate.org/portal/docs/",
-    "text": "User Docs"
-  }
-  ```
-- Properties:
-  - `showLink`: Show user docs hyperlink? Don't want to until they are built on PDP. Type: JSON Boolean.
-  - `url`: URL for user docs hyperlink. Type: JSON string.
-  - `text`: Text for user docs hyperlink. Type: JSON string.
-
-### Metadata request options
-
-`REACT_APP_STATIONS_QP_PROVINCES`
-- Sets the `provinces` query parameter in the request sent by the client
-to `/stations`.
-- Type: string.
-- Value: Comma-separated list of province codes (e.g., `BC,AB`)
-- Optional.
-
-### Client-side station filtering options
-
-`REACT_APP_STATION_FILTERS`
-- Semicolon-separated set of filter expressions applied to filter 
-  (select) station metadata received from API. (See [Filtering metadata](#filtering-metadata).)
-- Type: string.
-- Optional.
-- Station filtering may not be required if metadata request options (e.g., 
-`REACT_APP_STATIONS_QP_PROVINCES`) are set.
-
-`REACT_APP_NETWORK_FILTERS`
-- Semicolon-separated set of filter expressions applied to filter  
-  (select) network metadata received from API. (See [Filtering metadata](#filtering-metadata).)
-- Type: string.
-- Optional.
-
-### Map config
-
-`REACT_APP_DEFAULT_NETWORK_COLOR`
-- Default color for networks with unspecified color.
-- Type: string.
-- Default: `#000000`.
-- Must be a value accepted by
-  [Chroma.js](https://www.npmjs.com/package/chroma-js),
-  which includes standard web colour specs (#RRGGBB).
-
-`REACT_APP_ZOOM_TO_MARKER_RADIUS`
-- Specification for zoom to marker radius conversion.
-- Type: JSON array.
-- List of pairs (length-2 lists) of numbers (ints), which are
-  interpreted as a list of pairs of `[zoom, radius]` values. 
-  Zoom values must be in ascending order.
-- Default `[ [7, 2], [99, 4] ]`
-
-`REACT_APP_MAP_SPINNER`
-- Configuration for map spinner.
-- Type: JSON
-- Default:
-  ```json
-  {
-    "spinner": "Bars",
-    "x": "40%",
-    "y": "40%",
-    "width": "80",
-    "stroke": "darkgray",
-    "fill": "lightgray"
-  }
-  ```
-- Properties
-  - `spinner`: Name of the spinner, one of the 
-    [`svg-loaders-react`](https://www.npmjs.com/package/svg-loaders-react) spinners. Type: JSON string.
-  - `x`: x-position of spinner on map. Type: JSON string.
-  - `y`: y-position of spinner on map. Type: JSON string.
-  - `width`: Size of spinner on map. Type: JSON string.
-  - `stroke`: Stroke colour of spinner graphic. Type: JSON string.
-  - `fill`: Fill colour of spinner graphic. Type: JSON string.
-  - For additional info, see
-    [`MapSpinner`](https://github.com/pacificclimate/pcic-react-leaflet-components/blob/master/docs/package-contents.md#component-mapspinner).
-
-### Disclaimer dialog config
-
-`REACT_APP_DISCLAIMER`
-- Disclaimer dialog configuration.
-- Type: JSON. Note: MUST be all on one line. This is awkward.
-- Default (formatted on multiple lines; see note above):
-  ```json
-  {
-    "enabled": false,
-    "title": "Disclaimer Title",
-    "body": "Disclaimer body ...",
-    "buttonLabel": "Acknowledge"
-  } 
-  ```
-- Properties:
-  - `enabled`
-    - Present disclaimer dialog on app startup?
-    - Type: JSON Boolean.
-  - `title`
-    - Title content for disclaimer dialog.
-    - Type: JSON string
-  - `body`
-    - Body content for disclaimer dialog.
-    - Type: JSON string
-  - `buttonLabel`
-    - **Close** button label for disclaimer; recommend some variant of 
-    Acknowledge, Accept, ...
-    - Type: JSON string
-
-### Debug/dev config
-
-`REACT_APP_DEBUG_STATION_FETCH_OPTIONS`
-- Show/hide station fetch options controls for experimenting.
-- Value: string bool
-- Default: false
-
-`REACT_APP_MARKER_CLUSTERING_AVAILABLE`
-- Allow marker clustering.
-- When enabled, enables marker clustering by default and shows marker
-clustering control tab.
-- Semi dev/debug.
-- Case-insensitive string; "true" to turn on.
-- Optional, default false.
-
-`REACT_APP_SHOW_RELOAD_STATIONS_BUTTON`
-- Show Reload Stations button.
-- Dev/debug only.
-- Case-insensitive string; "true" to turn on.
-- Optional, default false.
-
-`REACT_APP_STATION_OFFSET`
-- Sets `offset` param in /stations request. For testing.
-- Optional.
-
-`REACT_APP_STATION_LIMIT`
-- Sets `limit` param in /stations request. For testing.
-- Optional.
-
-`REACT_APP_STATION_STRIDE`
-- Sets `stride` param in /stations request. For testing.
-- Optional.
-
-`REACT_APP_TIMING_ENABLED`
-- Enable timing of selected operations. When enabled, timings are logged to 
-console.
-- Value: string bool.
-- Default: false.
+- Required if YAML config.baseMap === "YNWT"
 
 ## Filtering metadata
 
