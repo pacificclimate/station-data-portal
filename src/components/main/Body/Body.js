@@ -102,6 +102,7 @@ function useMetadata() {
 
 function Body() {
   const config = useConfigContext();
+
   // Metadata fetched from backend
   const { metadata, setStnsLimit, reloadStations } = useMetadata();
 
@@ -226,6 +227,7 @@ function Body() {
                       selectedStations={selectedStations}
                       dataDownloadUrl={
                         dataDownloadUrl({
+                          config,
                           filterValues: filterValuesNormal,
                           polygon: area
                         })

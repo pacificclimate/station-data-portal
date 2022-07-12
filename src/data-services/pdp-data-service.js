@@ -11,7 +11,6 @@ import padCharsStart from 'lodash/fp/padCharsStart';
 import tap from 'lodash/fp/tap';
 import uniq from 'lodash/fp/uniq';
 import { geoJSON2WKT } from '../utils/geographic-encodings';
-import config from '../utils/configuration';
 
 
 const pad2 = padCharsStart('0', 2);
@@ -93,6 +92,7 @@ export const frequencyOptions2pdpFormat = (options, allOptions) => flow(
 
 
 export const dataDownloadTarget = ({
+  config,
   startDate,
   endDate,
   selectedNetworksOptions,
@@ -133,7 +133,7 @@ makeURI(
 
 
 export const dataDownloadUrl =
-  ({ filterValues, polygon }) =>
+  ({ config, filterValues, polygon }) =>
   ({ dataCategory, clipToDate, fileFormat }) => {
     // Check whether state has settled. Each selector calls an onReady callback
     // to export information (e.g., all its options) that it has set up
@@ -148,6 +148,7 @@ export const dataDownloadUrl =
     }
 
     return dataDownloadTarget({
+      config,
       ...filterValues,
       allNetworksOptions: filterValues.networkActions.getAllOptions(),
       allVariablesOptions: filterValues.variableActions.getAllOptions(),
