@@ -13,52 +13,6 @@ const ConfigContext = React.createContext({});
 export default ConfigContext;
 
 
-const defaultConfig = {
-  adjustableColumnWidthsDefault: [7, 5],
-  defaultTab: "Filters",
-  networkFilters: "",
-  stationFilters: "",
-  defaultNetworkColor: "#000000",
-  zoomToMarkerRadiusSpec: [ [7,2], [99,4] ],
-  userDocs: {
-    showLink: false,
-    url: "https://data.pacificclimate.org/portal/docs/",
-    text: "User Docs",
-  },
-  lethargy: {
-    enabled: true,
-    stability: 7,
-    sensitivity: 50,
-    tolerance: 0.05,
-  },
-  disclaimer: {
-    enabled: false,
-    title: "Disclaimer Title",
-    body: "Disclaimer body ...",
-    buttonLabel: "Acknowledge",
-  },
-  mapSpinner: {
-    spinner: "Bars",
-    x: "40%",
-    y: "40%",
-    width: "80",
-    stroke: "darkgray",
-    fill: "lightgray",
-  },
-  stationDebugFetchOptions: false,
-  stationDebugFetchLimits: [100, 500, 1000, 2000, 4000, 8000],
-  showReloadStationsButton: false,
-  timingEnabled: false,
-};
-
-const requiredConfigKeys = [
-  "appTitle",
-  "pdpDataUrl",
-  "sdsUrl",
-  "stationsQpProvinces",
-  "baseMap",
-];
-
 // Custom hook for fetching configuration from public/config.yaml.
 // This hook returns two state variables, `[config, errorMessage]`.
 //
@@ -72,8 +26,63 @@ const requiredConfigKeys = [
 // This hook should be used only by the top-level component, and the returned
 // `config` used to set the value provided by `ConfigContext.Provider`. See
 // component `App`.
-export function useFetchConfigContext(init = null) {
-  const [config, setConfig] = useState(init);
+export function useFetchConfigContext({
+  defaultConfig = {
+    adjustableColumnWidthsDefault: [7, 5],
+    defaultTab: "Filters",
+    defaultNetworkColor: "#000000",
+    zoomToMarkerRadiusSpec: [ [7,2], [99,4] ],
+    userDocs: {
+      showLink: false,
+      url: "https://data.pacificclimate.org/portal/docs/",
+      text: "User Docs",
+    },
+    lethargy: {
+      enabled: true,
+      stability: 7,
+      sensitivity: 50,
+      tolerance: 0.05,
+    },
+    disclaimer: {
+      enabled: false,
+      title: "Disclaimer Title",
+      body: "Disclaimer body ...",
+      buttonLabel: "Acknowledge",
+    },
+    mapSpinner: {
+      spinner: "Bars",
+      x: "40%",
+      y: "40%",
+      width: "80",
+      stroke: "darkgray",
+      fill: "lightgray",
+    },
+    stationDebugFetchOptions: false,
+    stationDebugFetchLimits: [100, 500, 1000, 2000, 4000, 8000],
+    showReloadStationsButton: false,
+    timingEnabled: false,
+  },
+
+  requiredConfigKeys = [
+    // Absolutely required values
+    "appTitle",
+    "sdsUrl",
+    "stationsQpProvinces",
+    "pdpDataUrl",
+    "baseMap",
+
+    // Required values with defaults
+    "adjustableColumnWidthsDefault",
+    "defaultTab",
+    "defaultNetworkColor",
+    "zoomToMarkerRadiusSpec",
+    "lethargy",
+    "userDocs",
+    "mapSpinner",
+    "disclaimer",
+  ],
+}) {
+  const [config, setConfig] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   useEffect(() => {
     axios.get(`${process.env.PUBLIC_URL}/config.yaml`)
