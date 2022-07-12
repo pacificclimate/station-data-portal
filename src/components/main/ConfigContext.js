@@ -21,19 +21,22 @@ export function useFetchConfigContext(init = null) {
     axios.get(`${process.env.PUBLIC_URL}/config.yaml`).then(response => {
       const cfg = yaml.load(response.data);
 
-      // Extend loaded config with some computed goodies
+      // Extend config with some env var values
+      cfg.appVersion = process.env.REACT_APP_APP_VERSION ?? "unknown";
+
+      // Extend config with some computed goodies
       cfg.stationDebugFetchLimitsOptions = cfg.stationDebugFetchLimits.map(
         value => ({ value, label: value.toString() })
       );
 
+      const zmrSpec = cfg.zoomToMarkerRadiusSpec;
       cfg.zoomToMarkerRadius = zoom => {
-        const spec = cfg.zoomToMarkerRadiusSpec;
-        for (const [_zoom, radius] of spec) {
+        for (const [_zoom, radius] of zmrSpec) {
           if (zoom <= _zoom) {
             return radius;
           }
         }
-        return spec[spec.length-1][1];
+        return zmrSpec[zmrSpec.length-1][1];
       }
 
       // Update the config state.
