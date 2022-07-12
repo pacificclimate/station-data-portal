@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 
 import Disclaimer from '../../info/Disclaimer';
@@ -8,11 +8,19 @@ import InitializeApp from "./app-initialization";
 
 import './App.css';
 import ConfigContext, { useFetchConfigContext } from '../ConfigContext';
+import { setTimingEnabled } from '../../../utils/timing';
 
 
 export default function App() {
   // must be invoked before any other items dependent on context.
   const [config, configErrorMessage] = useFetchConfigContext({});
+
+  // Export timing values to non-component code
+  useEffect(() => {
+    if (config?.timingEnabled) {
+      setTimingEnabled(config.timingEnabled);
+    }
+  }, [config]);
 
   if (configErrorMessage !== null) {
     return <div>{configErrorMessage}</div>
