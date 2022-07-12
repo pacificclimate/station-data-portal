@@ -1,7 +1,7 @@
-appTitle: "BC Station Data - PCDS"
-pdpDataUrl: "https://services.pacificclimate.org/data"
-sdsUrl: "http://localhost:5000"
-baseMap: "BC"
+appTitle: BC Station Data - PCDS
+pdpDataUrl: https://services.pacificclimate.org/data
+sdsUrl: http://localhost:5000
+baseMap: BC
 stationsQpProvinces: BC
 networkFilters: name != "PCIC Climate Variables"
 #stationFilters: histories[0].province = "BC"
