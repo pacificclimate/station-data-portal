@@ -12,7 +12,11 @@ import ConfigContext, { useFetchConfigContext } from '../ConfigContext';
 
 export default function App() {
   // must be invoked before any other items dependent on context.
-  const config = useFetchConfigContext();
+  const [config, configErrorMessage] = useFetchConfigContext();
+
+  if (configErrorMessage !== null) {
+    return <div>{configErrorMessage}</div>
+  }
 
   if (config === null) {
     return <div>Loading configuration...</div>
