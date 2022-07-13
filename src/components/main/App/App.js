@@ -1,26 +1,20 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Container } from 'react-bootstrap';
 
 import Disclaimer from '../../info/Disclaimer';
 import Header from '../Header/Header';
 import Body from '../Body';
-import InitializeApp from "./app-initialization";
+import useInitializeApp from "./app-initialization";
 
 import './App.css';
 import ConfigContext, { useFetchConfigContext } from '../ConfigContext';
-import { setTimingEnabled } from '../../../utils/timing';
 
 
 export default function App() {
   // must be invoked before any other items dependent on context.
   const [config, configErrorMessage] = useFetchConfigContext({});
 
-  // Export timing values to non-component code
-  useEffect(() => {
-    if (config?.timingEnabled) {
-      setTimingEnabled(config.timingEnabled);
-    }
-  }, [config]);
+  useInitializeApp(config);
 
   if (configErrorMessage !== null) {
     return <div>{configErrorMessage}</div>
@@ -33,7 +27,6 @@ export default function App() {
   return (
     <ConfigContext.Provider value={config}>
       <Container fluid className="App">
-        <InitializeApp/>
         <Disclaimer/>
         <Header/>
         <Body/>
