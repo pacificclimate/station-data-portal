@@ -220,29 +220,98 @@ timingEnabled: false
 
 ### Example custom configuration files
 
-#### PCDS data portal
+#### Default configuration
 
-Note: TBD items will be updated when production deployments are ready.
+Currently targets CRMP database.
 
 ```yaml
 appTitle: BC Station Data - PCDS
-pdpDataUrl: https://services.pacificclimate.org/data
-sdsUrl: TBD!!
 baseMap: BC
-stationsQpProvinces: BC
+
+# sdsUrl values will be replaced by dev or prod URLs when they become ready.
+# For now, we have demo instances inside the firewall.
+# Uses monsoon database
+sdsUrl: http://docker-dev02.pcic.uvic.ca:30512
+# Uses new database
+#sdsUrl: http://docker-dev02.pcic.uvic.ca:30562
+# Local instance
+#sdsUrl: http://localhost:5000
+
+# Currently deployed metadata backends do not respond to provinces QP.
+# When they do, we can use stationsQpProvinces and lose stationFilters
+#stationsQpProvinces: BC
+stationFilters: histories[0].province = "BC"
+
+# Always necessary for CRMP database
 networkFilters: name != "PCIC Climate Variables"
+
+# pdpDataUrl values will be replaced by dev or prod URLs when they become ready.
+# For now, we have a demo instance inside the firewall, below.
+# Uses monsoon database
+pdpDataUrl: http://docker-dev02.pcic.uvic.ca:30514
+# Uses new database
+#pdpDataUrl: http://docker-dev02.pcic.uvic.ca:???
+
+# Debug params
+#stationFilters: histories[0].province = "BC"
+#stationDebugFetchOptions: false
+#stationDebugFetchLimits: [100, 500, 1000, 2000, 4000, 8000]
+#stationOffset: undefined
+#stationLimit: undefined
+#stationStride: undefined
+#showReloadStationsButton: false
+#timingEnabled: false
+```
+
+#### PCDS data portal
+
+```yaml
+appTitle: BC Station Data - PCDS
+baseMap: BC
+
+# sdsUrl values will be replaced by dev or prod URLs when they become ready.
+# For now, we have demo instances inside the firewall.
+# Uses monsoon database
+sdsUrl: http://docker-dev02.pcic.uvic.ca:30512
+# Uses new database
+#sdsUrl: http://docker-dev02.pcic.uvic.ca:30562
+
+# Currently deployed metadata backends do not respond to provinces QP.
+# When they do, we can invert the commenting out below.
+#stationsQpProvinces: BC
+stationFilters: histories[0].province = "BC"
+
+# Always necessary for CRMP database
+networkFilters: name != "PCIC Climate Variables"
+
+# pdpDataUrl values will be replaced by dev or prod URLs when they become ready.
+# For now, we have a demo instance inside the firewall, below.
+# Uses monsoon database
+pdpDataUrl: http://docker-dev02.pcic.uvic.ca:30514
+# Uses new database
+#pdpDataUrl: http://docker-dev02.pcic.uvic.ca:???
 ```
 
 #### YNWT data portal
 
-Note: TBD items will be updated when production deployments are ready.
-
 ```yaml
 appTitle: YNWT Station Data
-pdpDataUrl: TBD!!
-sdsUrl: TBD!!
 baseMap: YNWT
-stationsQpProvinces: TBD!!
+
+# sdsUrl values will be replaced by prod URLs when they become ready.
+# For now, we have a dev instance.
+# Uses monsoon database
+sdsUrl: https://services.pacificclimate.org/dev/ynwt/meta
+
+# We do not at present need to filter based on province (verify!)
+#stationsQpProvinces: YK,NT
+# We do not at present need to filter networks (verify!)
+#networkFilters: ???
+
+# pdpDataUrl values will be replaced by prod URLs when they become ready.
+# For now, we have a dev instance.
+# Uses monsoon database
+pdpDataUrl: https://services.pacificclimate.org/dev/ynwt/data
 ```
 
 ### Custom configuration and Docker deployment
@@ -259,10 +328,11 @@ For example, in your docker-compose.yaml, include the following mount:
         read_only: true
 ```
 
-Note: We mount to this target because the app is built in the
-Docker container, and the file is picked up in the build. 
-If we move to a system in which the app is built in the
-Docker image, then the target will change, likely to 
+Note: We mount to target `/app/public/config.yml` because the app is built 
+in the Docker _container_, and this file is picked up in the build and
+copied to the appropriate build artifact. 
+If we move to a system in which the app is built in advance in the
+Docker _image_, then the target will change, likely to 
 `/app/build/static/config.yaml`.
 
 ## Environment variables
