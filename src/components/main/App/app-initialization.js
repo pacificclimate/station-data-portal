@@ -9,6 +9,7 @@ import { useConfigContext } from '../ConfigContext';
 
 export default function InitializeApp() {
   const config = useConfigContext();
+
   useEffect(() => {
     // Set up (polygon) drawing tool in Leaflet.
     L.drawLocal.edit.toolbar.buttons = {
@@ -31,5 +32,8 @@ export default function InitializeApp() {
         config.lethargy.tolerance,
       );
     }
+
+    // Set browser title
+    document.title = config.appTitle;
   }, [config]);
 }
