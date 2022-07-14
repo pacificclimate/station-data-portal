@@ -6,7 +6,8 @@ import {
   networkSelectorOptions2pdpFormat,
   variable2PdpVariableIdentifier,
   variableSelectorOptions2pdpFormat,
-  frequencyOptions2pdpFormat, dataDownloadTarget
+  frequencyOptions2pdpFormat,
+  dataDownloadTarget
 } from './pdp-data-service';
 
 
@@ -131,6 +132,8 @@ describe('dataDownloadTarget', () => {
     jest.resetModules();
   });
 
+  const config = { pdpDataUrl: "PDP_DATA_URL" };
+
   const regex = s => new RegExp(escapeRegExp(s));
 
   const geoJSONNullPolygon = {
@@ -140,6 +143,7 @@ describe('dataDownloadTarget', () => {
 
   it('works for clipToDate and onlyWithClimatology true', () => {
     const target = dataDownloadTarget({
+      config,
       startDate: new Date(2000, 0, 1),
       endDate: new Date(2010, 11, 31),
       selectedNetworksOptions: map(networkOption)(['nw1', 'nw2']),
@@ -151,7 +155,7 @@ describe('dataDownloadTarget', () => {
       dataCategory: 'category',
       dataFormat: dataFormatOption('format'),
     });
-    expect(target).toMatch(regex(`${process.env.REACT_APP_PDP_DATA_URL}/pcds/agg/?`));
+    expect(target).toMatch(regex(`PDP_DATA_URL/pcds/agg/?`));
     expect(target).toMatch(regex('from-date=2000%2F01%2F01'));
     expect(target).toMatch(regex('to-date=2010%2F12%2F31'));
     expect(target).toMatch(regex('network-name=nw1%2Cnw2'));
@@ -166,6 +170,7 @@ describe('dataDownloadTarget', () => {
 
   it('works for clipToDate and onlyWithClimatology false', () => {
     const target = dataDownloadTarget({
+      config,
       startDate: new Date(2000, 0, 1),
       endDate: new Date(2010, 11, 31),
       selectedNetworksOptions: map(networkOption)(['nw1', 'nw2']),
@@ -177,7 +182,7 @@ describe('dataDownloadTarget', () => {
       dataCategory: 'category',
       dataFormat: dataFormatOption('format'),
     });
-    expect(target).toMatch(regex(`${process.env.REACT_APP_PDP_DATA_URL}/pcds/agg/?`));
+    expect(target).toMatch(regex(`PDP_DATA_URL/pcds/agg/?`));
     expect(target).toMatch(regex('from-date=2000%2F01%2F01'));
     expect(target).toMatch(regex('to-date=2010%2F12%2F31'));
     expect(target).toMatch(regex('network-name=nw1%2Cnw2'));

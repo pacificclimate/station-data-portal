@@ -9,6 +9,7 @@ import logger from '../../../logger';
 import { getTimer } from '../../../utils/timing';
 
 import './ObservationCounts.css';
+import { useConfigContext } from '../../main/ConfigContext';
 
 logger.configure({ active: true });
 const timer = getTimer("Observation count timing")
@@ -20,17 +21,21 @@ const totalCounts = timer.timeThis("totalCounts")(
 );
 
 function ObservationCounts({startDate, endDate, stations}) {
+  const config = useConfigContext();
   const [countData, setCountData] = useState(null);
 
   useEffect(() => {
     // TODO: getObservationCounts should assemble params
     getObservationCounts({
-      params: {
-        start_date: startDate,
-        end_date: endDate,
+      config,
+      axiosConfig: {
+        params: {
+          start_date: startDate,
+          end_date: endDate,
+        }
       }
     }).then(response => setCountData(response.data));
-  }, [startDate, endDate]);
+  }, [config, startDate, endDate]);
 
   if (countData === null) {
     return <p>Loading counts...</p>

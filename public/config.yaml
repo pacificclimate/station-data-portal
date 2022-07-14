@@ -1,0 +1,36 @@
+appTitle: BC Station Data - PCDS
+baseMap: BC
+
+# sdsUrl values will be replaced by dev or prod URLs when they become ready.
+# For now, we have demo instances inside the firewall.
+# Uses monsoon database
+sdsUrl: http://docker-dev02.pcic.uvic.ca:30512
+# Uses new database
+#sdsUrl: http://docker-dev02.pcic.uvic.ca:30562
+# Local instance
+#sdsUrl: http://localhost:5000
+
+# Currently deployed metadata backends do not respond to provinces QP.
+# When they do, we can use stationsQpProvinces and lose stationFilters
+#stationsQpProvinces: BC
+stationFilters: histories[0].province = "BC"
+
+# Always necessary for CRMP database
+networkFilters: name != "PCIC Climate Variables"
+
+# pdpDataUrl values will be replaced by dev or prod URLs when they become ready.
+# For now, we have a demo instance inside the firewall, below.
+# Uses monsoon database
+pdpDataUrl: http://docker-dev02.pcic.uvic.ca:30514
+# Uses new database
+#pdpDataUrl: http://docker-dev02.pcic.uvic.ca:???
+
+# Debug params
+#stationFilters: histories[0].province = "BC"
+#stationDebugFetchOptions: false
+#stationDebugFetchLimits: [100, 500, 1000, 2000, 4000, 8000]
+#stationOffset: undefined
+#stationLimit: undefined
+#stationStride: undefined
+#showReloadStationsButton: false
+#timingEnabled: false

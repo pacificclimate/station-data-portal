@@ -19,7 +19,7 @@ import {
   uniqStationObsPeriods,
   uniqStationVariableNames,
 } from '../../../utils/station-info';
-import config from '../../../utils/configuration';
+import { useConfigContext } from '../../main/ConfigContext';
 
 logger.configure({ active: true });
 
@@ -27,14 +27,12 @@ logger.configure({ active: true });
 const formatDate = d => d ? d.toISOString().substr(0,10) : 'unknown';
 
 
-function StationPopup({
-  station,
-  defaultNetworkColor = config.defaultNetworkColor,
-  metadata,
-}) {
+function StationPopup({ station, metadata }) {
+  const config = useConfigContext();
+
   const network = stationNetwork(metadata.networks, station);
   const networkColor =
-    chroma(network.color ?? defaultNetworkColor).alpha(0.5).css();
+    chroma(network.color ?? config.defaultNetworkColor).alpha(0.5).css();
 
   const stationNames = flow(
     uniqStationNames,
@@ -141,7 +139,6 @@ function StationPopup({
 StationPopup.propTypes = {
   station: PropTypes.object.isRequired,
   metadata: PropTypes.object.isRequired,
-  defaultNetworkColor: PropTypes.string,
 };
 
 export default StationPopup;

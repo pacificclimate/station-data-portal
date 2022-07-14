@@ -26,10 +26,12 @@ import map from 'lodash/fp/map';
 import sum from 'lodash/fp/sum';
 import sortBy from 'lodash/fp/sortBy';
 import isNil from 'lodash/fp/isNil';
-import config from './configuration';
+
+
+let timingEnabled = false;
 
 export class Timer {
-  constructor(name, enabled = config.timingEnabled) {
+  constructor(name, enabled = timingEnabled) {
     this.name = name;
     this.enabled = enabled;
     this.timings = {};
@@ -91,7 +93,6 @@ export class Timer {
     }
     console.groupEnd();
   }
-
 }
 
 
@@ -103,3 +104,11 @@ export const getTimer = name => {
   }
   return registry[name];
 };
+
+
+export const setTimingEnabled = enabled => {
+  timingEnabled = enabled;
+  for (const timer of Object.values(registry)) {
+    timer.enabled = enabled;
+  }
+}

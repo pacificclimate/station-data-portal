@@ -8,17 +8,16 @@ import { Table } from 'react-bootstrap';
 import { useTable } from 'react-table';
 import logger from '../../../logger';
 import chroma from 'chroma-js';
+import { useConfigContext } from '../../main/ConfigContext';
 import './NetworksMetadata.css';
-import config from '../../../utils/configuration';
 
 
 logger.configure({ active: true });
 
 
-function NetworksMetadata({
-  networks,
-  defaultNetworkColor = config.defaultNetworkColor,
-}) {
+function NetworksMetadata({ networks }) {
+  const config = useConfigContext();
+
   const columns = React.useMemo(() => [
     {
       id: 'Colour',
@@ -31,7 +30,7 @@ function NetworksMetadata({
           height: "1em",
           borderRadius: "0.5em",
           backgroundColor: chroma(
-            network.color ?? defaultNetworkColor
+            network.color ?? config.defaultNetworkColor
           ).css(),
         }}>&nbsp;</div>
       )
@@ -50,7 +49,7 @@ function NetworksMetadata({
       maxWidth: 400,
       accessor: 'long_name'
     },
-  ], [defaultNetworkColor]);
+  ], [config.defaultNetworkColor]);
 
   const tableInstance = useTable({ columns, data: networks ?? [] });
   const {
@@ -117,7 +116,6 @@ function NetworksMetadata({
 
 NetworksMetadata.propTypes = {
   networks: PropTypes.array,
-  defaultNetworkColor: PropTypes.string,
 };
 
 export default NetworksMetadata;

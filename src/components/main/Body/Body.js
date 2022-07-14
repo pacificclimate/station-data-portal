@@ -37,7 +37,7 @@ import AdjustableColumns from '../../util/AdjustableColumns';
 import StationFilters, { useStationFiltering }
   from '../../controls/StationFilters';
 import baseMaps from '../../maps/baseMaps';
-import config from '../../../utils/configuration';
+import { useConfigContext } from '../ConfigContext';
 
 
 logger.configure({ active: true });
@@ -47,6 +47,8 @@ logger.configure({ active: true });
 // of debug callbacks for controlling station fetches. This hook is used only
 // by component Body; it's a way of clarifying and simplifying its code.
 function useMetadata() {
+  const config = useConfigContext();
+
   // Fetched metadata
   const [metadata, setMetadata] = useImmerByKey({
     networks: null,
@@ -69,23 +71,29 @@ function useMetadata() {
   // Fetch data from backend
 
   useEffect(() => {
-    getNetworks().then(response => setMetadata.networks(response.data));
-  }, []);
+    getNetworks({ appConfig: config })
+    .then(response => setMetadata.networks(response.data));
+  }, [config]);
 
   useEffect(() => {
-    getVariables().then(response => setMetadata.variables(response.data));
-  }, []);
+    getVariables({ appConfig: config })
+    .then(response => setMetadata.variables(response.data));
+  }, [config]);
 
   useEffect(() => {
-    getFrequencies().then(response => setMetadata.frequencies(response.data));
-  }, []);
+    getFrequencies({ appConfig: config })
+    .then(response => setMetadata.frequencies(response.data));
+  }, [config]);
 
   useEffect(() => {
     console.log("### loading stations")
     setMetadata.stations(null);
     getStations({
-      compact: true,
-      ...(config.stationDebugFetchOptions && { limit: debug.stnsLimit.value } )
+      appConfig: config,
+      getParams: {
+        compact: true,
+        ...(config.stationDebugFetchOptions && { limit: debug.stnsLimit.value })
+      }
     })
     .then(tap(() => console.log("### stations loaded")))
     .then(response => setMetadata.stations(response.data));
@@ -96,6 +104,8 @@ function useMetadata() {
 
 
 function Body() {
+  const config = useConfigContext();
+
   // Metadata fetched from backend
   const { metadata, setStnsLimit, reloadStations } = useMetadata();
 
@@ -220,6 +230,7 @@ function Body() {
                       selectedStations={selectedStations}
                       dataDownloadUrl={
                         dataDownloadUrl({
+                          config,
                           filterValues: filterValuesNormal,
                           polygon: area
                         })
