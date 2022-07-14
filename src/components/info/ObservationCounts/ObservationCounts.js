@@ -28,7 +28,7 @@ function ObservationCounts({startDate, endDate, stations}) {
     // TODO: getObservationCounts should assemble params
     getObservationCounts({
       config,
-      getConfig: {
+      axiosConfig: {
         params: {
           start_date: startDate,
           end_date: endDate,
