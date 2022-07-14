@@ -71,22 +71,25 @@ function useMetadata() {
   // Fetch data from backend
 
   useEffect(() => {
-    getNetworks({ config }).then(response => setMetadata.networks(response.data));
+    getNetworks({ appConfig: config })
+    .then(response => setMetadata.networks(response.data));
   }, [config]);
 
   useEffect(() => {
-    getVariables({ config }).then(response => setMetadata.variables(response.data));
+    getVariables({ appConfig: config })
+    .then(response => setMetadata.variables(response.data));
   }, [config]);
 
   useEffect(() => {
-    getFrequencies({ config }).then(response => setMetadata.frequencies(response.data));
+    getFrequencies({ appConfig: config })
+    .then(response => setMetadata.frequencies(response.data));
   }, [config]);
 
   useEffect(() => {
     console.log("### loading stations")
     setMetadata.stations(null);
     getStations({
-      config,
+      appConfig: config,
       getParams: {
         compact: true,
         ...(config.stationDebugFetchOptions && { limit: debug.stnsLimit.value })

@@ -24,8 +24,9 @@ export default ConfigContext;
 // is set to an appropriate message (which may be a string or a React object).
 //
 // This hook should be used only by the top-level component, and the returned
-// `config` used to set the value provided by `ConfigContext.Provider`. See
-// component `App`.
+// `config` used to set the value provided by `ConfigContext.Provider`. (For
+// specific usage, see component `App`.) All other components should access
+// app configuration using the hook `useConfigContext`.
 export function useFetchConfigContext({
   defaultConfig = {
     adjustableColumnWidthsDefault: [7, 5],

@@ -132,6 +132,10 @@ makeURI(
 );
 
 
+// This is a higher-order function that returns a function that constructs
+// data download URLs suitable for consumption by the PDP dataservice.
+// It is curried like this because of when and where the various parameters
+// are available in the calling code.
 export const dataDownloadUrl =
   ({ config, filterValues, polygon }) =>
   ({ dataCategory, clipToDate, fileFormat }) => {
