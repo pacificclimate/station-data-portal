@@ -19,6 +19,16 @@ For more details, see the
 
 For building and running a production app, see below.
 
+## Upgrading `pcic-react-leaflet-components`
+
+To get a successful upgrade in your local environment, you must do the 
+following:
+
+```
+npm uninstall pcic-react-leaflet-components
+npm install git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git#<version>
+```
+
 ## Testing
 
 Testing (unit) is sparse in this project. I'm still debating how much effort
