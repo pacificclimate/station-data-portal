@@ -49,6 +49,13 @@ function NetworksMetadata({ networks }) {
       maxWidth: 400,
       accessor: 'long_name'
     },
+    {
+      id: '# Stations',
+      Header: '# Stations',
+      minWidth: 80,
+      maxWidth: 100,
+      accessor: 'station_count'
+    },
   ], [config.defaultNetworkColor]);
 
   const tableInstance = useTable({ columns, data: networks ?? [] });
