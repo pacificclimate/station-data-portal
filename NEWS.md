@@ -1,5 +1,39 @@
 # News / Release Notes
 
+## 1.0.0
+
+*Release Date: 2022-Jul-18*
+
+Candidate production release.
+
+Changes:
+
+- [Use pcic-react-leaflet-components 3.0.1](https://github.com/pacificclimate/station-data-portal/pull/140)
+- [Config via YAML file](https://github.com/pacificclimate/station-data-portal/pull/139).
+- [Housekeeping](https://github.com/pacificclimate/station-data-portal/pull/138)
+  Major improvements in code maintainability.
+- [Add user docs](https://github.com/pacificclimate/station-data-portal/pull/126)
+- [Fix the date pickers](https://github.com/pacificclimate/station-data-portal/pull/137)
+- [Improve use of concurrency](https://github.com/pacificclimate/station-data-portal/pull/136)
+- [Decouple marker radius update from base layer update](https://github.com/pacificclimate/station-data-portal/pull/134)
+- [Fix leftover UI deficiencies](https://github.com/pacificclimate/station-data-portal/pull/133)
+- [Upgrade to React 18, React Leaflet 4, React Bootstrap 2.x](https://github.com/pacificclimate/station-data-portal/pull/132). 
+  Enables major improvements to app responsiveness.
+- [Use Lethargy package to fix inertial scroll zoom on Macs](https://github.com/pacificclimate/station-data-portal/pull/130)
+- [Add metadata download (CSV only)](https://github.com/pacificclimate/station-data-portal/pull/117)
+- [Enable/disable timing from config](https://github.com/pacificclimate/station-data-portal/pull/123)
+- [Use config to set provinces query param on stations request](https://github.com/pacificclimate/station-data-portal/pull/122)
+- [Add optional disclaimer dialogue](https://github.com/pacificclimate/station-data-portal/pull/116)
+- [Handle last remaining item removed from a filter selector](https://github.com/pacificclimate/station-data-portal/pull/115)
+- [Use smaller radius markers at lower zooms](https://github.com/pacificclimate/station-data-portal/pull/112)
+- [Fix favicon and title](https://github.com/pacificclimate/station-data-portal/pull/111)
+- [Fix frequency query parameter for data download for "all freqs" condition](https://github.com/pacificclimate/station-data-portal/pull/109)
+- [Refactor for maintainability](https://github.com/pacificclimate/station-data-portal/pull/108)
+- [Restore lazy popups](https://github.com/pacificclimate/station-data-portal/pull/103)
+- [Upgrade to React 17, React Leaflet 3.x](https://github.com/pacificclimate/station-data-portal/pull/102). 
+  Note subsequent upgrade to React 18, etc.
+- [Improve app performance](https://github.com/pacificclimate/station-data-portal/pull/98)
+
 ## 0.1.0
 
 *Release Date: 2022-Mar-31*
