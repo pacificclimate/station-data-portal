@@ -18,7 +18,8 @@ function InfoPopup({
         <Popover id={title}>
           <Popover.Header>{title}</Popover.Header>
           <Popover.Body>{children}</Popover.Body>
-        </Popover>}
+        </Popover>
+      }
     >
       <InfoCircle/>
     </OverlayTrigger>

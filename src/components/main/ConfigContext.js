@@ -58,6 +58,7 @@ export function useFetchConfigContext({
       stroke: "darkgray",
       fill: "lightgray",
     },
+    maxUrlLength: 2047,
     stationDebugFetchOptions: false,
     stationDebugFetchLimits: [100, 500, 1000, 2000, 4000, 8000],
     showReloadStationsButton: false,
