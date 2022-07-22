@@ -1,12 +1,31 @@
 # News / Release Notes
 
+## 1.1.0
+
+*Release Date: 2022-Jul-22*
+
+Candidate production release.
+
+Requires:
+- Station Data Portal Backend ver 10.2.0
+- PDP backend: branch `pcds_only`
+
+Changes:
+
+- [Add warning (or disable) download buttons when request URL is too long](https://github.com/pacificclimate/station-data-portal/pull/145)
+- [Add station count to Networks tab](https://github.com/pacificclimate/station-data-portal/pull/142)
+
 ## 1.0.0
 
 *Release Date: 2022-Jul-18*
 
 Candidate production release.
 
-Changes:
+Requires:
+- Station Data Portal Backend ver 10.1.0
+- PDP backend: branch `pcds_only`
+
+- Changes:
 
 - [Use pcic-react-leaflet-components 3.0.1](https://github.com/pacificclimate/station-data-portal/pull/140)
 - [Config via YAML file](https://github.com/pacificclimate/station-data-portal/pull/139).
