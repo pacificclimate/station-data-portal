@@ -21,21 +21,18 @@ const totalCounts = timer.timeThis("totalCounts")(
 );
 
 function ObservationCounts({startDate, endDate, stations}) {
-  const config = useConfigContext();
+  const appConfig = useConfigContext();
   const [countData, setCountData] = useState(null);
 
   useEffect(() => {
-    // TODO: getObservationCounts should assemble params
     getObservationCounts({
-      config,
-      axiosConfig: {
-        params: {
-          start_date: startDate,
-          end_date: endDate,
-        }
-      }
+      appConfig,
+      getParams: {
+        start_date: startDate,
+        end_date: endDate,
+      },
     }).then(response => setCountData(response.data));
-  }, [config, startDate, endDate]);
+  }, [appConfig, startDate, endDate]);
 
   if (countData === null) {
     return <p>Loading counts...</p>
