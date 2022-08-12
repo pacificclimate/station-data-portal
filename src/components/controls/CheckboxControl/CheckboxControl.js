@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Form } from 'react-bootstrap';
 
-import './OnlyWithClimatologyControl.css';
+import './CheckboxControl.css';
 
 export default function CheckboxControl({
   label, value, onChange, ...rest
