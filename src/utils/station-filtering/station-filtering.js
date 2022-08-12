@@ -1,3 +1,55 @@
+// Functions for filtering stations based on various criteria (station network,
+// observation date range, etc.).
+//
+// **Important information** about the meaning of the value of `history.freq`:
+//
+// Null for this value means that a frequency has not been assigned.
+//
+// Null is common as the frequency is assigned by an algorithm that appears
+// to be a heuristic for determining the most common observation interval,
+// followed by a transformation to a human-friendly string representing that
+// interval.
+//
+// The [heuristic](https://github.com/pacificclimate/crmp/blob/master/package/R/crmp-class.r#L712)
+// computes a value in hours representing the most common inter-observation
+// period (not frequency) in hours.
+//
+// The results of the heuristic are (I think), by some code not in this
+// particular codebase, transformed by
+// [this function](https://github.com/pacificclimate/crmp/blob/master/package/R/crmp-class.r#L726)
+// into the strings that are the values of `history.freq`.
+//
+// This algorithm (heuristic, then transformation to string) is manually
+// applied to the database on an ad-hoc basis.
+//
+// The heuristic returns a zero value when it receives zero "rows", i.e.
+// zero observations. This will be the case for any histories without
+// associated observations. A zero value is transformed to the string
+// "irregular".
+//
+// Unfortunately there is a second case in which the value of `freq` is
+// "irregular": When the transformation algorithm does not find a "cluster"
+// (of interval values, presumably; clustered by what, how?) with a clustering
+// weight greater than a threshold. In other words, if the intervals are
+// all over the place, then it also returns "irregular".
+//
+// This overloads the ultimate meaning of the value "irregular".
+//
+// In neither case, null or "irregular", interpret the meaning of
+// `history.freq` with respect to the condition "stations with no observations".
+// The null case means that the algorithm has not been run, and this says
+// nothing about the number of observations. The "irregular" case means that
+// either there are no observations or there are observations but their time
+// pattern is irregular.
+//
+// However, for the purpose of that interpretation, we can supply information
+// derived from a broader examination of the `history`: If the history has
+// the hallmarks of no observations, namely that the variables array is empty,
+// then we know more. In that case we ignore the contents of the `freq`
+// attribute and assign a status of "no observations" and pass the filter,
+// regardless of selected frequencies (just as we do for variable filtering).
+// If not, then we apply the usual filtering.
+
 import contains from 'lodash/fp/contains';
 import every from 'lodash/fp/every';
 import filter from 'lodash/fp/filter';
@@ -83,9 +135,12 @@ export const stationReportsSomeVariables =
         map("variable_ids"),
         flatten,
       ))(station.histories);
+      // If there are no observations (no variables), and we are including
+      // stations with no observations, then return true.
       if (includeStationsWithNoObs && stationVariableIds.length === 0) {
         return true;
       }
+      // Otherwise, match based on variable ids recorded in station histories.
       const r = some(uri => contains(uri, stationVariableIds))(variableIds);
       // if (!r) {
       //   console.log(`Station ${station.id} filtered out on variables`)
@@ -96,8 +151,24 @@ export const stationReportsSomeVariables =
 
 
 export const stationReportsAnyFreqs = ft.timeThis("stationReportsAnyFreqs")(
-    (station, freqs) => {
-    const stationFreqs = ft.timeThis("stationFreqs")(
+    (station, freqs, includeStationsWithNoObs) => {
+      // See comments at top of module regarding the meaning of `history.freq`
+      // when there are no observations for that history. That explains the
+      // following code.
+
+      // Compute the observation variables for this station. There are
+      // no observations if and only if there are no variables.
+      const stationVariableIds = flow(
+        map("variable_ids"),
+        flatten,
+      )(station.histories);
+      // If there are no observations (no variables), and we are including
+      // stations with no observations, then return true.
+      if (includeStationsWithNoObs && stationVariableIds.length === 0) {
+        return true;
+      }
+      // Otherwise, match based on frequencies recorded in station histories.
+      const stationFreqs = ft.timeThis("stationFreqs")(
         map("freq"),
       )(station.histories);
       const r = ft.timeThis("freq in stationFreqs")(
@@ -203,7 +274,9 @@ export const stationFilter = ({
         && stationReportsSomeVariables(
           station, selectedVariableIds, includeStationsWithNoObs
         )
-        && stationReportsAnyFreqs(station, selectedFrequencyValues)
+        && stationReportsAnyFreqs(
+          station, selectedFrequencyValues, includeStationsWithNoObs
+        )
         && (
           !onlyWithClimatology ||
           stationReportsClimatologyVariable(station, climatologyVariableIds)
