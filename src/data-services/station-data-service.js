@@ -37,6 +37,9 @@ export function getNetworks({ appConfig }) {
   return axios.get(
     urljoin(appConfig.sdsUrl, 'networks'),
     {
+      params: {
+        provinces: appConfig.stationsQpProvinces,
+      },
       transformResponse: axios.defaults.transformResponse.concat(
         filterNetworks,
       ),
@@ -46,12 +49,26 @@ export function getNetworks({ appConfig }) {
 
 
 export function getVariables({ appConfig }) {
-  return axios.get(urljoin(appConfig.sdsUrl, 'variables'));
+  return axios.get(
+    urljoin(appConfig.sdsUrl, 'variables'),
+    {
+      params: {
+        provinces: appConfig.stationsQpProvinces,
+      },
+    },
+  );
 }
 
 
 export function getFrequencies({ appConfig }) {
-  return axios.get(urljoin(appConfig.sdsUrl, 'frequencies'));
+  return axios.get(
+    urljoin(appConfig.sdsUrl, 'frequencies'),
+    {
+      params: {
+        provinces: appConfig.stationsQpProvinces,
+      },
+    },
+  );
 }
 
 
@@ -81,15 +98,21 @@ export function getStations({ appConfig, getParams, axiosConfig }) {
         filterStations,
         mapDeep(transformIso8601Date)
       ),
-      ...axiosConfig,
+    ...axiosConfig
     },
   );
 }
 
 
-export function getObservationCounts({ config, axiosConfig }) {
+export function getObservationCounts({ appConfig, getParams, axiosConfig }) {
   return axios.get(
-    urljoin(config.sdsUrl, 'observations', 'counts'),
-    axiosConfig,
+    urljoin(appConfig.sdsUrl, 'observations', 'counts'),
+    {
+      params: {
+        provinces: appConfig.stationsQpProvinces,
+        ...getParams,
+      },
+      ...axiosConfig,
+    },
   );
 }
