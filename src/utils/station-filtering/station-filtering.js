@@ -78,14 +78,15 @@ export const atLeastOne = items => items.length > 0;
 
 export const stationReportsSomeVariables =
   ft.timeThis("stationReportsSomeVariables")(
-    (station, variableIds) => {
+    (station, variableIds, includeStationsWithNoObs) => {
       const stationVariableIds = ft.timeThis("stationVariableIds")(flow(
         map("variable_ids"),
         flatten,
       ))(station.histories);
-      const r = ft.timeThis("variableUri in stationVariableIds")(
-        some(uri => contains(uri, stationVariableIds))
-      )(variableIds);
+      if (includeStationsWithNoObs && stationVariableIds.length === 0) {
+        return true;
+      }
+      const r = some(uri => contains(uri, stationVariableIds))(variableIds);
       // if (!r) {
       //   console.log(`Station ${station.id} filtered out on variables`)
       // }
@@ -165,6 +166,7 @@ export const stationInsideMultiPolygon = ft.timeThis("stationInsideMultiPolygon"
 
 export const stationFilter = ({
   filterValues: {
+    includeStationsWithNoObs,
     startDate,
     endDate,
     selectedNetworksOptions,
@@ -198,7 +200,9 @@ export const stationFilter = ({
   const r = filter(station => (
         stationMatchesDates(station, startDate, endDate, false)
         && stationInAnyNetwork(station, selectedNetworksOptions)
-        && stationReportsSomeVariables(station, selectedVariableIds)
+        && stationReportsSomeVariables(
+          station, selectedVariableIds, includeStationsWithNoObs
+        )
         && stationReportsAnyFreqs(station, selectedFrequencyValues)
         && (
           !onlyWithClimatology ||
