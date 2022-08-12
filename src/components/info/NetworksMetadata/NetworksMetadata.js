@@ -5,7 +5,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Table } from 'react-bootstrap';
-import { useTable } from 'react-table';
+import { useSortBy, useTable } from 'react-table';
 import logger from '../../../logger';
 import chroma from 'chroma-js';
 import { useConfigContext } from '../../main/ConfigContext';
@@ -24,6 +24,7 @@ function NetworksMetadata({ networks }) {
       Header: '',
       minWidth: 20,
       maxWidth: 20,
+      disableSortBy: true,
       accessor: network => (
         <div style={{
           width: "1em",
@@ -58,14 +59,24 @@ function NetworksMetadata({ networks }) {
     },
   ], [config.defaultNetworkColor]);
 
-  const tableInstance = useTable({ columns, data: networks ?? [] });
+  const data = React.useMemo(() => networks ?? [], [networks])
+
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     rows,
     prepareRow,
-  } = tableInstance;
+  } = useTable(
+    {
+      columns,
+      data,
+      initialState: {
+        sortBy: [{ id: 'Short Name' }]
+      }
+    },
+    useSortBy,
+  );
 
   if (networks === null) {
     return "Loading...";
@@ -82,11 +93,24 @@ function NetworksMetadata({ networks }) {
           <tr {...headerGroup.getHeaderGroupProps()}>
             {
               // Header cells
-              headerGroup.headers.map(column => (
-                <th {...column.getHeaderProps()}>
-                  {column.render('Header')}
-                </th>
-              ))
+              headerGroup.headers.map(column => {
+                const sortClass = column.isSorted
+                  ? (column.isSortedDesc ? 'sorted-desc' : 'sorted-asc')
+                  : '';
+                return (
+                    <th
+                      {
+                        ...column.getHeaderProps({
+                          ...column.getSortByToggleProps(),
+                          className: sortClass,
+                        })
+                      }
+                    >
+                      {column.render('Header')}
+                    </th>
+                  )
+                }
+              )
             }
           </tr>
         ))
