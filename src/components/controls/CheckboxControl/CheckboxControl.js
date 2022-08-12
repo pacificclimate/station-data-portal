@@ -5,10 +5,10 @@ import { Form } from 'react-bootstrap';
 import './CheckboxControl.css';
 
 export default function CheckboxControl({
-  label, value, onChange, ...rest
+  label, value, onChange, extra, ...rest
 }) {
   return (
-    <Form>
+    <Form className={"CheckboxControl"}>
       <Form.Check
         className={"fw-bold"}
         label={label}
@@ -16,6 +16,8 @@ export default function CheckboxControl({
         onChange={onChange}
         {...rest}
       />
+      {' '}
+      {extra}
     </Form>
   );
 }
@@ -24,4 +26,5 @@ CheckboxControl.propTypes = {
   label: PropTypes.string.isRequired,
   value: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
+  extra: PropTypes.any,
 };
