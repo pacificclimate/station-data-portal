@@ -34,9 +34,15 @@ before it can be used to access data. Click the **Accept** button to
 accept the terms of use and enter the app proper.
 
 The MDP’s first action is to fetch data describing all stations in its
-region database. This may take a few seconds. During this time, the map
-shows only the background base map. When all the descriptive data
-(metadata) has loaded, the map shows markers for each station.
+region database. This may take several seconds. During this time, the map
+shows a spinner and some of the selectors show "Loading...".
+When all the descriptive data (metadata) has loaded, the map shows markers
+for each station and the selectors are populated.
+
+.. figure:: ./images/map-spinner.png
+
+   *Map-updating spinner*
+
 
 In-app info and help
 ^^^^^^^^^^^^^^^^^^^^
@@ -66,8 +72,8 @@ details.
 Finding and selecting stations
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-You find and select stations by using a combination of station filtering
-options and spatial selection tools on the map.
+You find and select stations using a combination of station filtering
+options in the sidebar and spatial selection tools on the map.
 
 The map is the primary display of the stations you have selected. It
 typically takes up much of the screen real estate, which it shares with
@@ -77,7 +83,7 @@ column width controls at the top of the display.
 
 .. figure:: ./images/column-width-controls.png
 
-   Column width controls
+   *Column width controls*
 
 The main display area is divided into two columns, whose width can be
 adjusted in increments of 1/12 of the window width.
@@ -87,7 +93,7 @@ adjusted in increments of 1/12 of the window width.
 -  To move the division two increments left or right, click the ``<<``
    or ``>>`` button.
 -  To move the division completely to the left or right, click the
-   ``!<`` or ``>!`` button.
+   ``|<`` or ``>|`` button.
 
 Finding and selecting stations on the map
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -105,7 +111,7 @@ Navigating the map
 
 .. figure:: ./images/map-zoom-controls.png
 
-   Zoom controls
+   *Zoom controls*
 
 **Zoom in**: Click the zoom in |zoom in| icon in the upper left, double-click on the map, or roll the mousewheel forward.
 
@@ -127,7 +133,7 @@ station inside any polygon is selected.
 
 .. figure:: ./images/map-drawing-controls.png
 
-    Drawing controls
+    *Drawing controls*
 
 |draw rectangle|   To draw a roughly rectangular polygon, click the
 **Draw a rectangle** tool icon. Click and drag the mouse pointer from
@@ -168,13 +174,19 @@ reported by the station, use the controls on **Station Filters** tab.
 
 .. figure:: ./images/station-filters-tab.png
 
-   **Station Filters** tab
+   **Station Filters** *tab*
 
 At the top of the **Station Filters** tab is a legend that shows the
-number of stations selected by these controls (and by the map polygons,
-see above) out of the total available.
+number of stations (and associated histories; see section Stations
+and Histories) selected by these controls and by the map polygons
+(see above) out of the total available.
 
 The following controls control the filtering of stations.
+
+**Include stations with no observations**: Some stations do not (yet)
+have observations associated with them. To select *only* stations
+having at least one observation, check the checkbox. To exclude them,
+uncheck the checkbox.
 
 **Start Date**, **End Date**: Select only stations with observations
 within this period. Either date may be unspecified, in which case it
@@ -221,7 +233,7 @@ an example:
 
 .. figure:: ./images/map-metadata-popup-shedin-creek.png
 
-   Metadata popup example
+   *Metadata popup example*
 
 To dismiss the popup, click the **X** in the upper right corner.
 
@@ -237,24 +249,27 @@ dynamic and responsive your changes to the station filters.
 
 .. figure:: ./images/station-metadata-tab.png
 
-   **Station Metadata** tab
+   **Station Metadata** *tab*
 
 The tab contains a datagrid that presents the metadata for all stations
 selected jointly by the station filters and the map polygons. As the
 filters or map polygons are updated, the contents of the datagrid change
 accordingly.
 
+The contents of this tab can appear quite crowded; to view it with more
+column width, use the column width controls at the top of the column.
+
 Station metadata can be viewed and downloaded in two formats: by history
 and by station. (For information on the distinction between station and
 history, see the section above.)
 
-The by-history format presents one history per datagrid row, repeating
+The **By History** format presents one history per datagrid row, repeating
 station information in each row as necessary. It is a less compact and
 readable format, but more easily mechanically processed, and it breaks
 out values such as latitude and longitude into separate columns. That is
 why it is the default format.
 
-The by-station format presents one station per datagrid row, and rolls
+The **By Station** format presents one station per datagrid row, and rolls
 up information from all histories for a station into a more compact and
 readable form. It is however less easily mechanically processed, and
 combines related values such as latitude and longitude into single
@@ -285,7 +300,7 @@ tab.
 
 .. figure:: ./images/station-data-tab.png
 
-   **Station Data** tab
+   **Station Data** *tab*
 
 This tab shows a count of the stations selected, and of the number of
 observations and climatologies available from those selected stations.
@@ -303,11 +318,12 @@ Networks
 ^^^^^^^^
 
 The **Networks** tab lists details of all networks, showing their colour
-coding on the map. It serves as a legend to the map.
+coding on the map and a count of the stations associated with them.
+It serves as a legend to the map.
 
 .. figure:: ./images/networks-tab.png
 
-   **Networks** tab
+   **Networks** *tab*
 
 Unexpected behaviour
 ^^^^^^^^^^^^^^^^^^^^
