@@ -1,5 +1,22 @@
 # News / Release Notes
 
+## 1.2.0
+
+*Release Date: 2022-Aug-16*
+
+First production release.
+
+Requires:
+- Station Data Portal Backend: version 10.3.0
+- PDP backend: branch `pcds_only`
+
+Changes:
+
+- [Update user documentation (published on PDP)](https://github.com/pacificclimate/station-data-portal/pull/154)
+- [Handle filtering of stations with histories with no observations](https://github.com/pacificclimate/station-data-portal/pull/152)
+- [Add column sorting to Networks table](https://github.com/pacificclimate/station-data-portal/pull/151)
+- [Apply provinces query param to all metadata requests ]()
+
 ## 1.1.0
 
 *Release Date: 2022-Jul-22*
