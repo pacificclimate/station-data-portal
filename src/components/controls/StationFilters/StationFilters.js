@@ -26,6 +26,8 @@ import React from 'react';
 import './StationFilters.css';
 import { Col, Row } from 'react-bootstrap';
 
+import IncludeStationsWithNoObsControl
+  from "../../controls/IncludeStationsWithNoObsControl";
 import NetworkSelector from '../../selectors/NetworkSelector';
 import VariableSelector from '../../selectors/VariableSelector';
 import FrequencySelector
@@ -38,6 +40,7 @@ import { usePairedImmerByKey } from '../../../hooks';
 
 export const useStationFiltering = () => {
   const { normal, transitional, isPending, setState } = usePairedImmerByKey({
+    includeStationsWithNoObs: true,
     startDate: null,
     endDate: null,
     selectedNetworksOptions: [],
@@ -48,6 +51,8 @@ export const useStationFiltering = () => {
     frequencyActions: null,
     onlyWithClimatology: false,
   });
+  setState.toggleIncludeStationsWithNoObs = () =>
+    setState.includeStationsWithNoObs(!normal.includeStationsWithNoObs);
   setState.toggleOnlyWithClimatology = () =>
     setState.onlyWithClimatology(!normal.onlyWithClimatology);
   return { normal, transitional, isPending, setState };
@@ -65,6 +70,14 @@ function StationFilters({
 }) {
   return (
     <React.Fragment>
+      <Row {...rowClasses}>
+        <Col lg={12} md={12} sm={12}>
+          <IncludeStationsWithNoObsControl
+            value={state.includeStationsWithNoObs}
+            onChange={setState.toggleIncludeStationsWithNoObs}
+          />
+        </Col>
+      </Row>
       <Row {...rowClasses}>
         <Col lg={6} md={6} sm={6}>
           {/*<Button size={'sm'} onClick={handleClickAll}>Select all criteria</Button>*/}

@@ -1,0 +1,6 @@
+{
+  "name": "IncludeStationsWithNoObsControl",
+  "version": "0.0.0",
+  "private": true,
+  "main": "IncludeStationsWithNoObsControl.js"
+}

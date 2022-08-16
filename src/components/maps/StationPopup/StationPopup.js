@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Table } from 'react-bootstrap';
 import { Popup } from 'react-leaflet'
+import isNull from 'lodash/fp/isNull';
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 import join from 'lodash/fp/join';
@@ -56,17 +57,25 @@ function StationPopup({ station, metadata }) {
     </ul>
   );
 
-  const stationObsPeriods = (
-    <ul className={"compact scroll-y"}>
-      {
-        flow(
-          uniqStationObsPeriods,
+  const usops = uniqStationObsPeriods(station);
+  const stationObsPeriods =
+    (
+      usops.length === 1
+      && isNull(usops[0].min_obs_time)
+      && isNull(usops[0].max_obs_time)
+    ) ? (
+      <em>No observations</em>
+    ) : (
+      <ul className={"compact scroll-y"}>
+        {
           map(hx => (
-            <li>{formatDate(hx.min_obs_time)} to {formatDate(hx.max_obs_time)}</li>
-          ))
-        )(station)
-      }
-    </ul>
+            <li>
+              {formatDate(hx.min_obs_time)}{" to "}
+              {formatDate(hx.max_obs_time)}
+            </li>
+          ), usops)
+        }
+      </ul>
   );
 
   const stationObsFreqs = (
@@ -80,12 +89,14 @@ function StationPopup({ station, metadata }) {
     </ul>
   );
 
-  const variableNames = (
+  const usvns = uniqStationVariableNames(metadata.variables, station);
+  const variableNames = usvns.length === 0 ? (
+    <em>No observations</em>
+  ) : (
     <ul className={"compact"}>
-      {map(
-        name => (<li>{name}</li>),
-        uniqStationVariableNames(metadata.variables, station)
-      )}
+      {
+        map(name => (<li>{name}</li>), usvns)
+      }
     </ul>
   );
 
