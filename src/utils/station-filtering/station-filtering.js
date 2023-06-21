@@ -263,7 +263,7 @@ export const stationFilter = ({
 
   const climatologyVariableIds = ft.timeThis("climatologyVariableIds")(
     flow(
-      filter(({ cell_method }) => /(within|over)/.test(cell_method)),
+      filter(({ tags }) => contains("climatology", tags)),
       map("id"),
     )
   )(allVariables);
