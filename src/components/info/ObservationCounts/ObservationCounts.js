@@ -20,30 +20,33 @@ const totalCounts = timer.timeThis("totalCounts")(
     reduce((sum, station) => sum + (counts[station.id] || 0), 0)(stations)
 );
 
-function ObservationCounts({startDate, endDate, stations}) {
+function ObservationCounts({filterValues: {startDate, endDate}, clipToDate, stations}) {
   const appConfig = useConfigContext();
   const [countData, setCountData] = useState(null);
 
   useEffect(() => {
+    setCountData(null);
     getObservationCounts({
       appConfig,
       getParams: {
-        start_date: startDate,
-        end_date: endDate,
+        start_date: clipToDate ? startDate : undefined,
+        end_date: clipToDate ? endDate : undefined,
       },
     }).then(response => setCountData(response.data));
-  }, [appConfig, startDate, endDate]);
+  }, [appConfig, clipToDate, startDate, endDate]);
 
-  if (countData === null) {
-    return <p>Loading counts...</p>
-  }
+  const loadingMessage = "Loading ...";
 
   timer.resetAll();
-  const totalObservationCountsForStations =
-    totalCounts(countData.observationCounts, stations);
-  const totalClimatologyCountsForStations =
-    totalCounts(countData.climatologyCounts, stations);
+  const totalObservationCountsForStations = countData === null ?
+    loadingMessage :
+    totalCounts(countData.observationCounts, stations).toLocaleString();
+  const totalClimatologyCountsForStations = countData === null ?
+    loadingMessage :
+    totalCounts(countData.climatologyCounts, stations).toLocaleString();
   timer.log();
+
+  const timePeriod = clipToDate ? "filter dates" : "all dates"
 
   return (
     <Table size="sm">
@@ -60,15 +63,15 @@ function ObservationCounts({startDate, endDate, stations}) {
         </td>
       </tr>
       <tr>
-        <th>Total observations</th>
+        <th>Total observations ({timePeriod})</th>
         <td className="text-right">
-          {totalObservationCountsForStations.toLocaleString()}
+          {totalObservationCountsForStations}
         </td>
       </tr>
       <tr>
-        <th>Total climatologies</th>
+        <th>Total climatologies ({timePeriod})</th>
         <td className="text-right">
-          {totalClimatologyCountsForStations.toLocaleString()}
+          {totalClimatologyCountsForStations}
         </td>
       </tr>
       </tbody>

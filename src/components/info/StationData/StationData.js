@@ -18,7 +18,7 @@ logger.configure({ active: true });
 
 
 function StationData({
-  selectedStations, dataDownloadUrl, dataDownloadFilename, rowClasses
+  filterValues, selectedStations, dataDownloadUrl, dataDownloadFilename, rowClasses
 }) {
   const config = useConfigContext();
   const [fileFormat, setFileFormat] = useState();
@@ -29,19 +29,23 @@ function StationData({
     <React.Fragment>
       <Row {...rowClasses}>
         <Col lg={12} md={12} sm={12}>
-          <ObservationCounts stations={selectedStations}/>
-        </Col>
-      </Row>
-
-      <Row {...rowClasses}>
-        <Col lg={12} md={12} sm={12}>
-          <FileFormatSelector value={fileFormat} onChange={setFileFormat}/>
+          <ObservationCounts
+            filterValues={filterValues}
+            clipToDate={clipToDate}
+            stations={selectedStations}
+          />
         </Col>
       </Row>
 
       <Row {...rowClasses}>
         <Col lg={12} md={12} sm={12}>
           <ClipToDateControl value={clipToDate} onChange={toggleClipToDate}/>
+        </Col>
+      </Row>
+
+      <Row {...rowClasses}>
+        <Col lg={12} md={12} sm={12}>
+          <FileFormatSelector value={fileFormat} onChange={setFileFormat}/>
         </Col>
       </Row>
 

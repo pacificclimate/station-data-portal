@@ -227,6 +227,7 @@ function Body() {
                     />
 
                     <StationData
+                      filterValues={filterValuesNormal}
                       selectedStations={selectedStations}
                       dataDownloadUrl={
                         dataDownloadUrl({
