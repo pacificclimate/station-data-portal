@@ -1,5 +1,16 @@
 # News / Release Notes
 
+## 1.4.0
+
+*Release Date: 2023-Aug-28*
+
+Requires:
+- Station Data Portal Backend: version 11.2.0
+- PDP backend: branch `pcds_only`
+
+Changes:
+- [Apply date filtering to observation counts (Station Data tab)](https://github.com/pacificclimate/station-data-portal/pull/164)
+
 ## 1.3.0
 
 *Release Date: 2023-Aug-25*
