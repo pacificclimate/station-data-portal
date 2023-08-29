@@ -94,6 +94,7 @@ function smtColumnInfo({
     Header: 'Network Name',
     minWidth: 80,
     maxWidth: 100,
+    filter: 'startsWith',
   };
 
   const nativeIdColumn = {

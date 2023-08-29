@@ -2,11 +2,58 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import './PaginatedTable.css';
-import { usePagination, useTable } from 'react-table';
+import { usePagination, useTable, useFilters } from 'react-table';
 import { Table } from 'react-bootstrap';
 import PaginationControls from '../../controls/PaginationControls';
 
+function filterName(id) {
+  return {
+    'startsWith': 'Starts with',
+  }[id] || 'Contains'
+}
+
+// Define a default UI for filtering
+function DefaultColumnFilter({
+  column: { filter, filterValue, preFilteredRows, setFilter },
+}) {
+  const count = preFilteredRows.length
+
+  return (
+    <input
+      value={filterValue || ''}
+      onChange={e => {
+        setFilter(e.target.value || undefined) // Set undefined to remove the filter entirely
+      }}
+      placeholder={`(${count}) ${filterName(filter)} ...`}
+    />
+  )
+}
+
 function PaginatedTable({ data, columns, hiddenColumns = [] }) {
+  const filterTypes = React.useMemo(
+    () => ({
+      startsWith: (rows, id, filterValue) => {
+        return rows.filter(row => {
+          const rowValue = row.values[id]
+          return rowValue !== undefined
+            ? String(rowValue)
+            .toLowerCase()
+            .startsWith(String(filterValue).toLowerCase())
+            : true
+        })
+      },
+    }),
+    []
+  )
+
+  const defaultColumn = React.useMemo(
+    () => ({
+      // Let's set up our default Filter UI
+      Filter: DefaultColumnFilter,
+    }),
+    []
+  )
+
   const {
     // Basic table functionality
     getTableProps,
@@ -38,12 +85,15 @@ function PaginatedTable({ data, columns, hiddenColumns = [] }) {
       columns,
       data,
       // Necessary when paging controls added?
+      defaultColumn,
+      filterTypes,
       initialState: {
         pageSize: 10,
         pageIndex: 0,
         hiddenColumns,
       },
     },
+    useFilters,
     usePagination,
   );
 
@@ -80,6 +130,7 @@ function PaginatedTable({ data, columns, hiddenColumns = [] }) {
               headerGroup.headers.map(column => (
                 <th {...column.getHeaderProps()}>
                   {column.render('Header')}
+                  <div>{column.canFilter ? column.render('Filter') : null}</div>
                 </th>
               ))
             }
