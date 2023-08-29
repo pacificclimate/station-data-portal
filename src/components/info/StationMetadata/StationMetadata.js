@@ -1,5 +1,5 @@
 // This component renders a table showing a selected subset of station metadata.
-// This component wraps React Table v6. All props passed to this component are
+// This component wraps React Table. All props passed to this component are
 // passed into React Table.
 // This component also renders a download button with which users can download
 // the data in the table, plus extra hidden columns, as a CSV file.
@@ -58,6 +58,47 @@ const lexCompare = (a, b) => {
   }
   return a.length - b.length;
 }
+
+function filterName(id) {
+  return {
+    'startsWith': 'Starts with',
+  }[id] || 'Contains'
+}
+
+// Define a default UI for filtering
+function DefaultColumnFilter({
+  column: { filter, filterValue, preFilteredRows, setFilter },
+}) {
+  const count = preFilteredRows.length
+
+  return (
+    <input
+      value={filterValue || ''}
+      onChange={e => {
+        setFilter(e.target.value || undefined) // Set undefined to remove the filter entirely
+      }}
+      placeholder={`(${count}) ${filterName(filter)} ...`}
+    />
+  )
+}
+
+const makeDefaultColumn = () => ({
+  // Let's set up our default Filter UI
+  Filter: DefaultColumnFilter,
+});
+
+const makeFilterTypes = () => ({
+  startsWith: (rows, id, filterValue) => {
+    return rows.filter(row => {
+      const rowValue = row.values[id]
+      return rowValue !== undefined
+        ? String(rowValue)
+        .toLowerCase()
+        .startsWith(String(filterValue).toLowerCase())
+        : true
+    })
+  },
+});
 
 
 // Return column definitions for a tabular display of metadata.
@@ -159,6 +200,8 @@ function smtColumnInfo({
     };
 
     return {
+      makeDefaultColumn,
+      makeFilterTypes,
       columns: [
         { ...networkIdColumn, accessor: stationNetworkIdAccessor },
         { ...networkNameColumn, accessor: stationNetworkNameAccessor },
@@ -269,6 +312,8 @@ function smtColumnInfo({
   // An expanded display has one row per station history, and does not roll
   // up data shared between histories.
   return {
+    makeDefaultColumn,
+    makeFilterTypes,
     columns: [
       {
         ...networkIdColumn,

@@ -6,54 +6,24 @@ import { usePagination, useTable, useFilters } from 'react-table';
 import { Table } from 'react-bootstrap';
 import PaginationControls from '../../controls/PaginationControls';
 
-function filterName(id) {
-  return {
-    'startsWith': 'Starts with',
-  }[id] || 'Contains'
-}
-
-// Define a default UI for filtering
-function DefaultColumnFilter({
-  column: { filter, filterValue, preFilteredRows, setFilter },
+function PaginatedTable({
+  // Data to be displayed in table
+  data,
+  // Column definitions for table
+  columns,
+  // Hidden columns
+  hiddenColumns = [],
+  // Factory for defaultColumn argument to useTable (see note)
+  makeDefaultColumn = () => {},
+  // Factory for filterTypes argument to useTable (see note)
+  makeFilterTypes = () => {},
 }) {
-  const count = preFilteredRows.length
-
-  return (
-    <input
-      value={filterValue || ''}
-      onChange={e => {
-        setFilter(e.target.value || undefined) // Set undefined to remove the filter entirely
-      }}
-      placeholder={`(${count}) ${filterName(filter)} ...`}
-    />
-  )
-}
-
-function PaginatedTable({ data, columns, hiddenColumns = [] }) {
-  const filterTypes = React.useMemo(
-    () => ({
-      startsWith: (rows, id, filterValue) => {
-        return rows.filter(row => {
-          const rowValue = row.values[id]
-          return rowValue !== undefined
-            ? String(rowValue)
-            .toLowerCase()
-            .startsWith(String(filterValue).toLowerCase())
-            : true
-        })
-      },
-    }),
-    []
-  )
-
-  const defaultColumn = React.useMemo(
-    () => ({
-      // Let's set up our default Filter UI
-      Filter: DefaultColumnFilter,
-    }),
-    []
-  )
-
+  // Note: Several arguments to useTable are passed in from outside this
+  // component, which endeavours to be a bit general. Some of those arguments
+  // require memoizing with React.useMemo (see React Table documentation).
+  // Memoization can only be done at the top level of a React component;
+  // therefore we receive value factories, not memoized values, for these
+  // arguments, and memoize them here.
   const {
     // Basic table functionality
     getTableProps,
@@ -84,9 +54,8 @@ function PaginatedTable({ data, columns, hiddenColumns = [] }) {
     {
       columns,
       data,
-      // Necessary when paging controls added?
-      defaultColumn,
-      filterTypes,
+      defaultColumn: React.useMemo(makeDefaultColumn, []),
+      filterTypes: React.useMemo(makeFilterTypes, []),
       initialState: {
         pageSize: 10,
         pageIndex: 0,
@@ -171,6 +140,8 @@ PaginatedTable.propTypes = {
   data: PropTypes.array.isRequired,
   columns: PropTypes.array.isRequired,
   hiddenColumns: PropTypes.array,
+  makeDefaultColumn: PropTypes.func,
+  makeFilterTypes: PropTypes.func,
 };
 
 export default PaginatedTable;
