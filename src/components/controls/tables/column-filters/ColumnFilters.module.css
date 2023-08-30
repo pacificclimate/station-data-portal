@@ -1,0 +1,27 @@
+.wrapper {
+    display: flex;
+    font-size: 0.9em;
+    font-weight: normal;
+}
+
+.control {
+    margin-right: 0.5em;
+}
+
+.default {}
+
+.selectColumn {}
+
+.selectArrayColumn {}
+
+.coordinates .control {
+    width: 6em;
+}
+
+.coordinates .control.radius {
+    width: 4em;
+}
+
+.numberRange .control {
+    width: 5em;
+}
