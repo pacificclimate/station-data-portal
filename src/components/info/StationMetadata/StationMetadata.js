@@ -19,7 +19,7 @@ import flatten from 'lodash/fp/flatten';
 import join from 'lodash/fp/join';
 
 import InfoPopup from '../../util/InfoPopup';
-import TheTable from '../../controls/FancyTable';
+import TheTable from '../../controls/tables/FancyTable';
 import DownloadMetadata from '../../controls/DownloadMetadata';
 import FrequencySelector from '../../selectors/FrequencySelector';
 import logger from '../../../logger';
@@ -32,14 +32,17 @@ import {
   uniqStationVariableNames
 } from '../../../utils/station-info';
 import {
-  filterName,
   textStartsWith,
   includesIfDefined,
   coordinatesInBox,
   coordinatesWithinRadius,
   includesInArrayOfType,
   exactOrAll,
-} from '../../controls/FancyTable/filterTypes'
+} from '../../controls/tables/filterTypes';
+import DefaultColumnFilter from '../../controls/tables/column-filters/DefaultColumnFilter';
+import SelectColumnFilter from '../../controls/tables/column-filters/SelectColumnFilter';
+import NumberRangeColumnFilter from '../../controls/tables/column-filters/NumberRangeColumnFilter';
+import SelectArrayColumnFilter from '../../controls/tables/column-filters/SelectArrayColumnFilter';
 
 import './StationMetadata.css';
 
@@ -69,23 +72,6 @@ const lexCompare = (a, b) => {
 }
 
 // Define a default UI for filtering
-function DefaultColumnFilter({
-  column: { filter, filterValue, preFilteredRows, setFilter },
-}) {
-  const count = preFilteredRows.length
-
-  return (
-    <input
-      value={filterValue || ''}
-      onChange={e => {
-        setFilter(e.target.value || undefined) // Set undefined to remove the filter entirely
-      }}
-      placeholder={`${filterName(filter)} ...`}
-    />
-  )
-}
-
-
 function ColumnSearchCount({ column: {preFilteredRows} }) {
   return `Searching ${preFilteredRows.length} rows ...`;
 }
@@ -147,7 +133,13 @@ function smtColumnInfo({
     Header: 'Network Name',
     minWidth: 80,
     maxWidth: 100,
-    filter: 'textStartsWith',
+    Filter: ({ column }) => (
+      <SelectColumnFilter
+        column={column}
+        allValue={"*"}
+      />
+    ),
+    filter: exactOrAll("*"),
   };
 
   const nativeIdColumn = {
@@ -176,6 +168,13 @@ function smtColumnInfo({
     Header: 'Province',
     minWidth: 80,
     maxWidth: 100,
+    Filter: ({ column }) => (
+      <SelectColumnFilter
+        column={column}
+        allValue={"*"}
+      />
+    ),
+    filter: exactOrAll("*"),
   };
 
   const variablesColumn = {
@@ -184,11 +183,20 @@ function smtColumnInfo({
     id: 'Variables',
     Header: 'Variables',
     sortable: false,
+    accessor: data => uniqStationVariableNames(allVariables)(data.station),
     Cell: row => (
       <ul className={"compact"}>
         {map(name => (<li key={name}>{name}</li>), row.value)}
       </ul>
     ),
+    Filter: ({ column }) => (
+      <SelectArrayColumnFilter
+        toString={option => option}
+        column={column}
+        allValue={"*"}
+      />
+    ),
+    filter: includesInArrayOfType(String, "*"),
     csv: csvArrayRep(),
   };
 
@@ -366,6 +374,8 @@ function smtColumnInfo({
         minWidth: 80,
         maxWidth: 100,
         accessor: data => data.history.elevation ?? "n/a",
+        Filter: NumberRangeColumnFilter,
+        filter: 'between',
       },
       {
         id: 'Record Start',
@@ -387,11 +397,15 @@ function smtColumnInfo({
         minWidth: 80,
         maxWidth: 100,
         accessor: data => FrequencySelector.valueToLabel(data.history.freq),
+        Filter: ({ column }) => (
+          <SelectColumnFilter
+            column={column}
+            allValue={"*"}
+          />
+        ),
+        filter: exactOrAll("*"),
       },
-      {
-        ...variablesColumn,
-        accessor: data => uniqStationVariableNames(allVariables)(data.station)
-      },
+      { ...variablesColumn },
     ],
     hiddenColumns: [
       networkIdColumn.id,
