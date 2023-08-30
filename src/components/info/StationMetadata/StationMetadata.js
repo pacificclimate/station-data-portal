@@ -369,8 +369,8 @@ function smtColumnInfo({
         accessor: data => data.history.lat,
       },
       {
-        id: 'Elev',
-        Header: 'Elev (m)',
+        id: 'Elevation',
+        Header: 'Elevation (m)',
         minWidth: 80,
         maxWidth: 100,
         accessor: data => data.history.elevation ?? "n/a",
