@@ -4,6 +4,7 @@ import React from 'react';
 import './FancyTable.css';
 import { usePagination, useTable, useFilters } from 'react-table';
 import { Table } from 'react-bootstrap';
+import { flow, map, min, max } from 'lodash/fp';
 import PaginationControls from '../../controls/PaginationControls';
 
 function FancyTable({
@@ -86,12 +87,35 @@ function FancyTable({
     </tr>
   );
 
+  const filterCounts = flow(
+    map(col => col.preFilteredRows.length),
+    (ls => ({ min: min(ls), max: max(ls)})),
+  )(headerGroups[0].headers);
+
   return (
     <Table {...getTableProps()}>
       <thead>{paginationControls}</thead>
+
       <thead>
+
+      {/* Global column search count */}
+      <tr {...headerGroups[0].getHeaderGroupProps()}>
+        <td colSpan={visibleColumns.length}>
+          {`Showing ${filterCounts.min} of ${filterCounts.max} rows ...`}
+        </td>
+      </tr>
+
+      {/* Individual column search counts */}
+      {/*<tr {...headerGroups[0].getHeaderGroupProps()}>*/}
+      {/*  {*/}
+      {/*    headerGroups[0].headers.map(column => (*/}
+      {/*      <td>{column.render('ColumnSearchCount')}</td>*/}
+      {/*    ))*/}
+      {/*  }*/}
+      {/*</tr>*/}
+
       {
-        // Header rows
+        // Grid header rows
         headerGroups.map(headerGroup => (
           <tr {...headerGroup.getHeaderGroupProps()}>
             {
