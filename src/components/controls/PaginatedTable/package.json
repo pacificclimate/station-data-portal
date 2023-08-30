@@ -1,6 +1,0 @@
-{
-  "name": "PaginatedTable",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./PaginatedTable.js"
-}

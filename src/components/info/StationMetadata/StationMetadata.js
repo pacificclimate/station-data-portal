@@ -19,7 +19,7 @@ import flatten from 'lodash/fp/flatten';
 import join from 'lodash/fp/join';
 
 import InfoPopup from '../../util/InfoPopup';
-import PaginatedTable from '../../controls/PaginatedTable';
+import TheTable from '../../controls/FancyTable';
 import DownloadMetadata from '../../controls/DownloadMetadata';
 import FrequencySelector from '../../selectors/FrequencySelector';
 import logger from '../../../logger';
@@ -496,7 +496,7 @@ function StationMetadata({
       </ButtonToolbar>
       {
         isPending ? (<p>Loading...</p>) : (
-          <PaginatedTable data={data} {...columnInfo} />
+          <TheTable data={data} {...columnInfo} />
         )
       }
     </div>

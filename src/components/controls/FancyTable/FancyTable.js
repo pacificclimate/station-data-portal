@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import './PaginatedTable.css';
+import './FancyTable.css';
 import { usePagination, useTable, useFilters } from 'react-table';
 import { Table } from 'react-bootstrap';
 import PaginationControls from '../../controls/PaginationControls';
 
-function PaginatedTable({
+function FancyTable({
   // Data to be displayed in table
   data,
   // Column definitions for table
@@ -136,7 +136,7 @@ function PaginatedTable({
   );
 }
 
-PaginatedTable.propTypes = {
+FancyTable.propTypes = {
   data: PropTypes.array.isRequired,
   columns: PropTypes.array.isRequired,
   hiddenColumns: PropTypes.array,
@@ -144,4 +144,4 @@ PaginatedTable.propTypes = {
   makeFilterTypes: PropTypes.func,
 };
 
-export default PaginatedTable;
+export default FancyTable;
