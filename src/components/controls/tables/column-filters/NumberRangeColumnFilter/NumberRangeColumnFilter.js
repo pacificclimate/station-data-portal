@@ -9,9 +9,9 @@ const makeFilterNumberInputOnChange =
   ({ filterValue: prevFilterValues, setFilter }, index) => e =>
   {
     const inputValue = e.target.value;
-    const nextFilterValues = mapWithKey((prevFilterValue, i) =>
-      i === index ? inputValue && Number(inputValue) : prevFilterValue
-    )(prevFilterValues);
+    const nextFilterValues = prevFilterValues.map(
+      (prevFilterValue, i) => i === index ? inputValue && Number(inputValue) : prevFilterValue
+    );
     setFilter(nextFilterValues);
   };
 
