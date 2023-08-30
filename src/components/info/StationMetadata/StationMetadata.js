@@ -77,14 +77,23 @@ function DefaultColumnFilter({
       onChange={e => {
         setFilter(e.target.value || undefined) // Set undefined to remove the filter entirely
       }}
-      placeholder={`(${count}) ${filterName(filter)} ...`}
+      placeholder={`${filterName(filter)} ...`}
     />
   )
+}
+
+
+function ColumnSearchCount({ column: {preFilteredRows} }) {
+  return `Searching ${preFilteredRows.length} rows ...`;
 }
 
 const makeDefaultColumn = () => ({
   // Let's set up our default Filter UI
   Filter: DefaultColumnFilter,
+  // Individual column search counts are not presently used, but this may prove
+  // desirable in future and demonstrates a general approach for adding column
+  // information.
+  ColumnSearchCount: ColumnSearchCount,
 });
 
 const makeFilterTypes = () => ({
