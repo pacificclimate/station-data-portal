@@ -31,6 +31,15 @@ import {
   uniqStationObsPeriods,
   uniqStationVariableNames
 } from '../../../utils/station-info';
+import {
+  filterName,
+  textStartsWith,
+  includesIfDefined,
+  coordinatesInBox,
+  coordinatesWithinRadius,
+  includesInArrayOfType,
+  exactOrAll,
+} from '../../controls/FancyTable/filterTypes'
 
 import './StationMetadata.css';
 
@@ -57,12 +66,6 @@ const lexCompare = (a, b) => {
     }
   }
   return a.length - b.length;
-}
-
-function filterName(id) {
-  return {
-    'startsWith': 'Starts with',
-  }[id] || 'Contains'
 }
 
 // Define a default UI for filtering
@@ -96,18 +99,18 @@ const makeDefaultColumn = () => ({
   ColumnSearchCount: ColumnSearchCount,
 });
 
-const makeFilterTypes = () => ({
-  startsWith: (rows, id, filterValue) => {
-    return rows.filter(row => {
-      const rowValue = row.values[id]
-      return rowValue !== undefined
-        ? String(rowValue)
-        .toLowerCase()
-        .startsWith(String(filterValue).toLowerCase())
-        : true
-    })
-  },
-});
+
+// Factory for filterTypes
+function makeFilterTypes() {
+  return {
+    textStartsWith,
+    includesIfDefined,
+    includesInArrayOfType,
+    exactOrAll,
+    coordinatesInBox,
+    coordinatesWithinRadius,
+  };
+}
 
 
 // Return column definitions for a tabular display of metadata.
@@ -144,7 +147,7 @@ function smtColumnInfo({
     Header: 'Network Name',
     minWidth: 80,
     maxWidth: 100,
-    filter: 'startsWith',
+    filter: 'textStartsWith',
   };
 
   const nativeIdColumn = {
