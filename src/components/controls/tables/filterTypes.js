@@ -1,8 +1,6 @@
 // Custom column filter functions (not UIs).
 // This module mostly copied from wx-files-frontend.
 
-import includes from 'lodash/fp/includes';
-
 let filters = {};
 function register(fn) {
   filters[fn.name] = fn;
@@ -40,23 +38,49 @@ register(includesIfDefined);
 
 
 // An includes filter for array-valued rows; array elements of single type.
-// Matches any row whose array contains the filter value, or
-// passes all rows for specified "all" value.
-
-export const includesInArrayOfType = (type, all) => (rows, ids, filterValue) => {
-  if (filterValue === all) {
-    return rows;
-  }
-  return rows.filter(row => {
-    return ids.some(id => {
-      const rowValue = row.values[id]
-      return rowValue.includes(type(filterValue))
+// Matches any row whose array contains the filter value (requires an exact,
+// case-sensitive match), or passes all rows for specified "all" value.
+export const includesInArrayOfType = (type, all) => {
+  function result(rows, ids, filterValue) {
+    if (filterValue === all) {
+      return rows;
+    }
+    return rows.filter(row => {
+      return ids.some(id => {
+        const rowValue = row.values[id]
+        return rowValue.includes(type(filterValue))
+      });
     });
-  });
+  }
+  result.autoRemove = val => !val || !val.length;
+  result.filterName = 'Includes one of';
+  register(result);
+  return result;
 }
 includesInArrayOfType.autoRemove = val => !val || !val.length
 includesInArrayOfType.filterName = 'Includes one of';
 register(includesInArrayOfType);
+
+
+// An includes filter for array-valued rows; array elements of single type.
+// Matches any row whose array contains the filter value (requires only
+// case-insensitive, partial string match to one of the row values).
+export const includesSubstringInArrayOfString = (rows, ids, filterValue) => {
+  return rows.filter(row => {
+    return ids.some(id => {
+      const rowValues = row.values[id]
+      // Case-insensitive, partial string match to one of the row values
+      return rowValues.some(
+        value => {
+          return value?.toLowerCase()?.includes(filterValue?.toLowerCase()) ?? true;
+        }
+      )
+    });
+  });
+};
+includesSubstringInArrayOfString.autoRemove = val => !val || !val.length
+includesSubstringInArrayOfString.filterName = 'Contains';
+register(includesSubstringInArrayOfString);
 
 
 // Custom filter that matches exactly or passes all rows with specified "all"
@@ -154,8 +178,8 @@ coordinatesWithinRadius.filterName = 'Coordinates within radius';
 register(coordinatesWithinRadius);
 
 
-console.log("module", module)
-
+// console.log("filters", filters)
 export function filterName(id) {
+  // console.log("filterName id", id)
   return filters[id]?.filterName || id || 'Contains';
 }
