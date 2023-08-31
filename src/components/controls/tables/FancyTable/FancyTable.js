@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import './FancyTable.css';
+import styles from './FancyTable.module.css';
 import { usePagination, useTable, useFilters } from 'react-table';
 import { Table } from 'react-bootstrap';
 import { flow, map, min, max } from 'lodash/fp';
@@ -83,6 +83,7 @@ function FancyTable({
             pageSize,
             setPageSize,
           }}
+          variant={"success"}
         />
       </td>
     </tr>
@@ -153,7 +154,7 @@ function FancyTable({
       }
       </thead>
 
-      <tbody {...getTableBodyProps()}>
+      <tbody {...getTableBodyProps()} className={styles.scrolling}>
       {
         // Body rows
         page.map(row => {
