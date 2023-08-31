@@ -115,15 +115,34 @@ function FancyTable({
       {/*</tr>*/}
 
       {
-        // Grid header rows
+        // Column labels
         headerGroups.map(headerGroup => (
           <tr {...headerGroup.getHeaderGroupProps()}>
             {
-              // Header cells
+              // Label cells
               headerGroup.headers.map(column => (
                 <th {...column.getHeaderProps()}>
                   {column.render('Header')}
-                  <div>{column.canFilter ? column.render('Filter') : null}</div>
+                </th>
+              ))
+            }
+          </tr>
+        ))
+      }
+      {
+        // Column filters
+        headerGroups.map(headerGroup => (
+          <tr {...headerGroup.getHeaderGroupProps()}>
+            {
+              headerGroup.headers.map(column => (
+                <th {...column.getHeaderProps()}>
+                  {/* For some godforsaken reason, the standard column prop
+                  canFilter is always true, no matter how or where it's set.
+                  We use a custom prop doFilter, which behaves as expected. */}
+                  <div>{
+                    column.doFilter
+                      ? column.render('Filter')
+                      : <em>No filtering</em>}</div>
                 </th>
               ))
             }
