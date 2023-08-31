@@ -10,7 +10,7 @@ export default function NoColumnFilter({
 }) {
   return (
     <div className={`${styles.wrapper} ${styles.default}`}>
-      <Form.Text muted>No filter</Form.Text>
+      <Form.Text muted>No filter - use Station Filters</Form.Text>
     </div>
   );
 }
