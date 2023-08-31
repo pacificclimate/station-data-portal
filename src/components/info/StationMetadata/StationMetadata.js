@@ -58,7 +58,34 @@ function StationMetadata({
           </ButtonGroup>
           <ButtonGroup className={"me-3"}>
             <InfoPopup title={"Table Help"}>
-              <p>Help goes here</p>
+              <p>
+                This table allows you to explore station metadata dynamically.
+              </p>
+              <p>
+                The controls in this table affect only the <em>display</em> of
+                what is first selected by the <strong>Station Filters</strong> tab
+                and the map.
+                Nor does it affect the metadata that is downloaded by
+                the <strong>Download Metadata</strong> button.
+              </p>
+              <p>
+                Many table columns have filtering controls.
+                They allow through only rows that
+                match what you select or enter in them.
+                The count of rows that pass all the filters
+                is shown at the top of the table header, above the column labels
+                and the filter controls.
+              </p>
+              <p>
+                For example,
+                the Network Name column filter allows you to select
+                just one (or all) of the networks first selected by
+                the <strong>Networks</strong> control in
+                the <strong>Station Filters</strong> tab).
+                Similarly, to find a station or stations whose name partially
+                matches a given string, enter that string in the Station Name
+                column's filter.
+              </p>
             </InfoPopup>
           </ButtonGroup>
         </ButtonToolbar>
