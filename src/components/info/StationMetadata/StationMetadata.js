@@ -38,6 +38,7 @@ import {
   coordinatesWithinRadius,
   includesInArrayOfType,
   exactOrAll,
+  includesSubstringInArrayOfString,
 } from '../../controls/tables/filterTypes';
 import DefaultColumnFilter from '../../controls/tables/column-filters/DefaultColumnFilter';
 import SelectColumnFilter from '../../controls/tables/column-filters/SelectColumnFilter';
@@ -79,6 +80,7 @@ function ColumnSearchCount({ column: {preFilteredRows} }) {
 const makeDefaultColumn = () => ({
   // Let's set up our default Filter UI
   Filter: DefaultColumnFilter,
+  doFilter: false,
   // Individual column search counts are not presently used, but this may prove
   // desirable in future and demonstrates a general approach for adding column
   // information.
@@ -121,6 +123,7 @@ function smtColumnInfo({
     Header: 'Network ID',
     minWidth: 80,
     maxWidth: 100,
+    doFilter: true,
   };
 
   const stationNetworkNameAccessor = station => {
@@ -133,6 +136,7 @@ function smtColumnInfo({
     Header: 'Network Name',
     minWidth: 80,
     maxWidth: 100,
+    doFilter: true,
     Filter: ({ column }) => (
       <SelectColumnFilter
         column={column}
@@ -147,6 +151,7 @@ function smtColumnInfo({
     Header: 'Native ID',
     minWidth: 80,
     maxWidth: 100,
+    doFilter: true,
   };
 
   const stationIdColumn = {
@@ -154,6 +159,7 @@ function smtColumnInfo({
     Header: 'Station ID',
     minWidth: 80,
     maxWidth: 100,
+    doFilter: true,
   };
 
   const historyIdColumn = {
@@ -161,6 +167,7 @@ function smtColumnInfo({
     Header: 'History ID',
     minWidth: 80,
     maxWidth: 100,
+    doFilter: true,
   };
 
   const provinceColumn = {
@@ -168,6 +175,7 @@ function smtColumnInfo({
     Header: 'Province',
     minWidth: 80,
     maxWidth: 100,
+    doFilter: true,
     Filter: ({ column }) => (
       <SelectColumnFilter
         column={column}
@@ -189,6 +197,7 @@ function smtColumnInfo({
         {map(name => (<li key={name}>{name}</li>), row.value)}
       </ul>
     ),
+    doFilter: true,
     Filter: ({ column }) => (
       <SelectArrayColumnFilter
         toString={option => option}
@@ -239,6 +248,8 @@ function smtColumnInfo({
               {map(name => (<li key={name}>{name}</li>), row.value)}
             </ul>
           ),
+          doFilter: true,
+          filter: 'includesSubstringInArrayOfString',
           csv: csvArrayRep(),
         },
         {
@@ -308,6 +319,15 @@ function smtColumnInfo({
               {map(freq => (<li key={freq}>{freq}</li>), row.value)}
             </ul>
           ),
+          doFilter: true,
+          Filter: ({ column }) => (
+            <SelectArrayColumnFilter
+              toString={option => option}
+              column={column}
+              allValue={"*"}
+            />
+          ),
+          filter: includesInArrayOfType(String, "*"),
           csv: csvArrayRep(),
         },
         { ...variablesColumn, accessor: uniqStationVariableNames(allVariables) },
@@ -317,6 +337,9 @@ function smtColumnInfo({
           minWidth: 30,
           maxWidth: 30,
           accessor: station => station.histories.length,
+          doFilter: true,
+          Filter: NumberRangeColumnFilter,
+          filter: 'between',
         },
         historyIdsColumn,
       ],
@@ -351,6 +374,7 @@ function smtColumnInfo({
         minWidth: 80,
         maxWidth: 100,
         accessor: data => data.history.station_name,
+        doFilter: true,
       },
       { ...historyIdColumn, accessor: "history.id" },
       { ...provinceColumn, accessor: "history.province" },
@@ -374,6 +398,7 @@ function smtColumnInfo({
         minWidth: 80,
         maxWidth: 100,
         accessor: data => data.history.elevation ?? "n/a",
+        doFilter: true,
         Filter: NumberRangeColumnFilter,
         filter: 'between',
       },
@@ -397,6 +422,7 @@ function smtColumnInfo({
         minWidth: 80,
         maxWidth: 100,
         accessor: data => FrequencySelector.valueToLabel(data.history.freq),
+        doFilter: true,
         Filter: ({ column }) => (
           <SelectColumnFilter
             column={column}
