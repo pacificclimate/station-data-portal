@@ -37,11 +37,13 @@ includesIfDefined.filterName = 'Includes'
 register(includesIfDefined);
 
 
-// An includes filter for array-valued rows; array elements of single type.
-// Matches any row whose array contains the filter value (requires an exact,
-// case-sensitive match), or passes all rows for specified "all" value.
-export const includesInArrayOfType = (type, all) => {
-  function result(rows, ids, filterValue) {
+// Factory for an includes filter for array-valued rows; array elements of
+// single type, specified as a factory argument (e.g., String).
+// Resulting function matchers any row whose array contains the filter value
+// (requires an exact, case-sensitive match), or passes all rows for specified
+// "all" value.
+export const includesExactInArrayOfType = (type, all) =>
+  (rows, ids, filterValue) => {
     if (filterValue === all) {
       return rows;
     }
@@ -51,18 +53,15 @@ export const includesInArrayOfType = (type, all) => {
         return rowValue.includes(type(filterValue))
       });
     });
-  }
-  result.autoRemove = val => !val || !val.length;
-  result.filterName = 'Includes one of';
-  register(result);
-  return result;
-}
-includesInArrayOfType.autoRemove = val => !val || !val.length
-includesInArrayOfType.filterName = 'Includes one of';
-register(includesInArrayOfType);
+  };
+
+export const includesInArrayOfString = includesExactInArrayOfType(String, "*");
+includesInArrayOfString.autoRemove = val => !val || !val.length
+includesInArrayOfString.filterName = 'One item equals';
+register(includesInArrayOfString);
 
 
-// An includes filter for array-valued rows; array elements of single type.
+// A more forgiving includes filter for array-valued rows; array of Strings.
 // Matches any row whose array contains the filter value (requires only
 // case-insensitive, partial string match to one of the row values).
 export const includesSubstringInArrayOfString = (rows, ids, filterValue) => {
@@ -72,20 +71,20 @@ export const includesSubstringInArrayOfString = (rows, ids, filterValue) => {
       // Case-insensitive, partial string match to one of the row values
       return rowValues.some(
         value => {
-          return value?.toLowerCase()?.includes(filterValue?.toLowerCase()) ?? true;
+          return value?.toLowerCase()?.includes(filterValue?.toLowerCase())
+            ?? true;
         }
       )
     });
   });
 };
 includesSubstringInArrayOfString.autoRemove = val => !val || !val.length
-includesSubstringInArrayOfString.filterName = 'Contains';
+includesSubstringInArrayOfString.filterName = 'One item matches';
 register(includesSubstringInArrayOfString);
 
 
 // Custom filter that matches exactly or passes all rows with specified "all"
 // value.
-
 export const exactOrAll = all => (rows, ids, filterValue) => {
   if (filterValue === all) {
     return rows;
@@ -97,14 +96,16 @@ export const exactOrAll = all => (rows, ids, filterValue) => {
     });
   });
 }
-exactOrAll.autoRemove = val => typeof val === 'undefined'
-exactOrAll.filterName = 'Exactly equals'
-register(exactOrAll);
+
+
+export const exactOrAllAsterisk = exactOrAll("*");
+exactOrAllAsterisk.autoRemove = val => typeof val === 'undefined'
+exactOrAllAsterisk.filterName = 'All or exactly one'
+register(exactOrAllAsterisk);
 
 
 
 // Custom filter for coordinates within a bounding box defined in km.
-
 export function coordinatesInBox(rows, id, filterValue) {
   const [latCentre, lonCentre, distance] = filterValue;
 
@@ -140,7 +141,6 @@ register(coordinatesInBox);
 
 
 // Custom filter for coordinates within a radius in km.
-
 export function coordinatesWithinRadius(rows, id, filterValue) {
   const [latCentre, lonCentre, distance] = filterValue;
 
@@ -178,8 +178,22 @@ coordinatesWithinRadius.filterName = 'Coordinates within radius';
 register(coordinatesWithinRadius);
 
 
-// console.log("filters", filters)
+console.log("filters", filters)
 export function filterName(id) {
   // console.log("filterName id", id)
   return filters[id]?.filterName || id || 'Contains';
+}
+
+
+// Factory for React Table filterTypes argument (must be memoized).
+export function makeFilterTypes() {
+  return {
+    textStartsWith,
+    includesIfDefined,
+    includesInArrayOfString,
+    includesSubstringInArrayOfString,
+    exactOrAllAsterisk,
+    coordinatesInBox,
+    coordinatesWithinRadius,
+  };
 }
