@@ -5,6 +5,7 @@
 import PropTypes from 'prop-types';
 import React, { useState, useMemo, useTransition } from 'react';
 import {
+  Button,
   ButtonGroup,
   ButtonToolbar,
   ToggleButton,
@@ -47,66 +48,87 @@ function StationMetadata({
   // control what it does. We consider it an adjunct to the table.
   return (
     <div className={"StationMetadata"}>
-      <ButtonToolbar>
-        <ToggleButtonGroup
-          type={"radio"}
-          name={"compact"}
-          value={compact}
-          onChange={handleChangeCompact}
-          className={"me-1"}
-        >
-          {
-            [false, true].map(value => (
-              <ToggleButton
-                id={`stn-md-compact-${value.toString()}`}
-                key={value.toString()}
-                size={"sm"}
-                variant={"outline-dark"}
-                value={value}
-              >
-                By {value ? "Station" : "History"}
-              </ToggleButton>
-            ))
-          }
-        </ToggleButtonGroup>
-        <ButtonGroup className={"me-3"}>
-          <InfoPopup title={"Table Contents"}>
-            <p>
-              Station metadata can be displayed (and downloaded) in two formats,
-              by history and by station.
-            </p>
-            <p>
-              The by-history format presents one history per table row, repeating
-              station information in each row as necessary. It is a less compact
-              and readable format, but more easily mechanically processed, and
-              it breaks out values such as latitude and longitude into separate
-              columns.
-            </p>
-            <p>
-              The by-station format presents one station per table row,
-              and rolls up information from all histories
-              for a station into a more compact and readable form. It is
-              however less easily mechanically processed, and combines related
-              values such as latitude and longitude into single columns.
-            </p>
-          </InfoPopup>
-        </ButtonGroup>
-        <ButtonGroup className={"me-1"}>
-          <DownloadMetadata
-            data={data}
-            columns={columnInfo.columns}
-            filename={`station-metadata-${compact ? "by-station" : "by-history"}.csv`}
+      <ButtonToolbar className="justify-content-between">
+        {/* Table help popup */}
+        <ButtonToolbar>
+          <ButtonGroup className={"me-1"}>
+            <Button variant="outline-secondary" size={"sm"} as={"div"} disabled={true}>
+              Table Help
+            </Button>
+          </ButtonGroup>
+          <ButtonGroup className={"me-3"}>
+            <InfoPopup title={"Table Help"}>
+              <p>Help goes here</p>
+            </InfoPopup>
+          </ButtonGroup>
+        </ButtonToolbar>
+
+        {/* Table data organization buttons */}
+        <ButtonToolbar>
+          <ToggleButtonGroup
+            type={"radio"}
+            name={"compact"}
+            value={compact}
+            onChange={handleChangeCompact}
+            className={"me-1"}
           >
-            Download Metadata
-          </DownloadMetadata>
-        </ButtonGroup>
-        <ButtonGroup>
-          <InfoPopup title={"Download Metadata"}>
-            Download the metadata presented in the table below (all rows, not
-            just those visible) as a CSV file. The downloaded file includes
-            extra columns not visible in the table.
-          </InfoPopup>
-        </ButtonGroup>
+            {
+              [false, true].map(value => (
+                <ToggleButton
+                  id={`stn-md-compact-${value.toString()}`}
+                  key={value.toString()}
+                  size={"sm"}
+                  variant={"outline-dark"}
+                  value={value}
+                >
+                  By {value ? "Station" : "History"}
+                </ToggleButton>
+              ))
+            }
+          </ToggleButtonGroup>
+          <ButtonGroup className={"me-3"}>
+            <InfoPopup title={"Table Data Organization"}>
+              <p>
+                Station metadata can be displayed (and downloaded) in two formats,
+                by history and by station.
+              </p>
+              <p>
+                The by-history format presents one history per table row, repeating
+                station information in each row as necessary. It is a less compact
+                and readable format, but more easily mechanically processed, and
+                it breaks out values such as latitude and longitude into separate
+                columns.
+              </p>
+              <p>
+                The by-station format presents one station per table row,
+                and rolls up information from all histories
+                for a station into a more compact and readable form. It is
+                however less easily mechanically processed, and combines related
+                values such as latitude and longitude into single columns.
+              </p>
+            </InfoPopup>
+          </ButtonGroup>
+        </ButtonToolbar>
+
+        {/* Table download button */}
+        <ButtonToolbar>
+          <ButtonGroup className={"me-1"}>
+            <DownloadMetadata
+              data={data}
+              columns={columnInfo.columns}
+              filename={`station-metadata-${compact ? "by-station" : "by-history"}.csv`}
+            >
+              Download Metadata
+            </DownloadMetadata>
+          </ButtonGroup>
+          <ButtonGroup>
+            <InfoPopup title={"Download Metadata"}>
+              Download the metadata presented in the table below (all rows, not
+              just those visible) as a CSV file. The downloaded file includes
+              extra columns not visible in the table.
+            </InfoPopup>
+          </ButtonGroup>
+        </ButtonToolbar>
       </ButtonToolbar>
       {
         isPending ? (<p>Loading...</p>) : (
