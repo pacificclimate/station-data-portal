@@ -90,7 +90,7 @@ function FancyTable({
 
   const filterCounts = flow(
     map(col => col.preFilteredRows.length),
-    (ls => ({ min: min(ls), max: max(ls)})),
+    ls => ({ min: min(ls), max: max(ls)}),
   )(headerGroups[0].headers);
 
   return (
