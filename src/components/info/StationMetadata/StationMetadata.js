@@ -78,7 +78,7 @@ function StationMetadata({
                   id={`stn-md-compact-${value.toString()}`}
                   key={value.toString()}
                   size={"sm"}
-                  variant={"outline-dark"}
+                  variant={"outline-success"}
                   value={value}
                 >
                   By {value ? "Station" : "History"}
