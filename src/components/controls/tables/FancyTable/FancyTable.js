@@ -5,7 +5,8 @@ import './FancyTable.css';
 import { usePagination, useTable, useFilters } from 'react-table';
 import { Table } from 'react-bootstrap';
 import { flow, map, min, max } from 'lodash/fp';
-import PaginationControls from '../../../controls/tables/PaginationControls';
+import PaginationControls from '../PaginationControls';
+import NoColumnFilter from '../column-filters/NoColumnFilter';
 
 function FancyTable({
   // Data to be displayed in table
@@ -135,15 +136,16 @@ function FancyTable({
           <tr {...headerGroup.getHeaderGroupProps()}>
             {
               headerGroup.headers.map(column => (
-                <th {...column.getHeaderProps()}>
+                <td {...column.getHeaderProps()}>
                   {/* For some godforsaken reason, the standard column prop
                   canFilter is always true, no matter how or where it's set.
                   We use a custom prop doFilter, which behaves as expected. */}
                   <div>{
                     column.doFilter
                       ? column.render('Filter')
-                      : <em>No filtering</em>}</div>
-                </th>
+                      : <NoColumnFilter size={10}/>
+                  }</div>
+                </td>
               ))
             }
           </tr>
