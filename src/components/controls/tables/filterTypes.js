@@ -1,12 +1,6 @@
 // Custom column filter functions (not UIs).
 // This module mostly copied from wx-files-frontend.
 
-let filters = {};
-function register(fn) {
-  filters[fn.name] = fn;
-}
-
-
 export function textStartsWith(rows, id, filterValue) {
   return rows.filter(row => {
     const rowValue = row.values[id];
@@ -19,7 +13,6 @@ export function textStartsWith(rows, id, filterValue) {
 }
 textStartsWith.autoRemove = val => !val;
 textStartsWith.filterName = 'Starts with';
-register(textStartsWith);
 
 
 // A more forgiving 'includes' filter.
@@ -34,7 +27,6 @@ export const includesIfDefined = (rows, ids, filterValue) => {
 }
 includesIfDefined.autoRemove = val => !val || !val.length;
 includesIfDefined.filterName = 'Includes'
-register(includesIfDefined);
 
 
 // Factory for an includes filter for array-valued rows; array elements of
@@ -58,7 +50,6 @@ export const includesExactInArrayOfType = (type, all) =>
 export const includesInArrayOfString = includesExactInArrayOfType(String, "*");
 includesInArrayOfString.autoRemove = val => !val || !val.length
 includesInArrayOfString.filterName = 'One item equals';
-register(includesInArrayOfString);
 
 
 // A more forgiving includes filter for array-valued rows; array of Strings.
@@ -80,7 +71,6 @@ export const includesSubstringInArrayOfString = (rows, ids, filterValue) => {
 };
 includesSubstringInArrayOfString.autoRemove = val => !val || !val.length
 includesSubstringInArrayOfString.filterName = 'One item matches';
-register(includesSubstringInArrayOfString);
 
 
 // Custom filter that matches exactly or passes all rows with specified "all"
@@ -101,7 +91,6 @@ export const exactOrAll = all => (rows, ids, filterValue) => {
 export const exactOrAllAsterisk = exactOrAll("*");
 exactOrAllAsterisk.autoRemove = val => typeof val === 'undefined'
 exactOrAllAsterisk.filterName = 'All or exactly one'
-register(exactOrAllAsterisk);
 
 
 
@@ -137,7 +126,6 @@ coordinatesInBox.autoRemove = val =>
   !val || (typeof val[0] !== 'number' && typeof val[1] !== 'number' &&
   typeof val[2] !== 'number');
 coordinatesInBox.filterName = 'Coordinates in box'
-register(coordinatesInBox);
 
 
 // Custom filter for coordinates within a radius in km.
@@ -175,25 +163,20 @@ coordinatesWithinRadius.autoRemove = val =>
   !val || (typeof val[0] !== 'number' && typeof val[1] !== 'number' &&
   typeof val[2] !== 'number');
 coordinatesWithinRadius.filterName = 'Coordinates within radius';
-register(coordinatesWithinRadius);
 
 
-console.log("filters", filters)
+// Value for React Table filterTypes argument (must be memoized).
+export const filterTypes = {
+  textStartsWith,
+  includesIfDefined,
+  includesInArrayOfString,
+  includesSubstringInArrayOfString,
+  exactOrAllAsterisk,
+  coordinatesInBox,
+  coordinatesWithinRadius,
+};
+
+
 export function filterName(id) {
-  // console.log("filterName id", id)
-  return filters[id]?.filterName || id || 'Contains';
-}
-
-
-// Factory for React Table filterTypes argument (must be memoized).
-export function makeFilterTypes() {
-  return {
-    textStartsWith,
-    includesIfDefined,
-    includesInArrayOfString,
-    includesSubstringInArrayOfString,
-    exactOrAllAsterisk,
-    coordinatesInBox,
-    coordinatesWithinRadius,
-  };
+  return filterTypes[id]?.filterName || id || 'Contains';
 }

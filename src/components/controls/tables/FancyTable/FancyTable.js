@@ -15,17 +15,16 @@ function FancyTable({
   columns,
   // Hidden columns
   hiddenColumns = [],
-  // Factory for defaultColumn argument to useTable (see note)
-  makeDefaultColumn = () => {},
-  // Factory for filterTypes argument to useTable (see note)
-  makeFilterTypes = () => {},
+  // Value for defaultColumn argument to useTable (see note)
+  defaultColumn = {},
+  // Value for filterTypes argument to useTable (see note)
+  filterTypes = () => {},
 }) {
   // Note: Several arguments to useTable are passed in from outside this
   // component, which endeavours to be a bit general. Some of those arguments
   // require memoizing with React.useMemo (see React Table documentation).
   // Memoization can only be done at the top level of a React component;
-  // therefore we receive value factories, not memoized values, for these
-  // arguments, and memoize them here.
+  // therefore they are memoized inside this component.
   const {
     // Basic table functionality
     getTableProps,
@@ -56,8 +55,8 @@ function FancyTable({
     {
       columns,
       data,
-      defaultColumn: React.useMemo(makeDefaultColumn, []),
-      filterTypes: React.useMemo(makeFilterTypes, []),
+      defaultColumn: React.useMemo(() => defaultColumn, []),
+      filterTypes: React.useMemo(() => filterTypes, []),
       initialState: {
         pageSize: 10,
         pageIndex: 0,
@@ -186,8 +185,8 @@ FancyTable.propTypes = {
   data: PropTypes.array.isRequired,
   columns: PropTypes.array.isRequired,
   hiddenColumns: PropTypes.array,
-  makeDefaultColumn: PropTypes.func,
-  makeFilterTypes: PropTypes.func,
+  defaultColumn: PropTypes.func,
+  filterTypes: PropTypes.func,
 };
 
 export default FancyTable;

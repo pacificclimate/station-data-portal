@@ -12,7 +12,7 @@ import {
   uniqStationVariableNames
 } from '../../../utils/station-info';
 
-import { makeFilterTypes } from '../../controls/tables/filterTypes';
+import { filterTypes } from '../../controls/tables/filterTypes';
 import DefaultColumnFilter from '../../controls/tables/column-filters/DefaultColumnFilter';
 
 import FrequencySelector from '../../selectors/FrequencySelector';
@@ -45,11 +45,11 @@ const lexCompare = (a, b) => {
   return a.length - b.length;
 }
 
-// Factory for default column
-const makeDefaultColumn = () => ({
+// Default column
+const defaultColumn = {
   Filter: DefaultColumnFilter,
   doFilter: false,
-});
+};
 
 
 // Return column definitions for a tabular display of metadata.
@@ -180,8 +180,8 @@ export function smtColumnInfo({
     };
 
     return {
-      makeDefaultColumn,
-      makeFilterTypes,
+      makeDefaultColumn: defaultColumn,
+      filterTypes,
       columns: [
         { ...networkIdColumn, accessor: stationNetworkIdAccessor },
         { ...networkNameColumn, accessor: stationNetworkNameAccessor },
@@ -306,8 +306,8 @@ export function smtColumnInfo({
   // An expanded display has one row per station history, and does not roll
   // up data shared between histories.
   return {
-    makeDefaultColumn,
-    makeFilterTypes,
+    defaultColumn,
+    filterTypes,
     columns: [
       {
         ...networkIdColumn,

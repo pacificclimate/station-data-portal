@@ -65,7 +65,7 @@ function StationMetadata({
                 The controls in this table affect only the <em>display</em> of
                 what is first selected by the <strong>Station Filters</strong> tab
                 and the map.
-                Nor does it affect the metadata that is downloaded by
+                Neither does it affect the metadata that is downloaded by
                 the <strong>Download Metadata</strong> button.
               </p>
               <p>
