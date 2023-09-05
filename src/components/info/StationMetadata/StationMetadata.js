@@ -51,19 +51,21 @@ function StationMetadata({
       <ButtonToolbar className="justify-content-between">
         {/* Table help popup */}
         <ButtonToolbar>
-          <ButtonGroup className={"me-1"}>
-            <Button variant="outline-secondary" size={"sm"} as={"div"} disabled={true}>
-              Table Help
-            </Button>
-          </ButtonGroup>
           <ButtonGroup className={"me-3"}>
-            <InfoPopup title={"Table Help"}>
+            <InfoPopup
+              label={
+                <Button variant="outline-secondary" size={"sm"} as={"div"} disabled={true}>
+                  Table Help
+                </Button>
+              }
+              title={"Table Help"}
+            >
               <p>
                 This table allows you to explore station metadata dynamically.
               </p>
               <p>
                 The controls in this table affect only the <em>display</em> of
-                what is first selected by the <strong>Station Filters</strong> tab
+                metadata of the stations selected by the <strong>Station Filters</strong> tab
                 and the map.
                 Neither does it affect the metadata that is downloaded by
                 the <strong>Download Metadata</strong> button.
