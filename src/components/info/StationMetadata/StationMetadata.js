@@ -151,7 +151,7 @@ function StationMetadata({
             </DownloadMetadata>
           </ButtonGroup>
           <ButtonGroup>
-            <InfoPopup title={"Download Metadata"}>
+            <InfoPopup placement="left" title={"Download Metadata"}>
               Download the metadata presented in the table below (all rows, not
               just those visible) as a CSV file. The downloaded file includes
               extra columns not visible in the table.
