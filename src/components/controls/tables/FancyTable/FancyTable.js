@@ -69,6 +69,7 @@ function FancyTable({
     usePagination,
   );
 
+  // Pagination controls are used in header and footer.
   const paginationControls = (
     <tr>
       <td colSpan={visibleColumns.length}>
@@ -102,10 +103,10 @@ function FancyTable({
 
       <thead>
 
-      {/* Global column search count */}
+      {/* Column filtering global row count */}
       <tr {...headerGroups[0].getHeaderGroupProps()}>
         <td colSpan={visibleColumns.length}>
-          {`Showing ${filterCounts.min} of ${filterCounts.max} rows ...`}
+          {`Filters: Showing ${filterCounts.min} of ${filterCounts.max} rows ...`}
         </td>
       </tr>
 
