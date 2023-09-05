@@ -19,6 +19,8 @@ function FancyTable({
   defaultColumn = {},
   // Value for filterTypes argument to useTable (see note)
   filterTypes = () => {},
+  // All additional props are passed through to the React Bootstrap Table.
+  ...restOfProps
 }) {
   // Note: Several arguments to useTable are passed in from outside this
   // component, which endeavours to be a bit general. Some of those arguments
@@ -95,7 +97,7 @@ function FancyTable({
   )(headerGroups[0].headers);
 
   return (
-    <Table {...getTableProps()}>
+    <Table {...{ ...getTableProps(), ...restOfProps }}>
       <thead>{paginationControls}</thead>
 
       <thead>

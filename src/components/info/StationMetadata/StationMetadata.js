@@ -159,7 +159,13 @@ function StationMetadata({
       </ButtonToolbar>
       {
         isPending ? (<p>Loading...</p>) : (
-          <FancyTable data={data} {...columnInfo} />
+          <FancyTable
+            data={data}
+            {...columnInfo}
+            size="sm"
+            responsive
+            striped
+          />
         )
       }
     </div>
