@@ -58,7 +58,7 @@ function StationMetadata({
                   Table Help
                 </Button>
               }
-              title={"Table Help"}
+              // title={"Table Help"}
             >
               <p>
                 This table allows you to explore station metadata dynamically.
