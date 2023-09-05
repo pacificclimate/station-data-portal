@@ -18,13 +18,14 @@ export default function PaginationControls({
   previousPage,
   pageSize,
   setPageSize,
-  pageSizes = [10, 15, 20, 30],
+  pageSizes = [10, 15, 20, 30, 50],
   size = 'sm',
-  variant = 'light'
+  variant = 'light',
+  ...restOfProps
 }) {
   const buttonProps = { variant };
   return (
-      <ButtonToolbar className="justify-content-center">
+      <ButtonToolbar {...restOfProps}>
         <ButtonGroup className={styles.fwdBack} size={size}>
           <Button
             title="Go to first page"

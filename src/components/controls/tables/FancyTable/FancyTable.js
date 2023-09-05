@@ -83,6 +83,7 @@ function FancyTable({
             setPageSize,
           }}
           variant={"success"}
+          className="justify-content-center"
         />
       </td>
     </tr>
