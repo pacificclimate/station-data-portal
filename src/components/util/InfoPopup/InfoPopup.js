@@ -7,6 +7,7 @@ import { InfoCircle } from 'react-bootstrap-icons';
 
 
 function InfoPopup({
+  label= <InfoCircle/>,
   placement = "right",
   title,
   children,
@@ -21,7 +22,7 @@ function InfoPopup({
         </Popover>
       }
     >
-      <InfoCircle/>
+      {label}
     </OverlayTrigger>
   );
 }
