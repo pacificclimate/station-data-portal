@@ -180,7 +180,7 @@ export function smtColumnInfo({
     };
 
     return {
-      makeDefaultColumn: defaultColumn,
+      defaultColumn,
       filterTypes,
       columns: [
         { ...networkIdColumn, accessor: stationNetworkIdAccessor },
