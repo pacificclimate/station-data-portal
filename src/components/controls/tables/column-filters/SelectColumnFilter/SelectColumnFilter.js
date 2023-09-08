@@ -21,8 +21,7 @@ export default function SelectColumnFilter({
   // Render a multi-select box
   return (
     <div className={`${styles.wrapper} ${styles.selectColumn}`}>
-      <Form.Control
-        as="select"
+      <Form.Select
         value={filterValue}
         onChange={e => {
           setFilter(e.target.value || undefined)
@@ -35,7 +34,7 @@ export default function SelectColumnFilter({
             {option}
           </option>
         ))}
-      </Form.Control>
+      </Form.Select>
     </div>
   );
 }
