@@ -9,7 +9,8 @@ import {
   ButtonGroup,
   ButtonToolbar,
   ToggleButton,
-  ToggleButtonGroup
+  ToggleButtonGroup,
+  Card,
 } from 'react-bootstrap';
 
 import InfoPopup from '../../util/InfoPopup';
@@ -30,9 +31,11 @@ function StationMetadata({
     variables: allVariables
   },
 }) {
+  const [helpVisible, setHelpVisible] = useState(false);
   const [compact, setCompact] = useState(false);
   const [isPending, startTransition] = useTransition();
   const handleChangeCompact = v => startTransition(() => setCompact(v));
+  const handleHelpButtonClick = () => setHelpVisible(!helpVisible);
 
   const columnInfo = useMemo(
     () => smtColumnInfo({ allNetworks, allVariables, compact }),
@@ -49,46 +52,16 @@ function StationMetadata({
   return (
     <div className={"StationMetadata"}>
       <ButtonToolbar className="justify-content-between">
-        {/* Table help popup */}
+        {/* Table help show/hide button */}
         <ButtonToolbar>
           <ButtonGroup className={"me-3"}>
-            <InfoPopup
-              label={
-                <Button variant="outline-secondary" size={"sm"} as={"div"} disabled={true}>
-                  Table Help
-                </Button>
-              }
-              // title={"Table Help"}
+            <Button
+              onClick={handleHelpButtonClick}
+              size="sm"
+              variant="outline-secondary"
             >
-              <p>
-                This table allows you to explore station metadata dynamically.
-              </p>
-              <p>
-                The controls in this table affect only the <em>display</em> of
-                metadata of the stations selected by the <strong>Station Filters</strong> tab
-                and the map.
-                Neither does it affect the metadata that is downloaded by
-                the <strong>Download Metadata</strong> button.
-              </p>
-              <p>
-                Many table columns have filtering controls.
-                They allow through only rows that
-                match what you select or enter in them.
-                The count of rows that pass all the filters
-                is shown at the top of the table header, above the column labels
-                and the filter controls.
-              </p>
-              <p>
-                For example,
-                the Network Name column filter allows you to select
-                just one (or all) of the networks first selected by
-                the <strong>Networks</strong> control in
-                the <strong>Station Filters</strong> tab).
-                Similarly, to find a station or stations whose name partially
-                matches a given string, enter that string in the Station Name
-                column's filter.
-              </p>
-            </InfoPopup>
+              {helpVisible ? "Hide" : "Show"} Help
+            </Button>
           </ButtonGroup>
         </ButtonToolbar>
 
@@ -159,6 +132,74 @@ function StationMetadata({
           </ButtonGroup>
         </ButtonToolbar>
       </ButtonToolbar>
+
+      {
+        helpVisible && (
+          <Card body className="mt-3 mb-3">
+            <h1>Station metadata table</h1>
+            <p>
+              This table allows you to explore station metadata dynamically.
+            </p>
+            <p>
+              The controls in this table affect only the <em>display</em> of
+              metadata of the stations selected by the <strong>Station Filters</strong> tab
+              and the map. They affect neither the stations selected on the map,
+              nor the metadata that is downloaded by
+              the <strong>Download Metadata</strong> button on this tab,
+              nor the data downloaded by
+              the <strong>Download Timeseries/Climatology</strong> buttons
+              on the <strong>Station Data</strong> tab.
+            </p>
+            <h1>Filter controls</h1>
+            <p>
+              Filter controls are located just below each column label.
+              A filter allows through only those rows whose column
+              matches what you select or enter in them.
+              The count of rows that pass all the filters
+              is shown at the top of the table header, above the column labels
+              and the filter controls. Examples:
+              <ul>
+                <li>
+                  The Network Name column filter allows you to select
+                  all or just one of the networks selected by
+                  the <strong>Networks</strong> control in
+                  the <strong>Station Filters</strong> tab.
+                </li>
+                <li>
+                  To find a station or stations whose name partially
+                  matches a given string, enter that string in the Station Name
+                  column filter.
+                </li>
+                <li>
+                  You can use any number of the column filters, and the rows
+                  visible are only those that match all the filters.
+                </li>
+              </ul>
+            </p>
+            <h1>Managing overflow</h1>
+            <p>
+              Because the table contains a lot of information, it can
+              overflow horizontally and run far down the page vertically.
+              <ul>
+                <li>
+                  Use the column width buttons just below the header to give
+                  more space for the table and less space for the map. This
+                  can make it far easier to use the table.
+                </li>
+                <li>
+                  If table content is overflowing horizontally, scroll down
+                  to the bottom of the page to use the table's horizontal
+                  scroll bar.
+                </li>
+              </ul>
+            </p>
+            <h1>Other help</h1>
+            <p>See the <InfoPopup title="Very helpful!"/> next
+              to various items on this page.</p>
+          </Card>
+        )
+      }
+
       {
         isPending ? (<p>Loading...</p>) : (
           <FancyTable
