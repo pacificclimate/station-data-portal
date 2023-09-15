@@ -1,6 +1,7 @@
 import React from 'react';
 import Form from 'react-bootstrap/Form';
 import ClearButton from '../../misc/ClearButton';
+import isNumber from 'lodash/isNumber';
 import styles from '../ColumnFilters.module.css';
 
 // Custom filter UI for selecting number within a range (min, max).
@@ -28,7 +29,7 @@ export default function NumberRangeColumnFilter({
         className={styles.control}
         size="sm"
         type="number"
-        value={filterValue[0] || ''}
+        value={filterValue[0] ?? ''}
         onChange={makeFilterNumberInputOnChange({ filterValue, setFilter }, 0)}
         placeholder={'Min'}
       />
@@ -40,7 +41,7 @@ export default function NumberRangeColumnFilter({
         }}
         size="sm"
         type="number"
-        value={filterValue[1] || ''}
+        value={filterValue[1] ?? ''}
         onChange={makeFilterNumberInputOnChange({ filterValue, setFilter }, 1)}
         placeholder={'Max'}
       />
