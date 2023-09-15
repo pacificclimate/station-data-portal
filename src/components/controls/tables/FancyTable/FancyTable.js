@@ -110,15 +110,6 @@ function FancyTable({
         </td>
       </tr>
 
-      {/* Individual column search counts */}
-      {/*<tr {...headerGroups[0].getHeaderGroupProps()}>*/}
-      {/*  {*/}
-      {/*    headerGroups[0].headers.map(column => (*/}
-      {/*      <td>{column.render('ColumnSearchCount')}</td>*/}
-      {/*    ))*/}
-      {/*  }*/}
-      {/*</tr>*/}
-
       {
         // Column labels
         headerGroups.map(headerGroup => (
