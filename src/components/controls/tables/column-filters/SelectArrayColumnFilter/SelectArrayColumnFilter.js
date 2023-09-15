@@ -4,9 +4,12 @@ import ClearButton from '../../misc/ClearButton';
 import styles from '../ColumnFilters.module.css';
 import sortBy from 'lodash/fp/sortBy';
 
-// Custom filter UI for selecting a unique option from a list that contains
-// an array of option values. (Typically this array coalesces information about
-// a list of sub-objects associated with the row.)
+// Custom filter UI for selecting a unique option from set of rows, whose
+// values are a list that contains an array of option values. (Typically this
+// array coalesces information about a list of sub-objects associated with the
+// row.) Basically, collect all the unique option values and make a selector
+// out of them. The rows in question are those already filtered by other column
+// selectors, which are given by `column.preFilteredRows`.
 
 export default function SelectArrayColumnFilter({
   column: { filterValue, setFilter, preFilteredRows, id },
