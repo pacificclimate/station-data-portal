@@ -53,7 +53,8 @@ const defaultColumn = {
 
 
 // Return column definitions for a tabular display of metadata.
-// There are two display types, compact and expanded.
+// There are two display types, compact and expanded, corresponding to the
+// "By Station" and "By History" views in the UI.
 // The appropriate form of data (compact or expanded) must be used with the
 // column definitions. Column definitions and data (see `smtData`) are computed
 // by separate functions to make memoizing them simpler and more effective.
@@ -394,7 +395,8 @@ export function smtColumnInfo({
 
 
 // Return data for a tabular display of metadata.
-// There are two display types, compact and expanded.
+// There are two display types, compact and expanded, corresponding to the
+// "By Station" and "By History" views in the UI.
 // The appropriate form of column definitions (compact or expanded) must be
 // used with the data. Column definitions (see `smtColumnInfo`) and data are
 // computed by separate functions to make memoizing them simpler and more
