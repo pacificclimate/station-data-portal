@@ -1,0 +1,6 @@
+{
+  "name": "CoordinatesNearColumnFilter",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./CoordinatesNearColumnFilter.js"
+}

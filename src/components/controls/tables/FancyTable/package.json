@@ -1,0 +1,6 @@
+{
+  "name": "FancyTable",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./FancyTable.js"
+}

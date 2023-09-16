@@ -5,3 +5,8 @@
 .perPage {
     width: 15em;
 }
+
+.pageCount {
+    display: inline-block;
+    width: 2.5em;
+}

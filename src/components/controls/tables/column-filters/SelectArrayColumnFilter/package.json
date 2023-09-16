@@ -1,0 +1,6 @@
+{
+  "name": "SelectArrayColumnFilter",
+  "version": "0.0.0",
+  "private": true,
+  "main": "SelectArrayColumnFilter.js"
+}

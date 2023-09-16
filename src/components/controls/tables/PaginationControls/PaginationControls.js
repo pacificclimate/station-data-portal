@@ -18,17 +18,19 @@ export default function PaginationControls({
   previousPage,
   pageSize,
   setPageSize,
-  pageSizes = [10, 15, 20, 30],
+  pageSizes = [10, 15, 20, 30, 50],
   size = 'sm',
-  variant = 'light'
+  variant = 'light',
+  ...restOfProps
 }) {
   const buttonProps = { variant };
   return (
-      <ButtonToolbar>
+      <ButtonToolbar {...restOfProps}>
         <ButtonGroup className={styles.fwdBack} size={size}>
           <Button
             title="Go to first page"
             {...buttonProps}
+            disabled={!canPreviousPage}
             onClick={() => gotoPage(0)}
           >
             <SkipBackward/>
@@ -44,10 +46,12 @@ export default function PaginationControls({
           <Button
             {...buttonProps}
             variant={'outline-dark'}
-            className={"mb-1 me-1"}
             disabled
           >
-            Page {pageIndex + 1} of {pageCount}
+            Page
+            <span className={styles.pageCount}>{pageIndex + 1}</span>
+            of
+            <span className={styles.pageCount}>{pageCount}</span>
           </Button>
           <Button
             title="Go to next page"
@@ -60,6 +64,7 @@ export default function PaginationControls({
           <Button
             title="Go to last page"
             {...buttonProps}
+            disabled={!canNextPage}
             onClick={() => gotoPage(pageCount - 1)}
           >
             <SkipForward/>
