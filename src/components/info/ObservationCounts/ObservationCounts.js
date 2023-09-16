@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Table } from 'react-bootstrap';
 import { reduce } from 'lodash/fp';
 import { getObservationCounts } from
     '../../../data-services/station-data-service';
+import InfoPopup from '../../util/InfoPopup';
 
 import logger from '../../../logger';
 import { getTimer } from '../../../utils/timing';
@@ -14,13 +15,22 @@ import { useConfigContext } from '../../main/ConfigContext';
 logger.configure({ active: true });
 const timer = getTimer("Observation count timing")
 
+// Strips out the time portion of a date used in observation count queries;
+// that is far too fine for any likely resolution for those.
+function dateToStrForQuery(date) {
+  const pad = v => String(v).padStart(2, '0');
+  return date && `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`
+}
+
 
 const totalCounts = timer.timeThis("totalCounts")(
   (counts, stations) =>
     reduce((sum, station) => sum + (counts[station.id] || 0), 0)(stations)
 );
 
-function ObservationCounts({filterValues: {startDate, endDate}, clipToDate, stations}) {
+function ObservationCounts({
+  filterValues: {startDate, endDate}, clipToDate, stations
+}) {
   const appConfig = useConfigContext();
   const [countData, setCountData] = useState(null);
 
@@ -29,24 +39,28 @@ function ObservationCounts({filterValues: {startDate, endDate}, clipToDate, stat
     getObservationCounts({
       appConfig,
       getParams: {
-        start_date: clipToDate ? startDate : undefined,
-        end_date: clipToDate ? endDate : undefined,
+        start_date: clipToDate ? dateToStrForQuery(startDate) : undefined,
+        end_date: clipToDate ? dateToStrForQuery(endDate) : undefined,
       },
     }).then(response => setCountData(response.data));
   }, [appConfig, clipToDate, startDate, endDate]);
 
   const loadingMessage = "Loading ...";
 
-  timer.resetAll();
-  const totalObservationCountsForStations = countData === null ?
-    loadingMessage :
-    totalCounts(countData.observationCounts, stations).toLocaleString();
-  const totalClimatologyCountsForStations = countData === null ?
-    loadingMessage :
-    totalCounts(countData.climatologyCounts, stations).toLocaleString();
-  timer.log();
+  const countTotals = useMemo(() => {
+    if (countData === null) {
+      return { observations: null, climatologies: null }
+    }
+    const monthlyObservations =
+      totalCounts(countData.observationCounts, stations);
+    const monthlyClimatologies =
+      totalCounts(countData.climatologyCounts, stations);
+    return { observations: monthlyObservations, climatologies: monthlyClimatologies };
+  }, [countData, stations])
 
-  const timePeriod = clipToDate ? "filter dates" : "all dates"
+  const timePeriod = clipToDate
+    ? `${dateToStrForQuery(startDate)} to ${dateToStrForQuery(endDate)}`
+    : "all dates"
 
   return (
     <Table size="sm">
@@ -63,15 +77,20 @@ function ObservationCounts({filterValues: {startDate, endDate}, clipToDate, stat
         </td>
       </tr>
       <tr>
-        <th>Total observations ({timePeriod})</th>
+        <th>
+          Total observations ({timePeriod}) <InfoPopup title="Total observations">
+            Observation counts are estimates, and are less accurate for time
+            periods of less than a few months.
+          </InfoPopup>
+        </th>
         <td className="text-right">
-          {totalObservationCountsForStations}
+          {countTotals.observations?.toLocaleString() ?? loadingMessage}
         </td>
       </tr>
       <tr>
-        <th>Total climatologies ({timePeriod})</th>
+        <th>Total climatologies (all dates)</th>
         <td className="text-right">
-          {totalClimatologyCountsForStations}
+          {countTotals.climatologies?.toLocaleString() ?? loadingMessage}
         </td>
       </tr>
       </tbody>
