@@ -1,29 +1,33 @@
-appTitle: BC Station Data - PCDS
-baseMap: BC
-
-# sdsUrl values will be replaced by dev or prod URLs when they become ready.
-# For now, we have demo instances inside the firewall.
-# Uses monsoon database
-sdsUrl: http://docker-dev02.pcic.uvic.ca:30512
-# Uses new database
-#sdsUrl: http://docker-dev02.pcic.uvic.ca:30562
-# Local instance
-#sdsUrl: http://localhost:5000
-
-# Currently deployed metadata backends do not respond to provinces QP.
-# When they do, we can use stationsQpProvinces and lose stationFilters
+#appTitle: BC Station Data - PCDS
+#baseMap: BC
+#
+## Dev instance
+#sdsUrl: https://services.pacificclimate.org/dev/met-data-portal-pcds/api/metadata/
+## Local instance
+##sdsUrl: http://localhost:5000
 #stationsQpProvinces: BC
-stationFilters: histories[0].province = "BC"
+#
+## Always necessary for CRMP database
+#networkFilters: name != "PCIC Climate Variables"
+#
+## Dev instance
+##pdpDataUrl: http://docker-dev01.pcic.uvic.ca:30507
+#pdpDataUrl: https://services.pacificclimate.org/dev/met-data-portal-pcds/api/data/
 
-# Always necessary for CRMP database
-networkFilters: name != "PCIC Climate Variables"
+appTitle: Western Arctic Weather Data
+baseMap: YNWT
 
-# pdpDataUrl values will be replaced by dev or prod URLs when they become ready.
-# For now, we have a demo instance inside the firewall, below.
-# Uses monsoon database
-pdpDataUrl: http://docker-dev02.pcic.uvic.ca:30514
-# Uses new database
-#pdpDataUrl: http://docker-dev02.pcic.uvic.ca:???
+# Dev instance
+#sdsUrl: https://services.pacificclimate.org/dev/met-data-portal-ynwt/meta
+# Local instance
+sdsUrl: http://localhost:5000
+# We do not at present need to filter based on province (verify!)
+#stationsQpProvinces: YK,NT
+# We do not at present need to filter networks (verify!)
+#networkFilters: ???
+
+# Dev instance
+pdpDataUrl: https://services.pacificclimate.org/dev/met-data-portal-ynwt/data
 
 # Debug params
 #stationFilters: histories[0].province = "BC"
