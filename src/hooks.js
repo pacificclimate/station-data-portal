@@ -23,6 +23,30 @@ export const useBooleanStateWithToggler = init => {
 // This arrangement makes it easy to treat a single immutable state as a group
 // of named (by key) states, each with its own easy-to-use value setter.
 //
+// Suppose the desired state is an object with initial value
+//
+//    { a: ..., b: ..., c: .... }
+//
+// With useImmer, we'd have
+//
+//    const [state, setState] = useImmer(initial);
+//
+// Later, we'd update as follows:
+//
+//    setState(draft => draft.a = value)
+//    setState(draft => draft.b = value)
+//    setState(draft => draft.c = value)
+//
+// Now we can do
+//
+//    setState.a(value)
+//    setState.b(value)
+//    setState.c(value)
+//
+// This is *slightly* more convenient, but it doesn't seem very much more so.
+// What did I think was the payoff value in this?
+//
+//
 // This hook returns the state and setter in the conventional array pair.
 export const useImmerByKey = (initial) => {
   const [state, setState] = useImmer(initial);
