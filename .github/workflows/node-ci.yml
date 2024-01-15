@@ -26,3 +26,4 @@ jobs:
           npm install --force
           CI=false npm run build
           npm test
+          npm run check-format
