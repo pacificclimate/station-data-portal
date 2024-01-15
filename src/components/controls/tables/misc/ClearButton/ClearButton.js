@@ -1,7 +1,6 @@
-import React from 'react';
-import { XCircle } from 'react-bootstrap-icons';
-import styles from './ClearButton.module.css';
-
+import React from "react";
+import { XCircle } from "react-bootstrap-icons";
+import styles from "./ClearButton.module.css";
 
 export default function ClearButton({
   title = "Clear filter values",
@@ -12,13 +11,13 @@ export default function ClearButton({
     <span
       title={title}
       className={`${styles.ClearButton} text-primary`}
-      onClick={e => {
+      onClick={(e) => {
         e.stopPropagation();
         setFilter(undefined);
       }}
       {...restProps}
     >
-      <XCircle/>
+      <XCircle />
     </span>
   );
 }

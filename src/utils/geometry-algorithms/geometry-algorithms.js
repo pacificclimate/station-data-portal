@@ -18,8 +18,7 @@
 //    point arg, because it is likely that many points may be tested against
 //    a single polygon. It's subjective, but you get the idea.
 
-import { curry, concat, isEqual } from 'lodash/fp';
-
+import { curry, concat, isEqual } from "lodash/fp";
 
 // isLeft(): tests if a point is Left|On|Right of an infinite line.
 //    Input:  three points P0, P1, and P2
@@ -44,16 +43,18 @@ isLeft( Point P0, Point P1, Point P2 )
 
 export const isLeft = curry(
   (
-    getX, getY,   // Point coordinate accessor functions
-    P0,           // Origin point for line
-    P1,           // Terminus point for line
-    P2            // Point to be tested
+    getX,
+    getY, // Point coordinate accessor functions
+    P0, // Origin point for line
+    P1, // Terminus point for line
+    P2, // Point to be tested
   ) => {
-    return ( (getX(P1) - getX(P0)) * (getY(P2) - getY(P0))
-      - (getX(P2) -  getX(P0)) * (getY(P1) - getY(P0)) );
-  }
+    return (
+      (getX(P1) - getX(P0)) * (getY(P2) - getY(P0)) -
+      (getX(P2) - getX(P0)) * (getY(P1) - getY(P0))
+    );
+  },
 );
-
 
 // isPointInPolygonWn(): winding number test for a point in a polygon
 //      Input:  getX, getY = accessor functions to extract x and y coords from
@@ -85,18 +86,18 @@ wn_PnPoly( Point P, Point* V, int n )
 }
 */
 
-export const  isPointInPolygonWn = curry(
+export const isPointInPolygonWn = curry(
   (
-    getX, getY,   // Point coordinate accessor functions
-    polygon,      // Polygon: array of vertices (points);
-                  //  can be in closed or open style
-    point         // Point to be tested
+    getX,
+    getY, // Point coordinate accessor functions
+    polygon, // Polygon: array of vertices (points);
+    //  can be in closed or open style
+    point, // Point to be tested
   ) => {
     // Ensure a vertex list with V[0] = V[n]
-    const V =
-      isEqual(polygon[0], polygon[polygon.length-1]) ?
-        polygon :
-        concat(polygon, polygon[0]);
+    const V = isEqual(polygon[0], polygon[polygon.length - 1])
+      ? polygon
+      : concat(polygon, polygon[0]);
     const n = V.length - 1;
 
     // console.log('isPointInPolygonWn:', 'poly =', polygon);
@@ -111,15 +112,16 @@ export const  isPointInPolygonWn = curry(
 
     const Py = getY(point);
 
-    for (let i = 0; i < n; i++) {   // edge from V[i] to  V[i+1]
+    for (let i = 0; i < n; i++) {
+      // edge from V[i] to  V[i+1]
       // console.log('i =', i);
       if (getY(V[i]) <= Py) {
         // start y <= getY(point)
         // console.log('// start y <= getY(point)');
-        if (getY(V[i+1])  > Py) {
+        if (getY(V[i + 1]) > Py) {
           // an upward crossing
           // console.log('// an upward crossing');
-          if (isLeft(getX, getY, V[i], V[i+1], point) > 0) {
+          if (isLeft(getX, getY, V[i], V[i + 1], point) > 0) {
             // point left of  edge
             // console.log('// point left of  edge');
             wn += 1;
@@ -129,10 +131,10 @@ export const  isPointInPolygonWn = curry(
       } else {
         // start y > getY(point) (no test needed)
         // console.log('// start y > getY(point) (no test needed)');
-        if (getY(V[i+1])  <= Py) {
+        if (getY(V[i + 1]) <= Py) {
           // a downward crossing
           // console.log('// a downward crossing');
-          if (isLeft(getX, getY, V[i], V[i+1], point) < 0) {
+          if (isLeft(getX, getY, V[i], V[i + 1], point) < 0) {
             // point right of  edge
             // console.log('// point right of  edge');
             wn -= 1;
@@ -143,5 +145,5 @@ export const  isPointInPolygonWn = curry(
     }
 
     return wn;
-  }
+  },
 );

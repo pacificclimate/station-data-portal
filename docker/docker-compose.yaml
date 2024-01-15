@@ -9,7 +9,7 @@
 # variables appropriately when invoking docker-compose, or modify (a copy of)
 # this file with the desired values.
 
-version: '3.2'
+version: "3.2"
 services:
   frontend:
     build:

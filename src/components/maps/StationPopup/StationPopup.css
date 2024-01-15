@@ -1,8 +1,8 @@
 h1 {
-    font-size: 1.2em;
+  font-size: 1.2em;
 }
 
 .scroll-y {
-    max-height: 10em;
-    overflow-y: scroll;
+  max-height: 10em;
+  overflow-y: scroll;
 }

@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
-import './Disclaimer.css';
-import { useConfigContext } from '../../main/ConfigContext';
-
+import React, { useState } from "react";
+import { Button, Modal } from "react-bootstrap";
+import "./Disclaimer.css";
+import { useConfigContext } from "../../main/ConfigContext";
 
 function Disclaimer() {
   const config = useConfigContext();

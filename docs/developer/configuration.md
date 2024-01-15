@@ -3,15 +3,14 @@
 Most configuration of the Station Data Portal frontend is done via a YAML
 file, `public/config.yaml`. For details, see below.
 
-For technical reasons, a few configuration parameters must be supplied via 
+For technical reasons, a few configuration parameters must be supplied via
 environment variables.
 
 ## Configuration via `public/config.yaml`
 
-This file must be a key-value map. It overrides the default configuration 
+This file must be a key-value map. It overrides the default configuration
 values, which are given below. Certain keys do not have default values and
 _must_ be specified in `public/config.yaml`. The others are optional.
-
 
 ### Configuration options
 
@@ -19,25 +18,29 @@ For default values see [Default configuration](#default-configuration).
 
 #### Absolutely required values
 
-These values do not have defaults and must be specified 
+These values do not have defaults and must be specified
 in `public/config.yaml`. They are critical to the functioning of the app.
 
 `appTitle`
+
 - Title of portal (appears in header).
 - Value: string.
 - Required; no default.
 
 `sdsUrl`
+
 - URL for station data portal metadata backend (Station Data Service; SDS).
 - Value: string.
 - Required; no default.
 
 `pdpDataUrl`
+
 - URL for PDP data download service.
 - Value: string.
 - Required; no default.
 
 `baseMap`
+
 - Selects which base map (and thus which projection) to use for station
   map.
 - Type: string.
@@ -52,17 +55,20 @@ These values may be overridden, but not with `undefined` or with invalid
 value types. Typically, these values configure basic UI functionality.
 
 `adjustableColumnWidthsDefault`
+
 - Default setting for adjustable column widths (between map and tabs).
 - Type: array, length 2.
 - Required.
 
 `defaultTab`
+
 - Default tab in UI
 - Type: string.
 - Valid values: Filters | Metadata | Data | Networks
 - Required.
 
 `defaultNetworkColor`
+
 - Default color for networks with unspecified color.
 - Type: string.
 - Valid values: Must be a value accepted by
@@ -71,6 +77,7 @@ value types. Typically, these values configure basic UI functionality.
 - Required.
 
 `zoomToMarkerRadiusSpec`
+
 - Specification for zoom to marker radius conversion.
 - Type: array.
 - Valid values: List of pairs (length-2 lists) of numbers (ints), which are
@@ -79,6 +86,7 @@ value types. Typically, these values configure basic UI functionality.
 - Required.
 
 `lethargy`
+
 - Configuration for Lethargy (tool that improves map behaviour with mouse
   scrolling on Macs).
 - Type: key-value map
@@ -90,6 +98,7 @@ value types. Typically, these values configure basic UI functionality.
 - Required.
 
 `userDocs`
+
 - Configuration for user docs link (in app header)
 - Type: key-value map
 - Properties:
@@ -99,6 +108,7 @@ value types. Typically, these values configure basic UI functionality.
 - Required.
 
 `mapSpinner`
+
 - Configuration for map spinner.
 - Type: key-value map
 - Important properties
@@ -114,6 +124,7 @@ value types. Typically, these values configure basic UI functionality.
 - Required.
 
 `disclaimer`
+
 - Disclaimer dialog configuration.
 - Type: key-value map
 - Properties:
@@ -129,6 +140,7 @@ These values default to `undefined`. They may be overridden with values
 of the correct type.
 
 `stationsQpProvinces`
+
 - Sets the `provinces` query parameter in the request sent by the app
   to `/stations`.
 - Type: string.
@@ -136,49 +148,58 @@ of the correct type.
 - Optional.
 
 `stationFilters`
+
 - Semicolon-separated set of filter expressions applied to pre-filter
-  (select) station metadata received from API. 
+  (select) station metadata received from API.
   (See [Filtering metadata](#filtering-metadata).)
 - Type: string.
 - Optional.
-- Note: Station filtering may not be required if metadata request options 
+- Note: Station filtering may not be required if metadata request options
   (e.g., `stationsQpProvinces`) are set.
 - Optional.
 
 `networkFilters`
+
 - Semicolon-separated set of filter expressions applied to filter  
   (select) network metadata received from API. (See [Filtering metadata](#filtering-metadata).)
 - Type: string.
 - Optional.
 
 `stationDebugFetchOptions`
+
 - Show/hide station fetch options controls for experimenting.
 - Value: Boolean
 - Optional.
 
 `stationDebugFetchLimits`
+
 - Items for debug fetch dropdown.
 - Type: array.
 - Optional.
 
 `showReloadStationsButton`
+
 - Show Reload Stations button.
 - Type: Boolean.
 - Optional.
 
 `stationOffset`
+
 - Sets `offset` param in /stations request. For testing.
 - Optional.
 
 `stationLimit`
+
 - Sets `limit` param in /stations request. For testing.
 - Optional.
 
 `stationStride`
+
 - Sets `stride` param in /stations request. For testing.
 - Optional.
 
 `timingEnabled`
+
 - Enable timing of selected operations. When enabled, timings are logged to
   console.
 - Value: Boolean.
@@ -190,7 +211,7 @@ of the correct type.
 adjustableColumnWidthsDefault: [7, 5]
 defaultTab: Filters
 defaultNetworkColor: "#000000"
-zoomToMarkerRadiusSpec: [ [7,2], [99,4] ]
+zoomToMarkerRadiusSpec: [[7, 2], [99, 4]]
 userDocs:
   showLink: false
   url: "https://data.pacificclimate.org/portal/docs/"
@@ -321,18 +342,18 @@ a custom config file to `/app/public/config.yaml`.
 For example, in your docker-compose.yaml, include the following mount:
 
 ```yaml
-    volumes:
-      - type: bind
-        source: /path/to/custom/config.yaml
-        target: /app/public/config.yaml
-        read_only: true
+volumes:
+  - type: bind
+    source: /path/to/custom/config.yaml
+    target: /app/public/config.yaml
+    read_only: true
 ```
 
-Note: We mount to target `/app/public/config.yml` because the app is built 
+Note: We mount to target `/app/public/config.yml` because the app is built
 in the Docker _container_, and this file is picked up in the build and
-copied to the appropriate build artifact. 
+copied to the appropriate build artifact.
 If we move to a system in which the app is built in advance in the
-Docker _image_, then the target will change, likely to 
+Docker _image_, then the target will change, likely to
 `/app/build/static/config.yaml`.
 
 ## Environment variables
@@ -355,12 +376,14 @@ For production runs, environment variables are provided by
 ### Deployment
 
 `PUBLIC_URL`
+
 - Base URL for Station Data Portal frontend.
 - Type: string.
 - For production, set this to the URL configured in our proxy server.
 - Required.
 
 `REACT_APP_APP_VERSION`
+
 - Current version of the app.
 - Type: string.
 - This value should be set using `generate-commitish.sh` when the Docker image is built.
@@ -368,11 +391,13 @@ For production runs, environment variables are provided by
 - Note doubled `APP_` in name.
 
 `REACT_APP_BC_BASE_MAP_TILES_URL`
+
 - URL template (includes x, y, z) for BC base map tiles.
 - Type: string.
 - Required if YAML config.baseMap === "BC"
 
 `REACT_APP_YNWT_BASE_MAP_TILES_URL`
+
 - URL template (includes x, y, z) for YNWT base map tiles.
 - Type: string.
 - Required if YAML config.baseMap === "YNWT"
@@ -380,44 +405,45 @@ For production runs, environment variables are provided by
 ## Filtering metadata
 
 The app can filter metadata to include only a desired subset of items.  
-(For example, station metadata can be filtered to include only 
+(For example, station metadata can be filtered to include only
 stations in BC.)
 
 Filtering is configured by setting the appropriate environment variable
-to a string containing zero or more semicolon-separated filter expressions. 
+to a string containing zero or more semicolon-separated filter expressions.
 
 ### Filter expression
 
 A filter expression takes the form `<path> <op> <value>`, where
+
 - `<path>` is a JS path addressing a property in a metadata object,
 - `<op>` is a comparison operator (only =, != supported at the moment),
 - `<value>` is any valid JSON expression not containing a semicolon,
 - the filter expression components are separated by at least one space.
 
-Example: 
+Example:
 The filter expression `x[0].a = "foo"` filters (selects)
 only those metadata items containing a property selected by the path
 `x[0].y` with value equal to the string `foo`. For example, this expression
 selects the item
 
 ```json
-{ "x": [ { "a":  "foo" } ], "y": "other" }
+{ "x": [{ "a": "foo" }], "y": "other" }
 ```
 
 and deselects the item
 
 ```json
-{ "x": [ { "a":  "bar" } ], "y": "oh my" }
+{ "x": [{ "a": "bar" }], "y": "oh my" }
 ```
 
 ### Set of filter expressions
 
-One or more filter expressions can be used to filter metadata. Each 
+One or more filter expressions can be used to filter metadata. Each
 expression in the set must be satisfied (evaluate to `true`) in order
 to select an item.
 
 A set of filter expressions is specified by separating each filter
-expression by a semicolon. For example: 
+expression by a semicolon. For example:
 
 ```
 country = "CA";province = "BC"

@@ -1,13 +1,12 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-import './InfoPopup.css';
-import { OverlayTrigger, Popover } from 'react-bootstrap';
-import { InfoCircle } from 'react-bootstrap-icons';
-
+import "./InfoPopup.css";
+import { OverlayTrigger, Popover } from "react-bootstrap";
+import { InfoCircle } from "react-bootstrap-icons";
 
 function InfoPopup({
-  label= <InfoCircle/>,
+  label = <InfoCircle />,
   placement = "right",
   title,
   children,

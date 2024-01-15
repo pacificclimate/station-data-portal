@@ -11,12 +11,12 @@
 // and the filter expression components are separated by at least one space.
 // All filter expressions must be satisfied to pass a metadata item.
 
-import flow from 'lodash/fp/flow';
-import split from 'lodash/fp/split';
-import map from 'lodash/fp/map';
-import compact from 'lodash/fp/compact';
-import every from 'lodash/fp/every';
-import get from 'lodash/fp/get';
+import flow from "lodash/fp/flow";
+import split from "lodash/fp/split";
+import map from "lodash/fp/map";
+import compact from "lodash/fp/compact";
+import every from "lodash/fp/every";
+import get from "lodash/fp/get";
 
 const filterExpressionPattern =
   /\s*(?<path>[^ ]*)\s+(?<op>=|!=)\s+(?<value>.*)\s*/;
@@ -25,17 +25,17 @@ const filterExpressionPattern =
 // Any invalid expressions are flagged on the console and otherwise ignored.
 // A parsed filter expression is an object with keys 'path`, 'op', 'value'.
 export const filterExpressionsParser = flow(
-  split(';'),
+  split(";"),
   compact,
-  map(s => [s, s.match(filterExpressionPattern)]),
+  map((s) => [s, s.match(filterExpressionPattern)]),
   map(([s, match]) => {
     if (!match) {
-      console.warn(`Warning: '${s}' is not a valid filter expression`)
+      console.warn(`Warning: '${s}' is not a valid filter expression`);
     }
     return match;
   }),
   compact,
-  map(match => {
+  map((match) => {
     try {
       return {
         path: match.groups.path,
@@ -44,7 +44,7 @@ export const filterExpressionsParser = flow(
       };
     } catch {
       console.warn(
-        `Warning: Error parsing value in filter expression: ${match.groups.value}`
+        `Warning: Error parsing value in filter expression: ${match.groups.value}`,
       );
       return null;
     }
@@ -55,14 +55,15 @@ export const filterExpressionsParser = flow(
 // Given an array of parsed filter expressions, returns a predicate that
 // evaluates the conjunction (and) of the expressions for a given metadatum.
 // A parsed filter expression is an object with keys 'path`, 'op', 'value'.
-export const filterPredicate = expressions => item =>
-  every(
-    expression => {
-      const itemValue = get(expression.path, item);
-      switch (expression.op) {
-        case '=': return itemValue === expression.value;
-        case '!=': return itemValue !== expression.value;
-        default: return false;
-      }
+export const filterPredicate = (expressions) => (item) =>
+  every((expression) => {
+    const itemValue = get(expression.path, item);
+    switch (expression.op) {
+      case "=":
+        return itemValue === expression.value;
+      case "!=":
+        return itemValue !== expression.value;
+      default:
+        return false;
     }
-  )(expressions);
+  })(expressions);

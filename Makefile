@@ -1,6 +1,6 @@
 # These variables are set to make it convenient to run the docker image locally.
 tag = $(shell git rev-parse --abbrev-ref HEAD)
-port = 30501
+port = 30502
 public_url = http://localhost:${port}
 
 image:

@@ -21,12 +21,11 @@
 //
 // This is typically done immediately before `reset` is called.
 
-import flow from 'lodash/fp/flow';
-import map from 'lodash/fp/map';
-import sum from 'lodash/fp/sum';
-import sortBy from 'lodash/fp/sortBy';
-import isNil from 'lodash/fp/isNil';
-
+import flow from "lodash/fp/flow";
+import map from "lodash/fp/map";
+import sum from "lodash/fp/sum";
+import sortBy from "lodash/fp/sortBy";
+import isNil from "lodash/fp/isNil";
 
 let timingEnabled = false;
 
@@ -53,7 +52,7 @@ export class Timer {
   start(key, log = false) {
     if (!this.enabled) return;
     if (log) {
-      console.log(`${key} timing start`)
+      console.log(`${key} timing start`);
     }
     this.timings[key] = this.timings[key] || {};
     this.timings[key].start = Date.now();
@@ -64,51 +63,53 @@ export class Timer {
     if (!this.enabled) return;
     const more = Date.now() - this.timings[key].start;
     if (log) {
-      console.log(`${key} timing stop: ${more}`)
+      console.log(`${key} timing stop: ${more}`);
     }
     this.timings[key].duration += more;
     this.timings[key].start = null;
   }
 
-  timeThis = (key, options = {}) => f => {
-    if (!this.enabled) {
-      return f;
-    }
-    const { log = false } = options;
-    return (...args) => {
-      this.start(key, log);
-      const r = f(...args);
-      this.stop(key, log);
-      return r;
-    }
-  }
+  timeThis =
+    (key, options = {}) =>
+    (f) => {
+      if (!this.enabled) {
+        return f;
+      }
+      const { log = false } = options;
+      return (...args) => {
+        this.start(key, log);
+        const r = f(...args);
+        this.stop(key, log);
+        return r;
+      };
+    };
 
   log() {
     if (!this.enabled) return;
     console.group(this.name);
-    const totalDuration = flow(map('duration'), sum)(this.timings);
-    console.log(`Total duration: ${totalDuration / 1000} s`)
-    for(const [key, value] of sortBy('[0]', Object.entries(this.timings))) {
-      console.log(`${key}: ${value.duration / 1000} s (${Math.round(100 * value.duration / totalDuration)}%) [${value.start ? "running" : "stopped"}]`);
+    const totalDuration = flow(map("duration"), sum)(this.timings);
+    console.log(`Total duration: ${totalDuration / 1000} s`);
+    for (const [key, value] of sortBy("[0]", Object.entries(this.timings))) {
+      console.log(
+        `${key}: ${value.duration / 1000} s (${Math.round((100 * value.duration) / totalDuration)}%) [${value.start ? "running" : "stopped"}]`,
+      );
     }
     console.groupEnd();
   }
 }
 
-
 const registry = {};
 
-export const getTimer = name => {
+export const getTimer = (name) => {
   if (!registry[name]) {
     registry[name] = new Timer(name);
   }
   return registry[name];
 };
 
-
-export const setTimingEnabled = enabled => {
+export const setTimingEnabled = (enabled) => {
   timingEnabled = enabled;
   for (const timer of Object.values(registry)) {
     timer.enabled = enabled;
   }
-}
+};

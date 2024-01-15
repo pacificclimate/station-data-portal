@@ -1,21 +1,24 @@
 // This component uses the React Table infrastructure (already present for
 // metadata display) to prepare the data for React CSV package, which creates
 // a CSV file.
-import PropTypes from 'prop-types';
-import React, { useState } from 'react';
-import map from 'lodash/fp/map';
-import { useTable } from 'react-table';
-import { CSVLink } from 'react-csv';
+import PropTypes from "prop-types";
+import React, { useState } from "react";
+import map from "lodash/fp/map";
+import { useTable } from "react-table";
+import { CSVLink } from "react-csv";
 
-import logger from '../../../logger';
+import logger from "../../../logger";
 
-import './DownloadMetadata.css';
+import "./DownloadMetadata.css";
 
 logger.configure({ active: true });
 
-function DownloadMetadata(
-  { data, columns, filename="station-metadata.csv", children }
-) {
+function DownloadMetadata({
+  data,
+  columns,
+  filename = "station-metadata.csv",
+  children,
+}) {
   const { allColumns, rows, prepareRow } = useTable({ columns, data });
 
   // Data for CSV download can be bulky, so it is generated lazily.
@@ -26,24 +29,19 @@ function DownloadMetadata(
 
   // Convert each row to an array of values matching header array.
   // Column value in row is converted using column.csv function if defined.
-  const makeCsvData = () => map(
-    row => {
+  const makeCsvData = () =>
+    map((row) => {
       prepareRow(row);
-      return map(
-        column => {
-          const value = row.values[column.id];
-          return column.csv ? column.csv(value) : value;
-        },
-        allColumns
-      );
-    },
-    rows
-  );
+      return map((column) => {
+        const value = row.values[column.id];
+        return column.csv ? column.csv(value) : value;
+      }, allColumns);
+    }, rows);
 
   const handleClick = (event, done) => {
     setCsvData(makeCsvData());
     done(true);
-  }
+  };
 
   return (
     <CSVLink

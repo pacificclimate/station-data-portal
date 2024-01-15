@@ -21,22 +21,19 @@
 // complexity, and it places the state declarations right next to a key
 // consumer of them, the component `StationFilters`.
 
-import React from 'react';
+import React from "react";
 
-import './StationFilters.css';
-import { Col, Row } from 'react-bootstrap';
+import "./StationFilters.css";
+import { Col, Row } from "react-bootstrap";
 
-import IncludeStationsWithNoObsControl
-  from "../../controls/IncludeStationsWithNoObsControl";
-import NetworkSelector from '../../selectors/NetworkSelector';
-import VariableSelector from '../../selectors/VariableSelector';
-import FrequencySelector
-  from '../../selectors/FrequencySelector/FrequencySelector';
-import DateSelector from '../../selectors/DateSelector';
-import OnlyWithClimatologyControl
-  from '../../controls/OnlyWithClimatologyControl';
-import { commonSelectorStyles } from '../../selectors/styles';
-import { usePairedImmerByKey } from '../../../hooks';
+import IncludeStationsWithNoObsControl from "../../controls/IncludeStationsWithNoObsControl";
+import NetworkSelector from "../../selectors/NetworkSelector";
+import VariableSelector from "../../selectors/VariableSelector";
+import FrequencySelector from "../../selectors/FrequencySelector/FrequencySelector";
+import DateSelector from "../../selectors/DateSelector";
+import OnlyWithClimatologyControl from "../../controls/OnlyWithClimatologyControl";
+import { commonSelectorStyles } from "../../selectors/styles";
+import { usePairedImmerByKey } from "../../../hooks";
 
 export const useStationFiltering = () => {
   const { normal, transitional, isPending, setState } = usePairedImmerByKey({
@@ -83,7 +80,7 @@ function StationFilters({
           {/*<Button size={'sm'} onClick={handleClickAll}>Select all criteria</Button>*/}
           {/*<Button size={'sm'} onClick={handleClickNone}>Clear all criteria</Button>*/}
           <DateSelector
-            label={'Start Date'}
+            label={"Start Date"}
             value={state.startDate}
             onChange={setState.startDate}
             maxDate={state.endDate}
@@ -91,7 +88,7 @@ function StationFilters({
         </Col>
         <Col lg={6} md={6} sm={6}>
           <DateSelector
-            label={'End Date'}
+            label={"End Date"}
             value={state.endDate}
             onChange={setState.endDate}
             minDate={state.startDate}
@@ -151,7 +148,6 @@ function StationFilters({
   );
 }
 
-StationFilters.propTypes = {
-};
+StationFilters.propTypes = {};
 
 export default StationFilters;

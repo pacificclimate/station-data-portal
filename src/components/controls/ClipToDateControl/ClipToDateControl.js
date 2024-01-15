@@ -1,8 +1,8 @@
-import PropTypes from 'prop-types';
-import React, { Component } from 'react';
-import { Form } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React, { Component } from "react";
+import { Form } from "react-bootstrap";
 
-import './ClipToDateControl.css';
+import "./ClipToDateControl.css";
 
 export default class ClipToDateControl extends Component {
   static propTypes = {
@@ -24,4 +24,3 @@ export default class ClipToDateControl extends Component {
     );
   }
 }
-

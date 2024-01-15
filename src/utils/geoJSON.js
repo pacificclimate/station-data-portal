@@ -1,8 +1,8 @@
-import flattenDepth from 'lodash/fp/flattenDepth';
-import map from 'lodash/fp/map';
-import min from 'lodash/fp/min';
-import max from 'lodash/fp/max';
-import { isPointInPolygonWn } from './geometry-algorithms';
+import flattenDepth from "lodash/fp/flattenDepth";
+import map from "lodash/fp/map";
+import min from "lodash/fp/min";
+import max from "lodash/fp/max";
+import { isPointInPolygonWn } from "./geometry-algorithms";
 
 // GeoJSON MultiPolygon format. Taken from
 // https://conservancy.umn.edu/bitstream/handle/11299/210208/GeoJSON_Primer_2019.pdf
@@ -28,24 +28,22 @@ import { isPointInPolygonWn } from './geometry-algorithms';
 //   // ...
 // };
 
-
-export const checkGeoJSONMultiPolygon = geometry => {
-  if (geometry['type'] !== 'MultiPolygon') {
-    throw new Error(`Invalid geometry type: ${geometry['type']}`)
+export const checkGeoJSONMultiPolygon = (geometry) => {
+  if (geometry["type"] !== "MultiPolygon") {
+    throw new Error(`Invalid geometry type: ${geometry["type"]}`);
   }
 };
 
-
-export const gJMultiPolygonBoundingBox = geometry => {
+export const gJMultiPolygonBoundingBox = (geometry) => {
   const points = flattenDepth(3, geometry["coordinates"]);
-  const xs = map(p => p[0], points);
-  const ys = map(p => p[1], points);
+  const xs = map((p) => p[0], points);
+  const ys = map((p) => p[1], points);
   return [
     [min(xs), max(ys)], // top left
     [max(xs), min(ys)], // bottom right
-  ]
+  ];
 };
 
-const getX = point => point[0];
-const getY = point => point[1];
+const getX = (point) => point[0];
+const getY = (point) => point[1];
 export const isPointInGeoJSONPolygon = isPointInPolygonWn(getX, getY);
