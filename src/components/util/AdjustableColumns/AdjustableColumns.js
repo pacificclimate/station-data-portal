@@ -81,7 +81,8 @@ export default class AdjustableColumns extends Component {
             lg={12}
             className={"text-center"}
             style={{
-              marginBottom: "-0.5em",
+              marginTop: "0.25em",
+              marginBottom: "0.25em",
               marginLeft: "-2px",
               borderRight: "1px solid #777",
               borderLeft: "1px solid #777",

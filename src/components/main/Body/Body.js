@@ -139,121 +139,110 @@ function Body() {
   const rowClasses = { className: "mt-3" };
 
   return (
-    <div className={css.portal}>
-      <Row>
-        <AdjustableColumns
-          defaultLgs={config.adjustableColumnWidthsDefault}
-          contents={[
-            // "map" ||  // Uncomment to suppress map
-            <StationMap
-              {...baseMaps[config.baseMap]}
-              stations={filteredStations}
-              metadata={metadata}
-              onSetArea={setArea}
-              externalIsPending={
-                metadata.stations === null || filteringIsPending
-              }
-            />,
-
-            <Card style={{ marginLeft: "-15px", marginRight: "-10px" }}>
-              <Card.Body>
-                {config.showReloadStationsButton && (
-                  <Button onClick={reloadStations}>Reload stations</Button>
-                )}
-                <Tabs
-                  id="non-map-controls"
-                  defaultActiveKey={config.defaultTab}
-                  className={css.mainTabs}
-                >
-                  <Tab eventKey={"Filters"} title={"Station Filters"}>
-                    {config.stationDebugFetchOptions && (
-                      <Row>
-                        <Col lg={6}>Fetch limit</Col>
-                        <Col lg={6}>
-                          <Select
-                            options={config.stationDebugFetchLimitsOptions}
-                            value={stnsLimit}
-                            onChange={setStnsLimit}
-                          />
-                        </Col>
-                      </Row>
-                    )}
-                    <Row {...rowClasses}>
-                      <Col lg={12} md={12} sm={12}>
-                        <SelectionCounts
-                          allStations={metadata.stations}
-                          selectedStations={selectedStations}
-                        />
-                        <p className={"mb-0"}>
-                          (See Station Metadata and Station Data tabs for
-                          details)
-                        </p>
-                      </Col>
-                    </Row>
-                    <StationFilters
-                      state={filterValuesNormal}
-                      setState={filterValuesSetState}
-                      metadata={metadata}
-                      rowClasses={rowClasses}
+    <Row className={css.portal}>
+      <AdjustableColumns
+        defaultLgs={config.adjustableColumnWidthsDefault}
+        contents={[
+          // "map" ||  // Uncomment to suppress map
+          <StationMap
+            {...baseMaps[config.baseMap]}
+            stations={filteredStations}
+            metadata={metadata}
+            onSetArea={setArea}
+            externalIsPending={metadata.stations === null || filteringIsPending}
+            onReloadStations={reloadStations}
+            className={css.mainColumns}
+          />,
+          <Tabs
+            id="non-map-controls"
+            defaultActiveKey={config.defaultTab}
+            className={css.mainTabs}
+          >
+            <Tab eventKey={"Filters"} title={"Station Filters"}>
+              {config.stationDebugFetchOptions && (
+                <Row>
+                  <Col lg={6}>Fetch limit</Col>
+                  <Col lg={6}>
+                    <Select
+                      options={config.stationDebugFetchLimitsOptions}
+                      value={stnsLimit}
+                      onChange={setStnsLimit}
                     />
-                  </Tab>
+                  </Col>
+                </Row>
+              )}
+              <Row {...rowClasses}>
+                <Col lg={12} md={12} sm={12}>
+                  <SelectionCounts
+                    allStations={metadata.stations}
+                    selectedStations={selectedStations}
+                  />
+                  <p className={"mb-0"}>
+                    (See Station Metadata and Station Data tabs for details)
+                  </p>
+                </Col>
+              </Row>
+              <StationFilters
+                state={filterValuesNormal}
+                setState={filterValuesSetState}
+                metadata={metadata}
+                rowClasses={rowClasses}
+              />
+            </Tab>
 
-                  <Tab eventKey={"Metadata"} title={"Station Metadata"}>
-                    <Row {...rowClasses}>
-                      <SelectionCounts
-                        allStations={metadata.stations}
-                        selectedStations={selectedStations}
-                      />
-                    </Row>
-                    <StationMetadata
-                      stations={selectedStations}
-                      metadata={metadata}
-                    />
-                  </Tab>
+            <Tab eventKey={"Metadata"} title={"Station Metadata"}>
+              <Row {...rowClasses}>
+                <SelectionCounts
+                  allStations={metadata.stations}
+                  selectedStations={selectedStations}
+                />
+              </Row>
+              <StationMetadata
+                stations={selectedStations}
+                metadata={metadata}
+              />
+            </Tab>
 
-                  <Tab eventKey={"Data"} title={"Station Data"}>
-                    <Row {...rowClasses}>
-                      <SelectionCounts
-                        allStations={metadata.stations}
-                        selectedStations={selectedStations}
-                      />
-                      <SelectionCriteria />
-                    </Row>
-                    <UnselectedThings
-                      selectedNetworksOptions={
-                        filterValuesNormal.selectedNetworksOptions
-                      }
-                      selectedVariablesOptions={
-                        filterValuesNormal.selectedVariablesOptions
-                      }
-                      selectedFrequenciesOptions={
-                        filterValuesNormal.selectedFrequenciesOptions
-                      }
-                    />
+            <Tab eventKey={"Data"} title={"Station Data"}>
+              <Row {...rowClasses}>
+                <SelectionCounts
+                  allStations={metadata.stations}
+                  selectedStations={selectedStations}
+                />
+                <SelectionCriteria />
+              </Row>
+              <UnselectedThings
+                selectedNetworksOptions={
+                  filterValuesNormal.selectedNetworksOptions
+                }
+                selectedVariablesOptions={
+                  filterValuesNormal.selectedVariablesOptions
+                }
+                selectedFrequenciesOptions={
+                  filterValuesNormal.selectedFrequenciesOptions
+                }
+              />
 
-                    <StationData
-                      filterValues={filterValuesNormal}
-                      selectedStations={selectedStations}
-                      dataDownloadUrl={dataDownloadUrl({
-                        config,
-                        filterValues: filterValuesNormal,
-                        polygon: area,
-                      })}
-                      dataDownloadFilename={dataDownloadFilename}
-                      rowClasses={rowClasses}
-                    />
-                  </Tab>
+              <StationData
+                filterValues={filterValuesNormal}
+                selectedStations={selectedStations}
+                dataDownloadUrl={dataDownloadUrl({
+                  config,
+                  filterValues: filterValuesNormal,
+                  polygon: area,
+                })}
+                dataDownloadFilename={dataDownloadFilename}
+                rowClasses={rowClasses}
+              />
+            </Tab>
 
-                  <Tab eventKey={"Networks"} title={"Networks"}>
-                    <NetworksMetadata networks={metadata.networks} />
-                  </Tab>
-                </Tabs>
-              </Card.Body>
-            </Card>,
-          ]}
-        />
-      </Row>
-    </div>
+            <Tab eventKey={"Networks"} title={"Networks"}>
+              <NetworksMetadata networks={metadata.networks} />
+            </Tab>
+          </Tabs>,
+        ]}
+      />
+    </Row>
   );
 }
 
