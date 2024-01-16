@@ -1,13 +1,13 @@
-import PropTypes from 'prop-types';
-import React, { useState } from 'react';
-import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
-import capitalize from 'lodash/fp/capitalize';
-import map from 'lodash/fp/map';
-import { useStore } from '../../../state/state-store';
-import FileFormatSelector from '../../selectors/FileFormatSelector';
-import ClipToDateControl from '../../controls/ClipToDateControl';
-import ObservationCounts from '../../info/ObservationCounts';
-import InfoPopup from '../../util/InfoPopup';
+import PropTypes from "prop-types";
+import React, { useState } from "react";
+import { Button, ButtonToolbar, Col, Row } from "react-bootstrap";
+import capitalize from "lodash/fp/capitalize";
+import map from "lodash/fp/map";
+import { useStore } from "../../../state/state-store";
+import FileFormatSelector from "../../selectors/FileFormatSelector";
+import ClipToDateControl from "../../controls/ClipToDateControl";
+import ObservationCounts from "../../info/ObservationCounts";
+import InfoPopup from "../../util/InfoPopup";
 
 import logger from "../../../logger";
 
@@ -22,14 +22,14 @@ function StationData({
   dataDownloadFilename,
   rowClasses,
 }) {
-  const config = useStore(state => state.config);
+  const config = useStore((state) => state.config);
   const [fileFormat, setFileFormat] = useState();
   const [clipToDate, setClipToDate] = useState(false);
   const toggleClipToDate = () => setClipToDate(!clipToDate);
 
   return (
-    <React.Fragment>
-      <Row {...rowClasses}>
+    <>
+      <Row {...rowClasses} key="obs">
         <Col lg={12} md={12} sm={12}>
           <ObservationCounts
             filterValues={filterValues}
@@ -39,19 +39,19 @@ function StationData({
         </Col>
       </Row>
 
-      <Row {...rowClasses}>
+      <Row {...rowClasses} key="clip">
         <Col lg={12} md={12} sm={12}>
           <ClipToDateControl value={clipToDate} onChange={toggleClipToDate} />
         </Col>
       </Row>
 
-      <Row {...rowClasses}>
+      <Row {...rowClasses} key="file">
         <Col lg={12} md={12} sm={12}>
           <FileFormatSelector value={fileFormat} onChange={setFileFormat} />
         </Col>
       </Row>
 
-      <Row {...rowClasses}>
+      <Row {...rowClasses} key="button">
         <Col lg={12} md={12} sm={12}>
           <ButtonToolbar>
             {map(
@@ -66,12 +66,11 @@ function StationData({
                 const linkLabel = `Download ${capitalize(dataCategory)}`;
                 const urlTooLong = downloadUrl.length > config.maxUrlLength;
                 return (
-                  <>
+                  <React.Fragment key={dataCategory}>
                     <Button
                       variant={"primary"}
                       size={"sm"}
                       className={"me-2"}
-                      key={dataCategory}
                       disabled={urlTooLong}
                       href={urlTooLong ? undefined : downloadUrl}
                       download={
@@ -111,7 +110,7 @@ function StationData({
                         </InfoPopup>
                       </span>
                     )}
-                  </>
+                  </React.Fragment>
                 );
               },
               ["timeseries", "climatology"],
@@ -119,7 +118,7 @@ function StationData({
           </ButtonToolbar>
         </Col>
       </Row>
-    </React.Fragment>
+    </>
   );
 }
 

@@ -185,7 +185,6 @@ function StationMetadata({
           </p>
         </Card>
       )}
-
       {isPending ? (
         <p>Loading...</p>
       ) : (

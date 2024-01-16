@@ -1,15 +1,16 @@
-import { create } from 'zustand';
-import { loadConfigAction } from './action-load-config';
-
+import { create } from "zustand";
+import { createConfigSlice } from "./slice-config";
+import { createMetadataSlice } from "./slice-metadata";
+import { createDebugSlice } from "./slice-debug";
 
 export const useStore = create((set, get) => ({
-    // States
-    config: null,
-    configError: null,
-    isConfigLoaded: () => get().config !== null,
-    // Actions
-    initialize: () => get()._loadConfig(),
+  ...createConfigSlice(set, get),
+  ...createMetadataSlice(set, get),
+  ...createDebugSlice(set, get),
 
-    // Private Actions
-    _loadConfig: loadConfigAction(set, get)
-  }));
+  // Actions
+  initialize: async () => {
+    await get()._loadConfig();
+    set({ stationsLimit: get().config.stationDebugFetchLimitsOptions[0] });
+  },
+}));

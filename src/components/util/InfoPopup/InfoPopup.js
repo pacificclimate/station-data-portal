@@ -10,9 +10,11 @@ function InfoPopup({
   placement = "right",
   title,
   children,
+  key,
 }) {
   return (
     <OverlayTrigger
+      key={key}
       placement={placement}
       overlay={
         <Popover id={title}>

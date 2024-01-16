@@ -2,7 +2,7 @@ import axios from "axios";
 import urljoin from "url-join";
 import isString from "lodash/fp/isString";
 import tap from "lodash/fp/tap";
-import { mapDeep } from "../utils/fp";
+import { mapDeep } from "../utils/fp/fp";
 import { filterExpressionsParser, filterPredicate } from "./filtering";
 import filter from "lodash/fp/filter";
 
@@ -22,56 +22,56 @@ function transformIso8601Date(value) {
   return isDateString ? new Date(Date.parse(value)) : value;
 }
 
-export function getNetworks({ appConfig }) {
+export function getNetworks({ config }) {
   const parsedNetworkFilterExpressions = filterExpressionsParser(
-    appConfig.networkFilters,
+    config.networkFilters,
   );
   const filterNetworks = filter(
     filterPredicate(parsedNetworkFilterExpressions),
   );
 
-  return axios.get(urljoin(appConfig.sdsUrl, "networks"), {
+  return axios.get(urljoin(config.sdsUrl, "networks"), {
     params: {
-      provinces: appConfig.stationsQpProvinces,
+      provinces: config.stationsQpProvinces,
     },
     transformResponse: axios.defaults.transformResponse.concat(filterNetworks),
   });
 }
 
-export function getVariables({ appConfig }) {
-  return axios.get(urljoin(appConfig.sdsUrl, "variables"), {
+export function getVariables({ config }) {
+  return axios.get(urljoin(config.sdsUrl, "variables"), {
     params: {
-      provinces: appConfig.stationsQpProvinces,
+      provinces: config.stationsQpProvinces,
     },
   });
 }
 
-export function getFrequencies({ appConfig }) {
-  return axios.get(urljoin(appConfig.sdsUrl, "frequencies"), {
+export function getFrequencies({ config }) {
+  return axios.get(urljoin(config.sdsUrl, "frequencies"), {
     params: {
-      provinces: appConfig.stationsQpProvinces,
+      provinces: config.stationsQpProvinces,
     },
   });
 }
 
-export function getHistories({ appConfig }) {
-  return axios.get(urljoin(appConfig.sdsUrl, "histories"));
+export function getHistories({ config }) {
+  return axios.get(urljoin(config.sdsUrl, "histories"));
 }
 
-export function getStations({ appConfig, getParams, axiosConfig }) {
+export function getStations({ config, getParams, axiosConfig }) {
   const parsedStationFilterExpressions = filterExpressionsParser(
-    appConfig.stationFilters,
+    config.stationFilters,
   );
   const filterStations = filter(
     filterPredicate(parsedStationFilterExpressions),
   );
 
-  return axios.get(urljoin(appConfig.sdsUrl, "stations"), {
+  return axios.get(urljoin(config.sdsUrl, "stations"), {
     params: {
-      offset: appConfig.stationOffset,
-      limit: appConfig.stationLimit,
-      stride: appConfig.stationStride,
-      provinces: appConfig.stationsQpProvinces,
+      offset: config.stationOffset,
+      limit: config.stationLimit,
+      stride: config.stationStride,
+      provinces: config.stationsQpProvinces,
       ...getParams,
     },
     transformResponse: axios.defaults.transformResponse.concat(

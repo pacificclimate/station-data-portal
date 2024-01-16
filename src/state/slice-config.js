@@ -1,5 +1,5 @@
-import axios from 'axios';
 import yaml from "js-yaml";
+import { create } from "lodash";
 import filter from "lodash/fp/filter";
 import isUndefined from "lodash/fp/isUndefined";
 
@@ -7,7 +7,10 @@ const defaultConfig = {
   adjustableColumnWidthsDefault: [7, 5],
   defaultTab: "Filters",
   defaultNetworkColor: "#000000",
-  zoomToMarkerRadiusSpec: [[7, 2], [99, 4]],
+  zoomToMarkerRadiusSpec: [
+    [7, 2],
+    [99, 4],
+  ],
   userDocs: {
     showLink: false,
     url: "https://data.pacificclimate.org/portal/docs/",
@@ -56,23 +59,22 @@ const requiredConfigKeys = [
   "userDocs",
   "mapSpinner",
   "disclaimer",
-]
+];
 const checkMissingKeys = (config) => {
   const missingRequiredKeys = filter(
-    key => isUndefined(config[key]), requiredConfigKeys
+    (key) => isUndefined(config[key]),
+    requiredConfigKeys,
   );
   if (missingRequiredKeys.length > 0) {
     throw new Error(
       `Error in config.yaml: The following keys must have values, 
-      but do not: ${missingRequiredKeys}`
+      but do not: ${missingRequiredKeys}`,
     );
   }
-}
-
-
+};
 
 const getZoomMarkerRadius = (zmrSpec) => {
-  return zoom => {
+  return (zoom) => {
     for (const [_zoom, radius] of zmrSpec) {
       if (zoom <= _zoom) {
         return radius;
@@ -80,10 +82,9 @@ const getZoomMarkerRadius = (zmrSpec) => {
     }
     return zmrSpec[zmrSpec.length - 1][1];
   };
-}
+};
 
-
-export const loadConfigAction = (set, get) => {
+const loadConfigAction = (set, get) => {
   return async () => {
     let config = {};
     try {
@@ -94,8 +95,10 @@ export const loadConfigAction = (set, get) => {
     } catch (error) {
       set({
         configError: (
-          <div>Error loading or parsing config.yaml: <pre>{error.toString()}</pre></div>
-        )
+          <div>
+            Error loading or parsing config.yaml: <pre>{error.toString()}</pre>
+          </div>
+        ),
       });
       throw error;
     }
@@ -104,7 +107,7 @@ export const loadConfigAction = (set, get) => {
       checkMissingKeys(config);
     } catch (error) {
       set({
-        configError: error.toString()
+        configError: error.toString(),
       });
       throw error;
     }
@@ -113,13 +116,26 @@ export const loadConfigAction = (set, get) => {
     config.appVersion = process.env.REACT_APP_APP_VERSION ?? "unknown";
 
     // Extend config with some computed goodies
+    // TODO: Store shouldn't know about data presentation
     config.stationDebugFetchLimitsOptions = config.stationDebugFetchLimits.map(
-      value => ({ value, label: value.toString() })
+      (value) => ({ value, label: value.toString() }),
     );
 
-    config.zoomToMarkerRadius = getZoomMarkerRadius(config.zoomToMarkerRadiusSpec)
-
+    config.zoomToMarkerRadius = getZoomMarkerRadius(
+      config.zoomToMarkerRadiusSpec,
+    );
 
     set({ config });
-  }
+  };
 };
+
+export const createConfigSlice = (set, get) => ({
+  config: null,
+  configError: null,
+  isConfigLoaded: () => get().config !== null,
+
+  // private actions
+  _loadConfig: loadConfigAction(set, get),
+});
+
+export default createConfigSlice;
