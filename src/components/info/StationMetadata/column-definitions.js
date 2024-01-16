@@ -1,7 +1,7 @@
-import flow from 'lodash/fp/flow';
-import map from 'lodash/fp/map';
-import flatten from 'lodash/fp/flatten';
-import join from 'lodash/fp/join';
+import flow from "lodash/fp/flow";
+import map from "lodash/fp/map";
+import flatten from "lodash/fp/flatten";
+import join from "lodash/fp/join";
 
 import {
   stationNetwork,
@@ -9,20 +9,19 @@ import {
   uniqStationLocations,
   uniqStationNames,
   uniqStationObsPeriods,
-  uniqStationVariableNames
-} from '../../../utils/station-info';
+  uniqStationVariableNames,
+} from "../../../utils/station-info";
 
-import { filterTypes } from '../../controls/tables/filterTypes';
-import DefaultColumnFilter from '../../controls/tables/column-filters/DefaultColumnFilter';
+import { filterTypes } from "../../controls/tables/filterTypes";
+import DefaultColumnFilter from "../../controls/tables/column-filters/DefaultColumnFilter";
 
-import FrequencySelector from '../../selectors/FrequencySelector';
-import SelectColumnFilter from '../../controls/tables/column-filters/SelectColumnFilter';
-import NumberRangeColumnFilter from '../../controls/tables/column-filters/NumberRangeColumnFilter';
-import SelectArrayColumnFilter from '../../controls/tables/column-filters/SelectArrayColumnFilter';
-
+import FrequencySelector from "../../selectors/FrequencySelector";
+import SelectColumnFilter from "../../controls/tables/column-filters/SelectColumnFilter";
+import NumberRangeColumnFilter from "../../controls/tables/column-filters/NumberRangeColumnFilter";
+import SelectArrayColumnFilter from "../../controls/tables/column-filters/SelectArrayColumnFilter";
 
 // TODO: Move to utils
-const formatDate = d => d ? d.toISOString().substr(0,10) : 'unknown';
+const formatDate = (d) => (d ? d.toISOString().substr(0, 10) : "unknown");
 // TODO: Move to utils
 const csvArrayRep = (sep = "|") => join(sep);
 
@@ -43,14 +42,13 @@ const lexCompare = (a, b) => {
     }
   }
   return a.length - b.length;
-}
+};
 
 // Default column
 const defaultColumn = {
   Filter: DefaultColumnFilter,
   doFilter: false,
 };
-
 
 // Return column definitions for a tabular display of metadata.
 // There are two display types, compact and expanded, corresponding to the
@@ -60,104 +58,101 @@ const defaultColumn = {
 // by separate functions to make memoizing them simpler and more effective.
 // Column definitions include `csv` prop for representing a row value in
 // a CSV download file.
-export function smtColumnInfo({
-  allNetworks, allVariables, compact=true
-}) {
+export function smtColumnInfo({ allNetworks, allVariables, compact = true }) {
   // Columns and accessors common to both display types
 
-  const stationNetworkIdAccessor = station => {
+  const stationNetworkIdAccessor = (station) => {
     const network = stationNetwork(allNetworks, station);
     return network?.id;
   };
 
   const networkIdColumn = {
-    id: 'Network ID',
-    Header: 'Network ID',
+    id: "Network ID",
+    Header: "Network ID",
     minWidth: 80,
     maxWidth: 100,
     doFilter: true,
   };
 
-  const stationNetworkNameAccessor = station => {
+  const stationNetworkNameAccessor = (station) => {
     const network = stationNetwork(allNetworks, station);
-    return network ? network.name : '?';
+    return network ? network.name : "?";
   };
 
   const networkNameColumn = {
-    id: 'Network Name',
-    Header: 'Network Name',
+    id: "Network Name",
+    Header: "Network Name",
     minWidth: 80,
     maxWidth: 100,
     doFilter: true,
     Filter: ({ column }) => (
-      <SelectColumnFilter
-        column={column}
-        allValue={"*"}
-      />
+      <SelectColumnFilter column={column} allValue={"*"} />
     ),
-    filter: 'exactOrAllAsterisk',
+    filter: "exactOrAllAsterisk",
   };
 
   const nativeIdColumn = {
-    id: 'Native ID',
-    Header: 'Native ID',
+    id: "Native ID",
+    Header: "Native ID",
     minWidth: 80,
     maxWidth: 100,
     doFilter: true,
   };
 
   const stationIdColumn = {
-    id: 'Station ID',
-    Header: 'Station ID',
+    id: "Station ID",
+    Header: "Station ID",
     minWidth: 80,
     maxWidth: 100,
     doFilter: true,
   };
 
   const historyIdColumn = {
-    id: 'History ID',
-    Header: 'History ID',
+    id: "History ID",
+    Header: "History ID",
     minWidth: 80,
     maxWidth: 100,
     doFilter: true,
   };
 
   const provinceColumn = {
-    id: 'Province',
-    Header: 'Province',
+    id: "Province",
+    Header: "Province",
     minWidth: 80,
     maxWidth: 100,
     doFilter: true,
     Filter: ({ column }) => (
-      <SelectColumnFilter
-        column={column}
-        allValue={"*"}
-      />
+      <SelectColumnFilter column={column} allValue={"*"} />
     ),
-    filter: 'exactOrAllAsterisk',
+    filter: "exactOrAllAsterisk",
   };
 
   const variablesColumn = {
     minWidth: 100,
     maxWidth: 250,
-    id: 'Variables',
-    Header: 'Variables',
+    id: "Variables",
+    Header: "Variables",
     sortable: false,
-    accessor: data => uniqStationVariableNames(allVariables)(data.station),
-    Cell: row => (
+    accessor: (data) => uniqStationVariableNames(allVariables)(data.station),
+    Cell: (row) => (
       <ul className={"compact"}>
-        {map(name => (<li key={name}>{name}</li>), row.value)}
+        {map(
+          (name) => (
+            <li key={name}>{name}</li>
+          ),
+          row.value,
+        )}
       </ul>
     ),
     doFilter: true,
     Filter: ({ column }) => (
       <SelectArrayColumnFilter
-        toString={option => option}
+        toString={(option) => option}
         column={column}
         allValue={"*"}
       />
     ),
-    filter: 'includesInArrayOfString',
+    filter: "includesInArrayOfString",
     csv: csvArrayRep(),
   };
 
@@ -168,13 +163,18 @@ export function smtColumnInfo({
     const historyIdsColumn = {
       minWidth: 80,
       maxWidth: 100,
-      id: 'Hx Ids',
-      Header: 'Hx Ids',
-      accessor: station => map('id', station.histories),
+      id: "Hx Ids",
+      Header: "Hx Ids",
+      accessor: (station) => map("id", station.histories),
       sortMethod: lexCompare,
-      Cell: row => (
+      Cell: (row) => (
         <ul className={"compact"}>
-          {map(id => (<li key={id}>{id}</li>), row.value)}
+          {map(
+            (id) => (
+              <li key={id}>{id}</li>
+            ),
+            row.value,
+          )}
         </ul>
       ),
       csv: csvArrayRep(),
@@ -189,109 +189,126 @@ export function smtColumnInfo({
         { ...nativeIdColumn, accessor: "native_id" },
         { ...stationIdColumn, accessor: "id" },
         {
-          id: 'Unique Names',
-          Header: 'Unique Names',
+          id: "Unique Names",
+          Header: "Unique Names",
           minWidth: 120,
           maxWidth: 200,
           accessor: uniqStationNames,
           sortMethod: lexCompare,
-          Cell: row => (
+          Cell: (row) => (
             <ul className={"compact"}>
-              {map(name => (<li key={name}>{name}</li>), row.value)}
+              {map(
+                (name) => (
+                  <li key={name}>{name}</li>
+                ),
+                row.value,
+              )}
             </ul>
           ),
           doFilter: true,
-          filter: 'includesSubstringInArrayOfString',
+          filter: "includesSubstringInArrayOfString",
           csv: csvArrayRep(),
         },
         {
-          id: 'Unique Locations',
-          Header: 'Unique Locations',
+          id: "Unique Locations",
+          Header: "Unique Locations",
           minWidth: 120,
           maxWidth: 200,
           sortable: false,
           accessor: uniqStationLocations,
-          Cell: row => (
+          Cell: (row) => (
             <ul className={"compact"}>
-              {
-                map(location => (
+              {map(
+                (location) => (
                   // A location is a representative history item
                   <li key={location.id}>
-                    {-location.lon} W <br/>
-                    {location.lat} N <br/>
+                    {-location.lon} W <br />
+                    {location.lat} N <br />
                     Elev. {location.elevation} m
                   </li>
-                ), row.value)
-              }
+                ),
+                row.value,
+              )}
             </ul>
           ),
           csv: flow(
-            map(location =>
-              `${-location.lon} W, ${location.lat} N, Elev. ${location.elevation} m`
+            map(
+              (location) =>
+                `${-location.lon} W, ${location.lat} N, Elev. ${location.elevation} m`,
             ),
             csvArrayRep(),
           ),
         },
         {
-          id: 'Unique Records',
-          Header: 'Unique Records',
+          id: "Unique Records",
+          Header: "Unique Records",
           minWidth: 100,
           maxWidth: 100,
           sortable: false,
           accessor: uniqStationObsPeriods,
-          Cell: row => (
+          Cell: (row) => (
             <ul className={"compact"}>
-              {
-                map(period => (
+              {map(
+                (period) => (
                   // A period is a representative history item
                   <li key={period.id}>
-                    {formatDate(period.min_obs_time)} to <br/>
+                    {formatDate(period.min_obs_time)} to <br />
                     {formatDate(period.max_obs_time)}
                   </li>
-                ), row.value)
-              }
+                ),
+                row.value,
+              )}
             </ul>
           ),
           csv: flow(
-            map(period =>
-              `${formatDate(period.min_obs_time)} to ${formatDate(period.max_obs_time)}`
+            map(
+              (period) =>
+                `${formatDate(period.min_obs_time)} to ${formatDate(period.max_obs_time)}`,
             ),
-            csvArrayRep()
+            csvArrayRep(),
           ),
         },
         {
           minWidth: 80,
           maxWidth: 100,
-          id: 'Uniq Obs Freqs',
-          Header: 'Uniq Obs Freqs',
+          id: "Uniq Obs Freqs",
+          Header: "Uniq Obs Freqs",
           accessor: flow(uniqStationFreqs, map(FrequencySelector.valueToLabel)),
           sortMethod: lexCompare,
-          Cell: row => (
+          Cell: (row) => (
             <ul className={"compact"}>
-              {map(freq => (<li key={freq}>{freq}</li>), row.value)}
+              {map(
+                (freq) => (
+                  <li key={freq}>{freq}</li>
+                ),
+                row.value,
+              )}
             </ul>
           ),
           doFilter: true,
           Filter: ({ column }) => (
             <SelectArrayColumnFilter
-              toString={option => option}
+              toString={(option) => option}
               column={column}
               allValue={"*"}
             />
           ),
-          filter: 'includesInArrayOfString',
+          filter: "includesInArrayOfString",
           csv: csvArrayRep(),
         },
-        { ...variablesColumn, accessor: uniqStationVariableNames(allVariables) },
         {
-          id: '# Hx',
-          Header: '# Hx',
+          ...variablesColumn,
+          accessor: uniqStationVariableNames(allVariables),
+        },
+        {
+          id: "# Hx",
+          Header: "# Hx",
           minWidth: 30,
           maxWidth: 30,
-          accessor: station => station.histories.length,
+          accessor: (station) => station.histories.length,
           doFilter: true,
           Filter: NumberRangeColumnFilter,
-          filter: 'between',
+          filter: "between",
         },
         historyIdsColumn,
       ],
@@ -312,87 +329,79 @@ export function smtColumnInfo({
     columns: [
       {
         ...networkIdColumn,
-        accessor: data => stationNetworkIdAccessor(data.station)
+        accessor: (data) => stationNetworkIdAccessor(data.station),
       },
       {
-        ...networkNameColumn, accessor:
-          data => stationNetworkNameAccessor(data.station)
+        ...networkNameColumn,
+        accessor: (data) => stationNetworkNameAccessor(data.station),
       },
       { ...nativeIdColumn, accessor: "station.native_id" },
       { ...stationIdColumn, accessor: "station.id" },
       {
-        id: 'Station name',
-        Header: 'Station Name',
+        id: "Station name",
+        Header: "Station Name",
         minWidth: 80,
         maxWidth: 100,
-        accessor: data => data.history.station_name,
+        accessor: (data) => data.history.station_name,
         doFilter: true,
       },
       { ...historyIdColumn, accessor: "history.id" },
       { ...provinceColumn, accessor: "history.province" },
       {
-        id: 'Longitude',
-        Header: 'Longitude',
+        id: "Longitude",
+        Header: "Longitude",
         minWidth: 80,
         maxWidth: 100,
-        accessor: data => data.history.lon,
+        accessor: (data) => data.history.lon,
       },
       {
-        id: 'Latitude',
-        Header: 'Latitude',
+        id: "Latitude",
+        Header: "Latitude",
         minWidth: 80,
         maxWidth: 100,
-        accessor: data => data.history.lat,
+        accessor: (data) => data.history.lat,
       },
       {
-        id: 'Elevation',
-        Header: 'Elevation (m)',
+        id: "Elevation",
+        Header: "Elevation (m)",
         minWidth: 80,
         maxWidth: 100,
-        accessor: data => data.history.elevation ?? "n/a",
+        accessor: (data) => data.history.elevation ?? "n/a",
         doFilter: true,
         Filter: NumberRangeColumnFilter,
-        filter: 'between',
+        filter: "between",
       },
       {
-        id: 'Record Start',
-        Header: 'Record Start',
+        id: "Record Start",
+        Header: "Record Start",
         minWidth: 80,
         maxWidth: 100,
-        accessor: data => formatDate(data.history.min_obs_time),
+        accessor: (data) => formatDate(data.history.min_obs_time),
       },
       {
-        id: 'Record End',
-        Header: 'Record End',
+        id: "Record End",
+        Header: "Record End",
         minWidth: 80,
         maxWidth: 100,
-        accessor: data => formatDate(data.history.max_obs_time),
+        accessor: (data) => formatDate(data.history.max_obs_time),
       },
       {
-        id: 'Obs Freq',
-        Header: 'Obs Freq',
+        id: "Obs Freq",
+        Header: "Obs Freq",
         minWidth: 80,
         maxWidth: 100,
-        accessor: data => FrequencySelector.valueToLabel(data.history.freq),
+        accessor: (data) => FrequencySelector.valueToLabel(data.history.freq),
         doFilter: true,
         Filter: ({ column }) => (
-          <SelectColumnFilter
-            column={column}
-            allValue={"*"}
-          />
+          <SelectColumnFilter column={column} allValue={"*"} />
         ),
-        filter: 'exactOrAllAsterisk',
+        filter: "exactOrAllAsterisk",
       },
       { ...variablesColumn },
     ],
-    hiddenColumns: [
-      networkIdColumn.id,
-      stationIdColumn.id,
-      historyIdColumn.id,
-    ],
+    hiddenColumns: [networkIdColumn.id, stationIdColumn.id, historyIdColumn.id],
   };
 }
-
 
 // Return data for a tabular display of metadata.
 // There are two display types, compact and expanded, corresponding to the
@@ -407,7 +416,9 @@ export function smtData(stations, compact) {
   }
   // Expanded data: one history per item.
   return flow(
-    map(station => map(history => ({station, history}), station.histories)),
+    map((station) =>
+      map((history) => ({ station, history }), station.histories),
+    ),
     flatten,
   )(stations);
 }

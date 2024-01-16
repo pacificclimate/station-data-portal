@@ -1,14 +1,14 @@
 .StationMetadata table {
-    font-size: 0.8em;
+  font-size: 0.8em;
 }
 
 ul.compact {
-    padding-top: 0;
-    padding-bottom: 0;
-    padding-left: 15px;
-    padding-right: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 15px;
+  padding-right: 0;
 }
 
 ul.compact li {
-    margin-left: 0;
+  margin-left: 0;
 }

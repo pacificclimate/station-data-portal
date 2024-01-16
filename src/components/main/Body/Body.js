@@ -1,44 +1,39 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useImmerByKey } from '../../../hooks';
-import {
-  Button,
-  Card,
-  Col,
-  Row,
-  Tab,
-  Tabs
-} from 'react-bootstrap';
-import Select from 'react-select';
-import tap from 'lodash/fp/tap';
+import React, { useEffect, useMemo, useState } from "react";
+import { useImmerByKey } from "../../../hooks";
+import { Button, Card, Col, Row, Tab, Tabs } from "react-bootstrap";
+import Select from "react-select";
+import tap from "lodash/fp/tap";
 
-import css from '../common.module.css';
+import css from "../common.module.css";
 
-import logger from '../../../logger';
+import logger from "../../../logger";
 import {
   getFrequencies,
   getNetworks,
   getStations,
   getVariables,
-} from '../../../data-services/station-data-service';
-import { dataDownloadFilename, dataDownloadUrl }
-  from '../../../data-services/pdp-data-service';
+} from "../../../data-services/station-data-service";
+import {
+  dataDownloadFilename,
+  dataDownloadUrl,
+} from "../../../data-services/pdp-data-service";
 import {
   stationAreaFilter,
   stationFilter,
-} from '../../../utils/station-filtering';
-import StationMap from '../../maps/StationMap';
-import StationMetadata from '../../info/StationMetadata';
-import StationData from '../../info/StationData';
-import NetworksMetadata from '../../info/NetworksMetadata';
-import SelectionCounts from '../../info/SelectionCounts';
-import SelectionCriteria from '../../info/SelectionCriteria';
-import UnselectedThings from '../../info/UnselectedThings';
-import AdjustableColumns from '../../util/AdjustableColumns';
-import StationFilters, { useStationFiltering }
-  from '../../controls/StationFilters';
-import baseMaps from '../../maps/baseMaps';
-import { useConfigContext } from '../ConfigContext';
-
+} from "../../../utils/station-filtering";
+import StationMap from "../../maps/StationMap";
+import StationMetadata from "../../info/StationMetadata";
+import StationData from "../../info/StationData";
+import NetworksMetadata from "../../info/NetworksMetadata";
+import SelectionCounts from "../../info/SelectionCounts";
+import SelectionCriteria from "../../info/SelectionCriteria";
+import UnselectedThings from "../../info/UnselectedThings";
+import AdjustableColumns from "../../util/AdjustableColumns";
+import StationFilters, {
+  useStationFiltering,
+} from "../../controls/StationFilters";
+import baseMaps from "../../maps/baseMaps";
+import { useConfigContext } from "../ConfigContext";
 
 logger.configure({ active: true });
 
@@ -64,44 +59,48 @@ function useMetadata() {
   });
   const setStnsLimit = setDebug.stnsLimit;
   const reloadStations = () => {
-    console.log("### reloadStations")
+    console.log("### reloadStations");
     setDebug.stationsReload(debug.stationsReload + 1);
   };
 
   // Fetch data from backend
 
   useEffect(() => {
-    getNetworks({ appConfig: config })
-    .then(response => setMetadata.networks(response.data));
+    getNetworks({ appConfig: config }).then((response) =>
+      setMetadata.networks(response.data),
+    );
   }, [config]);
 
   useEffect(() => {
-    getVariables({ appConfig: config })
-    .then(response => setMetadata.variables(response.data));
+    getVariables({ appConfig: config }).then((response) =>
+      setMetadata.variables(response.data),
+    );
   }, [config]);
 
   useEffect(() => {
-    getFrequencies({ appConfig: config })
-    .then(response => setMetadata.frequencies(response.data));
+    getFrequencies({ appConfig: config }).then((response) =>
+      setMetadata.frequencies(response.data),
+    );
   }, [config]);
 
   useEffect(() => {
-    console.log("### loading stations")
+    console.log("### loading stations");
     setMetadata.stations(null);
     getStations({
       appConfig: config,
       getParams: {
         compact: true,
-        ...(config.stationDebugFetchOptions && { limit: debug.stnsLimit.value })
-      }
+        ...(config.stationDebugFetchOptions && {
+          limit: debug.stnsLimit.value,
+        }),
+      },
     })
-    .then(tap(() => console.log("### stations loaded")))
-    .then(response => setMetadata.stations(response.data));
+      .then(tap(() => console.log("### stations loaded")))
+      .then((response) => setMetadata.stations(response.data));
   }, [debug]);
 
   return { metadata, setStnsLimit, reloadStations };
 }
-
 
 function Body() {
   const config = useConfigContext();
@@ -124,19 +123,20 @@ function Body() {
   // based on it are done in a transition. The filter values state reflecting
   // this is `filterValuesTransitional`, used here.
   const filteredStations = useMemo(
-    () => stationFilter({
-      filterValues: filterValuesTransitional,
-      metadata,
-    }),
-    [filterValuesTransitional, metadata]
+    () =>
+      stationFilter({
+        filterValues: filterValuesTransitional,
+        metadata,
+      }),
+    [filterValuesTransitional, metadata],
   );
 
   const selectedStations = useMemo(
     () => stationAreaFilter(area, filteredStations),
-    [area, filteredStations]
+    [area, filteredStations],
   );
 
-  const rowClasses = { className: "mt-3" }
+  const rowClasses = { className: "mt-3" };
 
   return (
     <div className={css.portal}>
@@ -151,23 +151,21 @@ function Body() {
               metadata={metadata}
               onSetArea={setArea}
               externalIsPending={
-                (metadata.stations === null) || filteringIsPending
+                metadata.stations === null || filteringIsPending
               }
             />,
 
-            <Card style={{ marginLeft: '-15px', marginRight: '-10px' }}>
+            <Card style={{ marginLeft: "-15px", marginRight: "-10px" }}>
               <Card.Body>
-                { config.showReloadStationsButton && (
-                  <Button onClick={reloadStations}>
-                    Reload stations
-                  </Button>
+                {config.showReloadStationsButton && (
+                  <Button onClick={reloadStations}>Reload stations</Button>
                 )}
                 <Tabs
                   id="non-map-controls"
                   defaultActiveKey={config.defaultTab}
                   className={css.mainTabs}
                 >
-                  <Tab eventKey={'Filters'} title={'Station Filters'}>
+                  <Tab eventKey={"Filters"} title={"Station Filters"}>
                     {config.stationDebugFetchOptions && (
                       <Row>
                         <Col lg={6}>Fetch limit</Col>
@@ -187,7 +185,8 @@ function Body() {
                           selectedStations={selectedStations}
                         />
                         <p className={"mb-0"}>
-                          (See Station Metadata and Station Data tabs for details)
+                          (See Station Metadata and Station Data tabs for
+                          details)
                         </p>
                       </Col>
                     </Row>
@@ -199,7 +198,7 @@ function Body() {
                     />
                   </Tab>
 
-                  <Tab eventKey={'Metadata'} title={'Station Metadata'}>
+                  <Tab eventKey={"Metadata"} title={"Station Metadata"}>
                     <Row {...rowClasses}>
                       <SelectionCounts
                         allStations={metadata.stations}
@@ -212,42 +211,45 @@ function Body() {
                     />
                   </Tab>
 
-                  <Tab eventKey={'Data'} title={'Station Data'}>
+                  <Tab eventKey={"Data"} title={"Station Data"}>
                     <Row {...rowClasses}>
                       <SelectionCounts
                         allStations={metadata.stations}
                         selectedStations={selectedStations}
                       />
-                      <SelectionCriteria/>
+                      <SelectionCriteria />
                     </Row>
                     <UnselectedThings
-                      selectedNetworksOptions={filterValuesNormal.selectedNetworksOptions}
-                      selectedVariablesOptions={filterValuesNormal.selectedVariablesOptions}
-                      selectedFrequenciesOptions={filterValuesNormal.selectedFrequenciesOptions}
+                      selectedNetworksOptions={
+                        filterValuesNormal.selectedNetworksOptions
+                      }
+                      selectedVariablesOptions={
+                        filterValuesNormal.selectedVariablesOptions
+                      }
+                      selectedFrequenciesOptions={
+                        filterValuesNormal.selectedFrequenciesOptions
+                      }
                     />
 
                     <StationData
                       filterValues={filterValuesNormal}
                       selectedStations={selectedStations}
-                      dataDownloadUrl={
-                        dataDownloadUrl({
-                          config,
-                          filterValues: filterValuesNormal,
-                          polygon: area
-                        })
-                      }
+                      dataDownloadUrl={dataDownloadUrl({
+                        config,
+                        filterValues: filterValuesNormal,
+                        polygon: area,
+                      })}
                       dataDownloadFilename={dataDownloadFilename}
                       rowClasses={rowClasses}
                     />
                   </Tab>
 
-                  <Tab eventKey={'Networks'} title={'Networks'}>
-                    <NetworksMetadata networks={metadata.networks}/>
+                  <Tab eventKey={"Networks"} title={"Networks"}>
+                    <NetworksMetadata networks={metadata.networks} />
                   </Tab>
-
                 </Tabs>
               </Card.Body>
-            </Card>
+            </Card>,
           ]}
         />
       </Row>

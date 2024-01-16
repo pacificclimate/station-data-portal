@@ -1,8 +1,8 @@
-import React from 'react';
-import Form from 'react-bootstrap/Form';
-import ClearButton from '../../misc/ClearButton';
-import styles from '../ColumnFilters.module.css';
-import sortBy from 'lodash/fp/sortBy';
+import React from "react";
+import Form from "react-bootstrap/Form";
+import ClearButton from "../../misc/ClearButton";
+import styles from "../ColumnFilters.module.css";
+import sortBy from "lodash/fp/sortBy";
 
 // Custom filter UI for selecting a unique option from set of rows, whose
 // values are a list that contains an array of option values. (Typically this
@@ -13,7 +13,7 @@ import sortBy from 'lodash/fp/sortBy';
 
 export default function SelectArrayColumnFilter({
   column: { filterValue, setFilter, preFilteredRows, id },
-  toString = option => option.toString(),
+  toString = (option) => option.toString(),
   allValue = "*",
 }) {
   // Calculate the options for filtering using the preFilteredRows.
@@ -21,13 +21,13 @@ export default function SelectArrayColumnFilter({
   // to the list of options.
   const options = React.useMemo(() => {
     const options = new Set();
-    preFilteredRows.forEach(row => {
-      row.values[id].forEach(value => {
+    preFilteredRows.forEach((row) => {
+      row.values[id].forEach((value) => {
         options.add(value);
       });
     });
-    return sortBy(x => x, [...options.values()])
-  }, [id, preFilteredRows])
+    return sortBy((x) => x, [...options.values()]);
+  }, [id, preFilteredRows]);
 
   // Render a multi-select box
   return (
@@ -36,8 +36,8 @@ export default function SelectArrayColumnFilter({
         size="sm"
         as="select"
         value={filterValue}
-        onChange={e => {
-          setFilter(e.target.value || undefined)
+        onChange={(e) => {
+          setFilter(e.target.value || undefined);
         }}
       >
         <option value={allValue}>All</option>
@@ -50,5 +50,3 @@ export default function SelectArrayColumnFilter({
     </div>
   );
 }
-
-

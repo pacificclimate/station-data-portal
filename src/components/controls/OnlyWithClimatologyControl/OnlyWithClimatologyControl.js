@@ -1,8 +1,8 @@
-import PropTypes from 'prop-types';
-import React from 'react';
+import PropTypes from "prop-types";
+import React from "react";
 
 import CheckboxControl from "../CheckboxControl";
-import './OnlyWithClimatologyControl.css';
+import "./OnlyWithClimatologyControl.css";
 
 export default function OnlyWithClimatologyControl(props) {
   return (
@@ -10,7 +10,7 @@ export default function OnlyWithClimatologyControl(props) {
       label={"Only include stations with climatology"}
       {...props}
     />
-  )
+  );
 }
 
 OnlyWithClimatologyControl.propTypes = {

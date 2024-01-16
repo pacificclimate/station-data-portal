@@ -1,11 +1,15 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Form } from 'react-bootstrap';
+import PropTypes from "prop-types";
+import React from "react";
+import { Form } from "react-bootstrap";
 
-import './CheckboxControl.css';
+import "./CheckboxControl.css";
 
 export default function CheckboxControl({
-  label, value, onChange, extra, ...rest
+  label,
+  value,
+  onChange,
+  extra,
+  ...rest
 }) {
   return (
     <Form className={"CheckboxControl"}>
@@ -15,8 +19,7 @@ export default function CheckboxControl({
         checked={value}
         onChange={onChange}
         {...rest}
-      />
-      {' '}
+      />{" "}
       {extra}
     </Form>
   );

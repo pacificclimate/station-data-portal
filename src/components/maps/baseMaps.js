@@ -1,12 +1,12 @@
-import { BCBaseMap, YNWTBaseMap } from 'pcic-react-leaflet-components';
+import { BCBaseMap, YNWTBaseMap } from "pcic-react-leaflet-components";
 
 export default {
-  BC: { 
-    BaseMap: BCBaseMap,  
+  BC: {
+    BaseMap: BCBaseMap,
     initialViewport: BCBaseMap.initialViewport,
   },
-  YNWT: { 
-    BaseMap: YNWTBaseMap,  
+  YNWT: {
+    BaseMap: YNWTBaseMap,
     initialViewport: YNWTBaseMap.initialViewport,
   },
 };

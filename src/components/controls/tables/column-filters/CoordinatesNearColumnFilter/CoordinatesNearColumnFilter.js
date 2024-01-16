@@ -1,16 +1,13 @@
-import React from 'react';
-import Form from 'react-bootstrap/Form';
-import { makeFilterNumberInputOnChange} from '../../../../utils/filters';
-import ClearButton from '../../misc/ClearButton';
-import styles from '../ColumnFilters.module.css';
+import React from "react";
+import Form from "react-bootstrap/Form";
+import { makeFilterNumberInputOnChange } from "../../../../utils/filters";
+import ClearButton from "../../misc/ClearButton";
+import styles from "../ColumnFilters.module.css";
 
 // Custom UI for selecting a coordinates (lat, lon pair) near given coordinates.
 
 export default function CoordinatesNearColumnFilter({
-  column: {
-    filterValue = [undefined, undefined, undefined],
-    setFilter,
-  },
+  column: { filterValue = [undefined, undefined, undefined], setFilter },
 }) {
   return (
     <div className={`${styles.wrapper} ${styles.coordinates}`}>
@@ -19,7 +16,7 @@ export default function CoordinatesNearColumnFilter({
         size="sm"
         htmlSize={6}
         type="number"
-        value={filterValue[0] || ''}
+        value={filterValue[0] || ""}
         onChange={makeFilterNumberInputOnChange({ filterValue, setFilter }, 0)}
         placeholder={`Lat`}
       />
@@ -28,7 +25,7 @@ export default function CoordinatesNearColumnFilter({
         size="sm"
         htmlSize={6}
         type="number"
-        value={filterValue[1] || ''}
+        value={filterValue[1] || ""}
         onChange={makeFilterNumberInputOnChange({ filterValue, setFilter }, 1)}
         placeholder={`Lon`}
       />
@@ -36,7 +33,7 @@ export default function CoordinatesNearColumnFilter({
       <Form.Control
         className={`${styles.control} ${styles.radius}`}
         style={{
-          marginLeft: '0.5em',
+          marginLeft: "0.5em",
         }}
         size="sm"
         htmlSize={4}
@@ -50,5 +47,5 @@ export default function CoordinatesNearColumnFilter({
       km
       <ClearButton setFilter={setFilter} />
     </div>
-  )
+  );
 }

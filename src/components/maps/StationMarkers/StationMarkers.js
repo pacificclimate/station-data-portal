@@ -1,26 +1,24 @@
-import PropTypes from 'prop-types';
-import React, { useEffect, useRef, useState } from 'react';
-import { CircleMarker, Polygon, useMap, useMapEvents } from 'react-leaflet';
-import map from 'lodash/fp/map';
-import flow from 'lodash/fp/flow';
-import mapValues from 'lodash/fp/mapValues';
-import StationPopup from '../StationPopup';
-import StationTooltip from '../StationTooltip';
+import PropTypes from "prop-types";
+import React, { useEffect, useRef, useState } from "react";
+import { CircleMarker, Polygon, useMap, useMapEvents } from "react-leaflet";
+import map from "lodash/fp/map";
+import flow from "lodash/fp/flow";
+import mapValues from "lodash/fp/mapValues";
+import StationPopup from "../StationPopup";
+import StationTooltip from "../StationTooltip";
 
-import logger from '../../../logger';
+import logger from "../../../logger";
 
-import './StationMarkers.css';
+import "./StationMarkers.css";
 import {
   stationNetwork,
-  uniqStationLocations
-} from '../../../utils/station-info';
-import chroma from 'chroma-js';
-import { getTimer } from '../../../utils/timing';
-
+  uniqStationLocations,
+} from "../../../utils/station-info";
+import chroma from "chroma-js";
+import { getTimer } from "../../../utils/timing";
 
 logger.configure({ active: true });
 const timer = getTimer("StationMarkers timing");
-
 
 // This user hook implements lazy marker popup generation.
 // Returns an object `{ markerRef, addPopup, popup }`:
@@ -36,7 +34,7 @@ const useLazyPopup = ({ station, metadata }) => {
   // Callback: create popup if not already created.
   const addPopup = () => {
     if (popup === null) {
-      setPopup(<StationPopup station={station} metadata={metadata}/>);
+      setPopup(<StationPopup station={station} metadata={metadata} />);
     }
   };
 
@@ -51,19 +49,17 @@ const useLazyPopup = ({ station, metadata }) => {
   return { markerRef, popup, addPopup };
 };
 
-
 export const defaultMarkerOptions = {
   radius: 4,
   weight: 1,
   fillOpacity: 0.75,
-  color: '#000000',
+  color: "#000000",
 };
-
 
 function LocationMarker({
   station,
-  location,     // One location of the station (there may be several)
-  color,        // Station colour; overrides default color in markerOptions
+  location, // One location of the station (there may be several)
+  color, // Station colour; overrides default color in markerOptions
   markerOptions = defaultMarkerOptions,
   metadata,
 }) {
@@ -76,9 +72,9 @@ function LocationMarker({
       center={location}
       {...markerOptions}
       color={color}
-      eventHandlers={{click: addPopup}}
+      eventHandlers={{ click: addPopup }}
     >
-      <StationTooltip station={station} metadata={metadata}/>
+      <StationTooltip station={station} metadata={metadata} />
       {popup}
     </CircleMarker>
   );
@@ -91,11 +87,10 @@ LocationMarker.propTypes = {
   markerOptions: PropTypes.object,
 };
 
-
-function MultiLocationMarker ({
+function MultiLocationMarker({
   station,
-  locations,      // Unique locations for station.
-  color,          // Station colour; applied to all location markers
+  locations, // Unique locations for station.
+  color, // Station colour; applied to all location markers
   polygonOptions, // Multi-location marker is a polygon; this is its format
   metadata,
 }) {
@@ -112,7 +107,7 @@ function MultiLocationMarker ({
       positions={locations}
       onClick={addPopup}
     >
-      <StationTooltip station={station} metadata={metadata}/>
+      <StationTooltip station={station} metadata={metadata} />
       {popup}
     </Polygon>
   );
@@ -123,8 +118,7 @@ MultiLocationMarker.propTypes = {
   color: PropTypes.string.isRequired,
   metadata: PropTypes.object.isRequired,
   polygonOptions: PropTypes.object,
-}
-
+};
 
 function OneStationMarkers({
   station,
@@ -137,31 +131,30 @@ function OneStationMarkers({
 }) {
   const network = stationNetwork(metadata.networks, station);
   const locationColor = network?.color;
-  const polygonColor =
-    chroma(network?.color ?? polygonOptions.color).alpha(0.3).css();
+  const polygonColor = chroma(network?.color ?? polygonOptions.color)
+    .alpha(0.3)
+    .css();
 
   const uniqLatLngs = flow(
     uniqStationLocations,
-    map(hx => ({ id: hx.id, lng: hx.lon, lat: hx.lat }))
+    map((hx) => ({ id: hx.id, lng: hx.lon, lat: hx.lat })),
   )(station);
 
   return (
     <React.Fragment>
-      {
-        map(
-          location => (
-            <LocationMarker
-              station={station}
-              location={location}
-              color={locationColor}
-              metadata={metadata}
-              markerOptions={markerOptions}
-              key={location.id}
-            />
-          ),
-          uniqLatLngs
-        )
-      }
+      {map(
+        (location) => (
+          <LocationMarker
+            station={station}
+            location={location}
+            color={locationColor}
+            metadata={metadata}
+            markerOptions={markerOptions}
+            key={location.id}
+          />
+        ),
+        uniqLatLngs,
+      )}
       <MultiLocationMarker
         station={station}
         locations={uniqLatLngs}
@@ -180,7 +173,6 @@ OneStationMarkers.propTypes = {
   polygonOptions: PropTypes.object,
 };
 
-
 function ManyStationMarkers({
   stations,
   metadata,
@@ -192,12 +184,14 @@ function ManyStationMarkers({
   // TODO: This might be worth making into a custom hook.
   const leafletMap = useMap();
   const mapEventsWithMap = mapValues(
-    eventCallback => (...eventArgs) => eventCallback(leafletMap, ...eventArgs)
+    (eventCallback) =>
+      (...eventArgs) =>
+        eventCallback(leafletMap, ...eventArgs),
   )(mapEvents);
   useMapEvents(mapEventsWithMap);
 
   return map(
-    station => (
+    (station) => (
       <OneStationMarkers
         key={station.id}
         station={station}
@@ -205,7 +199,7 @@ function ManyStationMarkers({
         markerOptions={markerOptions}
       />
     ),
-    stations
+    stations,
   );
 }
 // ManyStationMarkers = React.memo(ManyStationMarkers);
@@ -214,5 +208,5 @@ ManyStationMarkers.propTypes = {
   metadata: PropTypes.object.isRequired,
   markerOptions: PropTypes.object,
   mapEvents: PropTypes.object,
-}
+};
 export { ManyStationMarkers };

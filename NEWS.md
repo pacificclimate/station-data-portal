@@ -2,32 +2,37 @@
 
 ## 1.5.0
 
-*Release Date: 2023-Sep-18*
+_Release Date: 2023-Sep-18_
 
 Requires:
+
 - Station Data Portal Backend: version 11.2.0
 - PDP backend: branch `pcds_only`
 
 Changes:
+
 - [Improve ObservationCount behaviour](https://github.com/pacificclimate/station-data-portal/pull/173)
 - [Add filtering to metadata table](https://github.com/pacificclimate/station-data-portal/pull/165)
 
 ## 1.4.0
 
-*Release Date: 2023-Aug-28*
+_Release Date: 2023-Aug-28_
 
 Requires:
+
 - Station Data Portal Backend: version 11.2.0
 - PDP backend: branch `pcds_only`
 
 Changes:
+
 - [Apply date filtering to observation counts (Station Data tab)](https://github.com/pacificclimate/station-data-portal/pull/164)
 
 ## 1.3.0
 
-*Release Date: 2023-Aug-25*
+_Release Date: 2023-Aug-25_
 
 Requires:
+
 - Station Data Portal Backend: version 11.2.0
 - PDP backend: branch `pcds_only`
 
@@ -37,11 +42,12 @@ Changes:
 
 ## 1.2.0
 
-*Release Date: 2022-Aug-16*
+_Release Date: 2022-Aug-16_
 
 First production release.
 
 Requires:
+
 - Station Data Portal Backend: version 10.3.0
 - PDP backend: branch `pcds_only`
 
@@ -54,11 +60,12 @@ Changes:
 
 ## 1.1.0
 
-*Release Date: 2022-Jul-22*
+_Release Date: 2022-Jul-22_
 
 Candidate production release.
 
 Requires:
+
 - Station Data Portal Backend ver 10.2.0
 - PDP backend: branch `pcds_only`
 
@@ -69,11 +76,12 @@ Changes:
 
 ## 1.0.0
 
-*Release Date: 2022-Jul-18*
+_Release Date: 2022-Jul-18_
 
 Candidate production release.
 
 Requires:
+
 - Station Data Portal Backend ver 10.1.0
 - PDP backend: branch `pcds_only`
 
@@ -88,7 +96,7 @@ Requires:
 - [Improve use of concurrency](https://github.com/pacificclimate/station-data-portal/pull/136)
 - [Decouple marker radius update from base layer update](https://github.com/pacificclimate/station-data-portal/pull/134)
 - [Fix leftover UI deficiencies](https://github.com/pacificclimate/station-data-portal/pull/133)
-- [Upgrade to React 18, React Leaflet 4, React Bootstrap 2.x](https://github.com/pacificclimate/station-data-portal/pull/132). 
+- [Upgrade to React 18, React Leaflet 4, React Bootstrap 2.x](https://github.com/pacificclimate/station-data-portal/pull/132).
   Enables major improvements to app responsiveness.
 - [Use Lethargy package to fix inertial scroll zoom on Macs](https://github.com/pacificclimate/station-data-portal/pull/130)
 - [Add metadata download (CSV only)](https://github.com/pacificclimate/station-data-portal/pull/117)
@@ -101,13 +109,12 @@ Requires:
 - [Fix frequency query parameter for data download for "all freqs" condition](https://github.com/pacificclimate/station-data-portal/pull/109)
 - [Refactor for maintainability](https://github.com/pacificclimate/station-data-portal/pull/108)
 - [Restore lazy popups](https://github.com/pacificclimate/station-data-portal/pull/103)
-- [Upgrade to React 17, React Leaflet 3.x](https://github.com/pacificclimate/station-data-portal/pull/102). 
+- [Upgrade to React 17, React Leaflet 3.x](https://github.com/pacificclimate/station-data-portal/pull/102).
   Note subsequent upgrade to React 18, etc.
 - [Improve app performance](https://github.com/pacificclimate/station-data-portal/pull/98)
 
 ## 0.1.0
 
-*Release Date: 2022-Mar-31*
+_Release Date: 2022-Mar-31_
 
 First dev release. Brings us to PR #92.
-

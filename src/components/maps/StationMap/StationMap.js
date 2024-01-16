@@ -36,31 +36,26 @@
 //  - `onSetArea` is called with a single GeoJSON object representing the
 //    contents of the layer group.
 
+import PropTypes from "prop-types";
+import React, { useMemo, useRef, useTransition } from "react";
 
-import PropTypes from 'prop-types';
-import React, {
-  useMemo,
-  useRef,
-  useTransition
-} from 'react';
+import { FeatureGroup, LayerGroup } from "react-leaflet";
+import { EditControl } from "react-leaflet-draw";
 
-import { FeatureGroup, LayerGroup } from 'react-leaflet';
-import { EditControl } from 'react-leaflet-draw';
+import MapInfoDisplay from "../MapInfoDisplay";
+import { defaultMarkerOptions, ManyStationMarkers } from "../StationMarkers";
+import { layersToGeoJSONMultipolygon } from "../../../utils/geoJSON-leaflet";
 
-import MapInfoDisplay from '../MapInfoDisplay';
-import { defaultMarkerOptions, ManyStationMarkers } from '../StationMarkers';
-import { layersToGeoJSONMultipolygon } from '../../../utils/geoJSON-leaflet';
+import logger from "../../../logger";
 
-import logger from '../../../logger';
-
-import './StationMap.css';
-import { getTimer } from '../../../utils/timing';
-import { MapSpinner } from 'pcic-react-leaflet-components';
-import { useImmer } from 'use-immer';
-import { useConfigContext } from '../../main/ConfigContext';
+import "./StationMap.css";
+import { getTimer } from "../../../utils/timing";
+import { MapSpinner } from "pcic-react-leaflet-components";
+import { useImmer } from "use-immer";
+import { useConfigContext } from "../../main/ConfigContext";
 
 logger.configure({ active: true });
-const smtimer = getTimer("StationMarker timing")
+const smtimer = getTimer("StationMarker timing");
 smtimer.log();
 
 function StationMap({
@@ -100,15 +95,18 @@ function StationMap({
     radius: config.zoomToMarkerRadius(initialViewport.zoom),
   }));
   const [markerUpdateIsPending, markerUpdateStartTransition] = useTransition();
-  const markerMapEvents = useMemo(() => ({
-    zoomend: (leafletMap) => {
-      markerUpdateStartTransition(() => {
-        setMarkerOptions(draft => {
-          draft.radius = config.zoomToMarkerRadius(leafletMap.getZoom());
+  const markerMapEvents = useMemo(
+    () => ({
+      zoomend: (leafletMap) => {
+        markerUpdateStartTransition(() => {
+          setMarkerOptions((draft) => {
+            draft.radius = config.zoomToMarkerRadius(leafletMap.getZoom());
+          });
         });
-      });
-    }
-  }), []);
+      },
+    }),
+    [],
+  );
 
   smtimer.log();
   smtimer.resetAll();
@@ -117,19 +115,21 @@ function StationMap({
   // layer group, seems to provide a more responsive UI. It's not clear why.
   // Or I might just be seeing ghosts.
 
-  const markers = useMemo(() =>
-    <ManyStationMarkers
-      stations={stations}
-      metadata={metadata}
-      markerOptions={markerOptions}
-      mapEvents={markerMapEvents}
-    />,
-    [stations, markerOptions]
+  const markers = useMemo(
+    () => (
+      <ManyStationMarkers
+        stations={stations}
+        metadata={metadata}
+        markerOptions={markerOptions}
+        mapEvents={markerMapEvents}
+      />
+    ),
+    [stations, markerOptions],
   );
 
   const markerLayerGroup = useMemo(
-    () => (<LayerGroup>{markers}</LayerGroup>),
-    [markers]
+    () => <LayerGroup>{markers}</LayerGroup>,
+    [markers],
   );
 
   const isPending = externalIsPending || markerUpdateIsPending;
@@ -143,11 +143,11 @@ function StationMap({
     >
       <MapInfoDisplay
         position={"bottomleft"}
-        what={map => `Zoom: ${map.getZoom()}`}
+        what={(map) => `Zoom: ${map.getZoom()}`}
       />
       <FeatureGroup ref={userShapeLayerRef}>
         <EditControl
-          position={'topleft'}
+          position={"topleft"}
           draw={{
             marker: false,
             circlemarker: false,
@@ -170,11 +170,11 @@ function StationMap({
         />
       </FeatureGroup>
       {markerLayerGroup}
-      {isPending && <MapSpinner {...config.mapSpinner}/>}
+      {isPending && <MapSpinner {...config.mapSpinner} />}
     </BaseMap>
   );
 }
-StationMap = React.memo(StationMap)
+StationMap = React.memo(StationMap);
 
 StationMap.propTypes = {
   BaseMap: PropTypes.func.isRequired,

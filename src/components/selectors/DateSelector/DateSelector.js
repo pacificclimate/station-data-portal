@@ -1,28 +1,25 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Form } from 'react-bootstrap';
-import DatePicker from 'react-datepicker';
-import InfoPopup from '../../util/InfoPopup';
+import PropTypes from "prop-types";
+import React from "react";
+import { Form } from "react-bootstrap";
+import DatePicker from "react-datepicker";
+import InfoPopup from "../../util/InfoPopup";
 
-import './DateSelector.css';
+import "./DateSelector.css";
 
-
-function DateSelector({value, onChange, label, ...restProps}) {
+function DateSelector({ value, onChange, label, ...restProps }) {
   return (
     <Form>
-      <Form.Label>{label}</Form.Label>
-      {' '}
+      <Form.Label>{label}</Form.Label>{" "}
       <InfoPopup title={label}>
-        Only stations matching Start Date and End Date are selected.
-        A station matches if the date of any observation for a station
-        falls within the specified Start and End dates.
-        An empty Start or End date matches any observation date.
-      </InfoPopup>
-      {' '}
+        Only stations matching Start Date and End Date are selected. A station
+        matches if the date of any observation for a station falls within the
+        specified Start and End dates. An empty Start or End date matches any
+        observation date.
+      </InfoPopup>{" "}
       <DatePicker
         selected={value}
         onChange={onChange}
-        dateFormat={'yyyy-MM-dd'}
+        dateFormat={"yyyy-MM-dd"}
         isClearable
         peekNextMonth
         showMonthDropdown
@@ -36,7 +33,7 @@ function DateSelector({value, onChange, label, ...restProps}) {
 
 DateSelector.propTypes = {
   value: PropTypes.object,
-  onChange:PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
   label: PropTypes.string,
 };
 

@@ -23,4 +23,3 @@ but built in React and with a more modern and flexible UI.
 
 Since the backends work with any PyCDS schema database, this application can replace PCDS
 simply by being pointed at backends connected to the CRMP database.
-

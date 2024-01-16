@@ -1,25 +1,25 @@
-import PropTypes from 'prop-types';
-import React, { Component } from 'react';
-import Select from 'react-select';
+import PropTypes from "prop-types";
+import React, { Component } from "react";
+import Select from "react-select";
 
-import logger from '../../../logger';
+import logger from "../../../logger";
 
-import { Form } from 'react-bootstrap';
+import { Form } from "react-bootstrap";
 
 logger.configure({ active: true });
 
 const options = [
   {
-    label: 'NetCDF',
-    value: 'nc',
+    label: "NetCDF",
+    value: "nc",
   },
   {
-    label: 'CSV/ASCII',
-    value: 'csv',
+    label: "CSV/ASCII",
+    value: "csv",
   },
   {
-    label: 'MS Excel 2010',
-    value: 'xlsx',
+    label: "MS Excel 2010",
+    value: "xlsx",
   },
 ];
 
@@ -32,13 +32,15 @@ export default class FileFormatSelector extends Component {
   state = {};
 
   componentDidMount() {
-    this.props.onChange(options[0])
+    this.props.onChange(options[0]);
   }
 
   render() {
     return (
       <Form>
-        <div><Form.Label>Output format</Form.Label></div>
+        <div>
+          <Form.Label>Output format</Form.Label>
+        </div>
         <Select
           options={options}
           value={this.props.value}

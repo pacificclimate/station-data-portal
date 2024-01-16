@@ -1,18 +1,15 @@
-import { useState, useTransition } from 'react';
-import { useImmer } from 'use-immer';
+import { useState, useTransition } from "react";
+import { useImmer } from "use-immer";
 
-
-export const useStateWithEventHandler = init => {
+export const useStateWithEventHandler = (init) => {
   const [state, setState] = useState(init);
-  return [state, e => setState(e.target.value)]
+  return [state, (e) => setState(e.target.value)];
 };
 
-
-export const useBooleanStateWithToggler = init => {
+export const useBooleanStateWithToggler = (init) => {
   const [state, setState] = useState(init);
   return [state, () => setState(!state)];
 };
-
 
 // This hook provides an immer state as in `useImmer`, with some
 // added conveniences. The initial state is expected to be hash object. The
@@ -27,16 +24,14 @@ export const useBooleanStateWithToggler = init => {
 export const useImmerByKey = (initial) => {
   const [state, setState] = useImmer(initial);
   for (const key of Object.keys(state)) {
-    setState[key] = value => {
-      setState(draft => {
+    setState[key] = (value) => {
+      setState((draft) => {
         draft[key] = value;
       });
     };
   }
   return [state, setState];
 };
-
-
 
 // This hook provides a pair of immutable (immer) states, `normal` and
 // `transitional`, that are updated together by a single setter. The normal
@@ -53,15 +48,14 @@ export const usePairedImmer = (initial) => {
   const [normal, setNormal] = useImmer(initial);
   const [transitional, setTransitional] = useImmer(initial);
   const [isPending, startTransition] = useTransition();
-  const setState = update => {
+  const setState = (update) => {
     setNormal(update);
     startTransition(() => {
       setTransitional(update);
     });
-  }
+  };
   return { normal, transitional, isPending, setState };
 };
-
 
 // This hook provides paired immer states as in `usePairedImmer`, with some
 // added conveniences. The initial state is expected to be hash object. The
@@ -87,8 +81,8 @@ export const usePairedImmerByKey = (initial) => {
   const pairedImmer = usePairedImmer(initial);
   const { normal, setState } = pairedImmer;
   for (const key of Object.keys(normal)) {
-    setState[key] = value => {
-      setState(draft => {
+    setState[key] = (value) => {
+      setState((draft) => {
         draft[key] = value;
       });
     };

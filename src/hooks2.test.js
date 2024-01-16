@@ -1,6 +1,5 @@
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act } from "@testing-library/react";
 import { usePairedImmer, usePairedImmerByKey } from "./hooks";
-
 
 describe("usePairedImmer", () => {
   const initial = { a: 1, b: 2 };
@@ -18,9 +17,9 @@ describe("usePairedImmer", () => {
     const { result } = renderHook(() => usePairedImmer(initial));
     expect(result.current.normal.a).toBe(initial.a);
     act(() => {
-      result.current.setState(draft => {
+      result.current.setState((draft) => {
         draft.a = 99;
-      })
+      });
     });
     expect(result.current.normal.a).toBe(99);
     expect(result.current.transitional.a).toBe(99);
@@ -54,13 +53,9 @@ describe("usePairedImmerByKey", () => {
 
     expect(result.current.normal.a).toBe(initial.a);
     act(() => {
-      result.current.setState.a(99)
+      result.current.setState.a(99);
     });
     expect(result.current.normal.a).toBe(99);
     expect(result.current.transitional.a).toBe(99);
   });
-
-
 });
-
-

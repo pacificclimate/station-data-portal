@@ -1,24 +1,27 @@
-import PropTypes from 'prop-types';
-import React, { useState } from 'react';
-import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
-import capitalize from 'lodash/fp/capitalize';
-import map from 'lodash/fp/map';
+import PropTypes from "prop-types";
+import React, { useState } from "react";
+import { Button, ButtonToolbar, Col, Row } from "react-bootstrap";
+import capitalize from "lodash/fp/capitalize";
+import map from "lodash/fp/map";
 
-import { useConfigContext } from '../../main/ConfigContext';
-import FileFormatSelector from '../../selectors/FileFormatSelector';
-import ClipToDateControl from '../../controls/ClipToDateControl';
-import ObservationCounts from '../../info/ObservationCounts';
-import InfoPopup from '../../util/InfoPopup';
+import { useConfigContext } from "../../main/ConfigContext";
+import FileFormatSelector from "../../selectors/FileFormatSelector";
+import ClipToDateControl from "../../controls/ClipToDateControl";
+import ObservationCounts from "../../info/ObservationCounts";
+import InfoPopup from "../../util/InfoPopup";
 
-import logger from '../../../logger';
+import logger from "../../../logger";
 
-import './StationData.css';
+import "./StationData.css";
 
 logger.configure({ active: true });
 
-
 function StationData({
-  filterValues, selectedStations, dataDownloadUrl, dataDownloadFilename, rowClasses
+  filterValues,
+  selectedStations,
+  dataDownloadUrl,
+  dataDownloadFilename,
+  rowClasses,
 }) {
   const config = useConfigContext();
   const [fileFormat, setFileFormat] = useState();
@@ -39,51 +42,55 @@ function StationData({
 
       <Row {...rowClasses}>
         <Col lg={12} md={12} sm={12}>
-          <ClipToDateControl value={clipToDate} onChange={toggleClipToDate}/>
+          <ClipToDateControl value={clipToDate} onChange={toggleClipToDate} />
         </Col>
       </Row>
 
       <Row {...rowClasses}>
         <Col lg={12} md={12} sm={12}>
-          <FileFormatSelector value={fileFormat} onChange={setFileFormat}/>
+          <FileFormatSelector value={fileFormat} onChange={setFileFormat} />
         </Col>
       </Row>
 
       <Row {...rowClasses}>
         <Col lg={12} md={12} sm={12}>
           <ButtonToolbar>
-            {
-              map(
-                dataCategory => {
-                  // Disable download buttons if the download URL exceeds
-                  // maximum allowable length. Provide explanation in popup.
-                  const downloadUrl = dataDownloadUrl({
-                    dataCategory, clipToDate, fileFormat
-                  });
-                  const linkLabel = `Download ${capitalize(dataCategory)}`;
-                  const urlTooLong = downloadUrl.length > config.maxUrlLength;
-                  return (
-                    <>
-                      <Button
-                        variant={"primary"}
-                        size={"sm"}
-                        className={"me-2"}
-                        key={dataCategory}
-                        disabled={urlTooLong}
-                        href={urlTooLong ? undefined : downloadUrl}
-                        download={urlTooLong ? undefined : dataDownloadFilename(
-                          { dataCategory, fileFormat }
-                        )}
-                      >
-                        {linkLabel}
-                      </Button>
-                      { urlTooLong && (<span className={"me-2"}>
+            {map(
+              (dataCategory) => {
+                // Disable download buttons if the download URL exceeds
+                // maximum allowable length. Provide explanation in popup.
+                const downloadUrl = dataDownloadUrl({
+                  dataCategory,
+                  clipToDate,
+                  fileFormat,
+                });
+                const linkLabel = `Download ${capitalize(dataCategory)}`;
+                const urlTooLong = downloadUrl.length > config.maxUrlLength;
+                return (
+                  <>
+                    <Button
+                      variant={"primary"}
+                      size={"sm"}
+                      className={"me-2"}
+                      key={dataCategory}
+                      disabled={urlTooLong}
+                      href={urlTooLong ? undefined : downloadUrl}
+                      download={
+                        urlTooLong
+                          ? undefined
+                          : dataDownloadFilename({ dataCategory, fileFormat })
+                      }
+                    >
+                      {linkLabel}
+                    </Button>
+                    {urlTooLong && (
+                      <span className={"me-2"}>
                         <InfoPopup title={"Download button disabled"}>
                           <p>
                             This button is disabled because the length of the
                             URL for the download ({downloadUrl.length}) exceeds
-                            the maximum allowable length for URLs
-                            ({config.maxUrlLength}).
+                            the maximum allowable length for URLs (
+                            {config.maxUrlLength}).
                           </p>
                           <p>
                             This is a technical issue, which will be fixed in an
@@ -103,17 +110,16 @@ function StationData({
                             either the cause or the solution.
                           </p>
                         </InfoPopup>
-                      </span>)}
-                    </>
-                  );
-                },
-                ['timeseries', 'climatology']
-              )
-            }
+                      </span>
+                    )}
+                  </>
+                );
+              },
+              ["timeseries", "climatology"],
+            )}
           </ButtonToolbar>
         </Col>
       </Row>
-
     </React.Fragment>
   );
 }

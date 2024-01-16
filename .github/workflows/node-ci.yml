@@ -4,26 +4,26 @@ on: push
 
 jobs:
   test:
-
     runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@master
+      - uses: actions/checkout@master
 
-    - name: Set up Node.js 16
-      uses: actions/setup-node@v3
-      with:
-        node-version: 16
+      - name: Set up Node.js 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
 
-    - name: Node.js Test Suite
-      # Note CI=false is required to prevent script from terminating with error
-      # on warnings. This is the intended behaviour of `build` and the
-      # recommended solution, despite how stupid it seems:
-      # https://github.com/facebook/create-react-app/issues/3657
-      run: |
-        npm --version
-        # Currently, we have to force install. For details, see 
-        # ./docs/installation.md
-        npm install --force
-        CI=false npm run build
-        npm test
+      - name: Node.js Test Suite
+        # Note CI=false is required to prevent script from terminating with error
+        # on warnings. This is the intended behaviour of `build` and the
+        # recommended solution, despite how stupid it seems:
+        # https://github.com/facebook/create-react-app/issues/3657
+        run: |
+          npm --version
+          # Currently, we have to force install. For details, see 
+          # ./docs/installation.md
+          npm install --force
+          CI=false npm run build
+          npm test
+          npm run check-format

@@ -1,9 +1,8 @@
 // This hook performs a number of one-time app initializations.
-import { useEffect } from 'react';
-import L from 'leaflet';
-import { setLethargicMapScrolling } from '../../../utils/leaflet-extensions';
-import { setTimingEnabled } from '../../../utils/timing';
-
+import { useEffect } from "react";
+import L from "leaflet";
+import { setLethargicMapScrolling } from "../../../utils/leaflet-extensions";
+import { setTimingEnabled } from "../../../utils/timing";
 
 function initializeApp(config) {
   if (config === null) {
