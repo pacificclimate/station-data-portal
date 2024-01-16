@@ -52,7 +52,7 @@ import "./StationMap.css";
 import { getTimer } from "../../../utils/timing";
 import { MapSpinner } from "pcic-react-leaflet-components";
 import { useImmer } from "use-immer";
-import { useConfigContext } from "../../main/ConfigContext";
+import { useStore } from "../../../state/state-store";
 import { StationRefresh } from "../StationRefresh/StationRefresh";
 
 logger.configure({ active: true });
@@ -76,7 +76,7 @@ function StationMap({
   // should be true if and only if slow updates to the map are pending
   // due to an external update.
 }) {
-  const config = useConfigContext();
+  const config = useStore(state => state.config);
   const userShapeLayerRef = useRef();
 
   // TODO: Remove

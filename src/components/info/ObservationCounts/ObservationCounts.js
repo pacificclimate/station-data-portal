@@ -8,8 +8,8 @@ import InfoPopup from "../../util/InfoPopup";
 import logger from "../../../logger";
 import { getTimer } from "../../../utils/timing";
 
-import "./ObservationCounts.css";
-import { useConfigContext } from "../../main/ConfigContext";
+import './ObservationCounts.css';
+import { useStore } from '../../../state/state-store';
 
 logger.configure({ active: true });
 const timer = getTimer("Observation count timing");
@@ -33,7 +33,7 @@ function ObservationCounts({
   clipToDate,
   stations,
 }) {
-  const appConfig = useConfigContext();
+  const appConfig = useStore(state => state.config);
   const [countData, setCountData] = useState(null);
 
   useEffect(() => {

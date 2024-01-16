@@ -1,14 +1,13 @@
-import PropTypes from "prop-types";
-import React, { useState } from "react";
-import { Button, ButtonToolbar, Col, Row } from "react-bootstrap";
-import capitalize from "lodash/fp/capitalize";
-import map from "lodash/fp/map";
-
-import { useConfigContext } from "../../main/ConfigContext";
-import FileFormatSelector from "../../selectors/FileFormatSelector";
-import ClipToDateControl from "../../controls/ClipToDateControl";
-import ObservationCounts from "../../info/ObservationCounts";
-import InfoPopup from "../../util/InfoPopup";
+import PropTypes from 'prop-types';
+import React, { useState } from 'react';
+import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
+import capitalize from 'lodash/fp/capitalize';
+import map from 'lodash/fp/map';
+import { useStore } from '../../../state/state-store';
+import FileFormatSelector from '../../selectors/FileFormatSelector';
+import ClipToDateControl from '../../controls/ClipToDateControl';
+import ObservationCounts from '../../info/ObservationCounts';
+import InfoPopup from '../../util/InfoPopup';
 
 import logger from "../../../logger";
 
@@ -23,7 +22,7 @@ function StationData({
   dataDownloadFilename,
   rowClasses,
 }) {
-  const config = useConfigContext();
+  const config = useStore(state => state.config);
   const [fileFormat, setFileFormat] = useState();
   const [clipToDate, setClipToDate] = useState(false);
   const toggleClipToDate = () => setClipToDate(!clipToDate);

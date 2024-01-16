@@ -20,14 +20,14 @@ import {
   uniqStationObsPeriods,
   uniqStationVariableNames,
 } from "../../../utils/station-info";
-import { useConfigContext } from "../../main/ConfigContext";
+import { useStore } from "../../../state/state-store";
 
 logger.configure({ active: true });
 
 const formatDate = (d) => (d ? d.toISOString().substr(0, 10) : "unknown");
 
 function StationPopup({ station, metadata }) {
-  const config = useConfigContext();
+  const config = useStore(state => state.config);
 
   const network = stationNetwork(metadata.networks, station);
   const networkColor = chroma(network.color ?? config.defaultNetworkColor)
