@@ -27,7 +27,7 @@ logger.configure({ active: true });
 const formatDate = (d) => (d ? d.toISOString().substr(0, 10) : "unknown");
 
 function StationPopup({ station, metadata }) {
-  const config = useStore(state => state.config);
+  const config = useStore((state) => state.config);
 
   const network = stationNetwork(metadata.networks, station);
   const networkColor = chroma(network.color ?? config.defaultNetworkColor)
@@ -36,12 +36,15 @@ function StationPopup({ station, metadata }) {
 
   const stationNames = flow(uniqStationNames, join(", "))(station);
 
+  const locKey = (loc) => `${loc.lat}-${loc.lon}-${loc.elevation}`;
+  const periodKey = (hx) => `${hx.min_obs_time}-${hx.max_obs_time}`;
+
   const stationLocations = (
     <ul className={"compact scroll-y"}>
       {flow(
         uniqStationLocations,
         map((loc) => (
-          <li>
+          <li key={locKey(loc)}>
             {-loc.lon} W <br />
             {loc.lat} N <br />
             Elev. {loc.elevation} m
@@ -61,7 +64,7 @@ function StationPopup({ station, metadata }) {
       <ul className={"compact scroll-y"}>
         {map(
           (hx) => (
-            <li>
+            <li key={periodKey(hx)}>
               {formatDate(hx.min_obs_time)}
               {" to "}
               {formatDate(hx.max_obs_time)}
@@ -76,7 +79,9 @@ function StationPopup({ station, metadata }) {
     <ul className={"compact"}>
       {flow(
         uniqStationFreqs,
-        map((freq) => <li>{FrequencySelector.valueToLabel(freq)}</li>),
+        map((freq) => (
+          <li key={freq}>{FrequencySelector.valueToLabel(freq)}</li>
+        )),
       )(station)}
     </ul>
   );
@@ -89,7 +94,7 @@ function StationPopup({ station, metadata }) {
       <ul className={"compact"}>
         {map(
           (name) => (
-            <li>{name}</li>
+            <li key={name}>{name}</li>
           ),
           usvns,
         )}
@@ -99,7 +104,7 @@ function StationPopup({ station, metadata }) {
   return (
     <Popup>
       <h1>Station: {stationNames}</h1>
-      <Table size={"sm"} condensed>
+      <Table size={"sm"} condensed="true">
         <tbody>
           <tr>
             <td>Network</td>

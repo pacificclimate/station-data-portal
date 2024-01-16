@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
-import './Disclaimer.css';
-import { useStore } from '../../../state/state-store';
-
+import React, { useState } from "react";
+import { Button, Modal } from "react-bootstrap";
+import "./Disclaimer.css";
+import { useStore } from "../../../state/state-store";
 
 function Disclaimer() {
-  const config = useStore(state => state.config);
+  const config = useStore((state) => state.config);
   const [acknowledged, setAcknowledged] = useState(!config.disclaimer.enabled);
   const acknowledge = () => setAcknowledged(true);
 

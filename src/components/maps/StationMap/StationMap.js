@@ -74,7 +74,7 @@ function StationMap({
   // should be true if and only if slow updates to the map are pending
   // due to an external update.
 }) {
-  const config = useStore(state => state.config);
+  const config = useStore((state) => state.config);
   const userShapeLayerRef = useRef();
 
   // TODO: Remove

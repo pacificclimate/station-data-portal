@@ -2,14 +2,13 @@ import PropTypes from "prop-types";
 import React, { useEffect, useState, useMemo } from "react";
 import { Table } from "react-bootstrap";
 import { reduce } from "lodash/fp";
-import { getObservationCounts } from "../../../data-services/station-data-service";
+import { getObservationCounts } from "../../../api/metadata";
 import InfoPopup from "../../util/InfoPopup";
-
 import logger from "../../../logger";
 import { getTimer } from "../../../utils/timing";
+import { useStore } from "../../../state/state-store";
 
-import './ObservationCounts.css';
-import { useStore } from '../../../state/state-store';
+import "./ObservationCounts.css";
 
 logger.configure({ active: true });
 const timer = getTimer("Observation count timing");
@@ -33,7 +32,7 @@ function ObservationCounts({
   clipToDate,
   stations,
 }) {
-  const appConfig = useStore(state => state.config);
+  const appConfig = useStore((state) => state.config);
   const [countData, setCountData] = useState(null);
 
   useEffect(() => {

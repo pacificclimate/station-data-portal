@@ -4,7 +4,7 @@ import { useStore } from "../../../state/state-store";
 import "./Header.css";
 
 function Header() {
-  const config = useStore(state => state.config);
+  const config = useStore((state) => state.config);
   return (
     <Row className={"Header"}>
       <Col lg={3} className="text-left">

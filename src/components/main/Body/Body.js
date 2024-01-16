@@ -2,21 +2,14 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useImmerByKey } from "../../../hooks";
 import { Button, Card, Col, Row, Tab, Tabs } from "react-bootstrap";
 import Select from "react-select";
-import tap from "lodash/fp/tap";
 
 import css from "../common.module.css";
 
 import logger from "../../../logger";
 import {
-  getFrequencies,
-  getNetworks,
-  getStations,
-  getVariables,
-} from "../../../data-services/station-data-service";
-import {
   dataDownloadFilename,
   dataDownloadUrl,
-} from "../../../data-services/pdp-data-service";
+} from "../../../api/pdp-data-service";
 import {
   stationAreaFilter,
   stationFilter,
@@ -34,79 +27,38 @@ import StationFilters, {
 } from "../../controls/StationFilters";
 import baseMaps from "../../maps/baseMaps";
 import { useStore } from "../../../state/state-store";
+import { useShallow } from "zustand/react/shallow";
 
 logger.configure({ active: true });
 
-// This hook wraps up all the metadata variables and fetching in one function,
-// exporting only the metadata state (an immer immutable) and a couple
-// of debug callbacks for controlling station fetches. This hook is used only
-// by component Body; it's a way of clarifying and simplifying its code.
-function useMetadata() {
-  const config = useStore(state => state.config);
-
-  // Fetched metadata
-  const [metadata, setMetadata] = useImmerByKey({
-    networks: null,
-    variables: null,
-    frequencies: null,
-    stations: null,
-  });
-
-  // Debugging support
-  const [debug, setDebug] = useImmerByKey({
-    stnsLimit: config.stationDebugFetchLimitsOptions[0],
-    stationsReload: 0,
-  });
-  const setStnsLimit = setDebug.stnsLimit;
-  const reloadStations = () => {
-    console.log("### reloadStations");
-    setDebug.stationsReload(debug.stationsReload + 1);
-  };
-
-  // Fetch data from backend
-
-  useEffect(() => {
-    getNetworks({ appConfig: config }).then((response) =>
-      setMetadata.networks(response.data),
-    );
-  }, [config]);
-
-  useEffect(() => {
-    getVariables({ appConfig: config }).then((response) =>
-      setMetadata.variables(response.data),
-    );
-  }, [config]);
-
-  useEffect(() => {
-    getFrequencies({ appConfig: config }).then((response) =>
-      setMetadata.frequencies(response.data),
-    );
-  }, [config]);
-
-  useEffect(() => {
-    console.log("### loading stations");
-    setMetadata.stations(null);
-    getStations({
-      appConfig: config,
-      getParams: {
-        compact: true,
-        ...(config.stationDebugFetchOptions && {
-          limit: debug.stnsLimit.value,
-        }),
-      },
-    })
-      .then(tap(() => console.log("### stations loaded")))
-      .then((response) => setMetadata.stations(response.data));
-  }, [debug]);
-
-  return { metadata, setStnsLimit, reloadStations };
-}
-
 function Body() {
-  const config = useStore(state => state.config);
+  const config = useStore((state) => state.config);
 
-  // Metadata fetched from backend
-  const { metadata, setStnsLimit, reloadStations } = useMetadata();
+  // metadata are the data items that can be watched for changes and
+  // should probably cause a re-render.
+  const metadata = useStore(
+    useShallow((state) => ({
+      networks: state.networks,
+      stations: state.stations,
+      variables: state.variables,
+      frequencies: state.frequencies,
+      stationsLimit: state.stationsLimit,
+    })),
+  );
+
+  // actions should be fixed functions on the store, so they shouldn't really change
+  const actions = useStore(
+    useShallow((state) => ({
+      setStationsLimit: state.setStationsLimit,
+      reloadStations: state.reloadStations,
+      loadMetadata: state.loadMetadata,
+    })),
+  );
+
+  // load data once on initial render
+  useEffect(() => {
+    actions.loadMetadata();
+  }, []);
 
   // Station filtering state and setters
   const {
@@ -158,7 +110,9 @@ function Body() {
             <Card style={{ marginLeft: "-15px", marginRight: "-10px" }}>
               <Card.Body>
                 {config.showReloadStationsButton && (
-                  <Button onClick={reloadStations}>Reload stations</Button>
+                  <Button onClick={actions.reloadStations}>
+                    Reload stations
+                  </Button>
                 )}
                 <Tabs
                   id="non-map-controls"
@@ -172,8 +126,10 @@ function Body() {
                         <Col lg={6}>
                           <Select
                             options={config.stationDebugFetchLimitsOptions}
-                            value={stnsLimit}
-                            onChange={setStnsLimit}
+                            value={metadata.stationsLimit}
+                            onChange={(val) =>
+                              actions.setStationsLimit(val.value)
+                            }
                           />
                         </Col>
                       </Row>
@@ -205,10 +161,12 @@ function Body() {
                         selectedStations={selectedStations}
                       />
                     </Row>
-                    <StationMetadata
-                      stations={selectedStations}
-                      metadata={metadata}
-                    />
+                    {selectedStations?.length > 0 && (
+                      <StationMetadata
+                        stations={selectedStations}
+                        metadata={metadata}
+                      />
+                    )}
                   </Tab>
 
                   <Tab eventKey={"Data"} title={"Station Data"}>
@@ -230,7 +188,6 @@ function Body() {
                         filterValuesNormal.selectedFrequenciesOptions
                       }
                     />
-
                     <StationData
                       filterValues={filterValuesNormal}
                       selectedStations={selectedStations}
