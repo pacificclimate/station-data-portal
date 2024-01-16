@@ -2,19 +2,20 @@
 // This component wraps React Table v6. All props passed to this component are
 // passed into React Table.
 
-import PropTypes from "prop-types";
-import React from "react";
-import { Table } from "react-bootstrap";
-import { useSortBy, useTable } from "react-table";
-import logger from "../../../logger";
-import chroma from "chroma-js";
-import { useConfigContext } from "../../main/ConfigContext";
-import "./NetworksMetadata.css";
+import PropTypes from 'prop-types';
+import React from 'react';
+import { Table } from 'react-bootstrap';
+import { useSortBy, useTable } from 'react-table';
+import logger from '../../../logger';
+import chroma from 'chroma-js';
+import './NetworksMetadata.css';
+import { useStore } from '../../../state/state-store';
+
 
 logger.configure({ active: true });
 
 function NetworksMetadata({ networks }) {
-  const config = useConfigContext();
+  const config = useStore(state => state.config);
 
   const columns = React.useMemo(
     () => [
