@@ -53,6 +53,7 @@ import { getTimer } from "../../../utils/timing";
 import { MapSpinner } from "pcic-react-leaflet-components";
 import { useImmer } from "use-immer";
 import { useConfigContext } from "../../main/ConfigContext";
+import { StationRefresh } from "../StationRefresh/StationRefresh";
 
 logger.configure({ active: true });
 const smtimer = getTimer("StationMarker timing");
@@ -68,6 +69,7 @@ function StationMap({
     color: "#f49853",
     weight: 1,
   },
+  onReloadStations = () => {},
 
   externalIsPending,
   // This is a transition-pending value passed in from the parent, and
@@ -168,6 +170,12 @@ function StationMap({
           onEdited={handleChangedGeometryLayers}
           onDeleted={handleChangedGeometryLayers}
         />
+        {config.showReloadStationsButton && (
+          <StationRefresh
+            position={"topleft"}
+            onReloadStations={onReloadStations}
+          />
+        )}
       </FeatureGroup>
       {markerLayerGroup}
       {isPending && <MapSpinner {...config.mapSpinner} />}
