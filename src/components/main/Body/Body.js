@@ -55,11 +55,6 @@ function Body() {
     })),
   );
 
-  // load data once on initial render
-  useEffect(() => {
-    actions.loadMetadata();
-  }, []);
-
   // Station filtering state and setters
   const {
     normal: filterValuesNormal,

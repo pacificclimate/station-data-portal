@@ -6,6 +6,7 @@ import Header from "../Header/Header";
 import Body from "../Body";
 import useInitializeApp from "./app-initialization";
 import { useStore } from "../../../state/state-store";
+import { Outlet } from "react-router-dom";
 
 import "./App.css";
 
@@ -15,12 +16,20 @@ export default function App() {
   const isConfigLoaded = useStore((state) => state.isConfigLoaded);
   const configErrorMessage = useStore((state) => state.configError);
   const config = useStore((state) => state.config);
+  const loadMetadata = useStore((state) => state.loadMetadata);
 
   useEffect(() => {
     if (!isConfigLoaded() && configErrorMessage === null) {
       initialize();
     }
   });
+
+  // load data once on initial render after config is loaded
+  useEffect(() => {
+    if (isConfigLoaded()) {
+      loadMetadata();
+    }
+  }, [config]);
 
   useInitializeApp(config);
 
@@ -36,7 +45,7 @@ export default function App() {
     <Container fluid className="App">
       <Disclaimer />
       <Header />
-      <Body />
+      <Outlet />
     </Container>
   );
 }

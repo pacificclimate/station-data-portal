@@ -11,7 +11,6 @@ export default function StationPreview() {
 
   return (
     <Container fluid classname="StationPreview">
-      <Header />
       {placeholder()}
       <br />
       <Link to={"/"}>Back to main</Link>

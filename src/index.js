@@ -1,7 +1,14 @@
 import "bootstrap/dist/css/bootstrap.css";
 import "react-datepicker/dist/react-datepicker.css";
 import "leaflet-draw/dist/leaflet.draw.css";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  createRoutesFromElements,
+  RouterProvider,
+  Routes,
+  Route,
+} from "react-router-dom";
+import Body from "./components/main/Body";
 
 import { createRoot } from "react-dom/client";
 
@@ -14,17 +21,18 @@ import StationPreview, {
 } from "./components/preview/StationPreview";
 import registerServiceWorker from "./registerServiceWorker";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-  },
-  {
-    path: "preview/:stationId",
-    element: <StationPreview />,
-    loader: stationLoader,
-  },
-]);
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<App />}>
+      <Route index element={<Body />} />
+      <Route
+        path="preview/:stationId"
+        element={<StationPreview />}
+        loader={stationLoader}
+      />
+    </Route>,
+  ),
+);
 
 const container = document.getElementById("root");
 const root = createRoot(container);
