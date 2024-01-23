@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { Table } from "react-bootstrap";
 import { Popup } from "react-leaflet";
+import { Link } from "react-router-dom";
 import isNull from "lodash/fp/isNull";
 import flow from "lodash/fp/flow";
 import map from "lodash/fp/map";
@@ -141,6 +142,12 @@ function StationPopup({ station, metadata }) {
           <tr>
             <td>Recorded variables</td>
             <td>{variableNames}</td>
+          </tr>
+          <tr>
+            <td>Preview</td>
+            <td>
+              <Link to={`preview/${station.id}`}>Preview variables</Link>
+            </td>
           </tr>
         </tbody>
       </Table>
