@@ -83,10 +83,22 @@ export function getStations({ config, getParams, axiosConfig }) {
   });
 }
 
-export function getObservationCounts({ appConfig, getParams, axiosConfig }) {
-  return axios.get(urljoin(appConfig.sdsUrl, "observations", "counts"), {
+export const getVariablePreview =
+  ({ config, stationId, endDate, startDate, axiosConfig }) =>
+  (variableId) => {
+    return axios.get(
+      `${process.env.PUBLIC_URL}/pv-${stationId}-${variableId}.json`,
+    );
+  };
+
+export function getObservationCounts({
+  appConfig: config,
+  getParams,
+  axiosConfig,
+}) {
+  return axios.get(urljoin(config.sdsUrl, "observations", "counts"), {
     params: {
-      provinces: appConfig.stationsQpProvinces,
+      provinces: config.stationsQpProvinces,
       ...getParams,
     },
     ...axiosConfig,

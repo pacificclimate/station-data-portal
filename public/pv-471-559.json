@@ -1,0 +1,17 @@
+{
+  "end_date": "1977-04-30T00:00:00Z",
+  "observations": [],
+  "start_date": "1976-10-30T00:00:00Z",
+  "station": {
+    "id": 471,
+    "network_uri": "/networks/1",
+    "uri": "/stations/471"
+  },
+  "uri": "/stations/471/observations/559?end_date=1977-04-30+00%3A00%3A00.000000",
+  "variable": {
+    "id": 559,
+    "name": "Precipitation Climatology",
+    "unit": "mm",
+    "uri": "/variables/559"
+  }
+}

@@ -5,6 +5,12 @@ import {
   getFrequencies,
 } from "../api/metadata";
 
+import flatten from "lodash/fp/flatten";
+import pipe from "lodash/fp/pipe";
+import map from "lodash/fp/map";
+import uniq from "lodash/fp/uniq";
+import { getVariablePreview } from "../api/metadata";
+
 const loadStationsAction = (set, get) => async () => {
   if (!get().isConfigLoaded()) {
     throw new Error("Cannot load stations until config is loaded");
@@ -29,7 +35,7 @@ const loadMetadataAction = (set, get) => async () => {
   }
   const config = get().config;
   console.log("### loading metadata");
-  set({ stations: null });
+  set({ stations: null, loadingMeta: true });
   const pStations = getStations({
     config,
     getParams: {
@@ -47,6 +53,7 @@ const loadMetadataAction = (set, get) => async () => {
     pFrequencies,
   ]);
   set({
+    loadingMeta: false,
     stations: response[0].data,
     networks: response[1].data,
     variables: response[2].data,
@@ -54,7 +61,30 @@ const loadMetadataAction = (set, get) => async () => {
   });
 };
 
+const loadStationPreviewAction = (set, get) => async (stationId) => {
+  if (!get().isConfigLoaded()) {
+    throw new Error("Cannot load stations until config is loaded");
+  }
+  const config = get().config;
+  console.log("### loading station preview");
+  const station = get().getStationById(stationId);
+  console.log("### loading station preview station", station);
+  const response = await Promise.all(
+    pipe(
+      // (obj) iterate over station histories
+      map("variable_ids"), // (int array) pluck out variableids
+      flatten, // (int) flatten into a single array
+      uniq, // (int) remove duplicates
+      map(getVariablePreview({ stationId /* other axios config here */ })), // (Promise) http calls for each station variable
+    )(station.histories),
+  );
+  console.log("### station preview loaded", response);
+  set({ stationPreview: map("data")(response) });
+};
+
 export const createMetadataSlice = (set, get) => ({
+  loadingMeta: true,
+
   networks: null,
   variables: null,
   frequencies: null,
@@ -62,14 +92,28 @@ export const createMetadataSlice = (set, get) => ({
 
   stationsLimit: null,
 
+  // load actions for retrieving remote data
   loadMetadata: loadMetadataAction(set, get),
   loadStations: loadStationsAction(set, get),
+  loadStationPreview: loadStationPreviewAction(set, get),
 
   reloadStations: () => {
     console.log("### reloadStations");
     set({ stations: null });
     get().loadStations();
   },
+
+  // getters
+  getStationById: (stationId) => {
+    console.log("### getStationById", stationId);
+    if (get().loadingMeta) {
+      return null;
+    }
+    console.log("### getStationById loaded", stationId);
+    return get().stations?.find((station) => station.id === +stationId);
+  },
+
+  // setters
   setStationsLimit: (limit) => {
     console.log("### setStationsLimit", limit);
     set({ stationsLimit: limit });
