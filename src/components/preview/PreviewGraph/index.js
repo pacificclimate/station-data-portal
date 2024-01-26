@@ -6,7 +6,6 @@ const PreviewGraph = ({ plotData }) => {
   // const [plot, setPlot] = useState({
   //     data: [], layout: {}, frames: [], config: {}
   // }, [plotData]);
-  console.log("### variable", plotData);
   if ((plotData.observations?.length ?? 0) === 0) {
     return (
       <div>No data found for {plotData.variable.name} in this time period.</div>
