@@ -18,10 +18,10 @@ logger.configure({ active: true });
 
 function FrequencySelector({
   allFrequencies,
-  onReady,
+  onReady = () => {},
   value,
   onChange,
-  defaultValueSelector,
+  defaultValueSelector = "all",
 }) {
   useEffect(() => {
     onReady({
@@ -92,11 +92,6 @@ FrequencySelector.propTypes = {
   value: PropTypes.array, // can be null
   onChange: PropTypes.func.isRequired,
   defaultValueSelector: LocalPropTypes.defaultValueSelector,
-};
-
-FrequencySelector.defaultProps = {
-  onReady: () => null,
-  defaultValueSelector: "all",
 };
 
 FrequencySelector.valueToLabel = (freq) => {

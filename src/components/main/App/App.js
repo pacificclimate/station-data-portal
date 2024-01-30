@@ -1,12 +1,12 @@
+"use client";
+
 import React, { useEffect } from "react";
 import { Container } from "react-bootstrap";
 
 import Disclaimer from "../../info/Disclaimer";
 import Header from "../Header/Header";
 import Body from "../Body";
-import useInitializeApp from "./app-initialization";
 import { useStore } from "../../../state/state-store";
-import { Outlet } from "react-router-dom";
 
 import "./App.css";
 
@@ -31,8 +31,6 @@ export default function App() {
     }
   }, [config]);
 
-  useInitializeApp(config);
-
   if (configErrorMessage !== null) {
     return <div>{configErrorMessage}</div>;
   }
@@ -45,7 +43,7 @@ export default function App() {
     <Container fluid className="App">
       <Disclaimer />
       <Header />
-      <Outlet />
+      <Body />
     </Container>
   );
 }

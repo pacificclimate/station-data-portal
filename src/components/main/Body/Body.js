@@ -14,7 +14,6 @@ import {
   stationAreaFilter,
   stationFilter,
 } from "../../../utils/station-filtering";
-import StationMap from "../../maps/StationMap";
 import StationMetadata from "../../info/StationMetadata";
 import StationData from "../../info/StationData";
 import NetworksMetadata from "../../info/NetworksMetadata";
@@ -25,11 +24,16 @@ import AdjustableColumns from "../../util/AdjustableColumns";
 import StationFilters, {
   useStationFiltering,
 } from "../../controls/StationFilters";
-import baseMaps from "../../maps/baseMaps";
 import { useStore } from "../../../state/state-store";
 import { useShallow } from "zustand/react/shallow";
 
 logger.configure({ active: true });
+
+import dynamic from "next/dynamic";
+
+const StationMap = dynamic(async () => await import("../../maps/StationMap"), {
+  ssr: false,
+});
 
 function Body() {
   const config = useStore((state) => state.config);
@@ -92,7 +96,6 @@ function Body() {
         contents={[
           // "map" ||  // Uncomment to suppress map
           <StationMap
-            {...baseMaps[config.baseMap]}
             stations={filteredStations}
             metadata={metadata}
             onSetArea={setArea}

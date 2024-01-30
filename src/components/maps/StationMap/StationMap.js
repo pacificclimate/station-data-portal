@@ -1,3 +1,5 @@
+"use client";
+
 // This component displays a map with a station marker for each station.
 //
 // Notes on user shape feature group:
@@ -37,10 +39,13 @@
 //    contents of the layer group.
 
 import PropTypes from "prop-types";
-import React, { useMemo, useRef, useTransition } from "react";
+import React, { useMemo, useRef, useEffect, useTransition } from "react";
 
 import { FeatureGroup, LayerGroup } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
+import L from "leaflet";
+import { setLethargicMapScrolling } from "../../../utils/leaflet-extensions";
+import { setTimingEnabled } from "../../../utils/timing";
 
 import MapInfoDisplay from "../MapInfoDisplay";
 import { defaultMarkerOptions, ManyStationMarkers } from "../StationMarkers";
@@ -54,14 +59,13 @@ import { MapSpinner } from "pcic-react-leaflet-components";
 import { useImmer } from "use-immer";
 import { useStore } from "../../../state/state-store";
 import { StationRefresh } from "../StationRefresh/StationRefresh";
+import baseMaps from "../../maps/baseMaps";
 
 logger.configure({ active: true });
 const smtimer = getTimer("StationMarker timing");
 smtimer.log();
 
 function StationMap({
-  BaseMap,
-  initialViewport,
   stations,
   metadata,
   onSetArea = () => {},
@@ -78,6 +82,9 @@ function StationMap({
 }) {
   const config = useStore((state) => state.config);
   const userShapeLayerRef = useRef();
+  const { BaseMap, initialViewport } = baseMaps[config.baseMap];
+  BaseMap.tileset.url =
+    "https://services.pacificclimate.org/tiles/bc-albers-lite/{z}/{x}/{y}.png";
 
   // TODO: Remove
   // const [geometryLayers, setGeometryLayers] = useState([]);
@@ -86,6 +93,37 @@ function StationMap({
     const layers = userShapeLayerRef?.current?.getLayers();
     onSetArea(layers && layersToGeoJSONMultipolygon(layers));
   };
+
+  useEffect(() => {
+    if (config === null) {
+      return;
+    }
+
+    // Set up (polygon) drawing tool in Leaflet.
+    L.drawLocal.edit.toolbar.buttons = {
+      edit: "Edit shapes",
+      editDisabled: "No shapes to edit",
+      remove: "Remove shapes",
+      removeDisabled: "No shapes to remove",
+    };
+    L.drawLocal.edit.handlers.remove.tooltip = "Click shape to remove";
+    L.drawLocal.edit.toolbar.actions.clearAll = {
+      title: "Remove all shapes",
+      text: "Remove all",
+    };
+
+    // Initialize Lethargy, which fixes scrolling problems with Mac computers.
+    if (config.lethargy.enabled) {
+      setLethargicMapScrolling(
+        config.lethargy.stability,
+        config.lethargy.sensitivity,
+        config.lethargy.tolerance,
+      );
+    }
+
+    // Export timing values to non-component code
+    setTimingEnabled(config.timingEnabled);
+  }, [config]);
 
   // Manage marker radius as a function of zoom. Use a transition so that it
   // doesn't interrupt other UI activity (including updating the base map).
@@ -185,8 +223,6 @@ function StationMap({
 StationMap = React.memo(StationMap);
 
 StationMap.propTypes = {
-  BaseMap: PropTypes.func.isRequired,
-  initialViewport: PropTypes.object.isRequired,
   stations: PropTypes.array.isRequired,
   metadata: PropTypes.object,
   onSetArea: PropTypes.func,

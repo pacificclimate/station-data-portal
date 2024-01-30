@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { Row, Col } from "react-bootstrap";
 import { useStore } from "../../../state/state-store";
 import "./Header.css";
@@ -9,10 +10,10 @@ function Header() {
     <Row className={"Header"}>
       <Col lg={3} className="text-left">
         <a href="https://pacificclimate.org/">
-          <img
-            src={require("./logo.png")}
-            width="328"
-            height="38"
+          <Image
+            src="/logo.png"
+            width={328}
+            height={38}
             alt="Pacific Climate Impacts Consortium"
           />
         </a>

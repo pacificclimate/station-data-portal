@@ -88,7 +88,7 @@ const loadConfigAction = (set, get) => {
   return async () => {
     let config = {};
     try {
-      const response = await fetch(`${process.env.PUBLIC_URL}/config.yaml`);
+      const response = await fetch(`/config.yaml`);
       const yamlConfig = await response.text();
       const fetchedConfig = yaml.load(yamlConfig);
       config = { ...defaultConfig, ...fetchedConfig };
