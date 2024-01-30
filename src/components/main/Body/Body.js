@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useMemo, useState } from "react";
 import { useImmerByKey } from "../../../hooks";
 import { Button, Card, Col, Row, Tab, Tabs } from "react-bootstrap";
@@ -35,9 +36,7 @@ const StationMap = dynamic(async () => await import("../../maps/StationMap"), {
   ssr: false,
 });
 
-function Body() {
-  const config = useStore((state) => state.config);
-
+function Body({ config }) {
   // metadata are the data items that can be watched for changes and
   // should probably cause a re-render.
   const metadata = useStore(
@@ -67,6 +66,11 @@ function Body() {
     setState: filterValuesSetState,
   } = useStationFiltering();
 
+  // load data once on initial render after config is loaded
+  useEffect(() => {
+    actions.loadMetadata({ config });
+  }, []);
+
   // Map polygon, used for selecting (not filtering) stations.
   const [area, setArea] = useState(undefined);
 
@@ -87,6 +91,10 @@ function Body() {
     [area, filteredStations],
   );
 
+  if (!metadata.stations) {
+    return <div>Loading...</div>;
+  }
+
   const rowClasses = { className: "mt-3" };
 
   return (
@@ -96,6 +104,7 @@ function Body() {
         contents={[
           // "map" ||  // Uncomment to suppress map
           <StationMap
+            config={config}
             stations={filteredStations}
             metadata={metadata}
             onSetArea={setArea}
@@ -114,7 +123,10 @@ function Body() {
                   <Col lg={6}>Fetch limit</Col>
                   <Col lg={6}>
                     <Select
-                      options={config.stationDebugFetchLimitsOptions}
+                      options={config.stationDebugFetchOptions.map((n) => ({
+                        value: n,
+                        label: n.toString(),
+                      }))}
                       value={stnsLimit}
                       onChange={setStnsLimit}
                     />
@@ -174,6 +186,7 @@ function Body() {
               />
 
               <StationData
+                config={config}
                 filterValues={filterValuesNormal}
                 selectedStations={selectedStations}
                 dataDownloadUrl={dataDownloadUrl({
@@ -187,7 +200,7 @@ function Body() {
             </Tab>
 
             <Tab eventKey={"Networks"} title={"Networks"}>
-              <NetworksMetadata networks={metadata.networks} />
+              <NetworksMetadata config={config} networks={metadata.networks} />
             </Tab>
           </Tabs>,
         ]}

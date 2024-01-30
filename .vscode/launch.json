@@ -5,6 +5,15 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Next Dev",
+      "request": "launch",
+      "runtimeArgs": ["run", "dev"],
+      "runtimeExecutable": "npm",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node"
+    },
+
+    {
       "type": "firefox",
       "request": "launch",
       "reAttach": true,

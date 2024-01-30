@@ -65,7 +65,20 @@ logger.configure({ active: true });
 const smtimer = getTimer("StationMarker timing");
 smtimer.log();
 
+const getZoomMarkerRadius = ({ config }) => {
+  const zmrSpec = config.zoomToMarkerRadiusSpec;
+  return (zoom) => {
+    for (const [_zoom, radius] of zmrSpec) {
+      if (zoom <= _zoom) {
+        return radius;
+      }
+    }
+    return zmrSpec[zmrSpec.length - 1][1];
+  };
+};
+
 function StationMap({
+  config,
   stations,
   metadata,
   onSetArea = () => {},
@@ -80,7 +93,6 @@ function StationMap({
   // should be true if and only if slow updates to the map are pending
   // due to an external update.
 }) {
-  const config = useStore((state) => state.config);
   const userShapeLayerRef = useRef();
   const { BaseMap, initialViewport } = baseMaps[config.baseMap];
   BaseMap.tileset.url =
@@ -132,7 +144,7 @@ function StationMap({
   // map events.
   const [markerOptions, setMarkerOptions] = useImmer(() => ({
     ...defaultMarkerOptions,
-    radius: config.zoomToMarkerRadius(initialViewport.zoom),
+    radius: getZoomMarkerRadius({ config })(initialViewport.zoom),
   }));
   const [markerUpdateIsPending, markerUpdateStartTransition] = useTransition();
   const markerMapEvents = useMemo(
@@ -140,7 +152,9 @@ function StationMap({
       zoomend: (leafletMap) => {
         markerUpdateStartTransition(() => {
           setMarkerOptions((draft) => {
-            draft.radius = config.zoomToMarkerRadius(leafletMap.getZoom());
+            draft.radius = getZoomMarkerRadius({ config })(
+              leafletMap.getZoom(),
+            );
           });
         });
       },

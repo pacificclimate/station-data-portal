@@ -13,9 +13,7 @@ import { useStore } from "../../../state/state-store";
 
 logger.configure({ active: true });
 
-function NetworksMetadata({ networks }) {
-  const config = useStore((state) => state.config);
-
+function NetworksMetadata({ config, networks }) {
   const columns = React.useMemo(
     () => [
       {
@@ -142,6 +140,7 @@ function NetworksMetadata({ networks }) {
 }
 
 NetworksMetadata.propTypes = {
+  config: PropTypes.object,
   networks: PropTypes.array,
 };
 

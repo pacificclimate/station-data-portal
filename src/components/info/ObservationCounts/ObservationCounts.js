@@ -28,23 +28,23 @@ const totalCounts = timer.timeThis("totalCounts")((counts, stations) =>
 );
 
 function ObservationCounts({
+  config,
   filterValues: { startDate, endDate },
   clipToDate,
   stations,
 }) {
-  const appConfig = useStore((state) => state.config);
   const [countData, setCountData] = useState(null);
 
   useEffect(() => {
     setCountData(null);
     getObservationCounts({
-      appConfig,
+      config,
       getParams: {
         start_date: clipToDate ? dateToStrForQuery(startDate) : undefined,
         end_date: clipToDate ? dateToStrForQuery(endDate) : undefined,
       },
     }).then((response) => setCountData(response.data));
-  }, [appConfig, clipToDate, startDate, endDate]);
+  }, [config, clipToDate, startDate, endDate]);
 
   const loadingMessage = "Loading ...";
 

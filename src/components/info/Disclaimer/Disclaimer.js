@@ -1,11 +1,10 @@
+"use client";
 import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import "./Disclaimer.css";
-import { useStore } from "../../../state/state-store";
 
-function Disclaimer() {
-  const config = useStore((state) => state.config);
-  const [acknowledged, setAcknowledged] = useState(!config.disclaimer.enabled);
+function Disclaimer({ disclaimer }) {
+  const [acknowledged, setAcknowledged] = useState(!disclaimer.enabled);
   const acknowledge = () => setAcknowledged(true);
 
   return (
@@ -16,12 +15,12 @@ function Disclaimer() {
       style={{ zIndex: 2000 }}
     >
       <Modal.Header>
-        <Modal.Title>{config.disclaimer.title}</Modal.Title>
+        <Modal.Title>{disclaimer.title}</Modal.Title>
       </Modal.Header>
-      <Modal.Body>{config.disclaimer.body}</Modal.Body>
+      <Modal.Body>{disclaimer.body}</Modal.Body>
       <Modal.Footer>
         <Button bsStyle={"primary"} onClick={acknowledge}>
-          {config.disclaimer.buttonLabel}
+          {disclaimer.buttonLabel}
         </Button>
       </Modal.Footer>
     </Modal>

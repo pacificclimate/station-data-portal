@@ -91,11 +91,7 @@ export const getVariablePreview =
     );
   };
 
-export function getObservationCounts({
-  appConfig: config,
-  getParams,
-  axiosConfig,
-}) {
+export function getObservationCounts({ config, getParams, axiosConfig }) {
   return axios.get(urljoin(config.sdsUrl, "observations", "counts"), {
     params: {
       provinces: config.stationsQpProvinces,

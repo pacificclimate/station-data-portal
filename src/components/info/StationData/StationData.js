@@ -16,13 +16,13 @@ import "./StationData.css";
 logger.configure({ active: true });
 
 function StationData({
+  config,
   filterValues,
   selectedStations,
   dataDownloadUrl,
   dataDownloadFilename,
   rowClasses,
 }) {
-  const config = useStore((state) => state.config);
   const [fileFormat, setFileFormat] = useState();
   const [clipToDate, setClipToDate] = useState(false);
   const toggleClipToDate = () => setClipToDate(!clipToDate);
@@ -32,6 +32,7 @@ function StationData({
       <Row {...rowClasses} key="obs">
         <Col lg={12} md={12} sm={12}>
           <ObservationCounts
+            config={config}
             filterValues={filterValues}
             clipToDate={clipToDate}
             stations={selectedStations}

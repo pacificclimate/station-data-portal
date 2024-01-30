@@ -1,11 +1,9 @@
 import React from "react";
 import Image from "next/image";
 import { Row, Col } from "react-bootstrap";
-import { useStore } from "../../../state/state-store";
 import "./Header.css";
 
-function Header() {
-  const config = useStore((state) => state.config);
+function Header({ config }) {
   return (
     <Row className={"Header"}>
       <Col lg={3} className="text-left">

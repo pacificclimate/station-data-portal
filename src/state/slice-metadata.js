@@ -11,76 +11,75 @@ import map from "lodash/fp/map";
 import uniq from "lodash/fp/uniq";
 import { getVariablePreview } from "../api/metadata";
 
-const loadStationsAction = (set, get) => async () => {
-  if (!get().isConfigLoaded()) {
-    throw new Error("Cannot load stations until config is loaded");
-  }
-  const config = get().config;
-  console.log("### loading stations");
-  set({ stations: null });
-  const response = await getStations({
-    config,
-    getParams: {
-      compact: true,
-      ...(config.stationDebugFetchOptions && { limit: get().stationsLimit }),
-    },
-  });
-  console.log("### stations loaded");
-  set({ stations: response.data });
-};
+const loadStationsAction =
+  (set, get) =>
+  async ({ config }) => {
+    console.log("### loading stations");
+    set({ stations: null });
+    const response = await getStations({
+      config,
+      getParams: {
+        compact: true,
+        ...(config.stationDebugFetchOptions && { limit: get().stationsLimit }),
+      },
+    });
+    console.log("### stations loaded");
+    set({ stations: response.data });
+  };
 
-const loadMetadataAction = (set, get) => async () => {
-  if (!get().isConfigLoaded()) {
-    throw new Error("Cannot load stations until config is loaded");
-  }
-  const config = get().config;
-  console.log("### loading metadata");
-  set({ stations: null, loadingMeta: true });
-  const pStations = getStations({
-    config,
-    getParams: {
-      compact: true,
-      ...(config.stationDebugFetchOptions && { limit: get().stationsLimit }),
-    },
-  });
-  const pNetworks = await getNetworks({ config });
-  const pVariables = await getVariables({ config });
-  const pFrequencies = await getFrequencies({ config });
-  const response = await Promise.all([
-    pStations,
-    pNetworks,
-    pVariables,
-    pFrequencies,
-  ]);
-  set({
-    loadingMeta: false,
-    stations: response[0].data,
-    networks: response[1].data,
-    variables: response[2].data,
-    frequencies: response[3].data,
-  });
-};
+const loadMetadataAction =
+  (set, get) =>
+  async ({ config }) => {
+    console.log("### loading metadata");
+    set({ stations: null, loadingMeta: true });
+    const pStations = getStations({
+      config,
+      getParams: {
+        compact: true,
+        ...(config.stationDebugFetchOptions && { limit: get().stationsLimit }),
+      },
+    });
+    const pNetworks = await getNetworks({ config });
+    const pVariables = await getVariables({ config });
+    const pFrequencies = await getFrequencies({ config });
+    const response = await Promise.all([
+      pStations,
+      pNetworks,
+      pVariables,
+      pFrequencies,
+    ]);
+    set({
+      loadingMeta: false,
+      stations: response[0].data,
+      networks: response[1].data,
+      variables: response[2].data,
+      frequencies: response[3].data,
+    });
+  };
 
-const loadStationPreviewAction = (set, get) => async (stationId) => {
-  if (!get().isConfigLoaded()) {
-    throw new Error("Cannot load stations until config is loaded");
-  }
-  const config = get().config;
-  console.log("### loading station preview");
-  const station = get().getStationById(stationId);
-  console.log("### loading station preview station", station);
-  const response = await Promise.all(
-    pipe(
-      // (obj) iterate over station histories
-      map("variable_ids"), // (int array) pluck out variableids
-      flatten, // (int) flatten into a single array
-      uniq, // (int) remove duplicates
-      map(getVariablePreview({ stationId /* other axios config here */ })), // (Promise) http calls for each station variable
-    )(station.histories),
-  );
-  console.log("### station preview loaded", response);
-  set({ stationPreview: map("data")(response) });
-};
+const loadStationPreviewAction =
+  (set, get) =>
+  async ({ config, stationId }) => {
+    console.log("### loading station preview");
+    const station = get().getStationById(stationId);
+    console.log("### loading station preview station", station);
+    const response = await Promise.all(
+      pipe(
+        // (obj) iterate over station histories
+        map("variable_ids"), // (int array) pluck out variableids
+        flatten, // (int) flatten into a single array
+        uniq, // (int) remove duplicates
+        map(
+          getVariablePreview({
+            config,
+            stationId /* other axios config here */,
+          }),
+        ), // (Promise) http calls for each station variable
+      )(station.histories),
+    );
+    console.log("### station preview loaded", response);
+    set({ stationPreview: map("data")(response) });
+  };
 
 export const createMetadataSlice = (set, get) => ({
   loadingMeta: true,
