@@ -7,12 +7,12 @@ import Body from "../Body";
 
 import "./App.css";
 
-export default function App({ config }) {
+export default function App({ metaData }) {
   return (
     <Container fluid className="App">
-      <Disclaimer disclaimer={config.disclaimer} />
-      <Header config={config} />
-      <Body config={config} />
+      <Disclaimer disclaimer={metaData.config.disclaimer} />
+      <Header config={metaData.config} />
+      <Body metaData={metaData} />
     </Container>
   );
 }

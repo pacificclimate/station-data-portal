@@ -158,8 +158,13 @@ function FancyTable({
                 {
                   // Body cells
                   row.cells.map((cell) => {
+                    const cellProps = cell.getCellProps();
+                    const key = cellProps.key;
+                    delete cellProps.key;
                     return (
-                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                      <td key={key} {...cell.getCellProps()}>
+                        {cell.render("Cell")}
+                      </td>
                     );
                   })
                 }

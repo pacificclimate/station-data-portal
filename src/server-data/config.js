@@ -76,6 +76,7 @@ const checkMissingKeys = (config) => {
 };
 
 const loadConfig = async () => {
+  console.log("### Loading config");
   let config = {};
   try {
     const response = await fs.readFile(
@@ -102,6 +103,13 @@ const loadConfig = async () => {
   return config;
 };
 
-export const config = await loadConfig();
+let hiddenConfig = null;
+
+export const config = await (async () => {
+  if (!hiddenConfig) {
+    hiddenConfig = await loadConfig();
+  }
+  return hiddenConfig;
+})();
 
 export default config;

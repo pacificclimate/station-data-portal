@@ -142,7 +142,7 @@ class VariableSelector extends Component {
     allVariables === null
       ? []
       : flow(
-          tap((allVariables) => console.log("allVariables", allVariables)),
+          //tap((allVariables) => console.log("allVariables", allVariables)),
 
           // Create one option per unique variable display_name.
           map((variable) => ({

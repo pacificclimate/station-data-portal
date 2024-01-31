@@ -57,7 +57,6 @@ import "./StationMap.css";
 import { getTimer } from "../../../utils/timing";
 import { MapSpinner } from "pcic-react-leaflet-components";
 import { useImmer } from "use-immer";
-import { useStore } from "../../../state/state-store";
 import { StationRefresh } from "../StationRefresh/StationRefresh";
 import baseMaps from "../../maps/baseMaps";
 
@@ -107,10 +106,6 @@ function StationMap({
   };
 
   useEffect(() => {
-    if (config === null) {
-      return;
-    }
-
     // Set up (polygon) drawing tool in Leaflet.
     L.drawLocal.edit.toolbar.buttons = {
       edit: "Edit shapes",
@@ -135,7 +130,7 @@ function StationMap({
 
     // Export timing values to non-component code
     setTimingEnabled(config.timingEnabled);
-  }, [config]);
+  }, []);
 
   // Manage marker radius as a function of zoom. Use a transition so that it
   // doesn't interrupt other UI activity (including updating the base map).

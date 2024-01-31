@@ -86,30 +86,38 @@ function NetworksMetadata({ config, networks }) {
         <thead>
           {
             // Header rows
-            headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {
-                  // Header cells
-                  headerGroup.headers.map((column) => {
-                    const sortClass = column.isSorted
-                      ? column.isSortedDesc
-                        ? "sorted-desc"
-                        : "sorted-asc"
-                      : "";
-                    return (
-                      <th
-                        {...column.getHeaderProps({
-                          ...column.getSortByToggleProps(),
-                          className: sortClass,
-                        })}
-                      >
-                        {column.render("Header")}
-                      </th>
-                    );
-                  })
-                }
-              </tr>
-            ))
+            headerGroups.map((headerGroup) => {
+              const headerGroupProps = headerGroup.getHeaderGroupProps();
+              const headerGroupKey = headerGroupProps.key;
+              delete headerGroupProps.key;
+
+              return (
+                <tr key={headerGroupKey} {...headerGroupProps}>
+                  {
+                    // Header cells
+                    headerGroup.headers.map((column) => {
+                      const sortClass = column.isSorted
+                        ? column.isSortedDesc
+                          ? "sorted-desc"
+                          : "sorted-asc"
+                        : "";
+                      const headerColumnProps = column.getHeaderProps({
+                        ...column.getSortByToggleProps(),
+                        className: sortClass,
+                      });
+                      const headerColumnKey = headerColumnProps.key;
+                      delete headerColumnProps.key;
+
+                      return (
+                        <th key={headerColumnKey} {...headerColumnProps}>
+                          {column.render("Header")}
+                        </th>
+                      );
+                    })
+                  }
+                </tr>
+              );
+            })
           }
         </thead>
 
@@ -124,8 +132,13 @@ function NetworksMetadata({ config, networks }) {
                   {
                     // Body cells
                     row.cells.map((cell) => {
+                      const cellProps = cell.getCellProps();
+                      const key = cellProps.key;
+                      delete cellProps.key;
                       return (
-                        <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                        <td key={key} {...cellProps}>
+                          {cell.render("Cell")}
+                        </td>
                       );
                     })
                   }
