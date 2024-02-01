@@ -24,8 +24,15 @@ const PreviewGraph = ({ plotData }) => {
         },
       ]}
       layout={{
+        // Setting these margins causes the graph to fill the available space
+        margin: {
+          t: 20, //top
+          l: 50, //left
+          r: 20, //right
+          b: 50, //bottom
+        },
         autosize: true,
-        title: plotData.variable.name,
+        title: null, //plotData.variable.name,
         xaxis: {
           title: "Time",
           type: "date",

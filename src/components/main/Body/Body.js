@@ -51,9 +51,23 @@ function Body() {
     useShallow((state) => ({
       setStationsLimit: state.setStationsLimit,
       reloadStations: state.reloadStations,
+      loadStations: state.loadStations,
       loadMetadata: state.loadMetadata,
     })),
   );
+
+  // load data once on initial render after config is loaded
+  useEffect(() => {
+    if (isConfigLoaded()) {
+      loadMetadata();
+    }
+  }, [config]);
+
+  useEffect(() => {
+    if (config) {
+      actions.loadStations();
+    }
+  }, [config]);
 
   // Station filtering state and setters
   const {

@@ -24,13 +24,6 @@ export default function App() {
     }
   });
 
-  // load data once on initial render after config is loaded
-  useEffect(() => {
-    if (isConfigLoaded()) {
-      loadMetadata();
-    }
-  }, [config]);
-
   useInitializeApp(config);
 
   if (configErrorMessage !== null) {

@@ -2,11 +2,13 @@ import { create } from "zustand";
 import { createConfigSlice } from "./slice-config";
 import { createMetadataSlice } from "./slice-metadata";
 import { createDebugSlice } from "./slice-debug";
+import { createPreviewSlice } from "./slice-preview";
 
 export const useStore = create((set, get) => ({
   ...createConfigSlice(set, get),
   ...createMetadataSlice(set, get),
   ...createDebugSlice(set, get),
+  ...createPreviewSlice(set, get),
 
   // Actions
   initialize: async () => {

@@ -1,181 +1,56 @@
-import { Link, useLoaderData } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { Container } from "react-bootstrap";
+import { useLoaderData } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Container, Spinner } from "react-bootstrap";
+import { useShallow } from "zustand/react/shallow";
 import { useStore } from "../../../state/state-store";
-import map from "lodash/fp/map";
-import PreviewGraph from "../PreviewGraph";
-import { Col, Row } from "react-bootstrap";
-import DateRange from "../../daterange";
-import startOfMonth from "date-fns/startOfMonth";
-import endOfMonth from "date-fns/endOfMonth";
-import isEqual from "date-fns/isEqual";
-import subMonths from "date-fns/subMonths";
-import addMonths from "date-fns/addMonths";
-import addDays from "date-fns/addDays";
-import differenceInYears from "date-fns/differenceInYears";
-import startOfDecade from "date-fns/startOfDecade";
-import endOfDecade from "date-fns/endOfDecade";
-import { end } from "@popperjs/core";
-
-const millisecondsPerMonth = 2629746000;
-const dataIntervals = [
-  {
-    min: "1969-08-01 00:00:00.000000",
-    max: "1977-04-30 00:00:00.000000",
-    vars_id: 428,
-    display_name: "Temperature (Max.)",
-    type: "observation",
-  },
-  {
-    min: "1969-08-01 00:00:00.000000",
-    max: "1977-04-30 00:00:00.000000",
-    vars_id: 431,
-    display_name: "Snowfall Amount",
-    type: "observation",
-  },
-  {
-    min: "2000-01-31 23:59:59.000000",
-    max: "2000-12-31 23:59:59.000000",
-    vars_id: 557,
-    display_name: "Temperature Climatology (Min.)",
-    type: "climatology",
-  },
-  {
-    min: "2000-01-31 23:59:59.000000",
-    max: "2000-12-31 23:59:59.000000",
-    vars_id: 559,
-    display_name: "Precipitation Climatology",
-    type: "climatology",
-  },
-  {
-    min: "1969-08-01 00:00:00.000000",
-    max: "1977-04-30 00:00:00.000000",
-    vars_id: 430,
-    display_name: "Rainfall Amount",
-    type: "observation",
-  },
-  {
-    min: "2000-01-31 23:59:59.000000",
-    max: "2000-12-31 23:59:59.000000",
-    vars_id: 556,
-    display_name: "Temperature Climatology (Max.)",
-    type: "climatology",
-  },
-  {
-    min: "2000-01-31 23:59:59.000000",
-    max: "2000-12-31 23:59:59.000000",
-    vars_id: 558,
-    display_name: "Temperature Climatology (Mean)",
-    type: "climatology",
-  },
-  {
-    min: "1969-08-01 00:00:00.000000",
-    max: "1977-04-30 00:00:00.000000",
-    vars_id: 427,
-    display_name: "Temperature (Min.)",
-    type: "observation",
-  },
-  {
-    min: "1969-08-01 00:00:00.000000",
-    max: "1977-04-30 00:00:00.000000",
-    vars_id: 429,
-    display_name: "Precipitation Amount",
-    type: "observation",
-  },
-];
+import NavBlock from "./NavBlock";
+import GraphsBlock from "./GraphsBlock";
 
 export default function StationPreview() {
   const urlParams = useLoaderData();
-  const station = useStore((state) =>
-    state.getStationById(urlParams.stationId),
+  const data = useStore(
+    useShallow((state) => ({
+      station: state.previewStation,
+      previewVariables: state.previewStationVariables,
+      config: state.config,
+    })),
   );
-  const loadStationPreview = useStore((state) => state.loadStationPreview);
-  const stationPreview = useStore((state) => state.stationPreview);
-  const isConfigLoaded = useStore((state) => state.isConfigLoaded);
-  const isMetaLoaded = useStore(
-    (state) => !state.loadingMeta && state.stations !== null,
-  );
-  const config = useStore((state) => state.config);
 
+  const actions = useStore((state) => ({
+    isConfigLoaded: state.isConfigLoaded,
+    loadPreviewStation: state.loadPreviewStation,
+    loadPreviewStationVariables: state.loadPreviewStationVariables,
+  }));
+
+  // load station we want to do a preview for, this may be instant if the stations are
+  // already loaded into the metadata. If missing it will ask the server
   useEffect(() => {
-    if (isConfigLoaded() && isMetaLoaded) {
-      loadStationPreview(urlParams.stationId);
+    if (actions.isConfigLoaded()) {
+      actions.loadPreviewStation(urlParams.stationId);
     }
-  }, [config, station]);
+  }, [data.isConfigLoaded, urlParams.stationId]);
 
-  let [selectedStart, setSelectedStart] = useState(
-    startOfMonth(new Date("1976-10-30T00:00:00Z")),
-  );
-  let [selectedEnd, setSelectedEnd] = useState(
-    endOfMonth(new Date("1977-04-30T00:00:00Z")),
-  );
+  // once station is loaded we need to load our preview information
+  useEffect(() => {
+    if (actions.isConfigLoaded() && data.station) {
+      actions.loadPreviewStationVariables(data.station.id);
+    }
+  }, [data.config, data.station]);
 
-  if (!station) {
+  if (!data.station) {
     return (
       <Container fluid className="StationPreview">
-        <div>Loading...</div>
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
       </Container>
     );
   }
-
-  const startTime = startOfDecade(new Date("1969-08-01 00:00:00.000000"));
-  const endTime = addDays(
-    endOfDecade(new Date("2000-12-31 23:59:59.000000")),
-    1,
-  );
-
-  console.log("### start", startTime);
-  console.log("### end", endTime);
-
-  const selectedInterval = [selectedStart, selectedEnd];
-  const disabledIntervals = [];
-
-  const error = null;
-  const ticks = differenceInYears(endTime, startTime) / 10 + 1;
-  console.log("### ticks", ticks);
-
-  const onTimeRangeChange = (range) => {
-    console.log("### onTimeRangeChange", range);
-  };
-
-  const onTimeRangeUpdate = (range) => {
-    console.log("### onTimeRangeUpdate", range, selectedStart, selectedEnd);
-  };
-  const onMode = (curr, next, step, reversed, getValue) => {
-    console.log("### mode", curr, next);
-    return curr;
-  };
-
-  console.log("### station preview", stationPreview);
+  console.log("### station preview", data.previewVariables);
   return (
-    <Container fluid className="StationPreview">
-      <Link to={"/"}>Back to main</Link>
-      <Row>
-        <DateRange
-          error={error}
-          ticksNumber={ticks}
-          selectedInterval={selectedInterval}
-          timelineInterval={[startTime, endTime]}
-          formatTick={(t) => new Date(t).getFullYear()}
-          step={millisecondsPerMonth}
-          onUpdateCallback={onTimeRangeUpdate}
-          onChangeCallback={onTimeRangeChange}
-          mode={onMode}
-          dataIntervals={dataIntervals.map((data) => ({
-            start: new Date(data.min),
-            end: new Date(data.max),
-            type: data.type,
-          }))}
-          hideHandles={true}
-        />
-      </Row>
-      {map((resp) => (
-        <Row key={`${resp.station.id}-${resp.variable.id}`}>
-          <Col xs={12}>
-            <PreviewGraph plotData={resp} />
-          </Col>
-        </Row>
-      ))(stationPreview)}
+    <Container className="StationPreview">
+      <NavBlock />
+      <GraphsBlock stationPreview={data.previewVariables} />
     </Container>
   );
 }

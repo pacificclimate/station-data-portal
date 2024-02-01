@@ -83,6 +83,16 @@ export function getStations({ config, getParams, axiosConfig }) {
   });
 }
 
+export const getStationById = ({ config, stationId, axiosConfig }) => {
+  return axios.get(urljoin(config.sdsUrl, "stations", stationId), {
+    transformResponse: axios.defaults.transformResponse.concat(
+      mapDeep(transformIso8601Date),
+    ),
+    ...axiosConfig,
+  });
+};
+
+// TODO: Connect to real API
 export const getVariablePreview =
   ({ config, stationId, endDate, startDate, axiosConfig }) =>
   (variableId) => {
