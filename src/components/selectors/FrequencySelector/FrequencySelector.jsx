@@ -10,7 +10,7 @@ import flow from "lodash/fp/flow";
 import get from "lodash/fp/get";
 import map from "lodash/fp/map";
 import sortBy from "lodash/fp/sortBy";
-import InfoPopup from "../../util/InfoPopup";
+import InfoPopup from "../../util/InfoPopup/InfoPopup";
 
 import css from "../common.module.css";
 

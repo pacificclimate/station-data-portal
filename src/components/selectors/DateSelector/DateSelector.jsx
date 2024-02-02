@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { Form } from "react-bootstrap";
 import DatePicker from "react-datepicker";
-import InfoPopup from "../../util/InfoPopup";
+import InfoPopup from "../../util/InfoPopup/InfoPopup";
 
 import "./DateSelector.css";
 

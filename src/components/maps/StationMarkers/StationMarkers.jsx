@@ -4,8 +4,8 @@ import { CircleMarker, Polygon, useMap, useMapEvents } from "react-leaflet";
 import map from "lodash/fp/map";
 import flow from "lodash/fp/flow";
 import mapValues from "lodash/fp/mapValues";
-import StationPopup from "../StationPopup";
-import StationTooltip from "../StationTooltip";
+import StationPopup from "../StationPopup/StationPopup";
+import StationTooltip from "../StationTooltip/StationTooltip";
 
 import logger from "../../../logger";
 

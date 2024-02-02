@@ -11,9 +11,9 @@ import includes from "lodash/fp/includes";
 import sortBy from "lodash/fp/sortBy";
 import flow from "lodash/fp/flow";
 import tap from "lodash/fp/tap";
-import { groupByGeneral } from "../../../utils/fp";
+import { groupByGeneral } from "../../../utils/fp/fp";
 import { defaultValue, selectorButtonProps } from "../common";
-import InfoPopup from "../../util/InfoPopup";
+import InfoPopup from "../../util/InfoPopup/InfoPopup";
 
 import logger from "../../../logger";
 

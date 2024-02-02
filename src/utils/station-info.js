@@ -1,13 +1,11 @@
 import flow from "lodash/fp/flow";
 import map from "lodash/fp/map";
 import uniq from "lodash/fp/uniq";
-import React from "react";
 import uniqWith from "lodash/fp/uniqWith";
 import { utcDateOnly } from "./dates";
 import find from "lodash/fp/find";
 import flatten from "lodash/fp/flatten";
 import compact from "lodash/fp/compact";
-import tap from "lodash/fp/tap";
 import sortBy from "lodash/fp/sortBy";
 import identity from "lodash/fp/identity";
 import sortedUniq from "lodash/fp/sortedUniq";

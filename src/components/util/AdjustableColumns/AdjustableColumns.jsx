@@ -8,7 +8,7 @@ import zipAll from "lodash/fp/zipAll";
 
 import logger from "../../../logger";
 
-import { mapWithKey } from "../../../utils/fp";
+import { mapWithKey } from "../../../utils/fp/fp";
 import {
   ChevronBarLeft,
   ChevronBarRight,

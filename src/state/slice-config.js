@@ -1,5 +1,4 @@
 import yaml from "js-yaml";
-import { create } from "lodash";
 import filter from "lodash/fp/filter";
 import isUndefined from "lodash/fp/isUndefined";
 
@@ -88,17 +87,13 @@ const loadConfigAction = (set, get) => {
   return async () => {
     let config = {};
     try {
-      const response = await fetch(`${process.env.PUBLIC_URL}/config.yaml`);
+      const response = await fetch(`/config.yaml`);
       const yamlConfig = await response.text();
       const fetchedConfig = yaml.load(yamlConfig);
       config = { ...defaultConfig, ...fetchedConfig };
     } catch (error) {
       set({
-        configError: (
-          <div>
-            Error loading or parsing config.yaml: <pre>{error.toString()}</pre>
-          </div>
-        ),
+        configError: error.toString(),
       });
       throw error;
     }
@@ -113,7 +108,7 @@ const loadConfigAction = (set, get) => {
     }
 
     // Extend config with some env var values
-    config.appVersion = process.env.REACT_APP_APP_VERSION ?? "unknown";
+    config.appVersion = import.meta.env.REACT_APP_APP_VERSION ?? "unknown";
 
     // Extend config with some computed goodies
     // TODO: Store shouldn't know about data presentation

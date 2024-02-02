@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import React from "react";
 
-import CheckboxControl from "../CheckboxControl";
+import CheckboxControl from "../CheckboxControl/CheckboxControl";
 import "./OnlyWithClimatologyControl.css";
 
 export default function OnlyWithClimatologyControl(props) {

@@ -4,10 +4,10 @@ import { Button, ButtonToolbar, Col, Row } from "react-bootstrap";
 import capitalize from "lodash/fp/capitalize";
 import map from "lodash/fp/map";
 import { useStore } from "../../../state/state-store";
-import FileFormatSelector from "../../selectors/FileFormatSelector";
-import ClipToDateControl from "../../controls/ClipToDateControl";
-import ObservationCounts from "../../info/ObservationCounts";
-import InfoPopup from "../../util/InfoPopup";
+import FileFormatSelector from "../../selectors/FileFormatSelector/FileFormatSelector";
+import ClipToDateControl from "../../controls/ClipToDateControl/ClipToDateControl";
+import ObservationCounts from "../ObservationCounts/ObservationCounts";
+import InfoPopup from "../../util/InfoPopup/InfoPopup";
 
 import logger from "../../../logger";
 

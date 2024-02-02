@@ -26,12 +26,12 @@ import React from "react";
 import "./StationFilters.css";
 import { Col, Row } from "react-bootstrap";
 
-import IncludeStationsWithNoObsControl from "../../controls/IncludeStationsWithNoObsControl";
-import NetworkSelector from "../../selectors/NetworkSelector";
-import VariableSelector from "../../selectors/VariableSelector";
+import IncludeStationsWithNoObsControl from "../IncludeStationsWithNoObsControl/IncludeStationsWithNoObsControl";
+import NetworkSelector from "../../selectors/NetworkSelector/NetworkSelector";
+import VariableSelector from "../../selectors/VariableSelector/VariableSelector";
 import FrequencySelector from "../../selectors/FrequencySelector/FrequencySelector";
-import DateSelector from "../../selectors/DateSelector";
-import OnlyWithClimatologyControl from "../../controls/OnlyWithClimatologyControl";
+import DateSelector from "../../selectors/DateSelector/DateSelector";
+import OnlyWithClimatologyControl from "../OnlyWithClimatologyControl/OnlyWithClimatologyControl";
 import { commonSelectorStyles } from "../../selectors/styles";
 import { usePairedImmerByKey } from "../../../hooks";
 

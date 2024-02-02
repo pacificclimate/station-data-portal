@@ -5,8 +5,8 @@ import styles from "./FancyTable.module.css";
 import { usePagination, useTable, useFilters } from "react-table";
 import { Table } from "react-bootstrap";
 import { flow, map, min, max } from "lodash/fp";
-import PaginationControls from "../PaginationControls";
-import NoColumnFilter from "../column-filters/NoColumnFilter";
+import PaginationControls from "../PaginationControls/PaginationControls";
+import NoColumnFilter from "../column-filters/NoColumnFilter/NoColumnFilter";
 
 function FancyTable({
   // Data to be displayed in table

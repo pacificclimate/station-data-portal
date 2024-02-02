@@ -13,18 +13,18 @@ import {
 import {
   stationAreaFilter,
   stationFilter,
-} from "../../../utils/station-filtering";
-import StationMap from "../../maps/StationMap";
-import StationMetadata from "../../info/StationMetadata";
-import StationData from "../../info/StationData";
-import NetworksMetadata from "../../info/NetworksMetadata";
-import SelectionCounts from "../../info/SelectionCounts";
-import SelectionCriteria from "../../info/SelectionCriteria";
-import UnselectedThings from "../../info/UnselectedThings";
+} from "../../../utils/station-filtering/station-filtering";
+import StationMap from "../../maps/StationMap/StationMap";
+import StationMetadata from "../../info/StationMetadata/StationMetadata";
+import StationData from "../../info/StationData/StationData";
+import NetworksMetadata from "../../info/NetworksMetadata/NetworksMetadata";
+import SelectionCounts from "../../info/SelectionCounts/SelectionCounts";
+import SelectionCriteria from "../../info/SelectionCriteria/SelectionCriteria";
+import UnselectedThings from "../../info/UnselectedThings/UnselectedThings";
 import AdjustableColumns from "../../util/AdjustableColumns";
 import StationFilters, {
   useStationFiltering,
-} from "../../controls/StationFilters";
+} from "../../controls/StationFilters/StationFilters";
 import baseMaps from "../../maps/baseMaps";
 import { useStore } from "../../../state/state-store";
 import { useShallow } from "zustand/react/shallow";
@@ -32,17 +32,17 @@ import { useShallow } from "zustand/react/shallow";
 logger.configure({ active: true });
 
 function Body() {
-  const config = useStore((state) => state.config);
-
   // metadata are the data items that can be watched for changes and
   // should probably cause a re-render.
-  const metadata = useStore(
+  const data = useStore(
     useShallow((state) => ({
+      config: state.config,
+      stationsLimit: state.stationsLimit,
+      // metadatas
       networks: state.networks,
       stations: state.stations,
       variables: state.variables,
       frequencies: state.frequencies,
-      stationsLimit: state.stationsLimit,
     })),
   );
 
@@ -53,21 +53,22 @@ function Body() {
       reloadStations: state.reloadStations,
       loadStations: state.loadStations,
       loadMetadata: state.loadMetadata,
+      isConfigLoaded: state.isConfigLoaded,
     })),
   );
 
   // load data once on initial render after config is loaded
   useEffect(() => {
-    if (isConfigLoaded()) {
-      loadMetadata();
+    if (actions.isConfigLoaded()) {
+      actions.loadMetadata();
     }
-  }, [config]);
+  }, [data.config]);
 
   useEffect(() => {
-    if (config) {
+    if (data.config) {
       actions.loadStations();
     }
-  }, [config]);
+  }, [data.config]);
 
   // Station filtering state and setters
   const {
@@ -87,9 +88,9 @@ function Body() {
     () =>
       stationFilter({
         filterValues: filterValuesTransitional,
-        metadata,
+        metadata: data,
       }),
-    [filterValuesTransitional, metadata],
+    [filterValuesTransitional, data],
   );
 
   const selectedStations = useMemo(
@@ -102,30 +103,30 @@ function Body() {
   return (
     <Row className={css.portal}>
       <AdjustableColumns
-        defaultLgs={config.adjustableColumnWidthsDefault}
+        defaultLgs={data.config.adjustableColumnWidthsDefault}
         contents={[
           // "map" ||  // Uncomment to suppress map
           <StationMap
-            {...baseMaps[config.baseMap]}
+            {...baseMaps[data.config.baseMap]}
             stations={filteredStations}
-            metadata={metadata}
+            metadata={data}
             onSetArea={setArea}
-            externalIsPending={metadata.stations === null || filteringIsPending}
+            externalIsPending={data.stations === null || filteringIsPending}
             onReloadStations={actions.reloadStations}
             className={css.mainColumns}
           />,
           <Tabs
             id="non-map-controls"
-            defaultActiveKey={config.defaultTab}
+            defaultActiveKey={data.config.defaultTab}
             className={css.mainTabs}
           >
             <Tab eventKey={"Filters"} title={"Station Filters"}>
-              {config.stationDebugFetchOptions && (
+              {data.config.stationDebugFetchOptions && (
                 <Row>
                   <Col lg={6}>Fetch limit</Col>
                   <Col lg={6}>
                     <Select
-                      options={config.stationDebugFetchLimitsOptions}
+                      options={data.config.stationDebugFetchLimitsOptions}
                       value={stnsLimit}
                       onChange={setStnsLimit}
                     />
@@ -135,7 +136,7 @@ function Body() {
               <Row {...rowClasses}>
                 <Col lg={12} md={12} sm={12}>
                   <SelectionCounts
-                    allStations={metadata.stations}
+                    allStations={data.stations}
                     selectedStations={selectedStations}
                   />
                   <p className={"mb-0"}>
@@ -146,7 +147,7 @@ function Body() {
               <StationFilters
                 state={filterValuesNormal}
                 setState={filterValuesSetState}
-                metadata={metadata}
+                metadata={data}
                 rowClasses={rowClasses}
               />
             </Tab>
@@ -154,20 +155,17 @@ function Body() {
             <Tab eventKey={"Metadata"} title={"Station Metadata"}>
               <Row {...rowClasses}>
                 <SelectionCounts
-                  allStations={metadata.stations}
+                  allStations={data.stations}
                   selectedStations={selectedStations}
                 />
               </Row>
-              <StationMetadata
-                stations={selectedStations}
-                metadata={metadata}
-              />
+              <StationMetadata stations={selectedStations} metadata={data} />
             </Tab>
 
             <Tab eventKey={"Data"} title={"Station Data"}>
               <Row {...rowClasses}>
                 <SelectionCounts
-                  allStations={metadata.stations}
+                  allStations={data.stations}
                   selectedStations={selectedStations}
                 />
                 <SelectionCriteria />
@@ -188,7 +186,7 @@ function Body() {
                 filterValues={filterValuesNormal}
                 selectedStations={selectedStations}
                 dataDownloadUrl={dataDownloadUrl({
-                  config,
+                  config: data.config,
                   filterValues: filterValuesNormal,
                   polygon: area,
                 })}
@@ -198,7 +196,7 @@ function Body() {
             </Tab>
 
             <Tab eventKey={"Networks"} title={"Networks"}>
-              <NetworksMetadata networks={metadata.networks} />
+              <NetworksMetadata networks={data.networks} />
             </Tab>
           </Tabs>,
         ]}

@@ -8,7 +8,7 @@ import flow from "lodash/fp/flow";
 import map from "lodash/fp/map";
 import join from "lodash/fp/join";
 import chroma from "chroma-js";
-import FrequencySelector from "../../selectors/FrequencySelector";
+import FrequencySelector from "../../selectors/FrequencySelector/FrequencySelector";
 
 import logger from "../../../logger";
 

@@ -13,12 +13,12 @@ import {
 } from "../../../utils/station-info";
 
 import { filterTypes } from "../../controls/tables/filterTypes";
-import DefaultColumnFilter from "../../controls/tables/column-filters/DefaultColumnFilter";
+import DefaultColumnFilter from "../../controls/tables/column-filters/DefaultColumnFilter/DefaultColumnFilter";
 
-import FrequencySelector from "../../selectors/FrequencySelector";
-import SelectColumnFilter from "../../controls/tables/column-filters/SelectColumnFilter";
-import NumberRangeColumnFilter from "../../controls/tables/column-filters/NumberRangeColumnFilter";
-import SelectArrayColumnFilter from "../../controls/tables/column-filters/SelectArrayColumnFilter";
+import FrequencySelector from "../../selectors/FrequencySelector/FrequencySelector";
+import SelectColumnFilter from "../../controls/tables/column-filters/SelectColumnFilter/SelectColumnFilter";
+import NumberRangeColumnFilter from "../../controls/tables/column-filters/NumberRangeColumnFilter/NumberRangeColumnFilter";
+import SelectArrayColumnFilter from "../../controls/tables/column-filters/SelectArrayColumnFilter/SelectArrayColumnFilter";
 
 // TODO: Move to utils
 const formatDate = (d) => (d ? d.toISOString().substr(0, 10) : "unknown");

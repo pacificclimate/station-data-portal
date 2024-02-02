@@ -3,7 +3,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { Table } from "react-bootstrap";
 import { reduce } from "lodash/fp";
 import { getObservationCounts } from "../../../api/metadata";
-import InfoPopup from "../../util/InfoPopup";
+import InfoPopup from "../../util/InfoPopup/InfoPopup";
 import logger from "../../../logger";
 import { getTimer } from "../../../utils/timing";
 import { useStore } from "../../../state/state-store";

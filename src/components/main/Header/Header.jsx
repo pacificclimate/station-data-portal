@@ -10,7 +10,7 @@ function Header() {
       <Col lg={3} className="text-left">
         <a href="https://pacificclimate.org/">
           <img
-            src={require("./logo.png")}
+            src="/logo.png"
             width="328"
             height="38"
             alt="Pacific Climate Impacts Consortium"

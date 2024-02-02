@@ -1,8 +1,8 @@
 import PropTypes from "prop-types";
 import React from "react";
 
-import InfoPopup from "../../util/InfoPopup";
-import CheckboxControl from "../CheckboxControl";
+import InfoPopup from "../../util/InfoPopup/InfoPopup";
+import CheckboxControl from "../CheckboxControl/CheckboxControl";
 import "./IncludeStationsWithNoObsControl.css";
 
 export default function IncludeStationsWithNoObsControl(props) {

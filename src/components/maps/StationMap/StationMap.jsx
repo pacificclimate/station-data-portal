@@ -42,8 +42,11 @@ import React, { useMemo, useRef, useTransition } from "react";
 import { FeatureGroup, LayerGroup } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 
-import MapInfoDisplay from "../MapInfoDisplay";
-import { defaultMarkerOptions, ManyStationMarkers } from "../StationMarkers";
+import MapInfoDisplay from "../MapInfoDisplay/MapInfoDisplay";
+import {
+  defaultMarkerOptions,
+  ManyStationMarkers,
+} from "../StationMarkers/StationMarkers";
 import { layersToGeoJSONMultipolygon } from "../../../utils/geoJSON-leaflet";
 
 import logger from "../../../logger";

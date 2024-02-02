@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { Container } from "react-bootstrap";
 
-import Disclaimer from "../../info/Disclaimer";
+import Disclaimer from "../../info/Disclaimer/Disclaimer";
 import Header from "../Header/Header";
-import Body from "../Body";
+import Body from "../Body/Body";
 import useInitializeApp from "./app-initialization";
 import { useStore } from "../../../state/state-store";
 import { Outlet } from "react-router-dom";

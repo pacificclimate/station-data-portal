@@ -3,6 +3,8 @@
   "version": "1.5.0",
   "private": true,
   "dependencies": {
+    "@vitejs/plugin-react-swc": "^3.6.0",
+    "vite-bundle-visualizer": "^1.0.1",
     "axios": "^0.27.2",
     "bootstrap": "^5.1.3",
     "chroma-js": "^2.4.2",
@@ -31,7 +33,6 @@
     "react-range-slider": "^0.2.1",
     "react-router-bootstrap": "^0.26.2",
     "react-router-dom": "^6.21.3",
-    "react-scripts": "5.0.1",
     "react-select": "^5.3.2",
     "react-table": "^7.8.0",
     "sass": "^1.70.0",
@@ -40,10 +41,12 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
     "husky": "^8.0.3",
     "jest-each": "^28.1.1",
     "lint-staged": "^15.2.0",
     "prettier": "3.2.2",
+    "rollup-plugin-license": "^3.2.0",
     "serve": "^13.0.2"
   },
   "lint-staged": {
@@ -55,10 +58,9 @@
     ]
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject",
+    "start": "vite",
+    "build": "vite build",
+    "test": "vite test --env=jsdom",
     "reinstall": "rm -rf ./node_modules; npm install --dev",
     "prepare": "husky install",
     "format": "prettier --write .",

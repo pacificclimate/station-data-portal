@@ -8,17 +8,17 @@ import {
   Routes,
   Route,
 } from "react-router-dom";
-import Body from "./components/main/Body";
+import Body from "./components/main/Body/Body";
 
 import { createRoot } from "react-dom/client";
 
 import "./bootstrap-extension.css";
 import "./index.css";
 
-import App from "./components/main/App";
+import App from "./components/main/App/App";
 import StationPreview, {
   loader as stationLoader,
-} from "./components/preview/StationPreview";
+} from "./components/preview/StationPreview/StationPreview";
 import registerServiceWorker from "./registerServiceWorker";
 
 const router = createBrowserRouter(

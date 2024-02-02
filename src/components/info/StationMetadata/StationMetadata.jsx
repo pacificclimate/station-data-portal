@@ -13,9 +13,9 @@ import {
   Card,
 } from "react-bootstrap";
 
-import InfoPopup from "../../util/InfoPopup";
-import FancyTable from "../../controls/tables/FancyTable";
-import DownloadMetadata from "../../controls/DownloadMetadata";
+import InfoPopup from "../../util/InfoPopup/InfoPopup";
+import FancyTable from "../../controls/tables/FancyTable/FancyTable";
+import DownloadMetadata from "../../controls/DownloadMetadata/DownloadMetadata";
 import { smtColumnInfo, smtData } from "./column-definitions";
 import logger from "../../../logger";
 

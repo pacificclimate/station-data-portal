@@ -96,9 +96,7 @@ export const getStationById = ({ config, stationId, axiosConfig }) => {
 export const getVariablePreview =
   ({ config, stationId, endDate, startDate, axiosConfig }) =>
   (variableId) => {
-    return axios.get(
-      `${process.env.PUBLIC_URL}/pv-${stationId}-${variableId}.json`,
-    );
+    return axios.get(`/pv-${stationId}-${variableId}.json`);
   };
 
 export function getObservationCounts({

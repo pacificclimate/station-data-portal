@@ -1,7 +1,7 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import { makeFilterNumberInputOnChange } from "../../../../utils/filters";
-import ClearButton from "../../misc/ClearButton";
+import ClearButton from "../../misc/ClearButton/ClearButton";
 import styles from "../ColumnFilters.module.css";
 
 // Custom UI for selecting a coordinates (lat, lon pair) near given coordinates.

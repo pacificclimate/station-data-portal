@@ -1,6 +1,6 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
-import ClearButton from "../../misc/ClearButton";
+import ClearButton from "../../misc/ClearButton/ClearButton";
 import styles from "../ColumnFilters.module.css";
 import sortBy from "lodash/fp/sortBy";
 

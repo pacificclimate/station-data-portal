@@ -12,12 +12,12 @@ import fromPairs from "lodash/fp/fromPairs";
 import identity from "lodash/fp/identity";
 import assign from "lodash/fp/assign";
 
-import { composeWithRestArgs } from "../../../utils/fp";
+import { composeWithRestArgs } from "../../../utils/fp/fp";
 import chroma from "chroma-js";
 import logger from "../../../logger";
 import { defaultValue, selectorButtonProps } from "../common";
 import LocalPropTypes from "../../local-prop-types";
-import InfoPopup from "../../util/InfoPopup";
+import InfoPopup from "../../util/InfoPopup/InfoPopup";
 
 import css from "../common.module.css";
 
