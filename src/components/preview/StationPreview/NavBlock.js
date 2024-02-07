@@ -1,17 +1,37 @@
-import React, { useState } from "react";
-import { Button, Card, InputGroup, Form, Stack } from "react-bootstrap";
+import React from "react";
+import {
+  Button,
+  Card,
+  InputGroup,
+  Form,
+  Stack,
+  Spinner,
+} from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
-import startOfMonth from "date-fns/startOfMonth";
-import endOfMonth from "date-fns/endOfMonth";
+import { useShallow } from "zustand/react/shallow";
+import { useStore } from "../../../state/state-store";
 import RangeBlock from "./RangeBlock";
+import EndDateControl from "./EndDateControl";
 
 const NavBlock = () => {
-  let [selectedStart, setSelectedStart] = useState(
-    startOfMonth(new Date("1976-10-30T00:00:00Z")),
+  const data = useStore(
+    useShallow((state) => ({
+      previewStationVariables: state.previewStationVariables,
+      selectedEndDate: state.selectedEndDate,
+      selectedDuration: state.selectedDuration,
+      showLegend: state.showLegend,
+    })),
   );
-  let [selectedEnd, setSelectedEnd] = useState(
-    endOfMonth(new Date("1977-04-30T00:00:00Z")),
-  );
+
+  const actions = useStore((state) => ({
+    setSelectedEndDate: state.setSelectedEndDate,
+    setDurationBeforeEnd: state.setDurationBeforeEnd,
+    toggleLegend: state.toggleLegend,
+  }));
+
+  if (!data.previewStationVariables || !data.selectedEndDate) {
+    return <Spinner />;
+  }
 
   return (
     <Card className="mb-2 mt-2">
@@ -26,9 +46,9 @@ const NavBlock = () => {
           <InputGroup>
             <Form.Select
               aria-label="duration"
-              value="6"
+              value={data.selectedDuration}
               onChange={(e) => {
-                console.log("### duration", e.target.value);
+                actions.setDurationBeforeEnd(e.target.value);
               }}
             >
               <option value="1">1 Month</option>
@@ -36,16 +56,11 @@ const NavBlock = () => {
               <option value="6">6 Months</option>
             </Form.Select>
             <InputGroup.Text id="basic-addon1">Ending</InputGroup.Text>
-            <Form.Control
-              type="date"
-              aria-describedby="basic-addon1"
-              value={selectedEnd.toISOString().split("T")[0]}
-              onChange={(e) => {
-                setSelectedEnd(startOfMonth(new Date(e.target.value)));
-              }}
-            />
+            <EndDateControl initialDate={data.selectedEndDate} />
           </InputGroup>
-          <Button>Hide Variables</Button>
+          <Button onClick={actions.toggleLegend}>
+            {data.showLegend ? "Hide" : "Show"} Legend
+          </Button>
         </Stack>
       </Card.Body>
     </Card>

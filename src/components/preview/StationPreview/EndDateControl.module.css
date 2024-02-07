@@ -1,0 +1,7 @@
+/* Needed to help boostrap style the component inside the wrapper correctly as part
+** of the input group */
+.datepicker input {
+  width: 100%;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}

@@ -1,5 +1,4 @@
 import yaml from "js-yaml";
-import { create } from "lodash";
 import filter from "lodash/fp/filter";
 import isUndefined from "lodash/fp/isUndefined";
 

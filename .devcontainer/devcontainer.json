@@ -31,5 +31,10 @@
     // give a nicer name to the container
     "--name",
     "${localEnv:USER}_stationdata"
-  ]
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": ["EditorConfig.EditorConfig"]
+    }
+  }
 }

@@ -53,13 +53,14 @@ function Body() {
       reloadStations: state.reloadStations,
       loadStations: state.loadStations,
       loadMetadata: state.loadMetadata,
+      isConfigLoaded: state.isConfigLoaded,
     })),
   );
 
   // load data once on initial render after config is loaded
   useEffect(() => {
-    if (isConfigLoaded()) {
-      loadMetadata();
+    if (actions.isConfigLoaded()) {
+      actions.loadMetadata();
     }
   }, [config]);
 
@@ -207,4 +208,5 @@ function Body() {
   );
 }
 
+export const Component = Body;
 export default Body;

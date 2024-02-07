@@ -46,17 +46,15 @@ export function getVariables({ config }) {
   });
 }
 
-export function getFrequencies({ config }) {
-  return axios.get(urljoin(config.sdsUrl, "frequencies"), {
+export const getFrequencies = ({ config }) =>
+  axios.get(urljoin(config.sdsUrl, "frequencies"), {
     params: {
       provinces: config.stationsQpProvinces,
     },
   });
-}
 
-export function getHistories({ config }) {
-  return axios.get(urljoin(config.sdsUrl, "histories"));
-}
+export const getHistories = ({ config }) =>
+  axios.get(urljoin(config.sdsUrl, "histories"));
 
 export function getStations({ config, getParams, axiosConfig }) {
   const parsedStationFilterExpressions = filterExpressionsParser(
@@ -83,23 +81,38 @@ export function getStations({ config, getParams, axiosConfig }) {
   });
 }
 
-export const getStationById = ({ config, stationId, axiosConfig }) => {
-  return axios.get(urljoin(config.sdsUrl, "stations", stationId), {
+export const getStationById = ({ config, stationId, axiosConfig }) =>
+  axios.get(urljoin(config.sdsUrl, "stations", stationId), {
     transformResponse: axios.defaults.transformResponse.concat(
       mapDeep(transformIso8601Date),
     ),
     ...axiosConfig,
   });
-};
 
-// TODO: Connect to real API
-export const getVariablePreview =
-  ({ config, stationId, endDate, startDate, axiosConfig }) =>
-  (variableId) => {
-    return axios.get(
-      `${process.env.PUBLIC_URL}/pv-${stationId}-${variableId}.json`,
+export const getStationVariables = ({ config, stationId }) =>
+  axios.get(
+    urljoin(config.sdsUrl, "stations", stationId.toString(), "variables"),
+  );
+
+export const getStationVariablesObservations =
+  ({ config, stationId, startDate, endDate }) =>
+  (variableId) =>
+    axios.get(
+      urljoin(
+        config.sdsUrl,
+        "stations",
+        stationId.toString(),
+        "variables",
+        variableId.toString(),
+        "observations",
+      ),
+      {
+        params: {
+          start_date: startDate.toISOString(),
+          end_date: endDate.toISOString(),
+        },
+      },
     );
-  };
 
 export function getObservationCounts({
   appConfig: config,

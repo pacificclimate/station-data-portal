@@ -1,23 +1,52 @@
-import React, { useState } from "react";
-import Plot from "react-plotly.js";
+import React from "react";
 import map from "lodash/fp/map";
+import { useShallow } from "zustand/react/shallow";
+import { useStore } from "../../../state/state-store";
 
-const PreviewGraph = ({ plotData }) => {
-  // const [plot, setPlot] = useState({
-  //     data: [], layout: {}, frames: [], config: {}
-  // }, [plotData]);
-  if ((plotData.observations?.length ?? 0) === 0) {
+// Importing a smaller version of plotly allows us to significantly reduce the
+// bundle size (approx 5MB to 1MB) over the full version of plotly.
+// https://github.com/plotly/react-plotly.js?tab=readme-ov-file#customizing-the-plotlyjs-bundle
+import Plotly from "plotly.js-basic-dist";
+import createPlotlyComponent from "react-plotly.js/factory";
+const Plot = createPlotlyComponent(Plotly);
+
+const getPlotData = (state, variableId) => {
+  return (
+    state.previewObservations?.find((v) => v.variable.id === variableId) ?? null
+  );
+};
+
+const PreviewGraph = ({ variableId }) => {
+  const { previewObservations, selectedStartDate, selectedEndDate } = useStore(
+    useShallow((state) => ({
+      previewObservations: getPlotData(state, variableId),
+      selectedStartDate: state.selectedStartDate,
+      selectedEndDate: state.selectedEndDate,
+    })),
+  );
+
+  console.log("### previewObservations", previewObservations);
+
+  if (previewObservations === null) {
+    return <div>Loading...</div>;
+  }
+
+  if ((previewObservations?.observations?.length ?? 0) === 0) {
     return (
-      <div>No data found for {plotData.variable.name} in this time period.</div>
+      <div>
+        No data found for {previewObservations.variable.name} in this time
+        period.
+      </div>
     );
   }
+
   return (
     <Plot
       style={{ width: "100%", height: "400px" }}
       data={[
         {
-          x: map("time", plotData.observations),
-          y: map("value", plotData.observations),
+          x: map("time", previewObservations.observations),
+          y: map("value", previewObservations.observations),
           type: "scatter",
           mode: "lines",
           marker: { color: "red" },
@@ -25,6 +54,7 @@ const PreviewGraph = ({ plotData }) => {
       ]}
       layout={{
         // Setting these margins causes the graph to fill the available space
+        // l (left) and b (bottom) are left slightly larger for axis labels
         margin: {
           t: 20, //top
           l: 50, //left
@@ -36,9 +66,11 @@ const PreviewGraph = ({ plotData }) => {
         xaxis: {
           title: "Time",
           type: "date",
+          autorange: false,
+          range: [selectedStartDate, selectedEndDate],
         },
         yaxis: {
-          title: plotData.variable.unit,
+          title: previewObservations.variable.unit,
         },
       }}
       useResizeHandler={true}

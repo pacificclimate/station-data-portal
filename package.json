@@ -16,7 +16,7 @@
     "lodash": "^4.17.21",
     "memoize-one": "^6.0.0",
     "pcic-react-leaflet-components": "git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git#3.0.1",
-    "plotly.js": "^2.28.0",
+    "plotly.js-basic-dist": "^2.29.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-bootstrap": "^2.4.0",
