@@ -16,7 +16,18 @@ import "./index.css";
 
 import registerServiceWorker from "./registerServiceWorker";
 
-console.log("### process.env.PUBLIC_URL", process.env.PUBLIC_URL);
+let baseName = "/";
+if (process.env.PUBLIC_URL) {
+  if (process.env.PUBLIC_URL.indexOf(".") >= 0) {
+    baseName = new URL(process.env.PUBLIC_URL).pathname;
+  } else {
+    // for development
+    baseName = process.env.PUBLIC_URL;
+  }
+}
+
+console.log("### PUBLIC_URL", process.env.PUBLIC_URL);
+console.log("### baseName", baseName);
 
 // Code split our bundle along our primary routes using the "lazy" function.
 // https://reactrouter.com/en/main/route/lazy
@@ -32,7 +43,7 @@ const router = createBrowserRouter(
     </Route>,
   ),
   {
-    basename: process.env.PUBLIC_URL ? process.env.PUBLIC_URL : "/",
+    basename: baseName,
   },
 );
 
