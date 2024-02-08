@@ -16,12 +16,14 @@ import "./index.css";
 
 import registerServiceWorker from "./registerServiceWorker";
 
+console.log("### process.env.PUBLIC_URL", process.env.PUBLIC_URL);
+
 // Code split our bundle along our primary routes using the "lazy" function.
 // https://reactrouter.com/en/main/route/lazy
 // Stationpreview in particular is large due to including the plotly library.
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<App />}>
+    <Route path="" element={<App />}>
       <Route index lazy={() => import("./components/main/Body")} />
       <Route
         path="preview/:stationId"
@@ -29,6 +31,9 @@ const router = createBrowserRouter(
       />
     </Route>,
   ),
+  {
+    basename: process.env.PUBLIC_URL ? process.env.PUBLIC_URL : "/",
+  },
 );
 
 const container = document.getElementById("root");
