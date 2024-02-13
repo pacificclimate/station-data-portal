@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import yaml from "js-yaml";
 import filter from "lodash/fp/filter";
 import isUndefined from "lodash/fp/isUndefined";
@@ -83,58 +84,55 @@ const getZoomMarkerRadius = (zmrSpec) => {
   };
 };
 
-const loadConfigAction = (set, get) => {
-  return async () => {
-    let config = {};
-    try {
-      const response = await fetch(`${process.env.PUBLIC_URL}/config.yaml`);
-      const yamlConfig = await response.text();
-      const fetchedConfig = yaml.load(yamlConfig);
-      config = { ...defaultConfig, ...fetchedConfig };
-    } catch (error) {
-      set({
-        configError: (
-          <div>
-            Error loading or parsing config.yaml: <pre>{error.toString()}</pre>
-          </div>
-        ),
-      });
-      throw error;
-    }
+const fetchConfig = async () => {
+  let config = {};
+  try {
+    const response = await fetch(`${process.env.PUBLIC_URL}/config.yaml`);
+    const yamlConfig = await response.text();
+    const fetchedConfig = yaml.load(yamlConfig);
+    config = { ...defaultConfig, ...fetchedConfig };
+  } catch (error) {
+    // set({
+    //   configError: (
+    //     <div>
+    //       Error loading or parsing config.yaml: <pre>{error.toString()}</pre>
+    //     </div>
+    //   ),
+    // });
+    throw error;
+  }
 
-    try {
-      checkMissingKeys(config);
-    } catch (error) {
-      set({
-        configError: error.toString(),
-      });
-      throw error;
-    }
+  try {
+    checkMissingKeys(config);
+  } catch (error) {
+    // set({
+    //   configError: error.toString(),
+    // });
+    throw error;
+  }
 
-    // Extend config with some env var values
-    config.appVersion = process.env.REACT_APP_APP_VERSION ?? "unknown";
+  // Extend config with some env var values
+  config.appVersion = process.env.REACT_APP_APP_VERSION ?? "unknown";
 
-    // Extend config with some computed goodies
-    // TODO: Store shouldn't know about data presentation
-    config.stationDebugFetchLimitsOptions = config.stationDebugFetchLimits.map(
-      (value) => ({ value, label: value.toString() }),
-    );
+  // Extend config with some computed goodies
+  // TODO: Store shouldn't know about data presentation
+  config.stationDebugFetchLimitsOptions = config.stationDebugFetchLimits.map(
+    (value) => ({ value, label: value.toString() }),
+  );
 
-    config.zoomToMarkerRadius = getZoomMarkerRadius(
-      config.zoomToMarkerRadiusSpec,
-    );
+  // TODO: config shouldn't be responsible for this
+  config.zoomToMarkerRadius = getZoomMarkerRadius(
+    config.zoomToMarkerRadiusSpec,
+  );
 
-    set({ config });
-  };
+  return config;
 };
 
-export const createConfigSlice = (set, get) => ({
-  config: null,
-  configError: null,
-  isConfigLoaded: () => get().config !== null,
+const CONFIG_QUERY_KEY = ["config"];
 
-  // private actions
-  _loadConfig: loadConfigAction(set, get),
-});
-
-export default createConfigSlice;
+export const useConfig = () =>
+  useQuery({
+    queryKey: CONFIG_QUERY_KEY,
+    queryFn: fetchConfig,
+    staleTime: Infinity, // config should rarely change while on the same version
+  });

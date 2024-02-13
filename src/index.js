@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React from "react";
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -7,6 +7,8 @@ import {
 } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import App from "./components/main/App";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import "bootstrap/dist/css/bootstrap.css";
 import "react-datepicker/dist/react-datepicker.css";
@@ -16,18 +18,27 @@ import "./index.css";
 
 import registerServiceWorker from "./registerServiceWorker";
 
-let baseName = "/";
-if (process.env.PUBLIC_URL) {
-  if (process.env.PUBLIC_URL.indexOf(".") >= 0) {
-    baseName = new URL(process.env.PUBLIC_URL).pathname;
-  } else {
-    // for development
-    baseName = process.env.PUBLIC_URL;
+/**
+ * When deploying the app to a URL that doesn't sit on the domain root we need to let the
+ * app router know the location that it at so it knows what portion of the URL it is
+ * responsible for.
+ *
+ * @returns string The base URL of the app
+ */
+const getBaseName = () => {
+  if (process.env.PUBLIC_URL) {
+    if (process.env.PUBLIC_URL.indexOf(".") >= 0) {
+      return new URL(process.env.PUBLIC_URL).pathname;
+    } else {
+      // for development
+      return process.env.PUBLIC_URL;
+    }
   }
-}
+  return "/";
+};
 
-console.log("### PUBLIC_URL", process.env.PUBLIC_URL);
-console.log("### baseName", baseName);
+// Create a client
+const queryClient = new QueryClient();
 
 // Code split our bundle along our primary routes using the "lazy" function.
 // https://reactrouter.com/en/main/route/lazy
@@ -43,11 +54,16 @@ const router = createBrowserRouter(
     </Route>,
   ),
   {
-    basename: baseName,
+    basename: getBaseName(),
   },
 );
 
 const container = document.getElementById("root");
 const root = createRoot(container);
-root.render(<RouterProvider router={router} />);
+root.render(
+  <QueryClientProvider client={queryClient}>
+    <RouterProvider router={router} />
+    <ReactQueryDevtools initialIsOpen={false} />
+  </QueryClientProvider>,
+);
 registerServiceWorker();

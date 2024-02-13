@@ -18,23 +18,33 @@ const baseHeight = 50;
  * @param {Object} params.index the index of this data track
  * @returns {Object} basicStyle
  **/
-const getTrackStyle = ({ source, target, count, index }) => {
+const getTrackStyle = ({ source, target, count, index, color }) => {
   const height = baseHeight / count / 2;
   const topPosition = -22 + (baseHeight / count) * index + height / 2;
+  console.log("### getTrackStyle", source, target, count, index, color);
   const basicStyle = {
     top: `${topPosition}px`,
     height: `${height}px`,
     left: `${source.percent}%`,
     width: `calc(${target.percent - source.percent}% - 1px)`,
+    backgroundColor: color,
   };
 
   return basicStyle;
 };
 
-const DataTrack = ({ source, target, getTrackProps, count, index, type }) => (
+const DataTrack = ({
+  source,
+  target,
+  getTrackProps,
+  count,
+  index,
+  type,
+  color,
+}) => (
   <div
     className={`react_time_range__data_track${type ? "__" + type : ""}`}
-    style={getTrackStyle({ source, target, count, index })}
+    style={getTrackStyle({ source, target, count, index, color })}
     {...getTrackProps()}
   />
 );

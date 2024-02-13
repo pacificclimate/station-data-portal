@@ -3,8 +3,10 @@ import { useEffect } from "react";
 import L from "leaflet";
 import { setLethargicMapScrolling } from "../../../utils/leaflet-extensions";
 import { setTimingEnabled } from "../../../utils/timing";
+import { useConfig } from "../../../state/query-hooks/use-config";
 
 function initializeApp(config) {
+  console.log("### initializeApp", config);
   if (config === null) {
     return;
   }
@@ -38,8 +40,16 @@ function initializeApp(config) {
   setTimingEnabled(config.timingEnabled);
 }
 
-export default function useInitializeApp(config) {
+/**
+ * This hook loads the config and initializes the app. Primarily setting up Map, Scrolling behaviour and debug timing.
+ *
+ * @returns {void}
+ */
+export default function useInitializeApp() {
+  const { data } = useConfig();
   useEffect(() => {
-    initializeApp(config);
-  }, [config]);
+    if (data) {
+      initializeApp(data);
+    }
+  }, [data]);
 }

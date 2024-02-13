@@ -21,7 +21,7 @@ const GraphsBlock = () => {
       {map((variable) => {
         return (
           <Row key={`${previewStation.id}-${variable.id}`} className="mb-1">
-            <Col xs={graphWidth}>
+            <Col xs={graphWidth} className="d-flex justify-content-center">
               <PreviewGraph variableId={variable.id} />
             </Col>
             {showLegend && (

@@ -6,6 +6,8 @@ import {
   Form,
   Stack,
   Spinner,
+  Row,
+  Col,
 } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { useShallow } from "zustand/react/shallow";
@@ -30,7 +32,19 @@ const NavBlock = () => {
   }));
 
   if (!data.previewStationVariables || !data.selectedEndDate) {
-    return <Spinner />;
+    return (
+      <Row>
+        <Col xs={12}>
+          <Card className="mb-2 mt-2 ">
+            <Card.Body className="d-flex justify-content-center">
+              <Spinner animation="border" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    );
   }
 
   return (

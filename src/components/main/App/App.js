@@ -1,36 +1,22 @@
 import React, { useEffect } from "react";
 import { Container } from "react-bootstrap";
-
 import Disclaimer from "../../info/Disclaimer";
 import Header from "../Header/Header";
-import Body from "../Body";
-import useInitializeApp from "./app-initialization";
-import { useStore } from "../../../state/state-store";
+import useInitializeApp from "./use-initialize-app";
 import { Outlet } from "react-router-dom";
 
 import "./App.css";
+import { useConfig } from "../../../state/query-hooks/use-config";
 
 export default function App() {
-  // must be invoked before any other items dependent on context.
-  const initialize = useStore((state) => state.initialize);
-  const isConfigLoaded = useStore((state) => state.isConfigLoaded);
-  const configErrorMessage = useStore((state) => state.configError);
-  const config = useStore((state) => state.config);
-  const loadMetadata = useStore((state) => state.loadMetadata);
+  const { isLoading, isError } = useConfig();
+  useInitializeApp();
 
-  useEffect(() => {
-    if (!isConfigLoaded() && configErrorMessage === null) {
-      initialize();
-    }
-  });
-
-  useInitializeApp(config);
-
-  if (configErrorMessage !== null) {
+  if (isError) {
     return <div>{configErrorMessage}</div>;
   }
 
-  if (config === null) {
+  if (isLoading) {
     return <div>Loading configuration...</div>;
   }
 

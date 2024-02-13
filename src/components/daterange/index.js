@@ -62,7 +62,7 @@ const getFormattedIntervals = (
   const formattedBlockedDates = blockedDates
     .sort((a, b) => a.start - b.start)
     .map((interval, index) => {
-      let { start, end, type } = interval;
+      let { start, end, type, color } = interval;
 
       if (isBefore(start, startTime)) start = startTime;
       if (isAfter(end, endTime)) end = endTime;
@@ -70,7 +70,7 @@ const getFormattedIntervals = (
       const source = getConfig(start);
       const target = getConfig(end);
 
-      return { id: `${classPrefix}-${index}`, source, target, type };
+      return { id: `${classPrefix}-${index}`, source, target, type, color };
     });
 
   console.log("### formattedBlockedDates", formattedBlockedDates);
@@ -258,18 +258,21 @@ class DateRange extends React.Component {
             <Tracks left={false} right={false}>
               {({ getTrackProps }) => (
                 <>
-                  {dataIntervals.map(({ id, source, target, type }, index) => (
-                    <DataTrack
-                      key={id}
-                      source={source}
-                      target={target}
-                      getTrackProps={getTrackProps}
-                      count={dataIntervals.length}
-                      index={index}
-                      type={type}
-                      disabled
-                    />
-                  ))}
+                  {dataIntervals.map(
+                    ({ id, source, target, type, color }, index) => (
+                      <DataTrack
+                        key={id}
+                        source={source}
+                        target={target}
+                        getTrackProps={getTrackProps}
+                        count={dataIntervals.length}
+                        index={index}
+                        type={type}
+                        color={color}
+                        disabled
+                      />
+                    ),
+                  )}
                 </>
               )}
             </Tracks>

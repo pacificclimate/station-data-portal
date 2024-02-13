@@ -54,16 +54,16 @@ import { MapSpinner } from "pcic-react-leaflet-components";
 import { useImmer } from "use-immer";
 import { useStore } from "../../../state/state-store";
 import { StationRefresh } from "../StationRefresh/StationRefresh";
+import { useConfig } from "../../../state/query-hooks/use-config";
 
 logger.configure({ active: true });
 const smtimer = getTimer("StationMarker timing");
 smtimer.log();
 
 function StationMap({
+  stations,
   BaseMap,
   initialViewport,
-  stations,
-  metadata,
   onSetArea = () => {},
   userShapeStyle = {
     color: "#f49853",
@@ -76,7 +76,7 @@ function StationMap({
   // should be true if and only if slow updates to the map are pending
   // due to an external update.
 }) {
-  const config = useStore((state) => state.config);
+  const { data: config } = useConfig();
   const userShapeLayerRef = useRef();
 
   // TODO: Remove
@@ -121,7 +121,6 @@ function StationMap({
     () => (
       <ManyStationMarkers
         stations={stations}
-        metadata={metadata}
         markerOptions={markerOptions}
         mapEvents={markerMapEvents}
       />
@@ -187,8 +186,6 @@ StationMap = React.memo(StationMap);
 StationMap.propTypes = {
   BaseMap: PropTypes.func.isRequired,
   initialViewport: PropTypes.object.isRequired,
-  stations: PropTypes.array.isRequired,
-  metadata: PropTypes.object,
   onSetArea: PropTypes.func,
 };
 

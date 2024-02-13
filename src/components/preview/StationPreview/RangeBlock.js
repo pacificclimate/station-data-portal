@@ -14,6 +14,7 @@ const millisedondsPerDay = 86400000;
 
 const RangeBlock = ({}) => {
   const {
+    config,
     minStartDate,
     maxEndDate,
     selectedStartDate,
@@ -22,6 +23,7 @@ const RangeBlock = ({}) => {
     setSelectedEndDate,
     previewStationVariables,
   } = useStore((state) => ({
+    config: state.config,
     minStartDate: state.minStartDate,
     maxEndDate: state.maxEndDate,
     selectedStartDate: state.selectedStartDate,
@@ -74,6 +76,7 @@ const RangeBlock = ({}) => {
   //   return curr;
   // };
 
+  console.log("### config", config);
   return (
     <DateRange
       error={error}
@@ -89,6 +92,7 @@ const RangeBlock = ({}) => {
         start: new Date(data.min_obs_time),
         end: new Date(data.max_obs_time),
         type: "observation",
+        color: config.plotColor,
       }))}
       //hideHandles={true}
     />

@@ -21,16 +21,20 @@ import {
   uniqStationObsPeriods,
   uniqStationVariableNames,
 } from "../../../utils/station-info";
-import { useStore } from "../../../state/state-store";
+import { useConfig } from "../../../state/query-hooks/use-config";
+import { useNetworks } from "../../../state/query-hooks/use-networks";
+import { useVariables } from "../../../state/query-hooks/use-variables";
 
 logger.configure({ active: true });
 
 const formatDate = (d) => (d ? d.toISOString().substr(0, 10) : "unknown");
 
-function StationPopup({ station, metadata }) {
-  const config = useStore((state) => state.config);
+function StationPopup({ station }) {
+  const { data: config } = useConfig();
+  const { data: networks } = useNetworks();
+  const { data: variables } = useVariables();
 
-  const network = stationNetwork(metadata.networks, station);
+  const network = stationNetwork(networks, station);
   const networkColor = chroma(network.color ?? config.defaultNetworkColor)
     .alpha(0.5)
     .css();
@@ -87,7 +91,7 @@ function StationPopup({ station, metadata }) {
     </ul>
   );
 
-  const usvns = uniqStationVariableNames(metadata.variables, station);
+  const usvns = uniqStationVariableNames(variables, station);
   const variableNames =
     usvns.length === 0 ? (
       <em>No observations</em>
@@ -157,7 +161,6 @@ function StationPopup({ station, metadata }) {
 
 StationPopup.propTypes = {
   station: PropTypes.object.isRequired,
-  metadata: PropTypes.object.isRequired,
 };
 
 export default StationPopup;

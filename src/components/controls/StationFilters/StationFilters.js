@@ -34,6 +34,9 @@ import DateSelector from "../../selectors/DateSelector";
 import OnlyWithClimatologyControl from "../../controls/OnlyWithClimatologyControl";
 import { commonSelectorStyles } from "../../selectors/styles";
 import { usePairedImmerByKey } from "../../../hooks";
+import { useNetworks } from "../../../state/query-hooks/use-networks";
+import { useVariables } from "../../../state/query-hooks/use-variables";
+import { useFrequencies } from "../../../state/query-hooks/use-frequencies";
 
 export const useStationFiltering = () => {
   const { normal, transitional, isPending, setState } = usePairedImmerByKey({
@@ -58,13 +61,12 @@ export const useStationFiltering = () => {
 function StationFilters({
   state,
   setState,
-  metadata: {
-    networks: allNetworks,
-    variables: allVariables,
-    frequencies: allFrequencies,
-  },
   rowClasses = { className: "mb-3" },
 }) {
+  const { data: allNetworks } = useNetworks();
+  const { data: allVariables } = useVariables();
+  const { data: allFrequencies } = useFrequencies();
+
   return (
     <React.Fragment>
       <Row {...rowClasses}>

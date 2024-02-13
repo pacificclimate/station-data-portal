@@ -20,13 +20,14 @@ import { smtColumnInfo, smtData } from "./column-definitions";
 import logger from "../../../logger";
 
 import "./StationMetadata.css";
+import { useNetworks } from "../../../state/query-hooks/use-networks";
+import { useVariables } from "../../../state/query-hooks/use-variables";
 
 logger.configure({ active: true });
 
-function StationMetadata({
-  stations,
-  metadata: { networks: allNetworks, variables: allVariables },
-}) {
+function StationMetadata({ stations }) {
+  const { data: allNetworks } = useNetworks();
+  const { data: allVariables } = useVariables();
   const [helpVisible, setHelpVisible] = useState(false);
   const [compact, setCompact] = useState(false);
   const [isPending, startTransition] = useTransition();

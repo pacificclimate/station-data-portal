@@ -4,10 +4,12 @@ import { Tooltip } from "react-leaflet";
 import { stationNetwork, uniqStationNames } from "../../../utils/station-info";
 import flow from "lodash/fp/flow";
 import join from "lodash/fp/join";
+import { useNetworks } from "../../../state/query-hooks/use-networks";
 import "./StationTooltip.css";
 
-function StationTooltip({ station, metadata }) {
-  const network = stationNetwork(metadata.networks, station);
+function StationTooltip({ station }) {
+  const { data: networks } = useNetworks();
+  const network = stationNetwork(networks, station);
   const stationNames = flow(uniqStationNames, join(", "))(station);
 
   return (
@@ -19,7 +21,6 @@ function StationTooltip({ station, metadata }) {
 
 StationTooltip.propTypes = {
   station: PropTypes.object.isRequired,
-  metadata: PropTypes.object.isRequired,
 };
 
 export default StationTooltip;

@@ -1,9 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useImmerByKey } from "../../../hooks";
-import { Button, Card, Col, Row, Tab, Tabs } from "react-bootstrap";
+import { Col, Row, Tab, Tabs } from "react-bootstrap";
 import Select from "react-select";
-
-import css from "../common.module.css";
 
 import logger from "../../../logger";
 import {
@@ -28,47 +25,40 @@ import StationFilters, {
 import baseMaps from "../../maps/baseMaps";
 import { useStore } from "../../../state/state-store";
 import { useShallow } from "zustand/react/shallow";
+import { useConfig } from "../../../state/query-hooks/use-config";
+import { useStations } from "../../../state/query-hooks/use-stations";
+import { useVariables } from "../../../state/query-hooks/use-variables";
+import { useFrequencies } from "../../../state/query-hooks/use-frequencies";
+
+import css from "../common.module.css";
 
 logger.configure({ active: true });
 
 function Body() {
-  const config = useStore((state) => state.config);
-
-  // metadata are the data items that can be watched for changes and
-  // should probably cause a re-render.
-  const metadata = useStore(
-    useShallow((state) => ({
-      networks: state.networks,
-      stations: state.stations,
-      variables: state.variables,
-      frequencies: state.frequencies,
-      stationsLimit: state.stationsLimit,
-    })),
-  );
+  const { data: config } = useConfig();
+  const {
+    data: stations,
+    isLoading: isStationsLoading,
+    isError: isStationsError,
+  } = useStations();
+  const {
+    data: variables,
+    isLoading: isVariablesLoading,
+    isError: isVariablesError,
+  } = useVariables();
+  const {
+    data: frequencies,
+    isLoading: isFrequenciesLoading,
+    isError: isFrequenciesError,
+  } = useFrequencies();
 
   // actions should be fixed functions on the store, so they shouldn't really change
   const actions = useStore(
     useShallow((state) => ({
       setStationsLimit: state.setStationsLimit,
       reloadStations: state.reloadStations,
-      loadStations: state.loadStations,
-      loadMetadata: state.loadMetadata,
-      isConfigLoaded: state.isConfigLoaded,
     })),
   );
-
-  // load data once on initial render after config is loaded
-  useEffect(() => {
-    if (actions.isConfigLoaded()) {
-      actions.loadMetadata();
-    }
-  }, [config]);
-
-  useEffect(() => {
-    if (config) {
-      actions.loadStations();
-    }
-  }, [config]);
 
   // Station filtering state and setters
   const {
@@ -88,9 +78,9 @@ function Body() {
     () =>
       stationFilter({
         filterValues: filterValuesTransitional,
-        metadata,
+        metadata: { stations, variables },
       }),
-    [filterValuesTransitional, metadata],
+    [filterValuesTransitional, stations, variables],
   );
 
   const selectedStations = useMemo(
@@ -109,9 +99,8 @@ function Body() {
           <StationMap
             {...baseMaps[config.baseMap]}
             stations={filteredStations}
-            metadata={metadata}
             onSetArea={setArea}
-            externalIsPending={metadata.stations === null || filteringIsPending}
+            externalIsPending={isStationsLoading || filteringIsPending}
             onReloadStations={actions.reloadStations}
             className={css.mainColumns}
           />,
@@ -136,7 +125,7 @@ function Body() {
               <Row {...rowClasses}>
                 <Col lg={12} md={12} sm={12}>
                   <SelectionCounts
-                    allStations={metadata.stations}
+                    allStations={stations}
                     selectedStations={selectedStations}
                   />
                   <p className={"mb-0"}>
@@ -147,7 +136,6 @@ function Body() {
               <StationFilters
                 state={filterValuesNormal}
                 setState={filterValuesSetState}
-                metadata={metadata}
                 rowClasses={rowClasses}
               />
             </Tab>
@@ -155,20 +143,17 @@ function Body() {
             <Tab eventKey={"Metadata"} title={"Station Metadata"}>
               <Row {...rowClasses}>
                 <SelectionCounts
-                  allStations={metadata.stations}
+                  allStations={stations}
                   selectedStations={selectedStations}
                 />
               </Row>
-              <StationMetadata
-                stations={selectedStations}
-                metadata={metadata}
-              />
+              <StationMetadata stations={selectedStations} />
             </Tab>
 
             <Tab eventKey={"Data"} title={"Station Data"}>
               <Row {...rowClasses}>
                 <SelectionCounts
-                  allStations={metadata.stations}
+                  allStations={stations}
                   selectedStations={selectedStations}
                 />
                 <SelectionCriteria />
@@ -199,7 +184,7 @@ function Body() {
             </Tab>
 
             <Tab eventKey={"Networks"} title={"Networks"}>
-              <NetworksMetadata networks={metadata.networks} />
+              <NetworksMetadata />
             </Tab>
           </Tabs>,
         ]}

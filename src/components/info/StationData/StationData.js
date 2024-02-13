@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { Button, ButtonToolbar, Col, Row } from "react-bootstrap";
 import capitalize from "lodash/fp/capitalize";
 import map from "lodash/fp/map";
-import { useStore } from "../../../state/state-store";
 import FileFormatSelector from "../../selectors/FileFormatSelector";
 import ClipToDateControl from "../../controls/ClipToDateControl";
 import ObservationCounts from "../../info/ObservationCounts";
@@ -12,6 +11,7 @@ import InfoPopup from "../../util/InfoPopup";
 import logger from "../../../logger";
 
 import "./StationData.css";
+import { useConfig } from "../../../state/query-hooks/use-config";
 
 logger.configure({ active: true });
 
@@ -22,7 +22,7 @@ function StationData({
   dataDownloadFilename,
   rowClasses,
 }) {
-  const config = useStore((state) => state.config);
+  const { data: config } = useConfig();
   const [fileFormat, setFileFormat] = useState();
   const [clipToDate, setClipToDate] = useState(false);
   const toggleClipToDate = () => setClipToDate(!clipToDate);

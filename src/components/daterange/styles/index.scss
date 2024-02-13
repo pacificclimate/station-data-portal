@@ -60,11 +60,9 @@ $react-time-range--track--disabled: repeating-linear-gradient(
   z-index: 2;
   &__observation {
     @extend .react_time_range__data_track;
-    background-color: red;
   }
   &__climatology {
     @extend .react_time_range__data_track;
-    background-color: green;
   }
 }
 

@@ -9,12 +9,14 @@ import { useSortBy, useTable } from "react-table";
 import logger from "../../../logger";
 import chroma from "chroma-js";
 import "./NetworksMetadata.css";
-import { useStore } from "../../../state/state-store";
+import { useConfig } from "../../../state/query-hooks/use-config";
+import { useNetworks } from "../../../state/query-hooks/use-networks";
 
 logger.configure({ active: true });
 
-function NetworksMetadata({ networks }) {
-  const config = useStore((state) => state.config);
+function NetworksMetadata() {
+  const { data: config } = useConfig();
+  const { data, isLoading, isError } = useNetworks();
 
   const columns = React.useMemo(
     () => [
@@ -61,84 +63,85 @@ function NetworksMetadata({ networks }) {
         accessor: "station_count",
       },
     ],
-    [config.defaultNetworkColor],
+    [config?.defaultNetworkColor],
   );
 
-  const data = React.useMemo(() => networks ?? [], [networks]);
+  // TODO: do I need to add back the networks use memo?
 
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    useTable(
-      {
-        columns,
-        data,
-        initialState: {
-          sortBy: [{ id: "Short Name" }],
-        },
-      },
-      useSortBy,
-    );
+  // const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
+  //   useTable(
+  //     {
+  //       columns,
+  //       data: (isLoading ? [] : data),
+  //       initialState: {
+  //         sortBy: [{ id: "Short Name" }],
+  //       },
+  //     },
+  //     useSortBy,
+  //   );
 
-  if (networks === null) {
+  if (isLoading) {
     return "Loading...";
   }
 
-  return (
-    <div>
-      <Table {...getTableProps()}>
-        <thead>
-          {
-            // Header rows
-            headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {
-                  // Header cells
-                  headerGroup.headers.map((column) => {
-                    const sortClass = column.isSorted
-                      ? column.isSortedDesc
-                        ? "sorted-desc"
-                        : "sorted-asc"
-                      : "";
-                    return (
-                      <th
-                        {...column.getHeaderProps({
-                          ...column.getSortByToggleProps(),
-                          className: sortClass,
-                        })}
-                      >
-                        {column.render("Header")}
-                      </th>
-                    );
-                  })
-                }
-              </tr>
-            ))
-          }
-        </thead>
+  return <div>Networks Table</div>;
+  // return (
+  //   <div>
+  //     <Table {...getTableProps()}>
+  //       <thead>
+  //         {
+  //           // Header rows
+  //           headerGroups.map((headerGroup) => (
+  //             <tr {...headerGroup.getHeaderGroupProps()}>
+  //               {
+  //                 // Header cells
+  //                 headerGroup.headers.map((column) => {
+  //                   const sortClass = column.isSorted
+  //                     ? column.isSortedDesc
+  //                       ? "sorted-desc"
+  //                       : "sorted-asc"
+  //                     : "";
+  //                   return (
+  //                     <th
+  //                       {...column.getHeaderProps({
+  //                         ...column.getSortByToggleProps(),
+  //                         className: sortClass,
+  //                       })}
+  //                     >
+  //                       {column.render("Header")}
+  //                     </th>
+  //                   );
+  //                 })
+  //               }
+  //             </tr>
+  //           ))
+  //         }
+  //       </thead>
 
-        <tbody {...getTableBodyProps()}>
-          {
-            // Body rows
-            rows.map((row) => {
-              // Prepare the row for display
-              prepareRow(row);
-              return (
-                <tr {...row.getRowProps()}>
-                  {
-                    // Body cells
-                    row.cells.map((cell) => {
-                      return (
-                        <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
-                      );
-                    })
-                  }
-                </tr>
-              );
-            })
-          }
-        </tbody>
-      </Table>
-    </div>
-  );
+  //       <tbody {...getTableBodyProps()}>
+  //         {
+  //           // Body rows
+  //           rows.map((row) => {
+  //             // Prepare the row for display
+  //             prepareRow(row);
+  //             return (
+  //               <tr {...row.getRowProps()}>
+  //                 {
+  //                   // Body cells
+  //                   row.cells.map((cell) => {
+  //                     return (
+  //                       <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+  //                     );
+  //                   })
+  //                 }
+  //               </tr>
+  //             );
+  //           })
+  //         }
+  //       </tbody>
+  //     </Table>
+  //   </div>
+  // );
 }
 
 NetworksMetadata.propTypes = {

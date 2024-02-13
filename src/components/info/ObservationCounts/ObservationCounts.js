@@ -2,13 +2,12 @@ import PropTypes from "prop-types";
 import React, { useEffect, useState, useMemo } from "react";
 import { Table } from "react-bootstrap";
 import { reduce } from "lodash/fp";
-import { getObservationCounts } from "../../../api/metadata";
 import InfoPopup from "../../util/InfoPopup";
 import logger from "../../../logger";
 import { getTimer } from "../../../utils/timing";
-import { useStore } from "../../../state/state-store";
-
 import "./ObservationCounts.css";
+import { useConfig } from "../../../state/query-hooks/use-config";
+import { useObservationCounts } from "../../../state/query-hooks/use-observation-counts";
 
 logger.configure({ active: true });
 const timer = getTimer("Observation count timing");
@@ -32,24 +31,20 @@ function ObservationCounts({
   clipToDate,
   stations,
 }) {
-  const appConfig = useStore((state) => state.config);
-  const [countData, setCountData] = useState(null);
-
-  useEffect(() => {
-    setCountData(null);
-    getObservationCounts({
-      appConfig,
-      getParams: {
-        start_date: clipToDate ? dateToStrForQuery(startDate) : undefined,
-        end_date: clipToDate ? dateToStrForQuery(endDate) : undefined,
-      },
-    }).then((response) => setCountData(response.data));
-  }, [appConfig, clipToDate, startDate, endDate]);
+  const { data: config } = useConfig();
+  const {
+    data: countData,
+    isLoading,
+    isError,
+  } = useObservationCounts(
+    dateToStrForQuery(startDate),
+    dateToStrForQuery(endDate),
+  );
 
   const loadingMessage = "Loading ...";
 
   const countTotals = useMemo(() => {
-    if (countData === null) {
+    if (isLoading || countData === null) {
       return { observations: null, climatologies: null };
     }
     const monthlyObservations = totalCounts(

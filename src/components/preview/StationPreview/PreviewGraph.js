@@ -1,4 +1,5 @@
 import React from "react";
+import { Spinner } from "react-bootstrap";
 import map from "lodash/fp/map";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "../../../state/state-store";
@@ -17,18 +18,25 @@ const getPlotData = (state, variableId) => {
 };
 
 const PreviewGraph = ({ variableId }) => {
-  const { previewObservations, selectedStartDate, selectedEndDate } = useStore(
-    useShallow((state) => ({
-      previewObservations: getPlotData(state, variableId),
-      selectedStartDate: state.selectedStartDate,
-      selectedEndDate: state.selectedEndDate,
-    })),
-  );
+  const { previewObservations, selectedStartDate, selectedEndDate, config } =
+    useStore(
+      useShallow((state) => ({
+        previewObservations: getPlotData(state, variableId),
+        selectedStartDate: state.selectedStartDate,
+        selectedEndDate: state.selectedEndDate,
+        showLegend: state.showLegend,
+        config: state.config,
+      })),
+    );
 
   console.log("### previewObservations", previewObservations);
 
   if (previewObservations === null) {
-    return <div>Loading...</div>;
+    return (
+      <Spinner animation="border" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </Spinner>
+    );
   }
 
   if ((previewObservations?.observations?.length ?? 0) === 0) {
@@ -49,7 +57,7 @@ const PreviewGraph = ({ variableId }) => {
           y: map("value", previewObservations.observations),
           type: "scatter",
           mode: "lines",
-          marker: { color: "red" },
+          marker: { color: config.plotColor },
         },
       ]}
       layout={{
@@ -62,7 +70,7 @@ const PreviewGraph = ({ variableId }) => {
           b: 50, //bottom
         },
         autosize: true,
-        title: null, //plotData.variable.name,
+        title: showLegend ? null : previewObservations.variable.name,
         xaxis: {
           title: "Time",
           type: "date",

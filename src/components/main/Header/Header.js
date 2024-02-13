@@ -1,10 +1,10 @@
 import React from "react";
 import { Row, Col } from "react-bootstrap";
-import { useStore } from "../../../state/state-store";
 import "./Header.css";
+import { useConfig } from "../../../state/query-hooks/use-config";
 
 function Header() {
-  const config = useStore((state) => state.config);
+  const { data: config } = useConfig();
   return (
     <Row className={"Header"}>
       <Col lg={3} className="text-left">
