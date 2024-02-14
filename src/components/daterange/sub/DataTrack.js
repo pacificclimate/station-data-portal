@@ -21,12 +21,11 @@ const baseHeight = 50;
 const getTrackStyle = ({ source, target, count, index, color }) => {
   const height = baseHeight / count / 2;
   const topPosition = -22 + (baseHeight / count) * index + height / 2;
-  console.log("### getTrackStyle", source, target, count, index, color);
   const basicStyle = {
     top: `${topPosition}px`,
     height: `${height}px`,
     left: `${source.percent}%`,
-    width: `calc(${target.percent - source.percent}% - 1px)`,
+    width: `calc(${target.percent - source.percent}% + 1px)`,
     backgroundColor: color,
   };
 

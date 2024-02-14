@@ -1,43 +1,24 @@
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, Link } from "react-router-dom";
 import React, { useEffect } from "react";
-import { Container, Spinner } from "react-bootstrap";
-import { useShallow } from "zustand/react/shallow";
-import { useStore } from "../../../state/state-store";
+import { Container, Spinner, Row, Col } from "react-bootstrap";
 import HeaderBlock from "./HeaderBlock";
 import NavBlock from "./NavBlock";
 import GraphsBlock from "./GraphsBlock";
+import { useStation } from "../../../state/query-hooks/use-station";
+import { useStationVariablesDefaults } from "../../../state/client-server-hooks/use-station-variables-defaults";
 
 export default function StationPreview() {
   const urlParams = useLoaderData();
-  const data = useStore(
-    useShallow((state) => ({
-      previewStation: state.previewStation,
-      previewVariables: state.previewStationVariables,
-      config: state.config,
-    })),
-  );
-  const actions = useStore((state) => ({
-    isConfigLoaded: state.isConfigLoaded,
-    loadPreviewStation: state.loadPreviewStation,
-    loadPreviewStationVariables: state.loadPreviewStationVariables,
-  }));
+  // initialize the zustand store with defaults based on data loaded from react query.
+  const {
+    data: previewStation,
+    isLoading: isStationLoading,
+    isError: isStationError,
+  } = useStation(urlParams.stationId);
+  const { data: previewStationVariables, isLoading } =
+    useStationVariablesDefaults(urlParams.stationId);
 
-  // load station we want to do a preview for, this may be instant if the stations are
-  // already loaded into the metadata. If missing it will ask the server
-  useEffect(() => {
-    if (actions.isConfigLoaded()) {
-      actions.loadPreviewStation(urlParams.stationId);
-    }
-  }, [data.config, urlParams.stationId]);
-
-  // once station is loaded we need to load our preview information
-  useEffect(() => {
-    if (actions.isConfigLoaded() && data.previewStation) {
-      actions.loadPreviewStationVariables(data.previewStation.id);
-    }
-  }, [data.config, data.previewStation]);
-
-  if (!data.previewStation) {
+  if (isLoading || isStationLoading) {
     return (
       <Container fluid className="StationPreview">
         <Spinner animation="border" role="status">
@@ -47,11 +28,17 @@ export default function StationPreview() {
     );
   }
 
+  const hasVariables = (previewStationVariables?.variables?.length ?? 0) > 0;
+
   return (
     <Container className="StationPreview mt-2">
       <HeaderBlock />
-      <NavBlock />
-      <GraphsBlock />
+      {hasVariables && (
+        <>
+          <NavBlock />
+          <GraphsBlock />
+        </>
+      )}
     </Container>
   );
 }

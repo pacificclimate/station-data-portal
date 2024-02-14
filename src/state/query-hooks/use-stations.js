@@ -6,6 +6,7 @@ import isString from "lodash/fp/isString";
 import { useQuery } from "@tanstack/react-query";
 import { mapDeep } from "../../utils/fp";
 import { useConfig } from "./use-config";
+import { useStore } from "../state-store";
 import { filterExpressionsParser, filterPredicate } from "./filtering";
 
 // TODO: should this be replaced with date-fns?
@@ -21,7 +22,7 @@ function transformIso8601Date(value) {
   return isDateString ? new Date(Date.parse(value)) : value;
 }
 
-export const getStations = async ({ config }) => {
+export const getStations = async ({ config, stationLimit }) => {
   const parsedStationFilterExpressions = filterExpressionsParser(
     config.stationFilters,
   );
@@ -32,7 +33,7 @@ export const getStations = async ({ config }) => {
   const { data } = await axios.get(urljoin(config.sdsUrl, "stations"), {
     params: {
       offset: config.stationOffset,
-      limit: config.stationLimit,
+      limit: stationLimit,
       stride: config.stationStride,
       provinces: config.stationsQpProvinces,
     },
@@ -50,10 +51,11 @@ export const STATIONS_QUERY_KEY = "stations";
 
 export const useStations = () => {
   const { data: config } = useConfig();
+  const stationLimit = useStore((state) => state.stationLimit);
 
   return useQuery({
     queryKey: [STATIONS_QUERY_KEY],
-    queryFn: () => getStations({ config }),
+    queryFn: () => getStations({ config, stationLimit }),
     enabled: !!config,
     staleTime: 1000 * 60 * 60 * 24, // 24 hours
   });

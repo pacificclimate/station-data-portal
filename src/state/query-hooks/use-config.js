@@ -84,32 +84,17 @@ const getZoomMarkerRadius = (zmrSpec) => {
   };
 };
 
+/**
+ * Layer 1. Server fetch and config parsing.
+ * @returns {Promise<object>}
+ */
 const fetchConfig = async () => {
-  let config = {};
-  try {
-    const response = await fetch(`${process.env.PUBLIC_URL}/config.yaml`);
-    const yamlConfig = await response.text();
-    const fetchedConfig = yaml.load(yamlConfig);
-    config = { ...defaultConfig, ...fetchedConfig };
-  } catch (error) {
-    // set({
-    //   configError: (
-    //     <div>
-    //       Error loading or parsing config.yaml: <pre>{error.toString()}</pre>
-    //     </div>
-    //   ),
-    // });
-    throw error;
-  }
+  const response = await fetch(`${process.env.PUBLIC_URL}/config.yaml`);
+  const yamlConfig = await response.text();
+  const fetchedConfig = yaml.load(yamlConfig);
+  const config = { ...defaultConfig, ...fetchedConfig };
 
-  try {
-    checkMissingKeys(config);
-  } catch (error) {
-    // set({
-    //   configError: error.toString(),
-    // });
-    throw error;
-  }
+  checkMissingKeys(config);
 
   // Extend config with some env var values
   config.appVersion = process.env.REACT_APP_APP_VERSION ?? "unknown";
@@ -130,6 +115,10 @@ const fetchConfig = async () => {
 
 const CONFIG_QUERY_KEY = ["config"];
 
+/**
+ * Layer 2. Query caching, async state management and request deduplication.
+ * @returns {object}
+ */
 export const useConfig = () =>
   useQuery({
     queryKey: CONFIG_QUERY_KEY,

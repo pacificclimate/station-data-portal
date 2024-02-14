@@ -1,20 +1,43 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import map from "lodash/fp/map";
 import { Accordion, Table, Row, Col, Spinner } from "react-bootstrap";
+import { useStation } from "../../../state/query-hooks/use-station";
 import { useStore } from "../../../state/state-store";
 
 export const HeaderBlock = () => {
-  const { previewStation } = useStore((state) => ({
-    previewStation: state.previewStation,
-  }));
+  const stationId = useStore((state) => state.stationId);
+  const { data: previewStation, isLoading, isError } = useStation(stationId);
 
-  if (!previewStation) {
+  if (isLoading) {
     return (
       <Row>
         <Col xs={12} className="d-flex justify-content-center">
           <Spinner animation="border" role="status">
             <span className="visually-hidden">Loading...</span>
           </Spinner>
+        </Col>
+      </Row>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Row>
+        <Col xs={12}>
+          <h1>Error loading station data.</h1>
+          <Link to="/">Return to map</Link>
+        </Col>
+      </Row>
+    );
+  }
+
+  if (!(previewStation.histories?.length ?? 0 > 0)) {
+    return (
+      <Row>
+        <Col xs={12}>
+          <h1>Station {previewStation.id} has no histories to display.</h1>
+          <Link to="/">Return to map</Link>
         </Col>
       </Row>
     );

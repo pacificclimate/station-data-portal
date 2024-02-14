@@ -29,6 +29,7 @@ import { useConfig } from "../../../state/query-hooks/use-config";
 import { useStations } from "../../../state/query-hooks/use-stations";
 import { useVariables } from "../../../state/query-hooks/use-variables";
 import { useFrequencies } from "../../../state/query-hooks/use-frequencies";
+import { useNetworks } from "../../../state/query-hooks/use-networks";
 
 import css from "../common.module.css";
 
@@ -51,8 +52,12 @@ function Body() {
     isLoading: isFrequenciesLoading,
     isError: isFrequenciesError,
   } = useFrequencies();
+  const {
+    data: networks,
+    isLoading: networksLoading,
+    isError: networksError,
+  } = useNetworks();
 
-  // actions should be fixed functions on the store, so they shouldn't really change
   const actions = useStore(
     useShallow((state) => ({
       setStationsLimit: state.setStationsLimit,
@@ -117,7 +122,7 @@ function Body() {
                     <Select
                       options={config.stationDebugFetchLimitsOptions}
                       value={stnsLimit}
-                      onChange={setStnsLimit}
+                      onChange={actions.setStnsLimit}
                     />
                   </Col>
                 </Row>
@@ -184,7 +189,7 @@ function Body() {
             </Tab>
 
             <Tab eventKey={"Networks"} title={"Networks"}>
-              <NetworksMetadata />
+              <NetworksMetadata networks={networks} />
             </Tab>
           </Tabs>,
         ]}

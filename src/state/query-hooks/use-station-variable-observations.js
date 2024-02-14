@@ -1,10 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import urljoin from "url-join";
+import formatISO from "date-fns/formatISO";
 import { useConfig } from "./use-config";
+import { useStore } from "../state-store";
 
 export const STATION_VARIABLE_OBSERVATIONS_QUERY_KEY =
   "station-variable-observations";
+
+const formatDateForApi = (date) => {
+  return formatISO(date, {
+    representation: "date",
+  });
+};
 
 export const getStationVariablesObservations = async ({
   config,
@@ -24,8 +32,8 @@ export const getStationVariablesObservations = async ({
     ),
     {
       params: {
-        start_date: startDate.toISOString(),
-        end_date: endDate.toISOString(),
+        start_date: formatDateForApi(startDate),
+        end_date: formatDateForApi(endDate),
       },
     },
   );
@@ -39,6 +47,12 @@ export const useStationVariableObservations = (
   endDate,
 ) => {
   const { data: config } = useConfig();
+
+  if (!stationId || !variableId || !startDate || !endDate) {
+    throw new Error(
+      "stationId, variableId, startDate, and endDate are required",
+    );
+  }
 
   return useQuery({
     queryKey: [

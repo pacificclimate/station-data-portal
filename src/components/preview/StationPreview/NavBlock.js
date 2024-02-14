@@ -11,27 +11,29 @@ import {
 } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { useShallow } from "zustand/react/shallow";
-import { useStore } from "../../../state/state-store";
 import RangeBlock from "./RangeBlock";
 import EndDateControl from "./EndDateControl";
+import { useStationVariables } from "../../../state/query-hooks/use-station-variables";
+import { useStore } from "../../../state/state-store";
 
 const NavBlock = () => {
   const data = useStore(
     useShallow((state) => ({
-      previewStationVariables: state.previewStationVariables,
-      selectedEndDate: state.selectedEndDate,
-      selectedDuration: state.selectedDuration,
       showLegend: state.showLegend,
+      stationId: state.stationId,
     })),
   );
-
   const actions = useStore((state) => ({
-    setSelectedEndDate: state.setSelectedEndDate,
     setDurationBeforeEnd: state.setDurationBeforeEnd,
     toggleLegend: state.toggleLegend,
   }));
+  const {
+    data: previewStationVariables,
+    isLoading,
+    isError,
+  } = useStationVariables(data.stationId);
 
-  if (!data.previewStationVariables || !data.selectedEndDate) {
+  if (isLoading) {
     return (
       <Row>
         <Col xs={12}>
@@ -40,6 +42,20 @@ const NavBlock = () => {
               <Spinner animation="border" role="status">
                 <span className="visually-hidden">Loading...</span>
               </Spinner>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    );
+  }
+
+  if (!(previewStationVariables.variables?.length ?? 0 > 0)) {
+    return (
+      <Row>
+        <Col xs={12}>
+          <Card className="mb-2 mt-2 ">
+            <Card.Body>
+              <Card.Title>This station has no associated variables.</Card.Title>
             </Card.Body>
           </Card>
         </Col>

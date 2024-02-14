@@ -7,7 +7,11 @@ import {
 } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import App from "./components/main/App";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+  QueryCache,
+} from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import "bootstrap/dist/css/bootstrap.css";
@@ -38,7 +42,12 @@ const getBaseName = () => {
 };
 
 // Create a client
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error) =>
+      console.error("An error occurred in the query cache", error),
+  }),
+});
 
 // Code split our bundle along our primary routes using the "lazy" function.
 // https://reactrouter.com/en/main/route/lazy

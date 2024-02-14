@@ -1,19 +1,16 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Container } from "react-bootstrap";
 import Disclaimer from "../../info/Disclaimer";
 import Header from "../Header/Header";
-import useInitializeApp from "./use-initialize-app";
 import { Outlet } from "react-router-dom";
 
 import "./App.css";
-import { useConfig } from "../../../state/query-hooks/use-config";
-
-export default function App() {
-  const { isLoading, isError } = useConfig();
-  useInitializeApp();
+import { useConfigDefaults } from "../../../state/client-server-hooks/use-config-defaults";
+export const App = () => {
+  const { isLoading, isError } = useConfigDefaults();
 
   if (isError) {
-    return <div>{configErrorMessage}</div>;
+    return <div>An Error occoured while loading the app configuration.</div>;
   }
 
   if (isLoading) {
@@ -27,4 +24,6 @@ export default function App() {
       <Outlet />
     </Container>
   );
-}
+};
+
+export default App;
