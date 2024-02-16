@@ -79,9 +79,6 @@ function StationMap({
   const { data: config } = useConfig();
   const userShapeLayerRef = useRef();
 
-  // TODO: Remove
-  // const [geometryLayers, setGeometryLayers] = useState([]);
-
   const handleChangedGeometryLayers = () => {
     const layers = userShapeLayerRef?.current?.getLayers();
     onSetArea(layers && layersToGeoJSONMultipolygon(layers));

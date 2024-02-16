@@ -35,8 +35,6 @@ const PreviewGraph = ({ variableId }) => {
     selectedEndDate,
   );
 
-  console.log("### previewObservations", previewObservations);
-
   if (isLoading) {
     return (
       <Spinner animation="border" role="status">

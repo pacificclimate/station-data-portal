@@ -4,12 +4,12 @@ port = 30502
 public_url = http://localhost:${port}
 
 image:
-	@SDP_TAG=$(tag) SDP_PORT=$(port) SDP_PUBLIC_URL=$(public_url) docker-compose -f docker/docker-compose.yaml build --build-arg REACT_APP_APP_VERSION='$(shell ./generate-commitish.sh)'
+	@SDP_TAG=$(tag) SDP_PORT=$(port) SDP_PUBLIC_URL=$(public_url) docker compose -f docker/docker-compose.yaml build --build-arg REACT_APP_APP_VERSION='$(shell ./generate-commitish.sh)'
 
 up:
-	@SDP_TAG=$(tag) SDP_PORT=$(port) SDP_PUBLIC_URL=$(public_url) docker-compose -f docker/docker-compose.yaml up -d
+	@SDP_TAG=$(tag) SDP_PORT=$(port) SDP_PUBLIC_URL=$(public_url) docker compose -f docker/docker-compose.yaml up -d --force-recreate
 	@echo "Station Data Portal running at $(public_url)"
 	@docker logs -f station-data-portal-frontend
 
 down:
-	@SDP_TAG=$(tag) SDP_PORT=$(port) SDP_PUBLIC_URL=$(public_url) docker-compose -f docker/docker-compose.yaml down
+	@SDP_TAG=$(tag) SDP_PORT=$(port) SDP_PUBLIC_URL=$(public_url) docker compose -f docker/docker-compose.yaml down

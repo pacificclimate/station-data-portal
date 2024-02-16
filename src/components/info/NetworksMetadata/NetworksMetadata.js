@@ -5,147 +5,136 @@
 import PropTypes from "prop-types";
 import React from "react";
 import { Table } from "react-bootstrap";
-import { useSortBy, useTable } from "react-table";
+import {
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+  flexRender,
+} from "@tanstack/react-table";
 import logger from "../../../logger";
-import chroma from "chroma-js";
 import "./NetworksMetadata.css";
 import { useConfig } from "../../../state/query-hooks/use-config";
 import { useNetworks } from "../../../state/query-hooks/use-networks";
+import { NetworkSpot } from "./NetworkSpot";
 
 logger.configure({ active: true });
 
 function NetworksMetadata() {
   const { data: config } = useConfig();
-  const { data, isLoading, isError } = useNetworks();
+  const { data: networks, isLoading, isError } = useNetworks();
+
+  const [sorting, setSorting] = React.useState([]);
+
+  const networkRenderer = (info) => (
+    <NetworkSpot color={info.getValue() ?? config.defaultNetworkColor} />
+  );
 
   const columns = React.useMemo(
     () => [
       {
-        id: "Colour",
-        Header: "",
+        id: "network_spot",
+        header: "",
         minWidth: 20,
         maxWidth: 20,
-        disableSortBy: true,
-        accessor: (network) => (
-          <div
-            style={{
-              width: "1em",
-              height: "1em",
-              borderRadius: "0.5em",
-              backgroundColor: chroma(
-                network.color ?? config.defaultNetworkColor,
-              ).css(),
-            }}
-          >
-            &nbsp;
-          </div>
-        ),
+        accessorKey: "color",
+        cell: networkRenderer,
       },
       {
-        id: "Short Name",
-        Header: "Short Name",
+        header: "Short Name",
         minWidth: 80,
         maxWidth: 100,
-        accessor: "name",
+        accessorKey: "name",
       },
       {
-        id: "Long Name",
-        Header: "Long Name",
+        header: "Long Name",
         minWidth: 80,
         maxWidth: 400,
-        accessor: "long_name",
+        accessorKey: "long_name",
       },
       {
-        id: "# Stations",
-        Header: "# Stations",
+        header: "# Stations",
         minWidth: 80,
         maxWidth: 100,
-        accessor: "station_count",
+        accessorKey: "station_count",
       },
     ],
-    [config?.defaultNetworkColor],
+    [],
   );
 
-  // TODO: do I need to add back the networks use memo?
-
-  // const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-  //   useTable(
-  //     {
-  //       columns,
-  //       data: (isLoading ? [] : data),
-  //       initialState: {
-  //         sortBy: [{ id: "Short Name" }],
-  //       },
-  //     },
-  //     useSortBy,
-  //   );
+  const table = useReactTable({
+    columns,
+    data: networks ?? [],
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  });
 
   if (isLoading) {
     return "Loading...";
   }
 
-  return <div>Networks Table</div>;
-  // return (
-  //   <div>
-  //     <Table {...getTableProps()}>
-  //       <thead>
-  //         {
-  //           // Header rows
-  //           headerGroups.map((headerGroup) => (
-  //             <tr {...headerGroup.getHeaderGroupProps()}>
-  //               {
-  //                 // Header cells
-  //                 headerGroup.headers.map((column) => {
-  //                   const sortClass = column.isSorted
-  //                     ? column.isSortedDesc
-  //                       ? "sorted-desc"
-  //                       : "sorted-asc"
-  //                     : "";
-  //                   return (
-  //                     <th
-  //                       {...column.getHeaderProps({
-  //                         ...column.getSortByToggleProps(),
-  //                         className: sortClass,
-  //                       })}
-  //                     >
-  //                       {column.render("Header")}
-  //                     </th>
-  //                   );
-  //                 })
-  //               }
-  //             </tr>
-  //           ))
-  //         }
-  //       </thead>
+  console.log("### NetworksMetadata", table.getRowModel(), networks);
 
-  //       <tbody {...getTableBodyProps()}>
-  //         {
-  //           // Body rows
-  //           rows.map((row) => {
-  //             // Prepare the row for display
-  //             prepareRow(row);
-  //             return (
-  //               <tr {...row.getRowProps()}>
-  //                 {
-  //                   // Body cells
-  //                   row.cells.map((cell) => {
-  //                     return (
-  //                       <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
-  //                     );
-  //                   })
-  //                 }
-  //               </tr>
-  //             );
-  //           })
-  //         }
-  //       </tbody>
-  //     </Table>
-  //   </div>
-  // );
+  const getSortedCssClass = (column) => {
+    const classes = [];
+    if (!column.getCanSort()) {
+      return "";
+    }
+    classes.push("cursor-pointer select-none");
+    classes.push(`sorted-${column.getIsSorted().toString()}`);
+    return classes.join(" ");
+  };
+
+  return (
+    <div>
+      <Table>
+        <thead>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <th key={header.id} colSpan={header.colSpan}>
+                  {header.isPlaceholder ? null : (
+                    <div
+                      {...{
+                        className: getSortedCssClass(header.column),
+                        onClick: header.column.getToggleSortingHandler(),
+                      }}
+                    >
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                    </div>
+                  )}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody>
+          {table.getRowModel().rows.map((row) => {
+            return (
+              <tr key={row.id}>
+                {row.getVisibleCells().map((cell) => {
+                  return (
+                    <td key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </Table>
+    </div>
+  );
 }
-
-NetworksMetadata.propTypes = {
-  networks: PropTypes.array,
-};
 
 export default NetworksMetadata;

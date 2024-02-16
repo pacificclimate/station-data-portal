@@ -76,9 +76,10 @@ const NavBlock = () => {
           <InputGroup>
             <Form.Select
               aria-label="duration"
-              value={data.selectedDuration}
+              value={data.selectedDuration?.toString()}
+              defaultValue="6"
               onChange={(e) => {
-                actions.setDurationBeforeEnd(e.target.value);
+                actions.setDurationBeforeEnd(parseInt(e.target.value, 10));
               }}
             >
               <option value="1">1 Month</option>

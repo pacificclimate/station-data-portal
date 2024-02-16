@@ -28,8 +28,8 @@ import { useShallow } from "zustand/react/shallow";
 import { useConfig } from "../../../state/query-hooks/use-config";
 import { useStations } from "../../../state/query-hooks/use-stations";
 import { useVariables } from "../../../state/query-hooks/use-variables";
-import { useFrequencies } from "../../../state/query-hooks/use-frequencies";
 import { useNetworks } from "../../../state/query-hooks/use-networks";
+import { NoRenderContent } from "./NoRenderContent";
 
 import css from "../common.module.css";
 
@@ -47,11 +47,6 @@ function Body() {
     isLoading: isVariablesLoading,
     isError: isVariablesError,
   } = useVariables();
-  const {
-    data: frequencies,
-    isLoading: isFrequenciesLoading,
-    isError: isFrequenciesError,
-  } = useFrequencies();
   const {
     data: networks,
     isLoading: networksLoading,
@@ -95,6 +90,8 @@ function Body() {
 
   const rowClasses = { className: "mt-3" };
 
+  const [key, setKey] = useState(config.defaultTab);
+
   return (
     <Row className={css.portal}>
       <AdjustableColumns
@@ -111,85 +108,94 @@ function Body() {
           />,
           <Tabs
             id="non-map-controls"
-            defaultActiveKey={config.defaultTab}
+            activeKey={key}
+            onSelect={(k) => setKey(k)}
             className={css.mainTabs}
           >
             <Tab eventKey={"Filters"} title={"Station Filters"}>
-              {config.stationDebugFetchOptions && (
-                <Row>
-                  <Col lg={6}>Fetch limit</Col>
-                  <Col lg={6}>
-                    <Select
-                      options={config.stationDebugFetchLimitsOptions}
-                      value={stnsLimit}
-                      onChange={actions.setStnsLimit}
+              <NoRenderContent visible={key === "Filters"}>
+                {config.stationDebugFetchOptions && (
+                  <Row>
+                    <Col lg={6}>Fetch limit</Col>
+                    <Col lg={6}>
+                      <Select
+                        options={config.stationDebugFetchLimitsOptions}
+                        value={stnsLimit}
+                        onChange={actions.setStnsLimit}
+                      />
+                    </Col>
+                  </Row>
+                )}
+                <Row {...rowClasses}>
+                  <Col lg={12} md={12} sm={12}>
+                    <SelectionCounts
+                      allStations={stations}
+                      selectedStations={selectedStations}
                     />
+                    <p className={"mb-0"}>
+                      (See Station Metadata and Station Data tabs for details)
+                    </p>
                   </Col>
                 </Row>
-              )}
-              <Row {...rowClasses}>
-                <Col lg={12} md={12} sm={12}>
+                <StationFilters
+                  state={filterValuesNormal}
+                  setState={filterValuesSetState}
+                  rowClasses={rowClasses}
+                />
+              </NoRenderContent>
+            </Tab>
+
+            <Tab eventKey={"Metadata"} title={"Station Metadata"}>
+              <NoRenderContent visible={key === "Metadata"}>
+                <Row {...rowClasses}>
                   <SelectionCounts
                     allStations={stations}
                     selectedStations={selectedStations}
                   />
-                  <p className={"mb-0"}>
-                    (See Station Metadata and Station Data tabs for details)
-                  </p>
-                </Col>
-              </Row>
-              <StationFilters
-                state={filterValuesNormal}
-                setState={filterValuesSetState}
-                rowClasses={rowClasses}
-              />
-            </Tab>
-
-            <Tab eventKey={"Metadata"} title={"Station Metadata"}>
-              <Row {...rowClasses}>
-                <SelectionCounts
-                  allStations={stations}
-                  selectedStations={selectedStations}
-                />
-              </Row>
-              <StationMetadata stations={selectedStations} />
+                </Row>
+                <StationMetadata stations={selectedStations} />
+              </NoRenderContent>
             </Tab>
 
             <Tab eventKey={"Data"} title={"Station Data"}>
-              <Row {...rowClasses}>
-                <SelectionCounts
-                  allStations={stations}
-                  selectedStations={selectedStations}
+              <NoRenderContent visible={key === "Data"}>
+                <Row {...rowClasses}>
+                  <SelectionCounts
+                    allStations={stations}
+                    selectedStations={selectedStations}
+                  />
+                  <SelectionCriteria />
+                </Row>
+                <UnselectedThings
+                  selectedNetworksOptions={
+                    filterValuesNormal.selectedNetworksOptions
+                  }
+                  selectedVariablesOptions={
+                    filterValuesNormal.selectedVariablesOptions
+                  }
+                  selectedFrequenciesOptions={
+                    filterValuesNormal.selectedFrequenciesOptions
+                  }
                 />
-                <SelectionCriteria />
-              </Row>
-              <UnselectedThings
-                selectedNetworksOptions={
-                  filterValuesNormal.selectedNetworksOptions
-                }
-                selectedVariablesOptions={
-                  filterValuesNormal.selectedVariablesOptions
-                }
-                selectedFrequenciesOptions={
-                  filterValuesNormal.selectedFrequenciesOptions
-                }
-              />
 
-              <StationData
-                filterValues={filterValuesNormal}
-                selectedStations={selectedStations}
-                dataDownloadUrl={dataDownloadUrl({
-                  config,
-                  filterValues: filterValuesNormal,
-                  polygon: area,
-                })}
-                dataDownloadFilename={dataDownloadFilename}
-                rowClasses={rowClasses}
-              />
+                <StationData
+                  filterValues={filterValuesNormal}
+                  selectedStations={selectedStations}
+                  dataDownloadUrl={dataDownloadUrl({
+                    config,
+                    filterValues: filterValuesNormal,
+                    polygon: area,
+                  })}
+                  dataDownloadFilename={dataDownloadFilename}
+                  rowClasses={rowClasses}
+                />
+              </NoRenderContent>
             </Tab>
 
             <Tab eventKey={"Networks"} title={"Networks"}>
-              <NetworksMetadata networks={networks} />
+              <NoRenderContent visible={key === "Networks"}>
+                <NetworksMetadata />
+              </NoRenderContent>
             </Tab>
           </Tabs>,
         ]}

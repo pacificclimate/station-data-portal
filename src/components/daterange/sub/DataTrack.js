@@ -24,8 +24,10 @@ const getTrackStyle = ({ source, target, count, index, color }) => {
   const basicStyle = {
     top: `${topPosition}px`,
     height: `${height}px`,
+    minHeight: "1px",
     left: `${source.percent}%`,
-    width: `calc(${target.percent - source.percent}% + 1px)`,
+    width: `calc(${target.percent - source.percent}%)`,
+    minWidth: "1px",
     backgroundColor: color,
   };
 

@@ -30,15 +30,11 @@ import registerServiceWorker from "./registerServiceWorker";
  * @returns string The base URL of the app
  */
 const getBaseName = () => {
-  if (process.env.PUBLIC_URL) {
-    if (process.env.PUBLIC_URL.indexOf(".") >= 0) {
-      return new URL(process.env.PUBLIC_URL).pathname;
-    } else {
-      // for development
-      return process.env.PUBLIC_URL;
-    }
+  if (process.env.PUBLIC_URL?.indexOf(".") >= 0) {
+    return new URL(process.env.PUBLIC_URL).pathname;
   }
-  return "/";
+
+  return "";
 };
 
 // Create a client
@@ -72,7 +68,6 @@ const root = createRoot(container);
 root.render(
   <QueryClientProvider client={queryClient}>
     <RouterProvider router={router} />
-    <ReactQueryDevtools initialIsOpen={false} />
   </QueryClientProvider>,
 );
-registerServiceWorker();
+console.log("### render index.js");
