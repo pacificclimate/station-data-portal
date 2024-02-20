@@ -5,8 +5,8 @@ import tap from "lodash/fp/tap";
 import isString from "lodash/fp/isString";
 import { useQuery } from "@tanstack/react-query";
 import { mapDeep } from "../../utils/fp";
-import { useConfig } from "./use-config";
-import { useStore } from "../state-store";
+import { useConfigContext } from "../context-hooks/use-config-context";
+import { useStore } from "../client/state-store";
 import { filterExpressionsParser, filterPredicate } from "./filtering";
 
 // TODO: should this be replaced with date-fns?
@@ -50,13 +50,13 @@ export const getStations = async ({ config, stationLimit }) => {
 export const STATIONS_QUERY_KEY = "stations";
 
 export const useStations = () => {
-  const { data: config } = useConfig();
+  const config = useConfigContext();
   const stationLimit = useStore((state) => state.stationLimit);
 
   return useQuery({
     queryKey: [STATIONS_QUERY_KEY],
     queryFn: () => getStations({ config, stationLimit }),
     enabled: !!config,
-    staleTime: 1000 * 60 * 60 * 24, // 24 hours
+    staleTime: 86400000, // 24 hours
   });
 };

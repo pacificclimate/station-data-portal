@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import urljoin from "url-join";
-import { useConfig } from "./use-config";
+import { useConfigContext } from "../context-hooks/use-config-context";
 
 export const OBSERVATION_COUNTS_QUERY_KEY = ["observation-counts"];
 
@@ -21,11 +21,11 @@ export const getObservationCounts = async ({ config, startDate, endDate }) => {
 };
 
 export const useObservationCounts = (startDate, endDate) => {
-  const { data: config } = useConfig();
+  const config = useConfigContext();
   return useQuery({
     queryKey: OBSERVATION_COUNTS_QUERY_KEY,
     queryFn: () => getObservationCounts({ config, startDate, endDate }),
     enabled: !!config,
-    staleTime: 1000 * 60 * 60 * 24, // 24 hours
+    staleTime: 86400000, // 24 hours
   });
 };

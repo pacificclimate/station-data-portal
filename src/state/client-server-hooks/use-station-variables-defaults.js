@@ -5,7 +5,7 @@ import max from "date-fns/max";
 import min from "date-fns/min";
 import subMonths from "date-fns/subMonths";
 import parseIso from "date-fns/parseISO";
-import { useStore } from "../state-store";
+import { useStore } from "../client/state-store";
 import { useStationVariables } from "../query-hooks/use-station-variables";
 
 const getMaxEndDate = flow(

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import urljoin from "url-join";
-import { useConfig } from "./use-config";
+import { useConfigContext } from "../context-hooks/use-config-context";
 
 const getFrequencies = async ({ config }) => {
   const { data } = await axios(urljoin(config.sdsUrl, "frequencies"), {
@@ -16,12 +16,12 @@ const getFrequencies = async ({ config }) => {
 export const FREQUENCIES_QUERY_KEY = ["frequencies"];
 
 export const useFrequencies = () => {
-  const { data: config } = useConfig();
+  const config = useConfigContext();
   return useQuery({
     queryKey: FREQUENCIES_QUERY_KEY,
     queryFn: () => getFrequencies({ config }),
     enabled: !!config,
-    staleTime: 1000 * 60 * 60 * 24, // 24 hours
+    staleTime: 86400000, // 24 hours
   });
 };
 

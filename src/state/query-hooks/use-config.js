@@ -116,7 +116,7 @@ const fetchConfig = async () => {
 const CONFIG_QUERY_KEY = ["config"];
 
 /**
- * Layer 2. Query caching, async state management and request deduplication.
+ * L2. Query hook for the config. Generally this should not be used directly but via {@link useConfigContext}
  * @returns {object}
  */
 export const useConfig = () =>

@@ -3,7 +3,7 @@ import urljoin from "url-join";
 import { useQuery } from "@tanstack/react-query";
 import filter from "lodash/fp/filter";
 import { filterExpressionsParser, filterPredicate } from "./filtering";
-import { useConfig } from "./use-config";
+import { useConfigContext } from "../context-hooks/use-config-context";
 
 /**
  *
@@ -31,11 +31,11 @@ export const getNetworks = async ({ config }) => {
 export const NETWORKS_QUERY_KEY = "networks";
 
 export const useNetworks = () => {
-  const { data: config } = useConfig();
+  const config = useConfigContext();
   return useQuery({
     queryKey: [NETWORKS_QUERY_KEY],
     queryFn: () => getNetworks({ config }),
     enabled: !!config,
-    staleTime: 1000 * 60 * 60 * 24, // 24 hours
+    staleTime: 86400000, // 24 hours
   });
 };

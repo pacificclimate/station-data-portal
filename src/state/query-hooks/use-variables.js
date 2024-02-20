@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import urljoin from "url-join";
-import { useConfig } from "./use-config";
+import { useConfigContext } from "@/state/context-hooks/use-config-context";
 
 export const VARIABLES_QUERY_KEY = ["variables"];
 
@@ -15,12 +15,12 @@ const getVariables = async ({ config }) => {
 };
 
 export const useVariables = () => {
-  const { data: config } = useConfig();
+  const config = useConfigContext();
   return useQuery({
     queryKey: VARIABLES_QUERY_KEY,
     queryFn: () => getVariables({ config }),
     enabled: !!config,
-    staleTime: 1000 * 60 * 60 * 24, // 24 hours
+    staleTime: 86400000, // 24 hours
   });
 };
 

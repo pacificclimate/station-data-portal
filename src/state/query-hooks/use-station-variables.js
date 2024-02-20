@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import urljoin from "url-join";
 import filter from "lodash/fp/filter";
-import { useConfig } from "./use-config";
+import { useConfigContext } from "../context-hooks/use-config-context";
 
 export const STATION_VARIABLES_QUERY_KEY = "station-variables";
 
@@ -20,12 +20,12 @@ export const getStationVariables = async ({ config, stationId }) => {
 };
 
 export const useStationVariables = (stationId) => {
-  const { data: config } = useConfig();
+  const config = useConfigContext();
 
   return useQuery({
     queryKey: [STATION_VARIABLES_QUERY_KEY, stationId],
     queryFn: () => getStationVariables({ config, stationId }),
     enabled: !!config,
-    staleTime: 1000 * 60 * 60 * 24, // 24 hours
+    staleTime: 86400000, // 24 hours
   });
 };

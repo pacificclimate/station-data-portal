@@ -2,8 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import urljoin from "url-join";
 import formatISO from "date-fns/formatISO";
-import { useConfig } from "./use-config";
-import { useStore } from "../state-store";
+import { useConfigContext } from "../context-hooks/use-config-context";
 
 export const STATION_VARIABLE_OBSERVATIONS_QUERY_KEY =
   "station-variable-observations";
@@ -46,7 +45,7 @@ export const useStationVariableObservations = (
   startDate,
   endDate,
 ) => {
-  const { data: config } = useConfig();
+  const config = useConfigContext();
 
   if (!stationId || !variableId || !startDate || !endDate) {
     throw new Error(
@@ -71,6 +70,6 @@ export const useStationVariableObservations = (
         endDate,
       }),
     enabled: !!config,
-    staleTime: 1000 * 60 * 60 * 24, // 24 hours
+    staleTime: 86400000, // 24 hours
   });
 };

@@ -4,6 +4,7 @@ import urljoin from "url-join";
 import { mapDeep } from "../../utils/fp";
 import { useConfig } from "./use-config";
 import isString from "lodash/fp/isString";
+import { useConfigContext } from "../context-hooks/use-config-context";
 
 export const STATION_QUERY_KEY = "station";
 
@@ -33,7 +34,7 @@ export const getStationById = async ({ config, stationId }) => {
 };
 
 export const useStation = (stationId) => {
-  const { data: config } = useConfig();
+  const config = useConfigContext();
 
   if (!stationId) {
     throw new Error("stationId is required");
@@ -43,6 +44,6 @@ export const useStation = (stationId) => {
     queryKey: [STATION_QUERY_KEY, stationId],
     queryFn: () => getStationById({ config, stationId }),
     enabled: !!config,
-    staleTime: 1000 * 60 * 60 * 24, // 24 hours
+    staleTime: 86400000, // 24 hours
   });
 };

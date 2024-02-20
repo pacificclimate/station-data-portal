@@ -39,6 +39,11 @@ const getBaseName = () => {
 
 // Create a client
 const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      //notifyOnChangeProps: 'tracked',
+    },
+  },
   queryCache: new QueryCache({
     onError: (error) =>
       console.error("An error occurred in the query cache", error),
@@ -50,7 +55,7 @@ const queryClient = new QueryClient({
 // Stationpreview in particular is large due to including the plotly library.
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="" element={<App />}>
+    <Route path="/" element={<App />}>
       <Route index lazy={() => import("./components/main/Body")} />
       <Route
         path="preview/:stationId"
