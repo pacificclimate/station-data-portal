@@ -2,8 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import map from "lodash/fp/map";
 import { Accordion, Table, Row, Col, Spinner } from "react-bootstrap";
-import { useStation } from "../../../state/query-hooks/use-station";
-import { useStore } from "../../../state/state-store";
+import { useStation } from "@/state/query-hooks/use-station";
+import { useStore } from "@/state/client/state-store";
 
 export const HeaderBlock = () => {
   const stationId = useStore((state) => state.stationId);

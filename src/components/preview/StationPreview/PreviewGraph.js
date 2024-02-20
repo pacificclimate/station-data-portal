@@ -2,15 +2,16 @@ import React from "react";
 import { Spinner } from "react-bootstrap";
 import map from "lodash/fp/map";
 import { useShallow } from "zustand/react/shallow";
-import { useStore } from "../../../state/state-store";
-import { useStationVariableObservations } from "../../../state/query-hooks/use-station-variable-observations";
+import { useStore } from "@/state/client/state-store";
+import { useStationVariableObservations } from "@/state/query-hooks/use-station-variable-observations";
+import { useConfigContext } from "@/state/context-hooks/use-config-context";
 
 // Importing a smaller version of plotly allows us to significantly reduce the
 // bundle size (approx 5MB to 1MB) over the full version of plotly.
 // https://github.com/plotly/react-plotly.js?tab=readme-ov-file#customizing-the-plotlyjs-bundle
 import Plotly from "plotly.js-basic-dist";
 import createPlotlyComponent from "react-plotly.js/factory";
-import { useConfig } from "../../../state/query-hooks/use-config";
+
 const Plot = createPlotlyComponent(Plotly);
 
 const PreviewGraph = ({ variableId }) => {
@@ -23,7 +24,7 @@ const PreviewGraph = ({ variableId }) => {
         showLegend: state.showLegend,
       })),
     );
-  const { data: config } = useConfig();
+  const config = useConfigContext();
   const {
     data: previewObservations,
     isLoading,

@@ -46,15 +46,14 @@ import MapInfoDisplay from "../MapInfoDisplay";
 import { defaultMarkerOptions, ManyStationMarkers } from "../StationMarkers";
 import { layersToGeoJSONMultipolygon } from "../../../utils/geoJSON-leaflet";
 
-import logger from "../../../logger";
+import logger from "@/logger";
 
 import "./StationMap.css";
-import { getTimer } from "../../../utils/timing";
+import { getTimer } from "@/utils/timing";
 import { MapSpinner } from "pcic-react-leaflet-components";
 import { useImmer } from "use-immer";
-import { useStore } from "../../../state/state-store";
 import { StationRefresh } from "../StationRefresh/StationRefresh";
-import { useConfig } from "../../../state/query-hooks/use-config";
+import useConfigContext from "@/state/context-hooks/use-config-context";
 
 logger.configure({ active: true });
 const smtimer = getTimer("StationMarker timing");
@@ -76,7 +75,7 @@ function StationMap({
   // should be true if and only if slow updates to the map are pending
   // due to an external update.
 }) {
-  const { data: config } = useConfig();
+  const config = useConfigContext();
   const userShapeLayerRef = useRef();
 
   const handleChangedGeometryLayers = () => {

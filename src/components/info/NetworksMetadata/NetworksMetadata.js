@@ -11,16 +11,17 @@ import {
   useReactTable,
   flexRender,
 } from "@tanstack/react-table";
-import logger from "../../../logger";
-import "./NetworksMetadata.css";
-import { useConfig } from "../../../state/query-hooks/use-config";
-import { useNetworks } from "../../../state/query-hooks/use-networks";
+import logger from "@/logger";
+import { useNetworks } from "@/state/query-hooks/use-networks";
+import useConfigContext from "@/state/context-hooks/use-config-context";
 import { NetworkSpot } from "./NetworkSpot";
+
+import "./NetworksMetadata.css";
 
 logger.configure({ active: true });
 
 function NetworksMetadata() {
-  const { data: config } = useConfig();
+  const config = useConfigContext();
   const { data: networks, isLoading, isError } = useNetworks();
 
   const [sorting, setSorting] = React.useState([]);

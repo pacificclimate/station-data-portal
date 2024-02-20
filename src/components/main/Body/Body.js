@@ -2,33 +2,27 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Col, Row, Tab, Tabs } from "react-bootstrap";
 import Select from "react-select";
 
-import logger from "../../../logger";
-import {
-  dataDownloadFilename,
-  dataDownloadUrl,
-} from "../../../api/pdp-data-service";
-import {
-  stationAreaFilter,
-  stationFilter,
-} from "../../../utils/station-filtering";
-import StationMap from "../../maps/StationMap";
-import StationMetadata from "../../info/StationMetadata";
-import StationData from "../../info/StationData";
-import NetworksMetadata from "../../info/NetworksMetadata";
-import SelectionCounts from "../../info/SelectionCounts";
-import SelectionCriteria from "../../info/SelectionCriteria";
-import UnselectedThings from "../../info/UnselectedThings";
-import AdjustableColumns from "../../util/AdjustableColumns";
+import logger from "@/logger";
+import { dataDownloadFilename, dataDownloadUrl } from "@/api/pdp-data-service";
+import { stationAreaFilter, stationFilter } from "@/utils/station-filtering";
+import StationMap from "@/components/maps/StationMap";
+import StationMetadata from "@/components/info/StationMetadata";
+import StationData from "@/components/info/StationData";
+import NetworksMetadata from "@/components/info/NetworksMetadata";
+import SelectionCounts from "@/components/info/SelectionCounts";
+import SelectionCriteria from "@/components/info/SelectionCriteria";
+import UnselectedThings from "@/components/info/UnselectedThings";
+import AdjustableColumns from "@/components/util/AdjustableColumns";
 import StationFilters, {
   useStationFiltering,
-} from "../../controls/StationFilters";
-import baseMaps from "../../maps/baseMaps";
-import { useStore } from "../../../state/state-store";
+} from "@/components/controls/StationFilters";
+import baseMaps from "@/components/maps/baseMaps";
+import { useStore } from "@/state/client/state-store";
 import { useShallow } from "zustand/react/shallow";
-import { useConfig } from "../../../state/query-hooks/use-config";
-import { useStations } from "../../../state/query-hooks/use-stations";
-import { useVariables } from "../../../state/query-hooks/use-variables";
-import { useNetworks } from "../../../state/query-hooks/use-networks";
+import { useStations } from "@/state/query-hooks/use-stations";
+import { useVariables } from "@/state/query-hooks/use-variables";
+import { useNetworks } from "@/state/query-hooks/use-networks";
+import useConfigContext from "@/state/context-hooks/use-config-context";
 import { NoRenderContent } from "./NoRenderContent";
 
 import css from "../common.module.css";
@@ -36,7 +30,7 @@ import css from "../common.module.css";
 logger.configure({ active: true });
 
 function Body() {
-  const { data: config } = useConfig();
+  const config = useConfigContext();
   const {
     data: stations,
     isLoading: isStationsLoading,
@@ -47,11 +41,6 @@ function Body() {
     isLoading: isVariablesLoading,
     isError: isVariablesError,
   } = useVariables();
-  const {
-    data: networks,
-    isLoading: networksLoading,
-    isError: networksError,
-  } = useNetworks();
 
   const actions = useStore(
     useShallow((state) => ({

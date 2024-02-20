@@ -13,8 +13,8 @@ import { LinkContainer } from "react-router-bootstrap";
 import { useShallow } from "zustand/react/shallow";
 import RangeBlock from "./RangeBlock";
 import EndDateControl from "./EndDateControl";
-import { useStationVariables } from "../../../state/query-hooks/use-station-variables";
-import { useStore } from "../../../state/state-store";
+import { useStationVariables } from "@/state/query-hooks/use-station-variables";
+import { useStore } from "@/state/client/state-store";
 
 const NavBlock = () => {
   const data = useStore(

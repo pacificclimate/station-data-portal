@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
-import "./Disclaimer.css";
-import { useStore } from "../../../state/state-store";
-import { useConfig } from "../../../state/query-hooks/use-config";
+import { useConfigContext } from "@/state/context-hooks/use-config-context";
 
 function Disclaimer() {
-  const { data: config } = useConfig();
+  const config = useConfigContext();
   const [acknowledged, setAcknowledged] = useState(!config.disclaimer.enabled);
   const acknowledge = () => setAcknowledged(true);
 

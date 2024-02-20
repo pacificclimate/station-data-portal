@@ -8,11 +8,9 @@ import flow from "lodash/fp/flow";
 import map from "lodash/fp/map";
 import join from "lodash/fp/join";
 import chroma from "chroma-js";
-import FrequencySelector from "../../selectors/FrequencySelector";
+import FrequencySelector from "@/components/selectors/FrequencySelector";
 
-import logger from "../../../logger";
-
-import "./StationPopup.css";
+import logger from "@/logger";
 import {
   stationNetwork,
   uniqStationFreqs,
@@ -20,17 +18,19 @@ import {
   uniqStationNames,
   uniqStationObsPeriods,
   uniqStationVariableNames,
-} from "../../../utils/station-info";
-import { useConfig } from "../../../state/query-hooks/use-config";
-import { useNetworks } from "../../../state/query-hooks/use-networks";
-import { useVariables } from "../../../state/query-hooks/use-variables";
+} from "@/utils/station-info";
+import { useNetworks } from "@/state/query-hooks/use-networks";
+import { useVariables } from "@/state/query-hooks/use-variables";
+
+import "./StationPopup.css";
+import useConfigContext from "@/state/context-hooks/use-config-context";
 
 logger.configure({ active: true });
 
 const formatDate = (d) => (d ? d.toISOString().substr(0, 10) : "unknown");
 
 function StationPopup({ station }) {
-  const { data: config } = useConfig();
+  const config = useConfigContext();
   const { data: networks } = useNetworks();
   const { data: variables } = useVariables();
 

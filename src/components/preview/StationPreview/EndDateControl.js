@@ -1,6 +1,6 @@
 import { useState } from "react";
 import DatePicker from "react-datepicker";
-import { useStore } from "../../../state/state-store";
+import { useStore } from "@/state/client/state-store";
 import css from "./EndDateControl.module.css";
 
 export const EndDateControl = () => {

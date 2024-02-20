@@ -1,21 +1,19 @@
-import React, { useState, useEffect } from "react";
-import DateRange from "../../daterange";
-import startOfMonth from "date-fns/startOfMonth";
-import endOfMonth from "date-fns/endOfMonth";
+import React from "react";
+import DateRange from "@/components/daterange";
 import addDays from "date-fns/addDays";
 import differenceInDays from "date-fns/differenceInDays";
 import differenceInYears from "date-fns/differenceInYears";
 import startOfDecade from "date-fns/startOfDecade";
 import endOfDecade from "date-fns/endOfDecade";
-import { useStore } from "../../../state/state-store";
-import { useConfig } from "../../../state/query-hooks/use-config";
-import { useStationVariables } from "../../../state/query-hooks/use-station-variables";
+import { useStore } from "@/state/client/state-store";
+import { useStationVariables } from "@/state/query-hooks/use-station-variables";
+import useConfigContext from "@/state/context-hooks/use-config-context";
 
 const millisecondsPerMonth = 2629746000;
 const millisedondsPerDay = 86400000;
 
 const RangeBlock = ({}) => {
-  const { data: config } = useConfig();
+  const config = useConfigContext();
   const storeData = useStore((state) => ({
     stationId: state.stationId,
     minStartDate: state.minStartDate,

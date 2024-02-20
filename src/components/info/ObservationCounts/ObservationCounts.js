@@ -1,13 +1,14 @@
 import PropTypes from "prop-types";
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import { Table } from "react-bootstrap";
 import { reduce } from "lodash/fp";
-import InfoPopup from "../../util/InfoPopup";
-import logger from "../../../logger";
-import { getTimer } from "../../../utils/timing";
+import InfoPopup from "@/components/util/InfoPopup";
+import logger from "@/logger";
+import { getTimer } from "@/utils/timing";
+import { useObservationCounts } from "@/state/query-hooks/use-observation-counts";
+import useConfigContext from "@/state/context-hooks/use-config-context";
+
 import "./ObservationCounts.css";
-import { useConfig } from "../../../state/query-hooks/use-config";
-import { useObservationCounts } from "../../../state/query-hooks/use-observation-counts";
 
 logger.configure({ active: true });
 const timer = getTimer("Observation count timing");
@@ -31,7 +32,7 @@ function ObservationCounts({
   clipToDate,
   stations,
 }) {
-  const { data: config } = useConfig();
+  const config = useConfigContext();
   const {
     data: countData,
     isLoading,

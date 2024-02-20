@@ -2,9 +2,9 @@ import React from "react";
 import { Card, Col, Row } from "react-bootstrap";
 import map from "lodash/fp/map";
 import PreviewGraph from "./PreviewGraph";
-import { useStore } from "../../../state/state-store";
-import { useStation } from "../../../state/query-hooks/use-station";
-import { useStationVariables } from "../../../state/query-hooks/use-station-variables";
+import { useStore } from "@/state/client/state-store";
+import { useStation } from "@/state/query-hooks/use-station";
+import { useStationVariables } from "@/state/query-hooks/use-station-variables";
 
 const GraphsBlock = () => {
   const stationId = useStore((state) => state.stationId);
