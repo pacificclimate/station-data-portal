@@ -115,13 +115,14 @@ const fetchConfig = async () => {
 
 const CONFIG_QUERY_KEY = ["config"];
 
+export const configQuery = () => ({
+  queryKey: CONFIG_QUERY_KEY,
+  queryFn: fetchConfig,
+  staleTime: Infinity, // config should rarely change while on the same version
+});
+
 /**
  * L2. Query hook for the config. Generally this should not be used directly but via {@link useConfigContext}
  * @returns {object}
  */
-export const useConfig = () =>
-  useQuery({
-    queryKey: CONFIG_QUERY_KEY,
-    queryFn: fetchConfig,
-    staleTime: Infinity, // config should rarely change while on the same version
-  });
+export const useConfig = () => useQuery(configQuery());

@@ -30,12 +30,14 @@ export const getNetworks = async ({ config }) => {
 
 export const NETWORKS_QUERY_KEY = "networks";
 
+export const networksQuery = (config) => ({
+  queryKey: [NETWORKS_QUERY_KEY],
+  queryFn: () => getNetworks({ config }),
+  enabled: !!config,
+  staleTime: 86400000, // 24 hours
+});
+
 export const useNetworks = () => {
   const config = useConfigContext();
-  return useQuery({
-    queryKey: [NETWORKS_QUERY_KEY],
-    queryFn: () => getNetworks({ config }),
-    enabled: !!config,
-    staleTime: 86400000, // 24 hours
-  });
+  return useQuery(networksQuery(config));
 };

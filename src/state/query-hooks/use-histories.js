@@ -11,12 +11,14 @@ export const getHistories = async ({ config }) => {
 
 export const HISTORIES_QUERY_KEY = ["histories"];
 
+export const historiesQuery = (config) => ({
+  queryKey: HISTORIES_QUERY_KEY,
+  queryFn: () => getHistories({ config }),
+  enabled: !!config,
+  staleTime: 86400000, // 24 hours
+});
+
 export const useHistories = () => {
   const config = useConfigContext();
-  return useQuery({
-    queryKey: HISTORIES_QUERY_KEY,
-    queryFn: getHistories({ config }),
-    enabled: !!config,
-    staleTime: 86400000, // 24 hours
-  });
+  return useQuery(historiesQuery(config));
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Col, Row, Tab, Tabs } from "react-bootstrap";
 import Select from "react-select";
 
@@ -19,15 +19,33 @@ import StationFilters, {
 import baseMaps from "@/components/maps/baseMaps";
 import { useStore } from "@/state/client/state-store";
 import { useShallow } from "zustand/react/shallow";
-import { useStations } from "@/state/query-hooks/use-stations";
-import { useVariables } from "@/state/query-hooks/use-variables";
-import { useNetworks } from "@/state/query-hooks/use-networks";
+import { stationsQuery, useStations } from "@/state/query-hooks/use-stations";
+import {
+  variablesQuery,
+  useVariables,
+} from "@/state/query-hooks/use-variables";
+import { networksQuery } from "@/state/query-hooks/use-networks";
+import { frequenciesQuery } from "@/state/query-hooks/use-frequencies";
+import { historiesQuery } from "@/state/query-hooks/use-histories";
+import { configQuery } from "@/state/query-hooks/use-config";
 import useConfigContext from "@/state/context-hooks/use-config-context";
 import { NoRenderContent } from "./NoRenderContent";
 
 import css from "../common.module.css";
 
 logger.configure({ active: true });
+
+export const bodyLoader = (queryClient) => async () => {
+  const config = await queryClient.ensureQueryData(configQuery());
+  const stationsLimit =
+    useStore.getState().stationsLimit ?? config.stationsLimit;
+  queryClient.ensureQueryData(stationsQuery(config, stationsLimit));
+  queryClient.ensureQueryData(variablesQuery(config));
+  queryClient.ensureQueryData(networksQuery(config));
+  queryClient.ensureQueryData(frequenciesQuery(config));
+  queryClient.ensureQueryData(historiesQuery(config));
+  return null;
+};
 
 function Body() {
   const config = useConfigContext();

@@ -33,6 +33,13 @@ export const getStationById = async ({ config, stationId }) => {
   return data;
 };
 
+export const stationQuery = (config, stationId) => ({
+  queryKey: [STATION_QUERY_KEY, stationId],
+  queryFn: () => getStationById({ config, stationId }),
+  enabled: !!config,
+  staleTime: 86400000, // 24 hours
+});
+
 export const useStation = (stationId) => {
   const config = useConfigContext();
 
@@ -40,10 +47,5 @@ export const useStation = (stationId) => {
     throw new Error("stationId is required");
   }
 
-  return useQuery({
-    queryKey: [STATION_QUERY_KEY, stationId],
-    queryFn: () => getStationById({ config, stationId }),
-    enabled: !!config,
-    staleTime: 86400000, // 24 hours
-  });
+  return useQuery(stationQuery(config, stationId));
 };

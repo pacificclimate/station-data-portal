@@ -73,7 +73,7 @@ const PreviewGraph = ({ variableId }) => {
         // Setting these margins causes the graph to fill the available space
         // l (left) and b (bottom) are left slightly larger for axis labels
         margin: {
-          t: 20, //top
+          t: !showLegend ? 40 : 20, //top
           l: 50, //left
           r: 20, //right
           b: 50, //bottom

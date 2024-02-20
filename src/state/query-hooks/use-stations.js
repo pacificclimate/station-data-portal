@@ -49,14 +49,16 @@ export const getStations = async ({ config, stationLimit }) => {
 
 export const STATIONS_QUERY_KEY = "stations";
 
+export const stationsQuery = (config, stationLimit) => ({
+  queryKey: [STATIONS_QUERY_KEY],
+  queryFn: () => getStations({ config, stationLimit }),
+  enabled: !!config,
+  staleTime: 86400000, // 24 hours
+});
+
 export const useStations = () => {
   const config = useConfigContext();
   const stationLimit = useStore((state) => state.stationLimit);
 
-  return useQuery({
-    queryKey: [STATIONS_QUERY_KEY],
-    queryFn: () => getStations({ config, stationLimit }),
-    enabled: !!config,
-    staleTime: 86400000, // 24 hours
-  });
+  return useQuery(stationsQuery(config, stationLimit));
 };

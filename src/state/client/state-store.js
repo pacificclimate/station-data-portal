@@ -14,3 +14,5 @@ export const useStore = create(
     setStationLimit: (limit) => set({ stationsLimit: limit }),
   })),
 );
+
+export default useStore;

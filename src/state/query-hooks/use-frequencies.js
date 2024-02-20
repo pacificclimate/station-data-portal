@@ -15,14 +15,16 @@ const getFrequencies = async ({ config }) => {
 
 export const FREQUENCIES_QUERY_KEY = ["frequencies"];
 
+export const frequenciesQuery = (config) => ({
+  queryKey: FREQUENCIES_QUERY_KEY,
+  queryFn: () => getFrequencies({ config }),
+  enabled: !!config,
+  staleTime: 86400000, // 24 hours
+});
+
 export const useFrequencies = () => {
   const config = useConfigContext();
-  return useQuery({
-    queryKey: FREQUENCIES_QUERY_KEY,
-    queryFn: () => getFrequencies({ config }),
-    enabled: !!config,
-    staleTime: 86400000, // 24 hours
-  });
+  return useQuery(frequenciesQuery(config));
 };
 
 export default useFrequencies;

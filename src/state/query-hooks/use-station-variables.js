@@ -19,13 +19,15 @@ export const getStationVariables = async ({ config, stationId }) => {
   return data;
 };
 
+export const stationVariablesQuery = (config, stationId) => ({
+  queryKey: [STATION_VARIABLES_QUERY_KEY, stationId],
+  queryFn: () => getStationVariables({ config, stationId }),
+  enabled: !!config,
+  staleTime: 86400000, // 24 hours
+});
+
 export const useStationVariables = (stationId) => {
   const config = useConfigContext();
 
-  return useQuery({
-    queryKey: [STATION_VARIABLES_QUERY_KEY, stationId],
-    queryFn: () => getStationVariables({ config, stationId }),
-    enabled: !!config,
-    staleTime: 86400000, // 24 hours
-  });
+  return useQuery(stationVariablesQuery(config, stationId));
 };

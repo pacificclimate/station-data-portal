@@ -9,7 +9,7 @@
 export const NoRenderContent = ({ visible, children }) => {
   if (!visible) return null;
 
-  return <>{children};</>;
+  return <>{children}</>;
 };
 
 export default NoRenderContent;

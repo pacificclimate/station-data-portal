@@ -14,14 +14,16 @@ const getVariables = async ({ config }) => {
   return data;
 };
 
+export const variablesQuery = (config) => ({
+  queryKey: VARIABLES_QUERY_KEY,
+  queryFn: () => getVariables({ config }),
+  enabled: !!config,
+  staleTime: 86400000, // 24 hours
+});
+
 export const useVariables = () => {
   const config = useConfigContext();
-  return useQuery({
-    queryKey: VARIABLES_QUERY_KEY,
-    queryFn: () => getVariables({ config }),
-    enabled: !!config,
-    staleTime: 86400000, // 24 hours
-  });
+  return useQuery(variablesQuery(config));
 };
 
 export default useVariables;

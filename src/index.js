@@ -6,13 +6,15 @@ import {
   Route,
 } from "react-router-dom";
 import { createRoot } from "react-dom/client";
-import App from "./components/main/App";
+import App from "@/components/main/App";
 import {
   QueryClient,
   QueryClientProvider,
   QueryCache,
 } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+import { bodyLoader } from "@/components/main/Body";
+import { previewLoader } from "@/components/preview/StationPreview";
 
 import "bootstrap/dist/css/bootstrap.css";
 import "react-datepicker/dist/react-datepicker.css";
@@ -56,10 +58,15 @@ const queryClient = new QueryClient({
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
-      <Route index lazy={() => import("./components/main/Body")} />
+      <Route
+        index
+        lazy={() => import("./components/main/Body")}
+        loader={bodyLoader(queryClient)}
+      />
       <Route
         path="preview/:stationId"
         lazy={() => import("./components/preview/StationPreview")}
+        loader={previewLoader(queryClient)}
       />
     </Route>,
   ),
