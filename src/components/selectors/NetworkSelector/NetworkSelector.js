@@ -1,8 +1,7 @@
 import PropTypes from "prop-types";
-import React, { Component } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Button, ButtonToolbar, Form } from "react-bootstrap";
 import Select from "react-select";
-import memoize from "memoize-one";
 import map from "lodash/fp/map";
 import flow from "lodash/fp/flow";
 import filter from "lodash/fp/filter";
@@ -12,153 +11,137 @@ import fromPairs from "lodash/fp/fromPairs";
 import identity from "lodash/fp/identity";
 import assign from "lodash/fp/assign";
 
-import { composeWithRestArgs } from "../../../utils/fp";
+import { composeWithRestArgs } from "@/utils/fp/fp";
 import chroma from "chroma-js";
-import logger from "../../../logger";
+import logger from "@/logger";
 import { defaultValue, selectorButtonProps } from "../common";
-import LocalPropTypes from "../../local-prop-types";
-import InfoPopup from "../../util/InfoPopup";
+import LocalPropTypes from "@/components/local-prop-types";
+import InfoPopup from "@/components/util/InfoPopup";
 
 import css from "../common.module.css";
 
 logger.configure({ active: true });
 
-class NetworkSelector extends Component {
-  static propTypes = {
-    allNetworks: PropTypes.array,
-    onReady: PropTypes.func.isRequired,
-    value: PropTypes.array, // can be null
-    onChange: PropTypes.func.isRequired,
-    defaultValueSelector: LocalPropTypes.defaultValueSelector,
-  };
-
-  static defaultProps = {
-    onReady: () => null,
-    defaultValueSelector: "all",
-  };
-
-  componentDidMount() {
-    this.setDefault();
-    const actions = {
-      getAllOptions: this.getOptions,
-      selectAll: this.handleClickAll,
-      selectNone: this.handleClickNone,
+const localStyles = {
+  option: (styles, { value, isDisabled }) => {
+    const color = chroma(value.color || "#000000");
+    return {
+      ...styles,
+      backgroundColor: isDisabled ? null : color.alpha(0.5).css(),
+      borderBottom: "1px solid #aaa",
     };
-    this.props.onReady(actions);
-  }
+  },
+  multiValue: (styles, { data: { value, isDisabled } }) => {
+    const color = chroma(value.color || "#000000");
+    return {
+      ...styles,
+      backgroundColor: isDisabled ? null : color.alpha(0.5).css(),
+    };
+  },
+};
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (this.props.allNetworks !== prevProps.allNetworks) {
-      this.setDefault();
-    }
-  }
+const formatLabels = flow(
+  map((network) => ({
+    value: network,
+    label: `${network.name}`,
+    isDisabled: !network.publish,
+  })),
+  sortBy("label"),
+);
 
-  setDefault = () => {
-    this.props.onChange(
-      defaultValue(this.props.defaultValueSelector, this.getOptions()),
-    );
+const NetworkSelector = (props) => {
+  const {
+    allNetworks,
+    onReady = () => null,
+    value,
+    onChange,
+    defaultValueSelector = "all",
+    styles,
+  } = props;
+  const options = useMemo(() => {
+    return allNetworks === null ? [] : formatLabels(allNetworks);
+  }, [allNetworks]);
+
+  useEffect(() => {
+    setDefault();
+  }, [allNetworks]);
+
+  useEffect(() => {
+    const actions = {
+      getAllOptions: () => options,
+      selectAll: handleClickAll,
+      selectNone: handleClickNone,
+    };
+    onReady(actions);
+  }, []);
+
+  const setDefault = () => {
+    onChange(defaultValue(defaultValueSelector, options));
   };
 
-  // This function must be an instance property to be memoized correctly.
-  makeOptions = memoize((allNetworks) =>
-    allNetworks === null
-      ? []
-      : flow(
-          map((network) => ({
-            value: network,
-            label: `${network.name}`,
-            // label: `${network.name} – ${network.long_name}`,
-            isDisabled: !network.publish,
-          })),
-          sortBy("label"),
-        )(allNetworks),
+  const handleClickAll = () =>
+    onChange(filter((option) => !option.isDisabled)(options));
+
+  const handleClickNone = () => onChange([]);
+
+  const composedStyles = assign(
+    styles,
+    flow(
+      toPairs,
+      map(([name, style]) => [
+        name,
+        composeWithRestArgs(style, styles[name] || identity),
+      ]),
+      fromPairs,
+    )(localStyles),
   );
 
-  static localStyles = {
-    option: (styles, { value, isDisabled }) => {
-      const color = chroma(value.color || "#000000");
-      return {
-        ...styles,
-        backgroundColor: isDisabled ? null : color.alpha(0.5).css(),
-        borderBottom: "1px solid #aaa",
-      };
-    },
-    multiValue: (styles, { data: { value, isDisabled } }) => {
-      const color = chroma(value.color || "#000000");
-      return {
-        ...styles,
-        backgroundColor: isDisabled ? null : color.alpha(0.5).css(),
-      };
-    },
-  };
+  return (
+    <Form>
+      <div>
+        <Form.Label>Network</Form.Label>{" "}
+        <InfoPopup title={"Network multiselector"}>
+          <ul className={"compact"}>
+            <li>At startup, all networks are selected.</li>
+            <li>
+              Use the None button to clear all networks from the selector.
+            </li>
+            <li>
+              Use the All button to add all available networks to the selector.
+            </li>
+            <li>
+              Click the dropdown and select an item to add a single unselected
+              network.
+            </li>
+            <li>Click the X next to a selected network to remove it.</li>
+          </ul>
+        </InfoPopup>
+      </div>
+      <ButtonToolbar className={css.selectorButtons}>
+        <Button {...selectorButtonProps} onClick={handleClickAll}>
+          All
+        </Button>
+        <Button {...selectorButtonProps} onClick={handleClickNone}>
+          None
+        </Button>
+      </ButtonToolbar>
+      <Select
+        options={options}
+        placeholder={allNetworks ? "Select or type to search..." : "Loading..."}
+        {...props}
+        styles={composedStyles}
+        isMulti
+      />
+    </Form>
+  );
+};
 
-  getOptions = () => this.makeOptions(this.props.allNetworks);
-
-  handleClickAll = () =>
-    this.props.onChange(
-      filter((option) => !option.isDisabled)(this.getOptions()),
-    );
-
-  handleClickNone = () => this.props.onChange([]);
-
-  render() {
-    const { styles } = this.props;
-    const composedStyles = assign(
-      styles,
-      flow(
-        toPairs,
-        map(([name, style]) => [
-          name,
-          composeWithRestArgs(style, styles[name] || identity),
-        ]),
-        fromPairs,
-      )(NetworkSelector.localStyles),
-    );
-
-    return (
-      <Form>
-        <div>
-          <Form.Label>Network</Form.Label>{" "}
-          <InfoPopup title={"Network multiselector"}>
-            <ul className={"compact"}>
-              <li>At startup, all networks are selected.</li>
-              <li>
-                Use the None button to clear all networks from the selector.
-              </li>
-              <li>
-                Use the All button to add all available networks to the
-                selector.
-              </li>
-              <li>
-                Click the dropdown and select an item to add a single unselected
-                network.
-              </li>
-              <li>Click the X next to a selected network to remove it.</li>
-            </ul>
-          </InfoPopup>
-        </div>
-        <ButtonToolbar className={css.selectorButtons}>
-          <Button {...selectorButtonProps} onClick={this.handleClickAll}>
-            All
-          </Button>
-          <Button {...selectorButtonProps} onClick={this.handleClickNone}>
-            None
-          </Button>
-        </ButtonToolbar>
-        <Select
-          options={this.getOptions()}
-          placeholder={
-            this.props.allNetworks
-              ? "Select or type to search..."
-              : "Loading..."
-          }
-          {...this.props}
-          styles={composedStyles}
-          isMulti
-        />
-      </Form>
-    );
-  }
-}
+NetworkSelector.propTypes = {
+  allNetworks: PropTypes.array,
+  onReady: PropTypes.func,
+  value: PropTypes.array, // can be null
+  onChange: PropTypes.func.isRequired,
+  defaultValueSelector: LocalPropTypes.defaultValueSelector,
+};
 
 export default NetworkSelector;

@@ -4,23 +4,22 @@ import { Form } from "react-bootstrap";
 
 import "./ClipToDateControl.css";
 
-export default class ClipToDateControl extends Component {
-  static propTypes = {
-    value: PropTypes.bool.isRequired,
-    onChange: PropTypes.func.isRequired,
-  };
+export const ClipToDateControl = ({ value, onChange }) => {
+  return (
+    <Form>
+      <Form.Check
+        className={"fw-bold"}
+        checked={value}
+        label={"Clip time series to filter date range"}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+    </Form>
+  );
+};
 
-  render() {
-    const { value, ...rest } = this.props;
-    return (
-      <Form>
-        <Form.Check
-          className={"fw-bold"}
-          checked={value}
-          label={"Clip time series to filter date range"}
-          {...rest}
-        />
-      </Form>
-    );
-  }
-}
+ClipToDateControl.propTypes = {
+  value: PropTypes.bool.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
+export default ClipToDateControl;

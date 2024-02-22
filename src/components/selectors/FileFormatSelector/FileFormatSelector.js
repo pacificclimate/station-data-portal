@@ -1,10 +1,9 @@
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
-import React, { Component } from "react";
+import { Form } from "react-bootstrap";
 import Select from "react-select";
 
-import logger from "../../../logger";
-
-import { Form } from "react-bootstrap";
+import logger from "@/logger";
 
 logger.configure({ active: true });
 
@@ -23,30 +22,24 @@ const options = [
   },
 ];
 
-export default class FileFormatSelector extends Component {
-  static propTypes = {
-    value: PropTypes.object,
-    onChange: PropTypes.func.isRequired,
-  };
+export const FileFormatSelector = ({ value, onChange }) => {
+  useEffect(() => {
+    onChange(options[0]);
+  }, []);
 
-  state = {};
+  return (
+    <Form>
+      <div>
+        <Form.Label>Output format</Form.Label>
+      </div>
+      <Select options={options} value={value} onChange={onChange} />
+    </Form>
+  );
+};
 
-  componentDidMount() {
-    this.props.onChange(options[0]);
-  }
+FileFormatSelector.propTypes = {
+  value: PropTypes.object,
+  onChange: PropTypes.func.isRequired,
+};
 
-  render() {
-    return (
-      <Form>
-        <div>
-          <Form.Label>Output format</Form.Label>
-        </div>
-        <Select
-          options={options}
-          value={this.props.value}
-          onChange={this.props.onChange}
-        />
-      </Form>
-    );
-  }
-}
+export default FileFormatSelector;
