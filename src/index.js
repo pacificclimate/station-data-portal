@@ -13,16 +13,14 @@ import {
   QueryCache,
 } from "@tanstack/react-query";
 
-import { bodyLoader } from "@/components/main/Body";
-import { previewLoader } from "@/components/preview/StationPreview";
+import { bodyLoader } from "@/components/main/Body/bodyLoader";
+import { previewLoader } from "@/components/preview/previewLoader";
 
 import "bootstrap/dist/css/bootstrap.css";
 import "react-datepicker/dist/react-datepicker.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import "./bootstrap-extension.css";
 import "./index.css";
-
-import registerServiceWorker from "./registerServiceWorker";
 
 /**
  * When deploying the app to a URL that doesn't sit on the domain root we need to let the

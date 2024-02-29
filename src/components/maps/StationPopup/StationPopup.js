@@ -8,7 +8,7 @@ import flow from "lodash/fp/flow";
 import map from "lodash/fp/map";
 import join from "lodash/fp/join";
 import chroma from "chroma-js";
-import FrequencySelector from "@/components/selectors/FrequencySelector";
+import { valueToLabel as frequencyValueToLabel } from "@/components/selectors/FrequencySelector";
 
 import logger from "@/logger";
 import {
@@ -21,9 +21,9 @@ import {
 } from "@/utils/station-info";
 import { useNetworks } from "@/state/query-hooks/use-networks";
 import { useVariables } from "@/state/query-hooks/use-variables";
+import useConfigContext from "@/state/context-hooks/use-config-context";
 
 import "./StationPopup.css";
-import useConfigContext from "@/state/context-hooks/use-config-context";
 
 logger.configure({ active: true });
 
@@ -84,9 +84,7 @@ function StationPopup({ station }) {
     <ul className={"compact"}>
       {flow(
         uniqStationFreqs,
-        map((freq) => (
-          <li key={freq}>{FrequencySelector.valueToLabel(freq)}</li>
-        )),
+        map((freq) => <li key={freq}>{frequencyValueToLabel(freq)}</li>),
       )(station)}
     </ul>
   );

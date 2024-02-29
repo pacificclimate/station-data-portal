@@ -1,6 +1,0 @@
-{
-  "name": "ObservationCounts",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./ObservationCounts.js"
-}

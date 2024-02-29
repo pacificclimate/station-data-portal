@@ -1,5 +1,5 @@
 import React from "react";
-import DateRange from "@/components/daterange";
+import DateRange from "@/components/controls/daterange";
 import addDays from "date-fns/addDays";
 import differenceInDays from "date-fns/differenceInDays";
 import differenceInYears from "date-fns/differenceInYears";

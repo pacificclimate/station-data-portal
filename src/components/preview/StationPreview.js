@@ -3,23 +3,9 @@ import React from "react";
 import { Container, Spinner } from "react-bootstrap";
 import { useStation } from "@/state/query-hooks/use-station";
 import { useStationVariablesDefaults } from "@/state/client-server-hooks/use-station-variables-defaults";
-import { stationVariablesQuery } from "@/state/query-hooks/use-station-variables";
-import { stationQuery } from "@/state/query-hooks/use-station";
-import { configQuery } from "@/state/query-hooks/use-config";
 import HeaderBlock from "./HeaderBlock";
 import NavBlock from "./NavBlock";
 import GraphsBlock from "./GraphsBlock";
-
-export const previewLoader =
-  (queryClient) =>
-  async ({ params }) => {
-    const stationId = params.stationId;
-    const config = await queryClient.ensureQueryData(configQuery());
-    queryClient.ensureQueryData(stationQuery(config, stationId));
-    queryClient.ensureQueryData(stationVariablesQuery(config, stationId));
-
-    return { stationId };
-  };
 
 export default function StationPreview() {
   const urlParams = useLoaderData();
