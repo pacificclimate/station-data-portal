@@ -36,8 +36,7 @@
 //  - `onSetArea` is called with a single GeoJSON object representing the
 //    contents of the layer group.
 
-import PropTypes from "prop-types";
-import React, { useMemo, useRef, useTransition } from "react";
+import React, { useEffect, useMemo, useRef, useTransition } from "react";
 
 import { FeatureGroup, LayerGroup } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
@@ -73,7 +72,6 @@ const StationMapRenderer = React.memo(
     config,
     externalIsPending,
   }) => {
-    console.log("RenderMap");
     // Manage marker radius as a function of zoom. Use a transition so that it
     // doesn't interrupt other UI activity (including updating the base map).
     // An immutable value makes setting `markerOptions` nice. To slightly improve
@@ -83,7 +81,10 @@ const StationMapRenderer = React.memo(
       ...defaultMarkerOptions,
       radius: config.zoomToMarkerRadius(initialViewport.zoom),
     }));
+    const [markerLayerGroup, setMarkers] = useImmer(<></>);
     const [markerUpdateIsPending, markerUpdateStartTransition] =
+      useTransition();
+    const [markerRenderIsPending, markerRenderStartTransition] =
       useTransition();
     const markerMapEvents = useMemo(
       () => ({
@@ -98,23 +99,27 @@ const StationMapRenderer = React.memo(
       [],
     );
 
-    // Splitting the `stations` memoization into two steps, markers and
-    // layer group, seems to provide a more responsive UI. It's not clear why.
-    // Or I might just be seeing ghosts.
-    const markerLayerGroup = useMemo(() => {
-      console.log("MarkerLayerGroupGen");
-      return (
-        <LayerGroup>
-          <ManyStationMarkers
-            stations={stations}
-            markerOptions={markerOptions}
-            mapEvents={markerMapEvents}
-          />
-        </LayerGroup>
-      );
-    }, [stations]);
+    // By applying these markers into a piece of local state and wrapping their generation into a transition,
+    // changes to the markers can be decoupled from the rendering of the rest of the map allowing for more
+    // responsive user interaction when interacting with filters or switching between pages. Further wrapping the
+    // whole operation in a useEffect ensures that the markers are only generated when the stations or marker options
+    // change.
+    useEffect(() => {
+      markerRenderStartTransition(() => {
+        setMarkers(() => (
+          <LayerGroup>
+            <ManyStationMarkers
+              stations={stations}
+              markerOptions={markerOptions}
+              mapEvents={markerMapEvents}
+            />
+          </LayerGroup>
+        ));
+      });
+    }, [stations, markerOptions]);
 
-    const isPending = externalIsPending || markerUpdateIsPending;
+    const isPending =
+      externalIsPending || markerUpdateIsPending || markerRenderIsPending;
 
     return (
       <BaseMap
