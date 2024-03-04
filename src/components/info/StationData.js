@@ -3,9 +3,13 @@ import React, { useState } from "react";
 import { Button, ButtonToolbar, Col, Row } from "react-bootstrap";
 import capitalize from "lodash/fp/capitalize";
 import map from "lodash/fp/map";
-import { dataDownloadUrl, dataDownloadFilename } from "@/api/pdp-data-service";
+import {
+  dataDownloadTarget,
+  dataDownloadFilename,
+} from "@/utils/pdp-data-service";
 import FileFormatSelector from "@/components/selectors/FileFormatSelector";
 import ClipToDateControl from "@/components/controls/ClipToDateControl";
+import SelectionCounts from "@/components/info/SelectionCounts";
 import ObservationCounts from "@/components/info/ObservationCounts";
 import SelectionCriteria from "@/components/info/SelectionCriteria";
 import UnselectedThings from "@/components/info/UnselectedThings";
@@ -13,22 +17,36 @@ import InfoPopup from "@/components/util/InfoPopup";
 import logger from "@/logger";
 import useConfigContext from "@/state/context-hooks/use-config-context";
 import { useStationsStore } from "@/state/client/stations-store";
+import { useNetworks } from "@/state/query-hooks/use-networks";
+import { useVariables } from "@/state/query-hooks/use-variables";
+import { useFrequencies } from "@/state/query-hooks/use-frequencies";
 
 logger.configure({ active: true });
 
 function StationData({ rowClasses }) {
   const config = useConfigContext();
-  const filterValues = useStationsStore((state) => state.getFilterValues());
-  const selectedStations = useStationsStore((state) => state.selectedStations);
-  const area = useStationsStore((state) => state.area);
+  const { data: allNetworks } = useNetworks();
+  const { data: allVariables } = useVariables();
+  const { data: allFrequencies } = useFrequencies();
+  const {
+    polygon,
+    startDate,
+    endDate,
+    selectedNetworksUris,
+    selectedVariablesIds,
+    selectedFrequencies,
+    onlyWithClimatology,
+  } = useStationsStore((state) => ({
+    polygon: state.selectedArea,
+    startDate: state.startDate,
+    endDate: state.endDate,
+    selectedNetworksUris: state.selectedNetworks,
+    selectedVariablesIds: state.selectedVariables,
+    selectedFrequencies: state.selectedFrequencies,
+    onlyWithClimatology: state.onlyWithClimatology,
+  }));
 
-  const dataDownloadUrlBound = dataDownloadUrl({
-    config,
-    filterValues,
-    polygon: area,
-  });
-
-  const [fileFormat, setFileFormat] = useState();
+  const [dataFormat, setFileFormat] = useState();
   const [clipToDate, setClipToDate] = useState(false);
   const toggleClipToDate = () => setClipToDate(!clipToDate);
 
@@ -39,18 +57,14 @@ function StationData({ rowClasses }) {
         <SelectionCriteria />
       </Row>
       <UnselectedThings
-        selectedNetworksOptions={filterValues.selectedNetworksOptions}
-        selectedVariablesOptions={filterValues.selectedVariablesOptions}
-        selectedFrequenciesOptions={filterValues.selectedFrequenciesOptions}
+        selectedNetworks={selectedNetworksUris}
+        selectedVariables={selectedVariablesIds}
+        selectedFrequencies={selectedFrequencies}
       />
 
       <Row className={rowClasses} key="obs">
         <Col lg={12} md={12} sm={12}>
-          <ObservationCounts
-            filterValues={filterValues}
-            clipToDate={clipToDate}
-            stations={selectedStations}
-          />
+          <ObservationCounts {...{ clipToDate }} />
         </Col>
       </Row>
 
@@ -62,7 +76,7 @@ function StationData({ rowClasses }) {
 
       <Row className={rowClasses} key="file">
         <Col lg={12} md={12} sm={12}>
-          <FileFormatSelector value={fileFormat} onChange={setFileFormat} />
+          <FileFormatSelector value={dataFormat} onChange={setFileFormat} />
         </Col>
       </Row>
 
@@ -73,10 +87,21 @@ function StationData({ rowClasses }) {
               (dataCategory) => {
                 // Disable download buttons if the download URL exceeds
                 // maximum allowable length. Provide explanation in popup.
-                const downloadUrl = dataDownloadUrlBound({
-                  dataCategory,
+                const downloadUrl = dataDownloadTarget({
+                  config,
+                  startDate,
+                  endDate,
+                  selectedNetworksUris,
+                  selectedVariablesIds,
+                  selectedFrequencies,
+                  polygon,
                   clipToDate,
-                  fileFormat,
+                  onlyWithClimatology,
+                  dataCategory,
+                  dataFormat,
+                  allNetworks,
+                  allVariables,
+                  allFrequencies,
                 });
                 const linkLabel = `Download ${capitalize(dataCategory)}`;
                 const urlTooLong = downloadUrl.length > config.maxUrlLength;
@@ -88,11 +113,7 @@ function StationData({ rowClasses }) {
                       className={"me-2"}
                       disabled={urlTooLong}
                       href={urlTooLong ? undefined : downloadUrl}
-                      download={
-                        urlTooLong
-                          ? undefined
-                          : dataDownloadFilename({ dataCategory, fileFormat })
-                      }
+                      download={urlTooLong ? undefined : downloadUrl}
                     >
                       {linkLabel}
                     </Button>

@@ -4,7 +4,7 @@ import { Form } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import InfoPopup from "@/components/util/InfoPopup/InfoPopup";
 
-import "./DateSelector.module.css";
+import "./DateSelector.css";
 
 function DateSelector({ value, onChange, label, ...restProps }) {
   return (

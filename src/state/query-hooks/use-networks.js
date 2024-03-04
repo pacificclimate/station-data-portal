@@ -5,11 +5,6 @@ import filter from "lodash/fp/filter";
 import { filterExpressionsParser, filterPredicate } from "./filtering";
 import { useConfigContext } from "../context-hooks/use-config-context";
 
-/**
- *
- * @param {Object}
- * @returns Promise
- */
 export const getNetworks = async ({ config }) => {
   const parsedNetworkFilterExpressions = filterExpressionsParser(
     config.networkFilters,

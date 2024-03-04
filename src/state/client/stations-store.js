@@ -1,4 +1,3 @@
-import { useTransition } from "react";
 import { stationAreaFilter, stationFilter } from "@/utils/station-filtering";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
@@ -119,7 +118,7 @@ export const useStationsStore = create(
         filteredStations: stationFilter({
           filterValues: {
             includeStationsWithNoObs: get().includeStationsWithNoObs,
-            setDate: get().startDate,
+            startDate: get().startDate,
             endDate: get().endDate,
             selectedNetworks: get().selectedNetworks,
             selectedVariables: get().selectedVariables,

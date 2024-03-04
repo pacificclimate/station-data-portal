@@ -16,7 +16,7 @@ import { useNetworks } from "@/state/query-hooks/use-networks";
 import useConfigContext from "@/state/context-hooks/use-config-context";
 import { NetworkSpot } from "./NetworkSpot";
 
-import "./NetworksMetadata.module.css";
+import "./NetworksMetadata.css";
 
 logger.configure({ active: true });
 

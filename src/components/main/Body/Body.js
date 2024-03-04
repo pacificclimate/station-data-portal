@@ -10,6 +10,7 @@ import NetworksMetadata from "@/components/info/NetworksMetadata";
 import AdjustableColumns from "@/components/util/AdjustableColumns";
 import useConfigContext from "@/state/context-hooks/use-config-context";
 import { NoRenderContent } from "./NoRenderContent";
+import { LazyRenderContent } from "./LazyRenderContent";
 import { useStationsStore } from "@/state/client/stations-store";
 import { useStationFilteringDefaults } from "@/state/client-server-hooks/use-station-filtering-defaults";
 
@@ -48,14 +49,14 @@ function Body() {
               </NoRenderContent>
             </Tab>
             <Tab eventKey={"Metadata"} title={"Station Metadata"}>
-              <NoRenderContent visible={key === "Metadata"}>
+              <LazyRenderContent visible={key === "Metadata"}>
                 <StationMetadata {...{ rowClasses }} />
-              </NoRenderContent>
+              </LazyRenderContent>
             </Tab>
             <Tab eventKey={"Data"} title={"Station Data"}>
-              <NoRenderContent visible={key === "Data"}>
+              <LazyRenderContent visible={key === "Data"}>
                 <StationData {...{ rowClasses }} />
-              </NoRenderContent>
+              </LazyRenderContent>
             </Tab>
             <Tab eventKey={"Networks"} title={"Networks"}>
               <NoRenderContent visible={key === "Networks"}>

@@ -6,22 +6,22 @@ import map from "lodash/fp/map";
 import join from "lodash/fp/join";
 
 function UnselectedThings({
-  selectedNetworksOptions,
-  selectedVariablesOptions,
-  selectedFrequenciesOptions,
+  selectedNetworks,
+  selectedVariables,
+  selectedFrequencies,
 }) {
   const selections = [
     {
       name: "networks",
-      items: selectedNetworksOptions,
+      items: selectedNetworks,
     },
     {
       name: "variables",
-      items: selectedVariablesOptions,
+      items: selectedVariables,
     },
     {
       name: "frequencies",
-      items: selectedFrequenciesOptions,
+      items: selectedFrequencies,
     },
   ];
 

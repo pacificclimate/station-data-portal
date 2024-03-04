@@ -35,13 +35,19 @@ export const useStationFilteringDefaults = (stationId) => {
   }));
 
   useEffect(() => {
+    // default setters are guarded against multiple sets, so this is safe to apply on each
+    // network request completion
+    if (variables)
+      setDefaultVariables(map((variable) => variable.id)(variables));
+    if (networks) setDefaultNetworks(map((network) => network.uri)(networks));
+    if (frequencies) setDefaultFrequencies(map(identity)(frequencies));
+
+    // stations tends to load last, defer applying of the filter until it lands,
+    // but allow setting of the selectors above as early as possible
     if (stations && variables && networks && frequencies) {
       setStations(stations);
       setVariables(variables);
-      // select everything by default.
-      setDefaultNetworks(map((network) => network.uri)(networks));
-      setDefaultVariables(map((variable) => variable.id)(variables));
-      setDefaultFrequencies(map(identity)(frequencies));
+      // select everything by default.)
       applyDefaultFilter();
     }
   }, [stations, variables, networks, frequencies]);

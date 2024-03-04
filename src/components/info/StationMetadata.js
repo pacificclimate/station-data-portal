@@ -22,9 +22,9 @@ import { smtColumnInfo, smtData } from "./column-definitions";
 import logger from "@/logger";
 import { useNetworks } from "@/state/query-hooks/use-networks";
 import { useVariables } from "@/state/query-hooks/use-variables";
-
-import "./StationMetadata.module.css";
 import { useStationsStore } from "@/state/client/stations-store";
+
+import "./StationMetadata.css";
 
 logger.configure({ active: true });
 

@@ -25,7 +25,7 @@ export const AdjustableColumns = ({ defaultLgs, contents }) => {
     );
   }
 
-  const [lgs, setLgs] = useState(clone(defaultLgs));
+  const [{ lgs }, setLgs] = useState({ lgs: clone(defaultLgs) });
   const handleShrinkLeftBy = (amount) => (index) => () =>
     setLgs((state) => {
       const lgs = state.lgs;

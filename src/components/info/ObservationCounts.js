@@ -7,6 +7,7 @@ import logger from "@/logger";
 import { getTimer } from "@/utils/timing";
 import { useObservationCounts } from "@/state/query-hooks/use-observation-counts";
 import useConfigContext from "@/state/context-hooks/use-config-context";
+import { useStationsStore } from "@/state/client/stations-store";
 
 logger.configure({ active: true });
 const timer = getTimer("Observation count timing");
@@ -25,19 +26,19 @@ const totalCounts = timer.timeThis("totalCounts")((counts, stations) =>
   reduce((sum, station) => sum + (counts[station.id] || 0), 0)(stations),
 );
 
-function ObservationCounts({
-  filterValues: { startDate, endDate },
-  clipToDate,
-  stations,
-}) {
-  const config = useConfigContext();
+function ObservationCounts({ clipToDate }) {
+  const { startDate, endDate, stations } = useStationsStore((state) => ({
+    startDate: state.startDate,
+    endDate: state.endDate,
+    stations: state.selectedStations,
+  }));
   const {
     data: countData,
     isLoading,
     isError,
   } = useObservationCounts(
-    dateToStrForQuery(startDate),
-    dateToStrForQuery(endDate),
+    clipToDate ? dateToStrForQuery(startDate) : null,
+    clipToDate ? dateToStrForQuery(endDate) : null,
   );
 
   const loadingMessage = "Loading ...";
@@ -68,16 +69,20 @@ function ObservationCounts({
     <Table size="sm">
       <thead>
         <tr>
-          <th colSpan={2}>Summary for selected stations</th>
+          <th scope="table" colSpan={2}>
+            Summary for selected stations
+          </th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <th>Number of stations</th>
-          <td className="text-right">{stations.length}</td>
+          <th scope="row">Number of stations</th>
+          <td className="text-right" style={{ width: "20%" }}>
+            {stations.length}
+          </td>
         </tr>
         <tr>
-          <th>
+          <th scope="row">
             Total observations ({timePeriod}){" "}
             <InfoPopup title="Total observations">
               Observation counts are estimates, and are less accurate for time
@@ -89,7 +94,7 @@ function ObservationCounts({
           </td>
         </tr>
         <tr>
-          <th>Total climatologies (all dates)</th>
+          <th scope="row">Total climatologies (all dates)</th>
           <td className="text-right">
             {countTotals.climatologies?.toLocaleString() ?? loadingMessage}
           </td>
