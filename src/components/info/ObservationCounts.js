@@ -6,8 +6,8 @@ import InfoPopup from "@/components/util/InfoPopup";
 import logger from "@/logger";
 import { getTimer } from "@/utils/timing";
 import { useObservationCounts } from "@/state/query-hooks/use-observation-counts";
-import useConfigContext from "@/state/context-hooks/use-config-context";
 import { useStationsStore } from "@/state/client/stations-store";
+import { useStationFilteringContext } from "@/state/context-hooks/use-station-filtering-context";
 
 logger.configure({ active: true });
 const timer = getTimer("Observation count timing");
@@ -27,10 +27,10 @@ const totalCounts = timer.timeThis("totalCounts")((counts, stations) =>
 );
 
 function ObservationCounts({ clipToDate }) {
-  const { startDate, endDate, stations } = useStationsStore((state) => ({
+  const { selectedStations: stations } = useStationFilteringContext();
+  const { startDate, endDate } = useStationsStore((state) => ({
     startDate: state.startDate,
     endDate: state.endDate,
-    stations: state.selectedStations,
   }));
   const {
     data: countData,

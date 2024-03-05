@@ -22,7 +22,7 @@ import { smtColumnInfo, smtData } from "./column-definitions";
 import logger from "@/logger";
 import { useNetworks } from "@/state/query-hooks/use-networks";
 import { useVariables } from "@/state/query-hooks/use-variables";
-import { useStationsStore } from "@/state/client/stations-store";
+import { useStationFilteringContext } from "@/state/context-hooks/use-station-filtering-context";
 
 import "./StationMetadata.css";
 
@@ -31,9 +31,7 @@ logger.configure({ active: true });
 function StationMetadata({ rowClasses }) {
   const { data: allNetworks } = useNetworks();
   const { data: allVariables } = useVariables();
-  const { selectedStations: stations } = useStationsStore((state) => ({
-    selectedStations: state.selectedStations,
-  }));
+  const { selectedStations: stations } = useStationFilteringContext();
 
   const [helpVisible, setHelpVisible] = useState(false);
   const [compact, setCompact] = useState(false);

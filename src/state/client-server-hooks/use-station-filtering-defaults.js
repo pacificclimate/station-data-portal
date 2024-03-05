@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useStations } from "@/state/query-hooks/use-stations";
+import { useShallow } from "zustand/react/shallow";
 import { useVariables } from "@/state/query-hooks/use-variables";
 import { useFrequencies } from "@/state/query-hooks/use-frequencies";
 import { useNetworks } from "@/state/query-hooks/use-networks";
@@ -8,31 +8,21 @@ import map from "lodash/fp/map";
 import identity from "lodash/fp/identity";
 
 /**
- * Layer 3. Integration between async server state and Zustand client state for preview station variables
- * @param {number} stationId
+ * Integration between query hooks loaded on the Body route and setting of defaults for filters.
  * @returns
  */
-export const useStationFilteringDefaults = (stationId) => {
-  const { data: stations /*isLoading, isError*/ } = useStations();
-  const { data: variables /*isLoading, isError*/ } = useVariables();
-  const { data: frequencies /*isLoading, isError*/ } = useFrequencies();
-  const { data: networks /*isLoading, isError*/ } = useNetworks();
-  const {
-    setStations,
-    setVariables,
-    setDefaultNetworks,
-    setDefaultVariables,
-    setDefaultFrequencies,
-    applyDefaultFilter,
-  } = useStationsStore((state) => ({
-    setStations: state.setStations,
-    setVariables: state.setVariables,
-    setDefaultNetworks: state.setDefaultNetworks,
-    setDefaultVariables: state.setDefaultVariables,
-    setDefaultFrequencies: state.setDefaultFrequencies,
-    applyDefaultFilter: state.applyDefaultFilter,
-    applyAreaFilter: state.applyAreaFilter,
-  }));
+export const useStationFilteringDefaults = () => {
+  const { data: variables } = useVariables();
+  const { data: frequencies } = useFrequencies();
+  const { data: networks } = useNetworks();
+  const { setDefaultNetworks, setDefaultVariables, setDefaultFrequencies } =
+    useStationsStore(
+      useShallow((state) => ({
+        setDefaultNetworks: state.setDefaultNetworks,
+        setDefaultVariables: state.setDefaultVariables,
+        setDefaultFrequencies: state.setDefaultFrequencies,
+      })),
+    );
 
   useEffect(() => {
     // default setters are guarded against multiple sets, so this is safe to apply on each
@@ -41,16 +31,5 @@ export const useStationFilteringDefaults = (stationId) => {
       setDefaultVariables(map((variable) => variable.id)(variables));
     if (networks) setDefaultNetworks(map((network) => network.uri)(networks));
     if (frequencies) setDefaultFrequencies(map(identity)(frequencies));
-
-    // stations tends to load last, defer applying of the filter until it lands,
-    // but allow setting of the selectors above as early as possible
-    if (stations && variables && networks && frequencies) {
-      setStations(stations);
-      setVariables(variables);
-      // select everything by default.)
-      applyDefaultFilter();
-    }
-  }, [stations, variables, networks, frequencies]);
-
-  return { stations, variables };
+  }, [variables, networks, frequencies]);
 };

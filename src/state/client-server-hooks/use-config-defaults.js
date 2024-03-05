@@ -6,7 +6,8 @@ import { useConfig } from "../query-hooks/use-config";
 import { useStore } from "../client/state-store";
 
 /**
- * This hook effectively runs once after config loads and provides various defaults to the app.
+ * This hook runs after config is loaded, used once at the "App" component level to ensure that
+ * Defaults are applied
  * @returns {object} results from useConfig hook.
  */
 export const useConfigDefaults = () => {

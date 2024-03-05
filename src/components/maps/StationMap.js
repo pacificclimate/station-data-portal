@@ -40,21 +40,22 @@ import React, { useEffect, useMemo, useRef, useTransition } from "react";
 
 import { FeatureGroup, LayerGroup } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
+import isEqual from "lodash/fp/isEqual";
+import { layersToGeoJSONMultipolygon } from "@/utils/geoJSON-leaflet";
+import { getTimer } from "@/utils/timing";
 import baseMaps from "@/components/maps/baseMaps";
 
 import MapInfoDisplay from "./MapInfoDisplay";
 import { defaultMarkerOptions, ManyStationMarkers } from "./StationMarkers";
-import { layersToGeoJSONMultipolygon } from "@/utils/geoJSON-leaflet";
 
 import logger from "@/logger";
-import { getTimer } from "@/utils/timing";
 import { MapSpinner } from "pcic-react-leaflet-components";
 import { useImmer } from "use-immer";
 import { StationRefresh } from "./StationRefresh/StationRefresh";
 import useConfigContext from "@/state/context-hooks/use-config-context";
 import { useStationsStore } from "@/state/client/stations-store";
 import { useStations } from "@/state/query-hooks/use-stations";
-import isEqual from "lodash/fp/isEqual";
+import { useStationFilteringContext } from "@/state/context-hooks/use-station-filtering-context";
 
 logger.configure({ active: true });
 const smtimer = getTimer("StationMarker timing");
@@ -168,14 +169,7 @@ const StationMapRenderer = React.memo(
     );
   },
   (prevProps, nextProps) => {
-    console.log("StationMapRenderer", prevProps, nextProps);
     const equal = isEqual(prevProps, nextProps);
-    for (const key in prevProps) {
-      if (isEqual(prevProps[key], nextProps[key])) {
-        console.log("StationMapRenderer", key, prevProps[key], nextProps[key]);
-      }
-    }
-    console.log("StationMapRenderer equal", equal);
     return equal;
   },
 );
@@ -193,10 +187,11 @@ const StationMap = ({
 }) => {
   const config = useConfigContext();
   const { isLoading: externalIsPending } = useStations();
-  const { filteredStations: stations, setArea } = useStationsStore((state) => ({
-    filteredStations: state.filteredStations,
+  const { setArea } = useStationsStore((state) => ({
     setArea: state.setArea,
   }));
+  const { isFiltering, filteredStations: stations } =
+    useStationFilteringContext();
 
   const userShapeLayerRef = useRef();
 
@@ -224,7 +219,7 @@ const StationMap = ({
         onReloadStations,
         config,
         stations,
-        externalIsPending,
+        externalIsPending: isFiltering || externalIsPending,
       }}
     />
   );

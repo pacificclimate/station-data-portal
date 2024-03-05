@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import React from "react";
 import flow from "lodash/fp/flow";
 import map from "lodash/fp/map";
@@ -6,8 +5,8 @@ import flatten from "lodash/fp/flatten";
 import sum from "lodash/fp/sum";
 
 import logger from "@/logger";
-
-import { useStationsStore } from "@/state/client/stations-store";
+import { useStations } from "@/state/query-hooks/use-stations";
+import { useStationFilteringContext } from "@/state/context-hooks/use-station-filtering-context";
 
 logger.configure({ active: true });
 
@@ -18,10 +17,8 @@ const numHistories = flow(
 );
 
 const SelectionCounts = ({ Container = "p" }) => {
-  const { stations, selectedStations } = useStationsStore((state) => ({
-    stations: state.stations,
-    selectedStations: state.selectedStations,
-  }));
+  const { data: stations } = useStations();
+  const { selectedStations } = useStationFilteringContext();
   if (!stations) {
     return <Container>Loading station info ...</Container>;
   }
@@ -38,10 +35,4 @@ const SelectionCounts = ({ Container = "p" }) => {
     </Container>
   );
 };
-
-SelectionCounts.propTypes = {
-  allStations: PropTypes.array,
-  selectedStations: PropTypes.array,
-};
-
 export default SelectionCounts;

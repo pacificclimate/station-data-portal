@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useShallow } from "zustand/react/shallow";
 import flow from "lodash/fp/flow";
 import map from "lodash/fp/map";
 import max from "date-fns/max";
@@ -20,19 +21,21 @@ const getMinStartDate = flow(
 );
 
 /**
- * Layer 3. Integration between async server state and Zustand client state for preview station variables
+ * Integration between server components loaded for the Preview route and the zustand store for that page
  * @param {number} stationId
- * @returns
+ * @returns {object} data, isLoading, isError from stationVariables. stationId as passed in.
  */
 export const useStationVariablesDefaults = (stationId) => {
   const { data, isLoading, isError } = useStationVariables(stationId);
   const selectedDuration = useStore((state) => state.selectedDuration);
-  const storeActions = useStore((state) => ({
-    setStationId: state.setStationId,
-    setSelectedEndDate: state.setSelectedEndDate,
-    setMaxEndDate: state.setMaxEndDate,
-    setMinStartDate: state.setMinStartDate,
-  }));
+  const storeActions = useStore(
+    useShallow((state) => ({
+      setStationId: state.setStationId,
+      setSelectedEndDate: state.setSelectedEndDate,
+      setMaxEndDate: state.setMaxEndDate,
+      setMinStartDate: state.setMinStartDate,
+    })),
+  );
 
   useEffect(() => {
     // if stationid changes, this will clear default ranges and set duration back to default
