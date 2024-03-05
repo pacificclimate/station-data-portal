@@ -2,9 +2,11 @@ import React from "react";
 import { Card, Col, Row } from "react-bootstrap";
 import map from "lodash/fp/map";
 import PreviewGraph from "./PreviewGraph";
+import { format } from "date-fns";
 import { useStore } from "@/state/client/state-store";
 import { useStation } from "@/state/query-hooks/use-station";
 import { useStationVariables } from "@/state/query-hooks/use-station-variables";
+import KVLabel from "./KVLabel";
 
 const GraphsBlock = () => {
   const stationId = useStore((state) => state.stationId);
@@ -81,7 +83,56 @@ const GraphsBlock = () => {
               <Card style={{ width: "100%" }}>
                 <Card.Body>
                   <Card.Title>{variable.display_name}</Card.Title>
-                  <Card.Body>{variable.description}</Card.Body>
+                  <Card.Body>
+                    <KVLabel
+                      {...{
+                        label: "Description",
+                        value: variable.description,
+                      }}
+                    />
+                    <KVLabel
+                      {...{
+                        label: "Units",
+                        value: variable.unit,
+                      }}
+                    />
+                    <KVLabel
+                      {...{
+                        label: "Cell Method",
+                        value: variable.cell_method,
+                      }}
+                    />
+                    <KVLabel
+                      {...{
+                        label: "Standard Name",
+                        value: variable.standard_name,
+                      }}
+                    />
+                    <KVLabel
+                      {...{
+                        label: "Frist Observation",
+                        value: variable.min_obs_time,
+                        formatter: (value) => (
+                          <>
+                            <br />
+                            {format(value, "PPpp")}
+                          </>
+                        ),
+                      }}
+                    />
+                    <KVLabel
+                      {...{
+                        label: "Last Observation",
+                        value: variable.max_obs_time,
+                        formatter: (value) => (
+                          <>
+                            <br />
+                            {format(value, "PPpp")}
+                          </>
+                        ),
+                      }}
+                    />
+                  </Card.Body>
                 </Card.Body>
               </Card>
             </Col>

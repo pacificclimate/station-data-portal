@@ -51,8 +51,8 @@ const PreviewGraph = ({ variableId }) => {
   if ((previewObservations?.observations?.length ?? 0) === 0) {
     return (
       <div>
-        No data found for {previewObservations.variable.name} in this time
-        period.
+        No data found for {previewObservations.variable.name} in the currently
+        selected time period.
       </div>
     );
   }
