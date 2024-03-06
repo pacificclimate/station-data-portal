@@ -110,7 +110,7 @@ const GraphsBlock = () => {
                     />
                     <KVLabel
                       {...{
-                        label: "Frist Observation",
+                        label: "First Observation",
                         value: variable.min_obs_time,
                         formatter: (value) => (
                           <>
