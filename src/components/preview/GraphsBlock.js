@@ -39,8 +39,8 @@ const GraphsBlock = () => {
     isLoading: isVariableLoading,
     isError: isVariableError,
   } = useStationVariables(stationId);
-  const graphWidth = showLegend ? 8 : 12;
   const legendWidth = showLegend ? 4 : 0;
+  const graphWidth = 12 - legendWidth;
 
   const [elements, setElements] = useState([]);
   const [currentActiveIndex] = useScrollspy(elements, {

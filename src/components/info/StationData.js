@@ -27,12 +27,13 @@ function StationData({ rowClasses }) {
   const { data: allNetworks } = useNetworks();
   const { data: allVariables } = useVariables();
   const { data: allFrequencies } = useFrequencies();
+
   const {
     polygon,
     startDate,
     endDate,
-    selectedNetworksUris,
-    selectedVariablesIds,
+    selectedNetworks: selectedNetworksUris,
+    selectedVariables: selectedVariablesIds,
     selectedFrequencies,
     onlyWithClimatology,
   } = useStationsStore(
@@ -41,8 +42,8 @@ function StationData({ rowClasses }) {
         "polygon",
         "startDate",
         "endDate",
-        "selectedNetworksUris",
-        "selectedVariablesIds",
+        "selectedNetworks",
+        "selectedVariables",
         "selectedFrequencies",
         "onlyWithClimatology",
       ]),
@@ -90,6 +91,22 @@ function StationData({ rowClasses }) {
               (dataCategory) => {
                 // Disable download buttons if the download URL exceeds
                 // maximum allowable length. Provide explanation in popup.
+                console.log({
+                  config,
+                  startDate,
+                  endDate,
+                  selectedNetworksUris,
+                  selectedVariablesIds,
+                  selectedFrequencies,
+                  polygon,
+                  clipToDate,
+                  onlyWithClimatology,
+                  dataCategory,
+                  dataFormat,
+                  allNetworks,
+                  allVariables,
+                  allFrequencies,
+                });
                 const downloadUrl = dataDownloadTarget({
                   config,
                   startDate,

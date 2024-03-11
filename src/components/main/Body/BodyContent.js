@@ -20,7 +20,6 @@ export const BodyContent = () => {
 
   const rowClasses = "mt-3";
 
-  const [key, setKey] = useState(config.defaultTab);
   return (
     <Row className={css.portal}>
       <AdjustableColumns
@@ -30,29 +29,30 @@ export const BodyContent = () => {
           <StationMap className={css.mainColumns} />,
           <Tabs
             id="non-map-controls"
-            activeKey={key}
-            onSelect={(k) => setKey(k)}
+            defaultActiveKey={config.defaultTab}
             className={css.mainTabs}
           >
-            <Tab eventKey={"Filters"} title={"Station Filters"}>
-              <NoRenderContent visible={key === "Filters"}>
-                <StationFilters {...{ rowClasses }} />
-              </NoRenderContent>
+            <Tab
+              eventKey={"Filters"}
+              title={"Station Filters"}
+              mountOnEnter
+              unmountOnExit
+            >
+              <StationFilters {...{ rowClasses }} />
             </Tab>
-            <Tab eventKey={"Metadata"} title={"Station Metadata"}>
-              <LazyRenderContent visible={key === "Metadata"}>
-                <StationMetadata {...{ rowClasses }} />
-              </LazyRenderContent>
+            <Tab eventKey={"Metadata"} title={"Station Metadata"} mountOnEnter>
+              <StationMetadata {...{ rowClasses }} />
             </Tab>
-            <Tab eventKey={"Data"} title={"Station Data"}>
-              <LazyRenderContent visible={key === "Data"}>
-                <StationData {...{ rowClasses }} />
-              </LazyRenderContent>
+            <Tab eventKey={"Data"} title={"Station Data"} mountOnEnter>
+              <StationData {...{ rowClasses }} />
             </Tab>
-            <Tab eventKey={"Networks"} title={"Networks"}>
-              <NoRenderContent visible={key === "Networks"}>
-                <NetworksMetadata />
-              </NoRenderContent>
+            <Tab
+              eventKey={"Networks"}
+              title={"Networks"}
+              mountOnEnter
+              unmountOnExit
+            >
+              <NetworksMetadata />
             </Tab>
           </Tabs>,
         ]}
