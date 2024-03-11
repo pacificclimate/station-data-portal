@@ -91,22 +91,6 @@ function StationData({ rowClasses }) {
               (dataCategory) => {
                 // Disable download buttons if the download URL exceeds
                 // maximum allowable length. Provide explanation in popup.
-                console.log({
-                  config,
-                  startDate,
-                  endDate,
-                  selectedNetworksUris,
-                  selectedVariablesIds,
-                  selectedFrequencies,
-                  polygon,
-                  clipToDate,
-                  onlyWithClimatology,
-                  dataCategory,
-                  dataFormat,
-                  allNetworks,
-                  allVariables,
-                  allFrequencies,
-                });
                 const downloadUrl = dataDownloadTarget({
                   config,
                   startDate,
