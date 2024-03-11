@@ -43,9 +43,9 @@ export const useStationVariablesDefaults = (stationId) => {
 
     if (data && data.variables?.length > 0) {
       const maxEndDate = getMaxEndDate(data.variables);
-      const selectedStartDate = subMonths(maxEndDate, selectedDuration);
+      // const selectedStartDate = subMonths(maxEndDate, selectedDuration);
 
-      console.log("### selected date range", selectedStartDate, maxEndDate);
+      // console.log("### selected date range", selectedStartDate, maxEndDate);
 
       // set default ranges
       storeActions.setMinStartDate(getMinStartDate(data.variables));

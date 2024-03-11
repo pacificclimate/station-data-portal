@@ -1,4 +1,6 @@
 import React from "react";
+import { useShallow } from "zustand/react/shallow";
+import pick from "lodash/fp/pick";
 import DateRange from "@/components/controls/daterange";
 import addDays from "date-fns/addDays";
 import differenceInDays from "date-fns/differenceInDays";
@@ -9,28 +11,29 @@ import { useStore } from "@/state/client/state-store";
 import { useStationVariables } from "@/state/query-hooks/use-station-variables";
 import useConfigContext from "@/state/context-hooks/use-config-context";
 
-const millisecondsPerMonth = 2629746000;
+//const millisecondsPerMonth = 2629746000;
 const millisedondsPerDay = 86400000;
 
 const RangeBlock = ({}) => {
   const config = useConfigContext();
-  const storeData = useStore((state) => ({
-    stationId: state.stationId,
-    minStartDate: state.minStartDate,
-    maxEndDate: state.maxEndDate,
-    selectedStartDate: state.selectedStartDate,
-    selectedEndDate: state.selectedEndDate,
-  }));
-  const actions = useStore((state) => ({
-    setSelectedStartDate: state.setSelectedStartDate,
-    setSelectedEndDate: state.setSelectedEndDate,
-  }));
+  const storeData = useStore(
+    useShallow(
+      pick([
+        "stationId",
+        "minStartDate",
+        "maxEndDate",
+        "selectedStartDate",
+        "selectedEndDate",
+      ]),
+    ),
+  );
+  const actions = useStore(
+    useShallow(pick(["setSelectedStartDate", "setSelectedEndDate"])),
+  );
 
-  const {
-    data: previewStationVariables,
-    isLoading,
-    isError,
-  } = useStationVariables(storeData.stationId);
+  const { data: previewStationVariables, isLoading } = useStationVariables(
+    storeData.stationId,
+  );
 
   if (!(previewStationVariables.variables?.length ?? 0 > 0)) {
     return <div>This station has no variables associated with it.</div>;
@@ -40,7 +43,7 @@ const RangeBlock = ({}) => {
     return <div>Loading...</div>;
   }
 
-  console.log("### RangeBlock", storeData, previewStationVariables);
+  //console.log("### RangeBlock", storeData, previewStationVariables);
 
   const startTime = startOfDecade(storeData.minStartDate);
   const endTime = addDays(endOfDecade(storeData.maxEndDate), 1);
@@ -54,18 +57,18 @@ const RangeBlock = ({}) => {
   const ticks = differenceInYears(endTime, startTime) / 10 + 1;
 
   const onTimeRangeChange = ([start, end]) => {
-    console.log(
-      "### onTimeRangeChange",
-      start,
-      end,
-      storeData.selectedStartDate,
-      storeData.selectedEndDate,
-    );
-    console.log(
-      "### diff",
-      differenceInDays(start, storeData.selectedStartDate),
-      differenceInDays(end, storeData.selectedEndDate),
-    );
+    // console.log(
+    //   "### onTimeRangeChange",
+    //   start,
+    //   end,
+    //   storeData.selectedStartDate,
+    //   storeData.selectedEndDate,
+    // );
+    // console.log(
+    //   "### diff",
+    //   differenceInDays(start, storeData.selectedStartDate),
+    //   differenceInDays(end, storeData.selectedEndDate),
+    // );
 
     // the range control will try to adjust its range to be aligned with its "step" value.
     // rejecting small adjustments made by the control prevent us getting into a loop of constant adjustments

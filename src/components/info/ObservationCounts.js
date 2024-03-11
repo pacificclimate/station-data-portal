@@ -1,7 +1,9 @@
 import PropTypes from "prop-types";
 import React, { useMemo } from "react";
+import { useShallow } from "zustand/react/shallow";
+import pick from "lodash/fp/pick";
+import reduce from "lodash/fp/reduce";
 import { Table } from "react-bootstrap";
-import { reduce } from "lodash/fp";
 import InfoPopup from "@/components/util/InfoPopup";
 import logger from "@/logger";
 import { getTimer } from "@/utils/timing";
@@ -28,15 +30,10 @@ const totalCounts = timer.timeThis("totalCounts")((counts, stations) =>
 
 function ObservationCounts({ clipToDate }) {
   const { selectedStations: stations } = useStationFilteringContext();
-  const { startDate, endDate } = useStationsStore((state) => ({
-    startDate: state.startDate,
-    endDate: state.endDate,
-  }));
-  const {
-    data: countData,
-    isLoading,
-    isError,
-  } = useObservationCounts(
+  const { startDate, endDate } = useStationsStore(
+    useShallow(pick(["startDate", "endDate"])),
+  );
+  const { data: countData, isLoading } = useObservationCounts(
     clipToDate ? dateToStrForQuery(startDate) : null,
     clipToDate ? dateToStrForQuery(endDate) : null,
   );

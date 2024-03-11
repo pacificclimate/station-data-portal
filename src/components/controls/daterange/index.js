@@ -73,7 +73,7 @@ const getFormattedIntervals = (
       return { id: `${classPrefix}-${index}`, source, target, type, color };
     });
 
-  console.log("### formattedBlockedDates", formattedBlockedDates);
+  // console.log("### formattedBlockedDates", formattedBlockedDates);
 
   return formattedBlockedDates;
 };
@@ -170,8 +170,6 @@ class DateRange extends React.Component {
       mode,
       hideHandles,
     } = this.props;
-
-    console.log("### dataIntervals", this.props.dataIntervals);
 
     const domain = timelineInterval.map((t) => Number(t));
 

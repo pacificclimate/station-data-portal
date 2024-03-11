@@ -10,11 +10,7 @@ import GraphsBlock from "./GraphsBlock";
 export default function StationPreview() {
   const urlParams = useLoaderData();
   // initialize the zustand store with defaults based on data loaded from react query.
-  const {
-    data: previewStation,
-    isLoading: isStationLoading,
-    isError: isStationError,
-  } = useStation(urlParams.stationId);
+  const { isLoading: isStationLoading } = useStation(urlParams.stationId);
   const { data: previewStationVariables, isLoading } =
     useStationVariablesDefaults(urlParams.stationId);
 
@@ -42,14 +38,5 @@ export default function StationPreview() {
     </Container>
   );
 }
-
-// returns the id of the selected station from the URL
-// the results of this function are accessed via "useLoaderData"
-// and it is configured via the router in index.js.
-export const loader = async ({ params }) => {
-  // TODO: Make int?
-  const stationId = params.stationId;
-  return { stationId };
-};
 
 export const Component = StationPreview;

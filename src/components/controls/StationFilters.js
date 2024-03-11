@@ -23,6 +23,8 @@
 
 import React from "react";
 import { Col, Row } from "react-bootstrap";
+import { useShallow } from "zustand/react/shallow";
+import pick from "lodash/fp/pick";
 
 import SelectionCounts from "@/components/info/SelectionCounts";
 import IncludeStationsWithNoObsControl from "@/components/controls/IncludeStationsWithNoObsControl";
@@ -31,29 +33,18 @@ import VariableSelector from "@/components/selectors/VariableSelector";
 import FrequencySelector from "@/components/selectors/FrequencySelector";
 import DateSelector from "@/components/selectors/DateSelector";
 import OnlyWithClimatologyControl from "@/components/controls/OnlyWithClimatologyControl";
-import { useVariables } from "@/state/query-hooks/use-variables";
-import { useFrequencies } from "@/state/query-hooks/use-frequencies";
 import { useStationsStore } from "@/state/client/stations-store";
 import { useStore } from "@/state/client/state-store";
 import { useConfigContext } from "@/state/context-hooks/use-config-context";
 
 function StationFilters({ rowClasses = "mb-3" }) {
   const config = useConfigContext();
-  const { data: allVariables } = useVariables();
-  const { data: allFrequencies } = useFrequencies();
   const { startDate, endDate, setStartDate, setEndDate } = useStationsStore(
-    (state) => ({
-      // dates
-      startDate: state.startDate,
-      endDate: state.endDate,
-      setStartDate: state.setStartDate,
-      setEndDate: state.setEndDate,
-    }),
+    useShallow(pick(["startDate", "endDate", "setStartDate", "setEndDate"])),
   );
-  const { stationsLimit, setStationsLimit } = useStore((state) => ({
-    stationsLimit: state.stationsLimit,
-    setStationsLimit: state.setStationsLimit,
-  }));
+  const { stationsLimit, setStationsLimit } = useStore(
+    useShallow(pick(["stationsLimit", "setStationsLimit"])),
+  );
 
   return (
     <>

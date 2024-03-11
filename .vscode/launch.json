@@ -24,22 +24,11 @@
       "name": "vscode-jest-tests",
       "request": "launch",
       "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "run",
-        "test",
-        "--runInBand"
-        //"--env=jest-environment-jsdom-sixteen",
-        //"--transformIgnorePatterns \"node_modules/(?!date-fns)/\""
-      ],
-      "args": [
-        //   "--runInBand",
-        //   "--fileDirname", // ADDING THE CURRENT FILENAME DIR FOR THE SCRIPT
-        //   "${fileDirname}"
-      ],
+      "runtimeArgs": ["run", "test", "--runInBand"],
+      "args": [],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
-      // "program": "${workspaceFolder}/tools/vscode-jest-tests/index.js" // THE SCRIPT
     }
   ]
 }

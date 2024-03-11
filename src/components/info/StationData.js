@@ -1,12 +1,11 @@
 import PropTypes from "prop-types";
 import React, { useState } from "react";
+import { useShallow } from "zustand/react/shallow";
+import pick from "lodash/fp/pick";
 import { Button, ButtonToolbar, Col, Row } from "react-bootstrap";
 import capitalize from "lodash/fp/capitalize";
 import map from "lodash/fp/map";
-import {
-  dataDownloadTarget,
-  dataDownloadFilename,
-} from "@/utils/pdp-data-service";
+import { dataDownloadTarget } from "@/utils/pdp-data-service";
 import FileFormatSelector from "@/components/selectors/FileFormatSelector";
 import ClipToDateControl from "@/components/controls/ClipToDateControl";
 import SelectionCounts from "@/components/info/SelectionCounts";
@@ -36,15 +35,19 @@ function StationData({ rowClasses }) {
     selectedVariablesIds,
     selectedFrequencies,
     onlyWithClimatology,
-  } = useStationsStore((state) => ({
-    polygon: state.selectedArea,
-    startDate: state.startDate,
-    endDate: state.endDate,
-    selectedNetworksUris: state.selectedNetworks,
-    selectedVariablesIds: state.selectedVariables,
-    selectedFrequencies: state.selectedFrequencies,
-    onlyWithClimatology: state.onlyWithClimatology,
-  }));
+  } = useStationsStore(
+    useShallow(
+      pick([
+        "polygon",
+        "startDate",
+        "endDate",
+        "selectedNetworksUris",
+        "selectedVariablesIds",
+        "selectedFrequencies",
+        "onlyWithClimatology",
+      ]),
+    ),
+  );
 
   const [dataFormat, setFileFormat] = useState();
   const [clipToDate, setClipToDate] = useState(false);

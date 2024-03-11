@@ -153,7 +153,6 @@ const VariableSelector = () => {
   const { size, variant, className } = selectorButtonProps;
 
   const onChange = (selected) => {
-    console.log(selected);
     setSelectedVariables(variableIdsFromOptions(selected));
   };
 

@@ -1,8 +1,6 @@
 // This component renders a table showing a selected subset of network metadata.
-// This component wraps React Table v6. All props passed to this component are
-// passed into React Table.
+// This component wraps React Table v8.
 
-import PropTypes from "prop-types";
 import React from "react";
 import { Table } from "react-bootstrap";
 import {
@@ -77,7 +75,7 @@ function NetworksMetadata() {
     return "Loading...";
   }
 
-  console.log("### NetworksMetadata", table.getRowModel(), networks);
+  //console.log("### NetworksMetadata", table.getRowModel(), networks);
 
   const getSortedCssClass = (column) => {
     const classes = [];

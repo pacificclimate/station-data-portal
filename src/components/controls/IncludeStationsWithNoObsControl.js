@@ -1,18 +1,17 @@
-import PropTypes from "prop-types";
 import React from "react";
+import { useShallow } from "zustand/react/shallow";
 
-import InfoPopup from "../util/InfoPopup/InfoPopup";
+import InfoPopup from "@/components/util/InfoPopup";
 import CheckboxControl from "./CheckboxControl";
 import { useStationsStore } from "@/state/client/stations-store";
 
 export default function IncludeStationsWithNoObsControl() {
-  const {
-    includeStationsWithNoObs: value,
-    toggleIncludeStationsWithNoObs: onChange,
-  } = useStationsStore((state) => ({
-    includeStationsWithNoObs: state.includeStationsWithNoObs,
-    toggleIncludeStationsWithNoObs: state.toggleIncludeStationsWithNoObs,
-  }));
+  const { value, onChange } = useStationsStore(
+    useShallow((state) => ({
+      value: state.includeStationsWithNoObs,
+      onChange: state.toggleIncludeStationsWithNoObs,
+    })),
+  );
   const label = "Include stations with no observations";
   return (
     <CheckboxControl
