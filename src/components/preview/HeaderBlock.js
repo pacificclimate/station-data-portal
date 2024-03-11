@@ -75,6 +75,10 @@ export const HeaderBlock = () => {
                       <td>Province: </td>
                       <td>{history.province}</td>
                     </tr>
+                    <tr>
+                      <td>Native Id:</td>
+                      <td>{previewStation.native_id}</td>
+                    </tr>
                   </tbody>
                 </Table>
               </Accordion.Body>

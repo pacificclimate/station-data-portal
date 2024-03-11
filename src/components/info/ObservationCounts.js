@@ -66,7 +66,7 @@ function ObservationCounts({ clipToDate }) {
     <Table size="sm">
       <thead>
         <tr>
-          <th scope="table" colSpan={2}>
+          <th scope="colgroup" colSpan={2}>
             Summary for selected stations
           </th>
         </tr>

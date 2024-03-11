@@ -80,4 +80,3 @@ root.render(
     <RouterProvider router={router} />
   </QueryClientProvider>,
 );
-console.log("### render index.js");

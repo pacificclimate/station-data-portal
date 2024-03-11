@@ -1,4 +1,6 @@
-import React from "react";
+import { useState, useEffect } from "react";
+import { useShallow } from "zustand/react/shallow";
+import pick from "lodash/fp/pick";
 import { Card, Col, Row } from "react-bootstrap";
 import map from "lodash/fp/map";
 import PreviewGraph from "./PreviewGraph";
@@ -7,10 +9,26 @@ import { useStore } from "@/state/client/state-store";
 import { useStation } from "@/state/query-hooks/use-station";
 import { useStationVariables } from "@/state/query-hooks/use-station-variables";
 import KVLabel from "./KVLabel";
+import { useScrollspy } from "@/utils/hooks/useScrollspy";
 
 const GraphsBlock = () => {
-  const stationId = useStore((state) => state.stationId);
-  const showLegend = useStore((state) => state.showLegend);
+  const {
+    stationId,
+    showLegend,
+    selectedStartDate,
+    selectedEndDate,
+    setActiveGraph,
+  } = useStore(
+    useShallow(
+      pick([
+        "stationId",
+        "showLegend",
+        "selectedStartDate",
+        "selectedEndDate",
+        "setActiveGraph",
+      ]),
+    ),
+  );
   const {
     data: previewStation,
     isLoading: isStationLoading,
@@ -21,15 +39,32 @@ const GraphsBlock = () => {
     isLoading: isVariableLoading,
     isError: isVariableError,
   } = useStationVariables(stationId);
-  const selectedStartDate = useStore((state) => state.selectedStartDate);
-  const selectedEndDate = useStore((state) => state.selectedEndDate);
-
   const graphWidth = showLegend ? 8 : 12;
   const legendWidth = showLegend ? 4 : 0;
 
+  const [elements, setElements] = useState([]);
+  const [currentActiveIndex] = useScrollspy(elements, {
+    offset: 300,
+  });
+  console.log(currentActiveIndex);
+  useEffect(() => {
+    setActiveGraph(currentActiveIndex);
+  }, [currentActiveIndex]);
+
+  const ids = map((variable) => `${previewStation.id}-${variable.id}`)(
+    previewStationVariables.variables,
+  );
+  useEffect(() => {
+    const widgetElements = ids.map((item) =>
+      document.querySelector(`.row[id="${item}"]`),
+    );
+
+    setElements(widgetElements);
+  }, []);
+
   if (isStationLoading || isVariableLoading) {
     return (
-      <Row>
+      <Row id="graphs-root">
         <Col xs={12} className="d-flex justify-content-center">
           <Card>
             <Card.Body>
@@ -43,7 +78,7 @@ const GraphsBlock = () => {
 
   if (isStationisError || isVariableError) {
     return (
-      <Row>
+      <Row id="graphs-root">
         <Col xs={12} className="d-flex justify-content-center">
           <Card>
             <Card.Body>
@@ -57,7 +92,7 @@ const GraphsBlock = () => {
 
   if (!(previewStationVariables.variables?.length ?? 0 > 0)) {
     return (
-      <Row>
+      <Row id="graphs-root">
         <Col xs={12} className="d-flex justify-content-center">
           <Card>
             <Card.Body>
@@ -70,9 +105,14 @@ const GraphsBlock = () => {
   }
 
   return (
-    <>
+    <div id="graphs-root" style={{ marginBottom: "66dvh" }}>
       {map((variable) => (
-        <Row key={`${previewStation.id}-${variable.id}`} className="mb-1">
+        <Row
+          key={`${previewStation.id}-${variable.id}`}
+          id={`${previewStation.id}-${variable.id}`}
+          className="pt-1"
+          style={{ minHeight: "400px" }}
+        >
           <Col xs={graphWidth} className="d-flex justify-content-center">
             {selectedStartDate && selectedEndDate && (
               <PreviewGraph variableId={variable.id} />
@@ -139,7 +179,7 @@ const GraphsBlock = () => {
           )}
         </Row>
       ))(previewStationVariables.variables)}
-    </>
+    </div>
   );
 };
 

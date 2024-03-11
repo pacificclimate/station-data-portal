@@ -24,6 +24,7 @@ const RangeBlock = ({}) => {
         "maxEndDate",
         "selectedStartDate",
         "selectedEndDate",
+        "activeGraph",
       ]),
     ),
   );
@@ -98,6 +99,7 @@ const RangeBlock = ({}) => {
           color: config.plotColor,
         })) ?? []
       }
+      activeIndex={storeData.activeGraph}
       //hideHandles={true}
     />
   );

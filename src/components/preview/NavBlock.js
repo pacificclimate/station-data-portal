@@ -16,6 +16,8 @@ import EndDateControl from "./EndDateControl";
 import { useStationVariables } from "@/state/query-hooks/use-station-variables";
 import { useStore } from "@/state/client/state-store";
 
+import css from "./NavBlock.module.css";
+
 const NavBlock = () => {
   const data = useStore(
     useShallow((state) => ({
@@ -64,37 +66,37 @@ const NavBlock = () => {
   }
 
   return (
-    <Card className="mb-2 mt-2">
-      <Card.Header style={{ backgroundColor: "white" }}>
+    <>
+      <Card className={["mt-2 mb-2 pb-1 pt-1", css.stickyHeader].join(" ")}>
         <RangeBlock />
-      </Card.Header>
-      <Card.Body>
-        <Stack direction="horizontal" gap={3}>
-          <LinkContainer to="/">
-            <Button>Back to Map</Button>
-          </LinkContainer>
-          <InputGroup>
-            <Form.Select
-              aria-label="duration"
-              value={data.selectedDuration?.toString()}
-              defaultValue="6"
-              onChange={(e) => {
-                actions.setDurationBeforeEnd(parseInt(e.target.value, 10));
-              }}
-            >
-              <option value="1">1 Month</option>
-              <option value="3">3 Months</option>
-              <option value="6">6 Months</option>
-            </Form.Select>
-            <InputGroup.Text id="basic-addon1">Ending</InputGroup.Text>
-            <EndDateControl initialDate={data.selectedEndDate} />
-          </InputGroup>
-          <Button onClick={actions.toggleLegend}>
-            {data.showLegend ? "Hide" : "Show"} Legend
-          </Button>
-        </Stack>
-      </Card.Body>
-    </Card>
+        <Card.Body>
+          <Stack direction="horizontal" gap={3}>
+            <LinkContainer to="/" style={{ width: "160px" }}>
+              <Button>Back to Map</Button>
+            </LinkContainer>
+            <InputGroup>
+              <Form.Select
+                aria-label="duration"
+                value={data.selectedDuration?.toString()}
+                defaultValue="6"
+                onChange={(e) => {
+                  actions.setDurationBeforeEnd(parseInt(e.target.value, 10));
+                }}
+              >
+                <option value="1">1 Month</option>
+                <option value="3">3 Months</option>
+                <option value="6">6 Months</option>
+              </Form.Select>
+              <InputGroup.Text id="basic-addon1">Ending</InputGroup.Text>
+              <EndDateControl initialDate={data.selectedEndDate} />
+            </InputGroup>
+            <Button onClick={actions.toggleLegend} style={{ width: "170px" }}>
+              {data.showLegend ? "Hide" : "Show"} Legend
+            </Button>
+          </Stack>
+        </Card.Body>
+      </Card>
+    </>
   );
 };
 

@@ -169,6 +169,7 @@ class DateRange extends React.Component {
       formatTick,
       mode,
       hideHandles,
+      activeIndex,
     } = this.props;
 
     const domain = timelineInterval.map((t) => Number(t));
@@ -265,6 +266,7 @@ class DateRange extends React.Component {
                         getTrackProps={getTrackProps}
                         count={dataIntervals.length}
                         index={index}
+                        activeIndex={activeIndex}
                         type={type}
                         color={color}
                         disabled
@@ -315,6 +317,7 @@ DateRange.propTypes = {
   timelineInterval: PropTypes.arrayOf(PropTypes.object),
   disabledIntervals: PropTypes.arrayOf(PropTypes.object),
   dataIntervals: PropTypes.arrayOf(PropTypes.object),
+  activeInterval: PropTypes.number,
   containerClassName: PropTypes.string,
   sliderRailClassName: PropTypes.string,
   step: PropTypes.number,
@@ -331,6 +334,7 @@ DateRange.defaultProps = {
   formatTick: (ms) => format(new Date(ms), "HH:mm"),
   disabledIntervals: [],
   dataIntervals: [],
+  activeInterval: -1,
   step: 1000 * 60 * 30,
   ticksNumber: 48,
   error: false,

@@ -12,6 +12,10 @@ export const createPreviewSlice = (set, get) => ({
   selectedDuration: 6,
 
   showLegend: true,
+  activeGraph: -1,
+  setActiveGraph: (index) => {
+    set({ activeGraph: index });
+  },
 
   setStationId: (id) => {
     if (id !== get().stationId) {
