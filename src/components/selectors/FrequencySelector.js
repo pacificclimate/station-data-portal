@@ -78,7 +78,10 @@ function FrequencySelector() {
         </InfoPopup>
       </div>
       <ButtonToolbar className={css.selectorButtons}>
-        <Button {...selectorButtonProps} onClick={() => onChange(getOptions())}>
+        <Button
+          {...selectorButtonProps}
+          onClick={() => onChange(getOptions(frequencies))}
+        >
           All
         </Button>
         <Button {...selectorButtonProps} onClick={() => onChange([])}>
