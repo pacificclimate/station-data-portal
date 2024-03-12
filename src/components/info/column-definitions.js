@@ -21,6 +21,7 @@ import FrequencySelector, {
 import SelectColumnFilter from "../controls/tables/column-filters/SelectColumnFilter/SelectColumnFilter";
 import NumberRangeColumnFilter from "../controls/tables/column-filters/NumberRangeColumnFilter/NumberRangeColumnFilter";
 import SelectArrayColumnFilter from "../controls/tables/column-filters/SelectArrayColumnFilter/SelectArrayColumnFilter";
+import { Link } from "react-router-dom";
 
 // TODO: Move to utils
 const formatDate = (d) => (d ? d.toISOString().substr(0, 10) : "unknown");
@@ -201,7 +202,9 @@ export function smtColumnInfo({ allNetworks, allVariables, compact = true }) {
             <ul className={"compact"}>
               {map(
                 (name) => (
-                  <li key={name}>{name}</li>
+                  <li key={name}>
+                    <Link to={`/preview/${row.row.original.id}`}>{name}</Link>
+                  </li>
                 ),
                 row.value,
               )}
@@ -344,8 +347,11 @@ export function smtColumnInfo({ allNetworks, allVariables, compact = true }) {
         Header: "Station Name",
         minWidth: 80,
         maxWidth: 100,
-        accessor: (data) => data.history.station_name,
+        accessor: (data) => [data.history.station_name, data.station.id],
         doFilter: true,
+        Cell: (row) => (
+          <Link to={`/preview/${row.value[1]}`}>{row.value[0]}</Link>
+        ),
       },
       { ...historyIdColumn, accessor: "history.id" },
       { ...provinceColumn, accessor: "history.province" },
