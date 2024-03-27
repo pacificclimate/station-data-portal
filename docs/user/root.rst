@@ -237,6 +237,49 @@ an example:
 
 To dismiss the popup, click the **X** in the upper right corner.
 
+In addition to basic metadata, the popup contains a link to the
+**Station Preview** screen which allows you to view more detail on the 
+specific variables available on the station as well a s a subset of the 
+observations rendered in a graphical view.
+
+Station Preview
+~~~~~~~~~~~~~~~
+
+The **Station Preview** screen allows a more specific view of an individual
+Station history. The screen is made up of a few sections.
+
+.. figure:: ./images/preview-title.png
+     
+    *Preview Title example*
+
+The preview title is a collapsible section that initially shows the station name
+and the estimated range of available variables. Click the title to expand the
+section and see the stations lat/long location as well as elevation and province.
+
+.. figure:: ./images/preview-range-controls.png
+     
+    *Preview Range Controls*
+
+The range controls allow you to select a date range for the observations you want to
+preview. This can be done in a few ways:
+
+  - Clicking the range slider will shift the range to the left or right
+  - Dragging the handles on the range will likewise adjust the time range
+  - Selecting a duration from the dropdown will change the resolution of the graphs by increasing or decreasing the number of observations shown
+  - Selecting a specific date from the date picker will adjust the range to that date
+
+(The range slider control does a best effort to show the date range of available variables 
+for a station but due to limitations in our current data does render potential gaps if a
+piece of data's collection was stopped and re-started)
+
+.. figure:: ./images/preview-graphs.png
+     
+    *Preview Graphs Example*
+
+The graphs section displays a visual graph of the observations for the selected time range.
+Alongside the graph is a legend with basic data about the variable. This legend can be hidden
+by toggling the show/hide legend button in the range controls for more graph space.
+
 Bulk metadata
 ~~~~~~~~~~~~~
 
@@ -355,27 +398,44 @@ ways.
 Station Listings
 ^^^^^^^^^^^^^^^^
 
-If you are interested in exploring the station offerings in a hierarchical listing format (as opposed to a map), we offer a station listings interface available at the URL https://data.pacificclimate.org/data/pcds/lister
+If you are interested in exploring the station offerings in a hierarchical 
+listing format (as opposed to a map), we offer a station listings interface 
+available at the URL https://data.pacificclimate.org/data/pcds/lister
 
-These listing pages lay out the stations in a hierarchy, splitting on raw data vs. climatology ("raw" or "climo"), CRMP network, and finally station. For example, to list all of the climatologies available for the BC Hydro network, one would navigate to https://data.pacificclimate.org/data/pcds/lister/climo/BCH/
+These listing pages lay out the stations in a hierarchy, splitting on raw data 
+vs. climatology ("raw" or "climo"), CRMP network, and finally station. For example, 
+to list all of the climatologies available for the BC Hydro network, one would 
+navigate to https://data.pacificclimate.org/data/pcds/lister/climo/BCH/
 
-The page for a single station includes a simple HTML page that lists all global metadata, all variables for the station, and it provides some form controls to download individual variables. Please note that you must select the checkbox for *each and every* variable that you want to download. None are selected by default, so clicking "Download" without any prior action will result in a bad request.
+The page for a single station includes a simple HTML page that lists all 
+global metadata, all variables for the station, and it provides some form controls 
+to download individual variables. Please note that you must select the checkbox for 
+*each and every* variable that you want to download. None are selected by default, 
+so clicking "Download" without any prior action will result in a bad request.
 
 Advanced/Programmatic Usage
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The whole data portal is written using open protocols and an advanced user with some scripting abilities should be able to reasonably script up a bulk download (assuming that the filters on the user interface do not cover your use case).
+The whole data portal is written using open protocols and an advanced user with some 
+scripting abilities should be able to reasonably script up a bulk download (assuming 
+that the filters on the user interface do not cover your use case).
 
-- The data portal speaks OPeNDAP. It should be able to generally do anything that's listed in the `OPeNDAP documentation <https://www.opendap.org/pdf/ESE-RFC-004v1.2.pdf>`_, including subselections with URL query string parameters.
+- The data portal speaks OPeNDAP. It should be able to generally do anything that's 
+- listed in the `OPeNDAP documentation <https://www.opendap.org/pdf/ESE-RFC-004v1.2.pdf>`_, including subselections with URL query string parameters.
 - You can select any number of a station's variables. If you don't specifically request one (or more) you get them all.
 - You can select (or deselect) observations based on simple conditional comparisons (less than, greater than, equal to, not equal to).
 
 Example 1
 ~~~~~~~~~
 
-For your purposes of demonstration, let's assume that a user is interested in downloading data from a whole bunch of Wildfire Management Branch stations, network code "FLNRO-WMB". From our instance of Pydap, you can get a station listing from the `data listing pages <https://data.pacificclimate.org/data/pcds/lister/raw/FLNRO-WMB/>`_.
+For your purposes of demonstration, let's assume that a user is interested in downloading 
+data from a whole bunch of Wildfire Management Branch stations, network code "FLNRO-WMB". 
+From our instance of Pydap, you can get a station listing from the `data listing pages <https://data.pacificclimate.org/data/pcds/lister/raw/FLNRO-WMB/>`_.
 
-If you have a list of network_name/station_ids (where station_id is the id by which it is called *by the network*, then you can patch together a URL for the full data download. For example, if you wanted to download FLNRO-WMB data for station "1002", the URL would be https://data.pacificclimate.org/data/pcds/lister/raw/FLNRO-WMB/1002.rsql.csv
+If you have a list of network_name/station_ids (where station_id is the id by which it
+ is called *by the network*, then you can patch together a URL for the full data download. 
+ For example, if you wanted to download FLNRO-WMB data for station "1002", the URL would 
+ be https://data.pacificclimate.org/data/pcds/lister/raw/FLNRO-WMB/1002.rsql.csv
 
 The file format extension on the end can be
 ``csv``, ``xls``, ``ascii``, or ``nc``.

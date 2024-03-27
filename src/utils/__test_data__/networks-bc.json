@@ -1,0 +1,152 @@
+[
+  {
+    "color": "#5791D9",
+    "id": 17,
+    "long_name": "Agricultural and Rural Development Act Network",
+    "name": "ARDA",
+    "publish": true,
+    "station_count": 3185,
+    "uri": "/networks/17",
+    "virtual": null
+  },
+  {
+    "color": "#0010A5",
+    "id": 5,
+    "long_name": "BC Hydro",
+    "name": "BCH",
+    "publish": true,
+    "station_count": 153,
+    "uri": "/networks/5",
+    "virtual": null
+  },
+  {
+    "color": "#43a3b2",
+    "id": 36,
+    "long_name": "Capital Regional District Water Supply Area ",
+    "name": "CRD",
+    "publish": true,
+    "station_count": 20,
+    "uri": "/networks/36",
+    "virtual": "false"
+  },
+  {
+    "color": "#FF0000",
+    "id": 1,
+    "long_name": "Environment and Climate Change Canada (Canadian Daily Climate Data 2007)",
+    "name": "EC",
+    "publish": true,
+    "station_count": 1688,
+    "uri": "/networks/1",
+    "virtual": null
+  },
+  {
+    "color": "#FF0000",
+    "id": 19,
+    "long_name": "Environment and Climate Change Canada (raw observations from \"Climate Data Online\")",
+    "name": "EC_raw",
+    "publish": true,
+    "station_count": 188,
+    "uri": "/networks/19",
+    "virtual": null
+  },
+  {
+    "color": "#B03060",
+    "id": 9,
+    "long_name": "BC Ministry of Environment and Climate Change Strategy - Air Quality Network",
+    "name": "ENV-AQN",
+    "publish": true,
+    "station_count": 276,
+    "uri": "/networks/9",
+    "virtual": null
+  },
+  {
+    "color": "#f61cc8",
+    "id": 14,
+    "long_name": "BC Ministry of Environment and Climate Change Strategy - Automated Snow Weather Network",
+    "name": "ENV-ASP",
+    "publish": true,
+    "station_count": 80,
+    "uri": "/networks/14",
+    "virtual": null
+  },
+  {
+    "color": "#0C6600",
+    "id": 11,
+    "long_name": "BC Ministry of Forests - Forest Ecosystems Research Network",
+    "name": "FLNRO-FERN",
+    "publish": true,
+    "station_count": 51,
+    "uri": "/networks/11",
+    "virtual": null
+  },
+  {
+    "color": "#0C6600",
+    "id": 12,
+    "long_name": "BC Ministry of Forests - Wildfire Service Network",
+    "name": "FLNRO-WMB",
+    "publish": true,
+    "station_count": 1030,
+    "uri": "/networks/12",
+    "virtual": null
+  },
+  {
+    "color": "#FE8F00",
+    "id": 16,
+    "long_name": "Forest Renewal British Columbia",
+    "name": "FRBC",
+    "publish": true,
+    "station_count": 22,
+    "uri": "/networks/16",
+    "virtual": null
+  },
+  {
+    "color": "#37ea00",
+    "id": 2,
+    "long_name": "Ministry of Transportation and Infrastructure - Automated stations ",
+    "name": "MoTIe",
+    "publish": true,
+    "station_count": 195,
+    "uri": "/networks/2",
+    "virtual": null
+  },
+  {
+    "color": "#37ea00",
+    "id": 3,
+    "long_name": "Ministry of Transportation and Infrastructure - Manual stations",
+    "name": "MoTIm",
+    "publish": true,
+    "station_count": 173,
+    "uri": "/networks/3",
+    "virtual": null
+  },
+  {
+    "color": "#0ef6f6",
+    "id": 15,
+    "long_name": "Metro Vancouver and Climate Change Strategy - Air Quality Network",
+    "name": "MVan",
+    "publish": true,
+    "station_count": 44,
+    "uri": "/networks/15",
+    "virtual": null
+  },
+  {
+    "color": "#895A44",
+    "id": 6,
+    "long_name": "Rio Tinto ",
+    "name": "RT",
+    "publish": true,
+    "station_count": 6,
+    "uri": "/networks/6",
+    "virtual": null
+  },
+  {
+    "color": null,
+    "id": 35,
+    "long_name": "UNBC Cariboo Alpine Mesonet",
+    "name": "UNBC_CAM",
+    "publish": true,
+    "station_count": 18,
+    "uri": "/networks/35",
+    "virtual": null
+  }
+]

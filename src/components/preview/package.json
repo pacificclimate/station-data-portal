@@ -1,0 +1,6 @@
+{
+  "name": "station-preview",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./StationPreview.js"
+}

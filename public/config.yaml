@@ -4,11 +4,11 @@ baseMap: BC
 # sdsUrl values will be replaced by dev or prod URLs when they become ready.
 # For now, we have demo instances inside the firewall.
 # Uses monsoon database
-sdsUrl: http://docker-dev02.pcic.uvic.ca:30512
+#sdsUrl: http://docker-dev02.pcic.uvic.ca:30512
 # Uses new database
 #sdsUrl: http://docker-dev02.pcic.uvic.ca:30562
 # Local instance
-#sdsUrl: http://localhost:5000
+sdsUrl: http://localhost:5000
 
 # Currently deployed metadata backends do not respond to provinces QP.
 # When they do, we can use stationsQpProvinces and lose stationFilters
@@ -34,3 +34,18 @@ pdpDataUrl: http://docker-dev02.pcic.uvic.ca:30514
 #stationStride: undefined
 #showReloadStationsButton: false
 #timingEnabled: false
+
+# Preview Options
+plotColor: "#1f77b4"
+dataRequestDurations: [1, 3, 6, 12] # months
+dataRequestDurationsDefault: 6 # months
+
+# disclaimer:
+#   enabled: true
+#   title: "Disclaimer"
+#   body: |
+#     The Pacific Climate Impacts Consortium (PCIC), and all monitoring and or funding partners
+#     who provide data or support to PCIC or its partners for this portal, take no responsibility
+#     for the accuracy of this data. Portal users acknowledge that they are using data from the
+#     portal at their own risk.
+#   buttonLabel: "Agree"

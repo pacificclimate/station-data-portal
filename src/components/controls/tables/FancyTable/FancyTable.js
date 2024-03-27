@@ -177,8 +177,8 @@ FancyTable.propTypes = {
   data: PropTypes.array.isRequired,
   columns: PropTypes.array.isRequired,
   hiddenColumns: PropTypes.array,
-  defaultColumn: PropTypes.func,
-  filterTypes: PropTypes.func,
+  defaultColumn: PropTypes.object,
+  filterTypes: PropTypes.object,
 };
 
 export default FancyTable;

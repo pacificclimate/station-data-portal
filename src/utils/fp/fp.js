@@ -33,14 +33,12 @@ export const forEachWithKey = forEach.convert({ cap: false });
 //  (and, not coincidentally, to pass the bulk of the work off to `groupBy`)
 //  is unsound and potentially inefficient, but very, very convenient. Shame.
 //  Sounder to use a WeakMap to accumulate the groups.
-// TODO: Remove unnecessary arg `list` and just return the function
-export const groupByGeneral = curry((by, list) =>
+export const groupByGeneral = (by) =>
   flow(
     groupBy((item) => JSON.stringify(by(item))),
     toPairs,
     map((pair) => ({ by: JSON.parse(pair[0]), items: pair[1] })),
-  )(list),
-);
+  );
 
 // Deeply map a function over an item; deeply in the sense of recursively
 // if the item is an array or object:

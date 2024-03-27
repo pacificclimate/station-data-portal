@@ -3,6 +3,8 @@
 # `SDP_TAG`: Image tag
 # `SDP_PORT`: External port to map to
 # `SDP_PUBLIC_URL`: Public URL of app
+# Note: These values are set as part of the makefile, initialize the container
+# Using it.
 #
 # Their values are set appropriately in the Makefile for use on a workstation.
 # For use in a production setting, either set the shell
@@ -15,7 +17,7 @@ services:
     build:
       context: ..
       dockerfile: ./docker/Dockerfile
-    image: pcic/station-data-portal-frontend:${SDP_TAG}
+    #image: pcic/station-data-portal-frontend:${SDP_TAG}
     container_name: station-data-portal-frontend
     environment:
       - PUBLIC_URL=${SDP_PUBLIC_URL}

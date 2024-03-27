@@ -1,25 +1,22 @@
 import React from "react";
 import { Container } from "react-bootstrap";
-
-import Disclaimer from "../../info/Disclaimer";
-import Header from "../Header/Header";
-import Body from "../Body";
-import useInitializeApp from "./app-initialization";
+import Disclaimer from "@/components/info/Disclaimer";
+import Header from "@/components/main/Header";
+import { Outlet } from "react-router-dom";
+import { useConfigDefaults } from "@/state/client-server-hooks/use-config-defaults";
 
 import "./App.css";
-import ConfigContext, { useFetchConfigContext } from "../ConfigContext";
 
-export default function App() {
-  // must be invoked before any other items dependent on context.
-  const [config, configErrorMessage] = useFetchConfigContext({});
+import { ConfigContext } from "@/state/context-hooks/use-config-context";
 
-  useInitializeApp(config);
+export const App = () => {
+  const { data: config, isLoading, isError } = useConfigDefaults();
 
-  if (configErrorMessage !== null) {
-    return <div>{configErrorMessage}</div>;
+  if (isError) {
+    return <div>An Error occoured while loading the app configuration.</div>;
   }
 
-  if (config === null) {
+  if (isLoading) {
     return <div>Loading configuration...</div>;
   }
 
@@ -28,8 +25,10 @@ export default function App() {
       <Container fluid className="App">
         <Disclaimer />
         <Header />
-        <Body />
+        <Outlet />
       </Container>
     </ConfigContext.Provider>
   );
-}
+};
+
+export default App;

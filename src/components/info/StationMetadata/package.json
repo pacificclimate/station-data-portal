@@ -1,6 +1,0 @@
-{
-  "name": "StationMetadata",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./StationMetadata.js"
-}

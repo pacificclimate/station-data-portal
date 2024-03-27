@@ -1,6 +1,7 @@
 import React from "react";
 import { Row, Col } from "react-bootstrap";
-import { useConfigContext } from "../ConfigContext";
+import { useConfigContext } from "@/state/context-hooks/use-config-context";
+
 import "./Header.css";
 
 function Header() {

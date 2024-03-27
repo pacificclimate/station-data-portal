@@ -1,6 +1,0 @@
-{
-  "name": "DownloadMetadata",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./DownloadMetadata.js"
-}
