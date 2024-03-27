@@ -1,5 +1,19 @@
 # News / Release Notes
 
+## 1.6.0
+
+_Release Date: 2024-Mar-24_
+
+Requires:
+
+- Station Data Portal Backend: version 11.4.0
+- PDP backend: branch `pcds_only`
+
+Changes:
+
+- [Add station data preview screen](https://github.com/pacificclimate/station-data-portal/pull/179)
+- [Add links to preview via metadata table and station popups](https://github.com/pacificclimate/station-data-portal/pull/179)
+
 ## 1.5.0
 
 _Release Date: 2023-Sep-18_
