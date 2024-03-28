@@ -34,13 +34,13 @@ import {
   addMinutes,
 } from "date-fns";
 
-import SliderRail from "./sub/SliderRail";
-import DisabledTrack from "./sub/Track";
-import DataTrack from "./sub/DataTrack";
-import Tick from "./sub/Tick";
-import Handle from "./sub/Handle";
+import SliderRail from "./daterange/sub/SliderRail";
+import DisabledTrack from "./daterange/sub/Track";
+import DataTrack from "./daterange/sub/DataTrack";
+import Tick from "./daterange/sub/Tick";
+import Handle from "./daterange/sub/Handle";
 
-import "./styles/index.scss";
+import "./daterange/styles/index.scss";
 
 const getTimelineConfig = (timelineStart, timelineLength) => (date) => {
   const percent =
@@ -59,19 +59,17 @@ const getFormattedIntervals = (
   const timelineLength = differenceInMilliseconds(endTime, startTime);
   const getConfig = getTimelineConfig(startTime, timelineLength);
 
-  const formattedBlockedDates = blockedDates
-    .sort((a, b) => a.start - b.start)
-    .map((interval, index) => {
-      let { start, end, type, color } = interval;
+  const formattedBlockedDates = blockedDates.map((interval, index) => {
+    let { start, end, type, color } = interval;
 
-      if (isBefore(start, startTime)) start = startTime;
-      if (isAfter(end, endTime)) end = endTime;
+    if (isBefore(start, startTime)) start = startTime;
+    if (isAfter(end, endTime)) end = endTime;
 
-      const source = getConfig(start);
-      const target = getConfig(end);
+    const source = getConfig(start);
+    const target = getConfig(end);
 
-      return { id: `${classPrefix}-${index}`, source, target, type, color };
-    });
+    return { id: `${classPrefix}-${index}`, source, target, type, color };
+  });
 
   // console.log("### formattedBlockedDates", formattedBlockedDates);
 
@@ -261,6 +259,7 @@ class DateRange extends React.Component {
                     ({ id, source, target, type, color }, index) => (
                       <DataTrack
                         key={id}
+                        id={id}
                         source={source}
                         target={target}
                         getTrackProps={getTrackProps}
