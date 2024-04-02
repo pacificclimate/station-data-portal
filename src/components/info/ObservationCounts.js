@@ -41,7 +41,7 @@ function ObservationCounts({ clipToDate }) {
   const loadingMessage = "Loading ...";
 
   const countTotals = useMemo(() => {
-    if (isLoading || countData === null) {
+    if (isLoading || !countData) {
       return { observations: null, climatologies: null };
     }
     const monthlyObservations = totalCounts(

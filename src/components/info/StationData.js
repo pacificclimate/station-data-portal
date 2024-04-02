@@ -29,7 +29,7 @@ function StationData({ rowClasses }) {
   const { data: allFrequencies } = useFrequencies();
 
   const {
-    polygon,
+    area: polygon,
     startDate,
     endDate,
     selectedNetworks: selectedNetworksUris,
@@ -39,7 +39,7 @@ function StationData({ rowClasses }) {
   } = useStationsStore(
     useShallow(
       pick([
-        "polygon",
+        "area",
         "startDate",
         "endDate",
         "selectedNetworks",
