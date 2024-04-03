@@ -1,5 +1,22 @@
 # News / Release Notes
 
+## 1.6.1
+
+_Release Date: 2024-Apr-04_
+
+Requires:
+
+- Station Data Portal Backend: version 11.4.1
+- PDP backend: branch `pcds_only`
+
+Changes:
+
+- [Bugfixes for previous release](https://github.com/pacificclimate/station-data-portal/pull/180)
+  - Fixes errors in observation counts causing screen crashes
+  - polygon selections are correctly passed to download urls
+  - download url filenames are correctly set
+  - a race condition when viewing preview resulting in an error due to missing station id has been fixed
+
 ## 1.6.0
 
 _Release Date: 2024-Mar-24_
