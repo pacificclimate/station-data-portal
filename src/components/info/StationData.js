@@ -5,7 +5,10 @@ import pick from "lodash/fp/pick";
 import { Button, ButtonToolbar, Col, Row } from "react-bootstrap";
 import capitalize from "lodash/fp/capitalize";
 import map from "lodash/fp/map";
-import { dataDownloadTarget } from "@/utils/pdp-data-service";
+import {
+  dataDownloadTarget,
+  dataDownloadFilename,
+} from "@/utils/pdp-data-service";
 import FileFormatSelector from "@/components/selectors/FileFormatSelector";
 import ClipToDateControl from "@/components/controls/ClipToDateControl";
 import SelectionCounts from "@/components/info/SelectionCounts";
@@ -117,7 +120,14 @@ function StationData({ rowClasses }) {
                       className={"me-2"}
                       disabled={urlTooLong}
                       href={urlTooLong ? undefined : downloadUrl}
-                      download={urlTooLong ? undefined : downloadUrl}
+                      download={
+                        urlTooLong
+                          ? undefined
+                          : dataDownloadFilename({
+                              dataCategory,
+                              fileFormat: dataFormat,
+                            })
+                      }
                     >
                       {linkLabel}
                     </Button>
