@@ -4,10 +4,9 @@ import flow from "lodash/fp/flow";
 import map from "lodash/fp/map";
 import max from "date-fns/max";
 import min from "date-fns/min";
-import subMonths from "date-fns/subMonths";
 import parseIso from "date-fns/parseISO";
-import { useStore } from "../client/state-store";
-import { useStationVariables } from "../query-hooks/use-station-variables";
+import { useStore } from "@/state/client/state-store";
+import { useStationVariables } from "@/state/query-hooks/use-station-variables";
 
 const getMaxEndDate = flow(
   map("max_obs_time"), // (string []) Pluck max_obs_time from variable objects (ISO 8601 date string)
@@ -27,7 +26,6 @@ const getMinStartDate = flow(
  */
 export const useStationVariablesDefaults = (stationId) => {
   const { data, isLoading, isError } = useStationVariables(stationId);
-  const selectedDuration = useStore((state) => state.selectedDuration);
   const storeActions = useStore(
     useShallow((state) => ({
       setStationId: state.setStationId,
@@ -37,15 +35,13 @@ export const useStationVariablesDefaults = (stationId) => {
     })),
   );
 
+  storeActions.setStationId(stationId);
+
   useEffect(() => {
     // if stationid changes, this will clear default ranges and set duration back to default
-    storeActions.setStationId(stationId);
 
     if (data && data.variables?.length > 0) {
       const maxEndDate = getMaxEndDate(data.variables);
-      // const selectedStartDate = subMonths(maxEndDate, selectedDuration);
-
-      // console.log("### selected date range", selectedStartDate, maxEndDate);
 
       // set default ranges
       storeActions.setMinStartDate(getMinStartDate(data.variables));

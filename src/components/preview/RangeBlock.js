@@ -1,7 +1,7 @@
 import React from "react";
 import { useShallow } from "zustand/react/shallow";
 import pick from "lodash/fp/pick";
-import DateRange from "@/components/controls/daterange";
+import DateRange from "@/components/controls/DateRange";
 import addDays from "date-fns/addDays";
 import differenceInDays from "date-fns/differenceInDays";
 import differenceInYears from "date-fns/differenceInYears";
@@ -93,6 +93,7 @@ const RangeBlock = ({}) => {
       //mode={onMode}
       dataIntervals={
         previewStationVariables.variables?.map((data) => ({
+          variableId: data.id,
           start: new Date(data.min_obs_time),
           end: new Date(data.max_obs_time),
           type: "observation",

@@ -1,17 +1,13 @@
 import { makeURI } from "./uri";
 import assignAll from "lodash/fp/assignAll";
 import capitalize from "lodash/fp/capitalize";
-import filter from "lodash/fp/filter";
-import flatten from "lodash/fp/flatten";
 import flow from "lodash/fp/flow";
 import get from "lodash/fp/get";
 import join from "lodash/fp/join";
 import map from "lodash/fp/map";
 import padCharsStart from "lodash/fp/padCharsStart";
-import tap from "lodash/fp/tap";
 import uniq from "lodash/fp/uniq";
 import { geoJSON2WKT } from "./geographic-encodings";
-import { includes, some } from "lodash";
 
 const pad2 = padCharsStart("0", 2);
 
@@ -141,5 +137,5 @@ export const dataDownloadTarget = ({
 //   };
 
 export const dataDownloadFilename = ({ dataCategory, fileFormat }) => {
-  return `${{ dataCategory, fileFormat }}.${get("value", fileFormat)}`;
+  return `${dataCategory}.${get("value", fileFormat)}`;
 };
