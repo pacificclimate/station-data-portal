@@ -4,7 +4,7 @@ baseMap: YNWT
 # sdsUrl values will be replaced by prod URLs when they become ready.
 # For now, we have a dev instance.
 # Uses monsoon database
-sdsUrl: https://services.pacificclimate.org/dev/ynwt/meta
+sdsUrl: https://beehive.pacificclimate.org/station-data-portal/ynwt/metadata/
 
 # We do not at present need to filter based on province (verify!)
 #stationsQpProvinces: YK,NT
@@ -14,4 +14,4 @@ sdsUrl: https://services.pacificclimate.org/dev/ynwt/meta
 # pdpDataUrl values will be replaced by prod URLs when they become ready.
 # For now, we have a dev instance.
 # Uses monsoon database
-pdpDataUrl: https://services.pacificclimate.org/dev/ynwt/data
+pdpDataUrl: https://beehive.pacificclimate.org/station-data-portal/ynwt/data/

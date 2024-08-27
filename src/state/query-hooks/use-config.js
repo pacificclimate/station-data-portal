@@ -89,7 +89,7 @@ const getZoomMarkerRadius = (zmrSpec) => {
  * @returns {Promise<object>}
  */
 const fetchConfig = async () => {
-  const response = await fetch(`${process.env.PUBLIC_URL}/config.yaml`);
+  const response = await fetch(`${window.env.PUBLIC_URL}/config.yaml`);
   const yamlConfig = await response.text();
   const fetchedConfig = yaml.load(yamlConfig);
   const config = { ...defaultConfig, ...fetchedConfig };
@@ -97,7 +97,7 @@ const fetchConfig = async () => {
   checkMissingKeys(config);
 
   // Extend config with some env var values
-  config.appVersion = process.env.REACT_APP_APP_VERSION ?? "unknown";
+  config.appVersion = window.env.REACT_APP_APP_VERSION ?? "unknown";
 
   // Extend config with some computed goodies
   // TODO: Store shouldn't know about data presentation

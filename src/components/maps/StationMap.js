@@ -65,6 +65,7 @@ const StationMapRenderer = React.memo(
   ({
     BaseMap,
     initialViewport,
+    baseMapTilesUrl,
     userShapeLayerRef,
     userShapeStyle,
     handleChangedGeometryLayers,
@@ -122,10 +123,13 @@ const StationMapRenderer = React.memo(
     const isPending =
       externalIsPending || markerUpdateIsPending || markerRenderIsPending;
 
+    console.log(baseMapTilesUrl);
+
     return (
       <BaseMap
         zoom={initialViewport.zoom}
         center={initialViewport.center}
+        baseMapTilesUrl={baseMapTilesUrl}
         preferCanvas={true}
         maxZoom={13}
       >
@@ -195,7 +199,8 @@ const StationMap = ({
 
   const userShapeLayerRef = useRef();
 
-  const { BaseMap, initialViewport } = baseMaps[config.baseMap];
+  const { BaseMap, initialViewport, baseMapTilesUrl } =
+    baseMaps[config.baseMap];
 
   const handleChangedGeometryLayers = useMemo(
     () => () => {
@@ -213,6 +218,7 @@ const StationMap = ({
       {...{
         BaseMap,
         initialViewport,
+        baseMapTilesUrl,
         userShapeLayerRef,
         userShapeStyle,
         handleChangedGeometryLayers,

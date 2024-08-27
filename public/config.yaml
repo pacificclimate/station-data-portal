@@ -8,7 +8,7 @@ baseMap: BC
 # Uses new database
 #sdsUrl: http://docker-dev02.pcic.uvic.ca:30562
 # Local instance
-sdsUrl: http://localhost:5000
+sdsUrl: https://beehive.pacificclimate.org/station-data-portal/pcds/metadata/
 
 # Currently deployed metadata backends do not respond to provinces QP.
 # When they do, we can use stationsQpProvinces and lose stationFilters
@@ -21,7 +21,7 @@ networkFilters: name != "PCIC Climate Variables"
 # pdpDataUrl values will be replaced by dev or prod URLs when they become ready.
 # For now, we have a demo instance inside the firewall, below.
 # Uses monsoon database
-pdpDataUrl: http://docker-dev02.pcic.uvic.ca:30514
+pdpDataUrl: https://beehive.pacificclimate.org/station-data-portal/pcds/data/
 # Uses new database
 #pdpDataUrl: http://docker-dev02.pcic.uvic.ca:???
 

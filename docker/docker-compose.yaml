@@ -2,7 +2,6 @@
 #
 # `SDP_TAG`: Image tag
 # `SDP_PORT`: External port to map to
-# `SDP_PUBLIC_URL`: Public URL of app
 # Note: These values are set as part of the makefile, initialize the container
 # Using it.
 #
@@ -19,14 +18,11 @@ services:
       dockerfile: ./docker/Dockerfile
     #image: pcic/station-data-portal-frontend:${SDP_TAG}
     container_name: station-data-portal-frontend
-    environment:
-      - PUBLIC_URL=${SDP_PUBLIC_URL}
-    env_file:
-      - bc.env
     volumes:
       - type: bind
         source: ./bc-config.yaml
-        target: /app/public/config.yaml
+        target: /app/config.yaml
         read_only: true
+      - ./bc.env.js:/app/env.js
     ports:
       - "${SDP_PORT}:8080"

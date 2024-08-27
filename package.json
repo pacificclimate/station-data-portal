@@ -17,7 +17,7 @@
     "lethargy": "^1.0.9",
     "lodash": "^4.17.21",
     "memoize-one": "^6.0.0",
-    "pcic-react-leaflet-components": "git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git#3.0.1",
+    "pcic-react-leaflet-components": "git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git#tile-url-as-prop",
     "plotly.js-basic-dist": "^2.29.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
@@ -61,7 +61,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "craco build",
+    "build": "REACT_APP_APP_VERSION=$(bash ./generate-commitish.sh) && craco build",
     "test": "craco test --env=jsdom",
     "eject": "react-scripts eject",
     "reinstall": "rm -rf ./node_modules; npm install --dev",

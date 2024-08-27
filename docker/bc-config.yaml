@@ -1,13 +1,8 @@
 appTitle: BC Station Data - PCDS
 baseMap: BC
 
-# sdsUrl values will be replaced by dev or prod URLs when they become ready.
-# For now, we have demo instances inside the firewall.
-# Uses monsoon database
-#sdsUrl: http://docker-dev02.pcic.uvic.ca:30512
-# Uses new database
-#sdsUrl: http://docker-dev02.pcic.uvic.ca:30562
-sdsUrl: http://localhost:5000
+# Uses swarm based dev url by default
+sdsUrl: https://beehive.pacificclimate.org/station-data-portal/pcds/metadata/
 
 # Currently deployed metadata backends do not respond to provinces QP.
 # When they do, we can invert the commenting out below.
@@ -17,9 +12,7 @@ stationFilters: histories[0].province = "BC"
 # Always necessary for CRMP database
 networkFilters: name != "PCIC Climate Variables"
 
-# pdpDataUrl values will be replaced by dev or prod URLs when they become ready.
-# For now, we have a demo instance inside the firewall, below.
 # Uses monsoon database
-pdpDataUrl: http://docker-dev02.pcic.uvic.ca:30514
+pdpDataUrl: https://beehive.pacificclimate.org/station-data-portal/pcds/data/
 # Uses new database
 #pdpDataUrl: http://docker-dev02.pcic.uvic.ca:???
