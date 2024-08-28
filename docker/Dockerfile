@@ -1,6 +1,11 @@
 
 
-FROM node:22
+FROM node:22-bookworm-slim
+
+RUN apt-get -y update &&  \ 
+    apt-get install --no-install-recommends  \
+    -y curl && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN npm install -g serve
 
