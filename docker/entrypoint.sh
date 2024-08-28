@@ -1,3 +1,3 @@
 #!/bin/bash
 
-serve -s . -l 8080
+serve -s . -l 8080 -c serve.json
