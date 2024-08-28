@@ -89,10 +89,8 @@ const getZoomMarkerRadius = (zmrSpec) => {
  * @returns {Promise<object>}
  */
 const fetchConfig = async () => {
-  const response = await fetch(`${window.env.PUBLIC_URL}/config.yaml`);
-  const yamlConfig = await response.text();
-  const fetchedConfig = yaml.load(yamlConfig);
-  const config = { ...defaultConfig, ...fetchedConfig };
+  const loadedConfig = window.env;
+  const config = { ...defaultConfig, ...loadedConfig };
 
   checkMissingKeys(config);
 
