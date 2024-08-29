@@ -72,6 +72,6 @@ const nameFromStackLine = /^\s*at (?:\w+\.)?(\w+) .*$/;
 });
 
 const logger = new Logger();
-logger.configure({ active: !process.env.CI || process.env.CI === "log" });
+logger.configure({ active: !window.env.CI || window.env.CI === "log" });
 
 export default logger;

@@ -378,9 +378,8 @@ For production runs, environment variables are provided by
 `PUBLIC_URL`
 
 - Base URL for Station Data Portal frontend.
-- Type: string.
-- For production, set this to the URL configured in our proxy server.
-- Required.
+- For local development this should match the expected local url (generally http://localhost:3000/)
+- For production this will be set to %REPLACE_URL% and needs to be injected at start time. This happens in the docker container's entrypoint.sh and allows us to configure the sites expected path at run time.
 
 `REACT_APP_APP_VERSION`
 
