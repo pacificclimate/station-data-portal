@@ -30,8 +30,8 @@ import "./index.css";
  * @returns string The base URL of the app
  */
 const getBaseName = () => {
-  if (process.env.PUBLIC_URL?.indexOf(".") >= 0) {
-    return new URL(process.env.PUBLIC_URL).pathname;
+  if (window.env.PUBLIC_URL?.indexOf(".") >= 0) {
+    return new URL(window.env.PUBLIC_URL).pathname;
   }
 
   return "";

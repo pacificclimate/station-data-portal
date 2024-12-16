@@ -2,13 +2,16 @@
 
 ## Execution environment
 
-Node.js >= 9.2.0 (**important**)
+Node.js >= 16 (**important**)
 
 All other package requirements are specified in `package.json`.
 
 We **strongly** recommend using [`nvm`](https://github.com/creationix/nvm) to manage your `node`/`npm` install.
 In particular, you will have trouble finding later versions of Node.js in standard Linux installs;
 `nvm` however is up to date with all recent releases.
+
+Alternatively the .devcontainer setup will contain everything needed to set up this environment to the last verified version
+of node used for the project.
 
 Note: Avoid `snap` packages. Experience to date suggests it does not result in stable, reliable installations.
 
