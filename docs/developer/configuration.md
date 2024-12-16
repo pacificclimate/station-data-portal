@@ -1,16 +1,16 @@
 # Configuration
 
 Most configuration of the Station Data Portal frontend is done via a YAML
-file, `public/config.yaml`. For details, see below.
+file, `public/config.js`. For details, see below.
 
 For technical reasons, a few configuration parameters must be supplied via
 environment variables.
 
-## Configuration via `public/config.yaml`
+## Configuration via `public/config.js`
 
 This file must be a key-value map. It overrides the default configuration
 values, which are given below. Certain keys do not have default values and
-_must_ be specified in `public/config.yaml`. The others are optional.
+_must_ be specified in `public/config.js`. The others are optional.
 
 ### Configuration options
 
@@ -19,7 +19,7 @@ For default values see [Default configuration](#default-configuration).
 #### Absolutely required values
 
 These values do not have defaults and must be specified
-in `public/config.yaml`. They are critical to the functioning of the app.
+in `public/config.js`. They are critical to the functioning of the app.
 
 `appTitle`
 
@@ -208,35 +208,40 @@ of the correct type.
 ### Default configuration
 
 ```yaml
-adjustableColumnWidthsDefault: [7, 5]
-defaultTab: Filters
-defaultNetworkColor: "#000000"
-zoomToMarkerRadiusSpec: [[7, 2], [99, 4]]
-userDocs:
-  showLink: false
-  url: "https://data.pacificclimate.org/portal/docs/"
-  text: "User Docs"
-lethargy:
-  enabled: true
-  stability: 7
-  sensitivity: 50
-  tolerance: 0.05
-disclaimer:
-  enabled: false
-  title: "Disclaimer Title"
-  body: "Disclaimer body ..."
-  buttonLabel: "Acknowledge"
-mapSpinner:
-  spinner: "Bars"
-  x: "40%"
-  y: "40%"
-  width: "80"
-  stroke: "darkgray"
-  fill: "lightgray"
-stationDebugFetchOptions: false
-stationDebugFetchLimits: [100, 500, 1000, 2000, 4000, 8000]
-showReloadStationsButton: false
-timingEnabled: false
+{
+  "adjustableColumnWidthsDefault": [7, 5],
+  "defaultTab": "Filters",
+  "defaultNetworkColor": "#000000",
+  "zoomToMarkerRadiusSpec": [[7, 2], [99, 4]],
+  "userDocs":
+    {
+      "showLink": false,
+      "url": "https://data.pacificclimate.org/portal/docs/",
+      "text": "User Docs",
+    },
+  "lethargy":
+    { "enabled": true, "stability": 7, "sensitivity": 50, "tolerance": 0.05 },
+  "disclaimer":
+    {
+      "enabled": false,
+      "title": "Disclaimer Title",
+      "body": "Disclaimer body ...",
+      "buttonLabel": "Acknowledge",
+    },
+  "mapSpinner":
+    {
+      "spinner": "Bars",
+      "x": "40%",
+      "y": "40%",
+      "width": "80",
+      "stroke": "darkgray",
+      "fill": "lightgray",
+    },
+  "stationDebugFetchOptions": false,
+  "stationDebugFetchLimits": [100, 500, 1000, 2000, 4000, 8000],
+  "showReloadStationsButton": false,
+  "timingEnabled": false,
+}
 ```
 
 ### Example custom configuration files
@@ -245,94 +250,72 @@ timingEnabled: false
 
 Currently targets CRMP database.
 
-```yaml
-appTitle: BC Station Data - PCDS
-baseMap: BC
-
-# sdsUrl values will be replaced by dev or prod URLs when they become ready.
-# For now, we have demo instances inside the firewall.
-# Uses monsoon database
-sdsUrl: http://docker-dev02.pcic.uvic.ca:30512
-# Uses new database
-#sdsUrl: http://docker-dev02.pcic.uvic.ca:30562
-# Local instance
-#sdsUrl: http://localhost:5000
-
-# Currently deployed metadata backends do not respond to provinces QP.
-# When they do, we can use stationsQpProvinces and lose stationFilters
-#stationsQpProvinces: BC
-stationFilters: histories[0].province = "BC"
-
-# Always necessary for CRMP database
-networkFilters: name != "PCIC Climate Variables"
-
-# pdpDataUrl values will be replaced by dev or prod URLs when they become ready.
-# For now, we have a demo instance inside the firewall, below.
-# Uses monsoon database
-pdpDataUrl: http://docker-dev02.pcic.uvic.ca:30514
-# Uses new database
-#pdpDataUrl: http://docker-dev02.pcic.uvic.ca:???
-
-# Debug params
-#stationFilters: histories[0].province = "BC"
-#stationDebugFetchOptions: false
-#stationDebugFetchLimits: [100, 500, 1000, 2000, 4000, 8000]
-#stationOffset: undefined
-#stationLimit: undefined
-#stationStride: undefined
-#showReloadStationsButton: false
-#timingEnabled: false
+```js
+window.env = {
+  appTitle: "BC Station Data - PCDS",
+  baseMap: "BC",
+  // Uses development database
+  sdsUrl:
+    "https://beehive.pacificclimate.org/station-data-portal/pcds/metadata",
+  //sdsUrl: http://localhost:5000,
+  // Currently deployed metadata backends do not respond to provinces QP.
+  // When they do, we can use stationsQpProvinces and lose stationFilters
+  //stationsQpProvinces: "BC",
+  stationFilters: 'histories[0].province = "BC"',
+  // Always necessary for CRMP database
+  networkFilters: 'name != "PCIC Climate Variables"',
+  // pdpDataUrl values will be replaced by dev or prod URLs when they become ready.
+  // For now, we have a demo instance inside the firewall, below.
+  // Uses development database
+  pdpDataUrl:
+    "https://beehive.pacificclimate.org/station-data-portal/pcds/data",
+  // optional Debug params
+  //stationFilters: histories[0].province = "BC"
+  //stationDebugFetchOptions: false
+  //stationDebugFetchLimits: [100, 500, 1000, 2000, 4000, 8000]
+  //stationOffset: undefined
+  //stationLimit: undefined
+  //stationStride: undefined
+  //showReloadStationsButton: false
+  //timingEnabled: false
+};
 ```
 
 #### PCDS data portal
 
-```yaml
-appTitle: BC Station Data - PCDS
-baseMap: BC
-
-# sdsUrl values will be replaced by dev or prod URLs when they become ready.
-# For now, we have demo instances inside the firewall.
-# Uses monsoon database
-sdsUrl: http://docker-dev02.pcic.uvic.ca:30512
-# Uses new database
-#sdsUrl: http://docker-dev02.pcic.uvic.ca:30562
-
-# Currently deployed metadata backends do not respond to provinces QP.
-# When they do, we can invert the commenting out below.
-#stationsQpProvinces: BC
-stationFilters: histories[0].province = "BC"
-
-# Always necessary for CRMP database
-networkFilters: name != "PCIC Climate Variables"
-
-# pdpDataUrl values will be replaced by dev or prod URLs when they become ready.
-# For now, we have a demo instance inside the firewall, below.
-# Uses monsoon database
-pdpDataUrl: http://docker-dev02.pcic.uvic.ca:30514
-# Uses new database
-#pdpDataUrl: http://docker-dev02.pcic.uvic.ca:???
+```js
+window.env = {
+  appTitle: "BC Station Data - PCDS",
+  baseMap: "BC",
+  // uses development database
+  sdsUrl:
+    "https://beehive.pacificclimate.org/station-data-portal/pcds/metadata",
+  // Currently deployed metadata backends do not respond to provinces QP.
+  // When they do, we can invert the commenting out below.
+  //stationsQpProvinces: "BC",
+  stationFilters: 'histories[0].province = "BC"',
+  // Always necessary for CRMP database
+  networkFilters: 'name != "PCIC Climate Variables"',
+  pdpDataUrl:
+    "https://beehive.pacificclimate.org/station-data-portal/pcds/data",
+};
 ```
 
 #### YNWT data portal
 
-```yaml
-appTitle: YNWT Station Data
-baseMap: YNWT
-
-# sdsUrl values will be replaced by prod URLs when they become ready.
-# For now, we have a dev instance.
-# Uses monsoon database
-sdsUrl: https://services.pacificclimate.org/dev/ynwt/meta
-
-# We do not at present need to filter based on province (verify!)
-#stationsQpProvinces: YK,NT
-# We do not at present need to filter networks (verify!)
-#networkFilters: ???
-
-# pdpDataUrl values will be replaced by prod URLs when they become ready.
-# For now, we have a dev instance.
-# Uses monsoon database
-pdpDataUrl: https://services.pacificclimate.org/dev/ynwt/data
+```js
+window.env = {
+  appTitle: "YNWT Station Data",
+  baseMap: "YNWT",
+  // We do not at present need to filter based on province (verify!)
+  //stationsQpProvinces: YK,NT
+  // We do not at present need to filter networks (verify!)
+  //networkFilters: ???
+  sdsUrl:
+    "https://beehive.pacificclimate.org/station-data-portal/ynwt/metadata",
+  pdpDataUrl:
+    "https://beehive.pacificclimate.org/station-data-portal/ynwt/metadata",
+};
 ```
 
 ### Custom configuration and Docker deployment
@@ -344,17 +327,15 @@ For example, in your docker-compose.yaml, include the following mount:
 ```yaml
 volumes:
   - type: bind
-    source: /path/to/custom/config.yaml
-    target: /app/public/config.yaml
+    source: /path/to/custom/config.js
+    target: /app/config.js
     read_only: true
 ```
 
-Note: We mount to target `/app/public/config.yml` because the app is built
-in the Docker _container_, and this file is picked up in the build and
-copied to the appropriate build artifact.
-If we move to a system in which the app is built in advance in the
-Docker _image_, then the target will change, likely to
-`/app/build/static/config.yaml`.
+Note: We mount to target `/app/config.js` because the app is built and loaded into
+this directory. When executed the docker container's entrypoint will substitute any
+`%PUBLIC_URL%` references in code (`%REPLACE_PUBLIC_URL%` in the container) with
+the values of PUBLIC_URL in the config.js.
 
 ## Environment variables
 
@@ -370,16 +351,13 @@ For development runs of the app launched with `npm start`, the files
 For more details, see the
 [CRA documentation](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables).
 
-For production runs, environment variables are provided by
-`docker-compose.yaml`.
-
-### Deployment
+### Build time variables
 
 `PUBLIC_URL`
 
 - Base URL for Station Data Portal frontend.
 - For local development this should match the expected local url (generally http://localhost:3000/)
-- For production this will be set to %REPLACE_URL% and needs to be injected at start time. This happens in the docker container's entrypoint.sh and allows us to configure the sites expected path at run time.
+- For production this will be set to %REPLACE_PUBLIC_URL% and needs to be injected at start time. This happens in the docker container's entrypoint.sh and allows us to configure the sites expected path at run time.
 
 `REACT_APP_APP_VERSION`
 
@@ -388,18 +366,6 @@ For production runs, environment variables are provided by
 - This value should be set using `generate-commitish.sh` when the Docker image is built.
 - It is not recommended to manually override the automatically generated value when the image is run.
 - Note doubled `APP_` in name.
-
-`REACT_APP_BC_BASE_MAP_TILES_URL`
-
-- URL template (includes x, y, z) for BC base map tiles.
-- Type: string.
-- Required if YAML config.baseMap === "BC"
-
-`REACT_APP_YNWT_BASE_MAP_TILES_URL`
-
-- URL template (includes x, y, z) for YNWT base map tiles.
-- Type: string.
-- Required if YAML config.baseMap === "YNWT"
 
 ## Filtering metadata
 

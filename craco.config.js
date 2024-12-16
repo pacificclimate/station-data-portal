@@ -10,6 +10,10 @@ module.exports = {
       options: {},
     },
   ],
+  // Works around a warning that plotly.js doesn't have a source map
+  // As warnings are treated as errors in the build, this is necessary
+  // node_modules are generally external code so it is hard to fix the warning
+  // and we can safely ignore sourcemap errors.
   webpack: {
     configure: {
       ignoreWarnings: [

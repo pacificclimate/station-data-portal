@@ -19,6 +19,6 @@ services:
     #image: pcic/station-data-portal-frontend:${SDP_TAG}
     container_name: station-data-portal-frontend
     volumes:
-      - ./ynwt.env.js:/app/env.js
+      - ./config.bc.js:/app/config.js
     ports:
       - "${SDP_PORT}:8080"
