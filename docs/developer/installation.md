@@ -73,3 +73,8 @@ To overcome the false error messages, it was installed with
 to treat the errors in this particular install as warnings. The result is
 enshrined in `package-lock.json` and the application can be installed as
 usual (no `--force`) when this `package-lock.json` is present.
+
+Notes:
+
+This project was started via [create-react-app](https://github.com/facebook/create-react-app)
+and augmented via [craco](https://github.com/dilanx/craco)

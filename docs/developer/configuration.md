@@ -306,7 +306,11 @@ window.env = {
 ```js
 window.env = {
   appTitle: "YNWT Station Data",
-  baseMap: "YNWT",
+  baseMap: "YNWT",ronment variables for configuring the app are:
+
+`PUBLIC_URL`
+ this at true run time. See `docker/entrypoint.sh` for the specifics
+  of this replace implementation.
   // We do not at present need to filter based on province (verify!)
   //stationsQpProvinces: YK,NT
   // We do not at present need to filter networks (verify!)
@@ -355,7 +359,7 @@ For more details, see the
 
 `PUBLIC_URL`
 
-- Base URL for Station Data Portal frontend.
+- Base URL for Station Data Portal frontend, required mostly for frontend routing
 - For local development this should match the expected local url (generally http://localhost:3000/)
 - For production this will be set to %REPLACE_PUBLIC_URL% and needs to be injected at start time. This happens in the docker container's entrypoint.sh and allows us to configure the sites expected path at run time.
 

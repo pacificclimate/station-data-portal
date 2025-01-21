@@ -13,7 +13,6 @@ data from a
 - [Development and testing](docs/developer/development.md)
 - [Production](docs/developer/production.md)
 - [User documentation](docs/developer/user-doc.md)
-- [Project initialization](docs/developer/Project-initialization.md)
 
 ## Releasing
 

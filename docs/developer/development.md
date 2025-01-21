@@ -8,27 +8,7 @@ npm start
 
 This starts the app with environment variables taken from local `.env` files. Generally env variables should be avoided
 In favour of values being placed in the `public/config.js` file as these values are pulled when the code
-is built. Brief summary:
-
-- `.env`: Global default settings
-- `.env.development`: Development-specific settings (`npm start`)
-- `.env.production`: Production-specific settings (`npm run build`)
-
-For more details, see the
-[CRA documentation](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables).
-Take special note of the `.env.*` file priorities when attempting to override for different build types.
-
-For building and running a production app, see below.
-
-## the PUBLIC_URL variable
-
-In line with create react app this variable still needs to be set for correct working of application routers.
-In development this will be set to the value in `.env.development` which should be set to the expected url while
-executing `npm start`. Generally this will be `http://localhost:3000` by default.
-
-For production (running `npm run build`) this will be set to `%REPLACE_PUBLIC_URL%` and allow the built
-docker container to be able to set this at true run time. See `docker/entrypoint.sh` for the specifics
-of this replace implementation.
+is built. See [configuration](./configuration.md) for more details.
 
 ## Upgrading `pcic-react-leaflet-components`
 

@@ -10,13 +10,13 @@
 # variables appropriately when invoking docker-compose, or modify (a copy of)
 # this file with the desired values.
 
-version: "3.2"
+version: "3.8"
 services:
   frontend:
     build:
       context: ..
       dockerfile: ./docker/Dockerfile
-    #image: pcic/station-data-portal-frontend:${SDP_TAG}
+    image: pcic/station-data-portal-frontend:${SDP_TAG}
     container_name: station-data-portal-frontend
     volumes:
       - ./config.bc.js:/app/config.js
