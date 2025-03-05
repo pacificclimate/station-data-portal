@@ -306,7 +306,7 @@ window.env = {
 ```js
 window.env = {
   appTitle: "YNWT Station Data",
-  baseMap: "YNWT",ronment variables for configuring the app are:
+  baseMap: "YNWT",
 
 `PUBLIC_URL`
  this at true run time. See `docker/entrypoint.sh` for the specifics
