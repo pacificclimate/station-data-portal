@@ -29,4 +29,3 @@ jobs:
           dockerfile: docker/Dockerfile
           repository: pcic/station-data-portal-frontend
           tag_with_ref: true
-          build_args: REACT_APP_APP_VERSION=${{ env.REACT_APP_APP_VERSION }}
