@@ -1,6 +1,6 @@
 # These variables are set to make it convenient to run the docker image locally.
 # Tag will save the image with 
-tag = $(bash ./generate-commitish.sh)
+tag = $(shell git rev-parse --abbrev-ref HEAD)
 port = 30503
 
 image:
