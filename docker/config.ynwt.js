@@ -7,9 +7,6 @@ window.env = {
   appTitle: "YNWT Station Data",
   baseMap: "YNWT",
 
-  // sdsUrl values will be replaced by prod URLs when they become ready.
-  // For now, we have a dev instance.
-  // Uses monsoon database
   sdsUrl:
     "https://beehive.pacificclimate.org/met-data-portal-ynwt/api/metadata/",
 
@@ -18,9 +15,6 @@ window.env = {
   // We do not at present need to filter networks (verify!)
   //networkFilters: ???
 
-  // pdpDataUrl values will be replaced by prod URLs when they become ready.
-  // For now, we have a dev instance.
-  // Uses monsoon database
   pdpDataUrl:
     "https://beehive.pacificclimate.org/met-data-portal-ynwt/api/data/",
 };

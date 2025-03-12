@@ -17,9 +17,6 @@ window.env = {
   // Always necessary for CRMP database
   networkFilters: 'name != "PCIC Climate Variables"',
 
-  // Uses monsoon database
   pdpDataUrl:
     "https://beehive.pacificclimate.org/met-data-portal-pcds/api/data/",
-  // Uses new database
-  //pdpDataUrl: http://docker-dev02.pcic.uvic.ca:???
 };

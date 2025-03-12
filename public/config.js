@@ -7,13 +7,6 @@ window.env = {
   appTitle: "BC Station Data - PCDS",
   baseMap: "BC",
 
-  // sdsUrl values will be replaced by dev or prod URLs when they become ready.
-  // For now, we have demo instances inside the firewall.
-  // Uses monsoon database
-  //sdsUrl: http://docker-dev02.pcic.uvic.ca:30512
-  // Uses new database
-  //sdsUrl: http://docker-dev02.pcic.uvic.ca:30562
-  // Local instance
   sdsUrl:
     "https://beehive.pacificclimate.org/met-data-portal-pcds/api/metadata/",
 
@@ -25,13 +18,8 @@ window.env = {
   // Always necessary for CRMP database
   networkFilters: 'name != "PCIC Climate Variables"',
 
-  // pdpDataUrl values will be replaced by dev or prod URLs when they become ready.
-  // For now, we have a demo instance inside the firewall, below.
-  // Uses monsoon database
   pdpDataUrl:
     "https://beehive.pacificclimate.org/met-data-portal-pcds/api/data/",
-  // Uses new database
-  //pdpDataUrl: http://docker-dev02.pcic.uvic.ca:???
 
   // Debug params
   //stationFilters: histories[0].province = "BC"
