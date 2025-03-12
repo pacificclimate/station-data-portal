@@ -16,7 +16,7 @@ services:
     build:
       context: ..
       dockerfile: ./docker/Dockerfile
-    image: pcic/station-data-portal-frontend:${SDP_TAG}
+    # image: pcic/station-data-portal-frontend:${SDP_TAG}
     container_name: station-data-portal-frontend
     volumes:
       - ./config.bc.js:/app/config.js

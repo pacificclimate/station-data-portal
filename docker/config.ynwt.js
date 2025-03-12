@@ -11,7 +11,7 @@ window.env = {
   // For now, we have a dev instance.
   // Uses monsoon database
   sdsUrl:
-    "https://beehive.pacificclimate.org/station-data-portal/ynwt/metadata/",
+    "https://beehive.pacificclimate.org/met-data-portal-ynwt/api/metadata/",
 
   // We do not at present need to filter based on province (verify!)
   //stationsQpProvinces: YK,NT
@@ -22,5 +22,5 @@ window.env = {
   // For now, we have a dev instance.
   // Uses monsoon database
   pdpDataUrl:
-    "https://beehive.pacificclimate.org/station-data-portal/ynwt/data/",
+    "https://beehive.pacificclimate.org/met-data-portal-ynwt/api/data/",
 };

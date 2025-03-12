@@ -15,7 +15,7 @@ window.env = {
   //sdsUrl: http://docker-dev02.pcic.uvic.ca:30562
   // Local instance
   sdsUrl:
-    "https://beehive.pacificclimate.org/station-data-portal/pcds/metadata/",
+    "https://beehive.pacificclimate.org/met-data-portal-pcds/api/metadata/",
 
   // Currently deployed metadata backends do not respond to provinces QP.
   // When they do, we can use stationsQpProvinces and lose stationFilters
@@ -29,7 +29,7 @@ window.env = {
   // For now, we have a demo instance inside the firewall, below.
   // Uses monsoon database
   pdpDataUrl:
-    "https://beehive.pacificclimate.org/station-data-portal/pcds/data/",
+    "https://beehive.pacificclimate.org/met-data-portal-pcds/api/data/",
   // Uses new database
   //pdpDataUrl: http://docker-dev02.pcic.uvic.ca:???
 
