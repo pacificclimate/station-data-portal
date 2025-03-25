@@ -1,5 +1,20 @@
 # News / Release Notes
 
+## 1.7.0
+
+_Release Date: 2025-Mar-025_
+
+Requires:
+
+- Station Data Portal Backend: version 11.4.1
+- PDP backend: branch `pcds_only`
+
+Changes:
+
+- Updated developer documentation
+- Update node and ubuntu dependencies to 22.14 and 24.04 respectively
+- Update docker builds to work with static assets vastly speeding up frontend start up time
+
 ## 1.6.1
 
 _Release Date: 2024-Apr-04_

@@ -1,6 +1,6 @@
 {
   "name": "station-data-portal",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "private": true,
   "dependencies": {
     "@tanstack/react-query": "^5.20.2",
