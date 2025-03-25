@@ -7,7 +7,7 @@ window.env = {
 
   // Uses swarm based dev url by default
   sdsUrl:
-    "https://beehive.pacificclimate.org/station-data-portal/pcds/metadata/",
+    "https://beehive.pacificclimate.org/met-data-portal-pcds/api/metadata/",
 
   // Currently deployed metadata backends do not respond to provinces QP.
   // When they do, we can invert the commenting out below.
@@ -17,9 +17,6 @@ window.env = {
   // Always necessary for CRMP database
   networkFilters: 'name != "PCIC Climate Variables"',
 
-  // Uses monsoon database
   pdpDataUrl:
-    "https://beehive.pacificclimate.org/station-data-portal/pcds/data/",
-  // Uses new database
-  //pdpDataUrl: http://docker-dev02.pcic.uvic.ca:???
+    "https://beehive.pacificclimate.org/met-data-portal-pcds/api/data/",
 };
