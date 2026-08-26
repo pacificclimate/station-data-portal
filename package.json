@@ -17,7 +17,7 @@
     "lethargy": "^1.0.9",
     "lodash": "^4.17.21",
     "memoize-one": "^6.0.0",
-    "pcic-react-leaflet-components": "git+https://github.com/pacificclimate/pcic-react-leaflet-components.git#node24-npm12-security-policy",
+    "pcic-react-leaflet-components": "git+https://github.com/pacificclimate/pcic-react-leaflet-components.git#3.3.0",
     "plotly.js-basic-dist": "^2.34.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
