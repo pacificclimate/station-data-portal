@@ -17,7 +17,7 @@
     "lethargy": "^1.0.9",
     "lodash": "^4.17.21",
     "memoize-one": "^6.0.0",
-    "pcic-react-leaflet-components": "git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git#tile-url-as-prop",
+    "pcic-react-leaflet-components": "git+https://github.com/pacificclimate/pcic-react-leaflet-components.git#3.3.0",
     "plotly.js-basic-dist": "^2.34.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
@@ -67,7 +67,7 @@
     "build": "REACT_APP_APP_VERSION=$(bash ./generate-commitish.sh) && craco build",
     "test": "craco test --env=jsdom",
     "eject": "react-scripts eject",
-    "reinstall": "rm -rf ./node_modules; npm install --dev",
+    "reinstall": "npm ci",
     "prepare": "husky install",
     "format": "prettier --write .",
     "check-format": "prettier --check ."
@@ -83,5 +83,14 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "engines": {
+    "node": "24.x",
+    "npm": "12.x"
+  },
+  "allowScripts": {
+    "core-js@3.23.2": true,
+    "core-js-pure@3.23.2": true,
+    "es5-ext@0.10.62": false
   }
 }
