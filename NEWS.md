@@ -1,5 +1,13 @@
 # News / Release Notes
 
+## 1.8.0
+
+_Release Date: 2026-Aug-28_
+
+Changes:
+
+- [Add npm policy, node 24, pin CI](https://github.com/pacificclimate/station-data-portal/pull/191)
+
 ## 1.7.0
 
 _Release Date: 2025-Mar-025_
