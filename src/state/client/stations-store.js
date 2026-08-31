@@ -24,7 +24,7 @@ export const useStationsStore = create(
       set({ endDate: date });
     },
 
-    includeStationsWithNoObs: true,
+    includeStationsWithNoObs: false,
     toggleIncludeStationsWithNoObs: () => {
       set({ includeStationsWithNoObs: !get().includeStationsWithNoObs });
     },
