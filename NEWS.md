@@ -1,5 +1,14 @@
 # News / Release Notes
 
+## 1.8.1
+
+_Release Date: 2026-Aug-29_
+
+Changes:
+
+- Sets the default state for the "Include stations with no
+  observation" checkbox to be false to avoid user confusion
+
 ## 1.8.0
 
 _Release Date: 2026-Aug-28_
