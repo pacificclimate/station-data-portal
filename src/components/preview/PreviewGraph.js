@@ -69,6 +69,7 @@ const PreviewGraph = ({ variableId }) => {
           y: map("value", previewObservations.observations),
           type: "scatter",
           mode: isWindDirection ? "markers" : "lines",
+          line: { color: config.plotColor },
           marker: { color: config.plotColor },
         },
       ]}
