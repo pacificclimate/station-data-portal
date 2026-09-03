@@ -1,15 +1,26 @@
 import React from "react";
 import { Spinner } from "react-bootstrap";
-import map from "lodash/fp/map";
 import { useShallow } from "zustand/react/shallow";
 import { useStore } from "@/state/client/state-store";
 import { useStationVariableObservations } from "@/state/query-hooks/use-station-variable-observations";
-import { useConfigContext } from "@/state/context-hooks/use-config-context";
 
-import Plotly from "plotly.js-basic-dist";
+import Plotly from "plotly.js/lib/core";
+import barpolar from "plotly.js/lib/barpolar";
 import createPlotlyComponent from "react-plotly.js/factory";
 
+Plotly.register([barpolar]);
+
 const Plot = createPlotlyComponent(Plotly);
+
+const cardinalDirections = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+const windRoseColors = [
+  "#dbe9f6",
+  "#b3d2e8",
+  "#82b7d8",
+  "#5599c8",
+  "#2d78b3",
+  "#0b4f8a",
+];
 
 const getCompassDirection = (degrees) => {
   if (
@@ -20,11 +31,10 @@ const getCompassDirection = (degrees) => {
     return "";
   }
 
-  const directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
   const normalizedDegrees = ((Number(degrees) % 360) + 360) % 360;
   const index = Math.round(normalizedDegrees / 45) % 8;
 
-  return directions[index];
+  return cardinalDirections[index];
 };
 
 const findClosestObservation = (time, observations) => {
@@ -50,6 +60,57 @@ const findClosestObservation = (time, observations) => {
   return closest;
 };
 
+const buildWindRoseData = (speedObservations, directionObservations) => {
+  const pairedObservations = speedObservations.flatMap((speedObservation) => {
+    const directionObservation = findClosestObservation(
+      speedObservation.time,
+      directionObservations,
+    );
+    const speed = Number(speedObservation.value);
+    const direction = Number(directionObservation?.value);
+
+    if (Number.isFinite(speed) && Number.isFinite(direction)) {
+      return [{ speed, direction: getCompassDirection(direction) }];
+    }
+
+    return [];
+  });
+
+  if (!pairedObservations.length) {
+    return { bins: [], observationCount: 0 };
+  }
+
+  const maximumSpeed = Math.max(
+    ...pairedObservations.map((observation) => observation.speed),
+  );
+  const binSize = maximumSpeed / windRoseColors.length || 1;
+
+  const bins = windRoseColors.map((color, index) => {
+    const minimum = index * binSize;
+    const maximum = (index + 1) * binSize;
+    const counts = Object.fromEntries(
+      cardinalDirections.map((direction) => [direction, 0]),
+    );
+
+    return {
+      color,
+      minimum,
+      maximum,
+      counts,
+    };
+  });
+
+  pairedObservations.forEach((observation) => {
+    const binIndex = Math.min(
+      Math.max(Math.floor(observation.speed / binSize), 0),
+      bins.length - 1,
+    );
+    bins[binIndex].counts[observation.direction] += 1;
+  });
+
+  return { bins, observationCount: pairedObservations.length };
+};
+
 const WindGraph = ({ speedVariableId, directionVariableId }) => {
   const { stationId, selectedStartDate, selectedEndDate, showLegend } =
     useStore(
@@ -60,8 +121,6 @@ const WindGraph = ({ speedVariableId, directionVariableId }) => {
         showLegend: state.showLegend,
       })),
     );
-
-  const config = useConfigContext();
 
   const {
     data: speedObservations,
@@ -106,112 +165,62 @@ const WindGraph = ({ speedVariableId, directionVariableId }) => {
 
   const speedUnit = speedObservations?.variable?.unit ?? "";
 
-  const speedCustomData = speedData.map((speedObservation) => {
-    const directionObservation = findClosestObservation(
-      speedObservation.time,
-      directionData,
+  const { bins: windRoseData, observationCount } = buildWindRoseData(
+    speedData,
+    directionData,
+  );
+
+  if (!windRoseData.length) {
+    return (
+      <div>
+        No paired wind data found in the currently selected time period.
+      </div>
     );
-
-    if (!directionObservation) {
-      return [null, ""];
-    }
-
-    const direction = Number(directionObservation.value);
-
-    return [direction, getCompassDirection(direction)];
-  });
-
-  const directionCustomData = directionData.map((directionObservation) => {
-    const speedObservation = findClosestObservation(
-      directionObservation.time,
-      speedData,
-    );
-
-    return [
-      speedObservation ? Number(speedObservation.value) : null,
-      getCompassDirection(Number(directionObservation.value)),
-    ];
-  });
+  }
 
   return (
     <Plot
       style={{ width: "100%", height: "500px" }}
       data={[
-        {
-          x: map("time", speedData),
-          y: map("value", speedData),
-          customdata: speedCustomData,
-          type: "scatter",
-          mode: "lines",
-          name: "Wind speed",
-          yaxis: "y",
-          line: {
-            color: config.plotColor,
-          },
+        ...windRoseData.map((bin) => ({
+          type: "barpolar",
+          r: cardinalDirections.map(
+            (direction) => (bin.counts[direction] / observationCount) * 100,
+          ),
+          theta: cardinalDirections,
+          name: `${bin.minimum.toFixed(1)}–${bin.maximum.toFixed(1)} ${speedUnit}`,
+          marker: { color: bin.color },
           hovertemplate:
-            "%{x}<br>" +
-            `<b>Wind speed:</b> %{y:.1f} ${speedUnit}` +
-            "<br>" +
-            "<b>Wind direction:</b> %{customdata[0]:.0f}° " +
-            "(%{customdata[1]})" +
+            "<b>%{theta}</b><br>" +
+            `Speed: ${bin.minimum.toFixed(1)}–${bin.maximum.toFixed(1)} ${speedUnit}<br>` +
+            "Frequency: %{r:.1f}%" +
             "<extra></extra>",
-        },
-        {
-          x: map("time", directionData),
-          y: map("value", directionData),
-          customdata: directionCustomData,
-          type: "scatter",
-          mode: "markers",
-          name: "Wind direction",
-          yaxis: "y2",
-          marker: {
-            color: config.plotColor,
-            size: 4,
-            opacity: 0.7,
-          },
-          hovertemplate:
-            "%{x}<br>" +
-            `<b>Wind speed:</b> %{customdata[0]:.1f} ${speedUnit}` +
-            "<br>" +
-            "<b>Wind direction:</b> %{y:.0f}° " +
-            "(%{customdata[1]})" +
-            "<extra></extra>",
-        },
+        })),
       ]}
       layout={{
         margin: {
           t: !showLegend ? 50 : 30,
-          l: 60,
-          r: 50,
-          b: 50,
+          l: 40,
+          r: 80,
+          b: 40,
         },
         autosize: true,
-        title: showLegend ? null : "Wind speed and direction",
-        xaxis: {
-          title: "Time",
-          type: "date",
-          autorange: false,
-          range: [selectedStartDate, selectedEndDate],
-          anchor: "y2",
+        title: showLegend ? null : "Wind rose",
+        polar: {
+          barmode: "stack",
+          bargap: 0.1,
+          angularaxis: {
+            direction: "clockwise",
+            rotation: 90,
+          },
+          radialaxis: {
+            ticksuffix: "%",
+            angle: 45,
+            rangemode: "tozero",
+          },
         },
-        yaxis: {
-          title: speedUnit || "Wind speed",
-          domain: [0.32, 1],
-          rangemode: "tozero",
-        },
-        yaxis2: {
-          title: "Direction",
-          domain: [0, 0.22],
-          range: [0, 360],
-          tickmode: "array",
-          tickvals: [0, 45, 90, 135, 180, 225, 270, 315],
-          ticktext: ["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
-        },
-        showlegend: true,
         legend: {
-          orientation: "h",
-          x: 0,
-          y: 1.08,
+          traceorder: "reversed",
         },
         hovermode: "closest",
       }}
