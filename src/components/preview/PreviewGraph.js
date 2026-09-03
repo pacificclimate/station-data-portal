@@ -57,6 +57,9 @@ const PreviewGraph = ({ variableId }) => {
     );
   }
 
+  const isWindDirection =
+    previewObservations.variable.standard_name === "wind_from_direction";
+
   return (
     <Plot
       style={{ width: "100%", height: "400px" }}
@@ -65,7 +68,7 @@ const PreviewGraph = ({ variableId }) => {
           x: map("time", previewObservations.observations),
           y: map("value", previewObservations.observations),
           type: "scatter",
-          mode: "lines",
+          mode: isWindDirection ? "markers" : "lines",
           marker: { color: config.plotColor },
         },
       ]}
@@ -86,9 +89,17 @@ const PreviewGraph = ({ variableId }) => {
           autorange: false,
           range: [selectedStartDate, selectedEndDate],
         },
-        yaxis: {
-          title: previewObservations.variable.unit,
-        },
+        yaxis: isWindDirection
+          ? {
+              title: "Wind direction",
+              range: [0, 360],
+              tickmode: "array",
+              tickvals: [0, 45, 90, 135, 180, 225, 270, 315],
+              ticktext: ["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
+            }
+          : {
+              title: previewObservations.variable.unit,
+            },
       }}
       useResizeHandler={true}
       //onInitialized={(figure) => {setPlot(figure)}}
