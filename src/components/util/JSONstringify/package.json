@@ -1,6 +1,0 @@
-{
-  "name": "JSONstringify",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./JSONstringify.js"
-}
