@@ -40,7 +40,7 @@
   ],
   "customizations": {
     "vscode": {
-      "extensions": ["EditorConfig.EditorConfig", "ms-vscode.makefile-tools"]
+      "extensions": ["EditorConfig.EditorConfig"]
     }
   }
 }

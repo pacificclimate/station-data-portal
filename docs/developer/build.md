@@ -19,13 +19,15 @@ Testing for deployment involves building in production mode and setting up a con
 in production. This allows us to ensure that dependencies are met and gives us a portable artifact
 that we can set up on any docker capable machine and expect to work.
 
-Creating the container can be done via the `make image` command. This command executes `npm run build`
+Creating the image can be done via `npm run docker:build`. This command executes `npm run build`
 creating a static version of the website. `process.env` variables are baked into the files at this
 time, so it should be avoided for evironment specific configuration use. These static assests are in
 the `build/` folder. Once built the [Dockerfile](../../docker/Dockerfile) pulls in these files along
-with dependencies to generate a docker image.
+with dependencies to generate a docker image, tagged `pcic/station-data-portal-frontend:local`.
 
-Running the created docker image can be done via `make up`. This brings up the image based on the
+Running the created docker image can be done via `npm run docker:up`, and removing the container via
+`npm run docker:down`. See [development](./development.md#test-docker-infrastructure) for running a
+published image instead. `docker:up` brings up the image based on the
 specification in the [docker-compose.yaml](../../docker/docker-compose.yaml). This specification also
 overrides our local development configuration values by mounting an alternative configuration. Two examples
 are provided `config.bc.js` and `config.ynwt.js` representing our two common production versions. `bc`

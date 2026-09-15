@@ -41,28 +41,43 @@ Tests are also automatically run by a GitHub action on each commit.
 ### Test Docker infrastructure
 
 It can be useful to test the Docker infrastructure locally before
-deployment on a server. To do so:
+deployment on a server. The `docker:*` npm scripts wrap
+[`docker/docker-compose.yaml`](../../docker/docker-compose.yaml), which mounts
+`docker/config.bc.js` as the container's `config.js`. To do so:
 
-1. Pull or build image.
+1. Build or pull an image.
 
-   - To pull:
+   - To build from your working tree:
 
+     ```bash
+     npm run docker:build
      ```
-     docker pull pcic/station-data-portal-frontend:<tag>
+
+     This runs `npm run build`, then builds an image tagged
+     `pcic/station-data-portal-frontend:local`. Rerun it after code changes;
+     `docker:up` doesn't rebuild.
+
+   - To pull a published image:
+
+     ```bash
+     SDP_TAG=<tag> docker compose -f docker/docker-compose.yaml pull
      ```
 
-     Typically `<tag>` is your current branch name.
+     `<tag>` is a branch name or release version, as published by the
+     [Docker publishing workflow](../../.github/workflows/docker-publish.yml).
 
-   - To build:
+2. Run the container at http://localhost:30503:
 
-     `make image`
+   ```bash
+   npm run docker:up
+   ```
 
-     This automatically builds an image tagged with the current branch name.
+   For a pulled image, run `SDP_TAG=<tag> npm run docker:up`. The container
+   runs in the foreground; Ctrl-C stops it. To use another host port, set
+   `SDP_PORT` and change `PUBLIC_URL` in `docker/config.bc.js` to match.
 
-2. Run container:
+3. Remove the container:
 
-   `make up`
-
-3. Stop and remove container:
-
-   `make down`
+   ```bash
+   npm run docker:down
+   ```
