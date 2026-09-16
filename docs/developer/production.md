@@ -33,8 +33,9 @@ build flow to allow us to inject this configuration.
 ### Deployment
 
 See the contents of the [`docker`](docker) directory for an example of how
-to run the SDP Docker image. The [Makefile](Makefile) shows how to run the
-image using `docker-compose`. You may wish to copy and modify
+to run the SDP Docker image. The `docker:*` scripts in
+[`package.json`](../../package.json) show how to run the image using
+`docker compose`. You may wish to copy and modify
 `docker-compose.yaml` to construct a production deployment.
 
 Note: All **deployment environment variables**, except `REACT_APP_APP_VERSION`,
