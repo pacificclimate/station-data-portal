@@ -10,7 +10,8 @@ import {
   polygon2,
 } from "../__test_data__/sample-leaflet-layers.js";
 
-describe("geoJSONToLeafletLayers", function () {});
+// No tests written for this function yet; `.todo` keeps the gap visible.
+describe.todo("geoJSONToLeafletLayers");
 
 describe("layersToGeoJSON", function () {
   const expectedSingle = {

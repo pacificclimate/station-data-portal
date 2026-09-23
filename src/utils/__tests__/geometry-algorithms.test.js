@@ -1,4 +1,3 @@
-import each from "jest-each";
 import { isLeft, isPointInPolygonWn } from "../geometry-algorithms";
 
 // Helpers
@@ -20,11 +19,11 @@ describe("isLeft", () => {
 
   // Note: `isLeft` switches sign depending on whether the line is upwaard or
   // downward. This complicates the tests a bit.
-  each([
+  describe.each([
     ["with upward line", p0, p1, true],
     ["with downward line", p1, p0, false],
-  ]).describe("%s", (desc, p0, p1, upward) => {
-    each([
+  ])("%s", (desc, p0, p1, upward) => {
+    it.each([
       [
         "left of line",
         Point(-1, 1),
@@ -36,7 +35,7 @@ describe("isLeft", () => {
         upward ? "toBeLessThan" : "toBeGreaterThan",
       ],
       ["on line", Point(0.5, 0.5), "toEqual"],
-    ]).test("for point %s", (desc, p2, matcher) => {
+    ])("for point %s", (desc, p2, matcher) => {
       const expecter = expect(isLeftXY(p0, p1, p2));
       expecter[matcher](0);
     });
@@ -89,7 +88,7 @@ describe("isPointInPolygonWn", () => {
     Point(-2, -1),
   ];
 
-  each([
+  describe.each([
     ["a triangle with closed definition", triangleClosed],
     ["a triangle with open definition", triangleOpen],
     ["a triangle, CW", reverse(triangleOpen), true],
@@ -97,11 +96,11 @@ describe("isPointInPolygonWn", () => {
     ["a rectangle, CW", reverse(rectangle), true],
     ["a convex quadrilateral", convexQuadrilateral],
     ["a big convex polygon", bigConvexPolygon],
-  ]).describe("when polygon is %s", (descr, polygon, cw) => {
-    each([
+  ])("when polygon is %s", (descr, polygon, cw) => {
+    it.each([
       ["inside", Point(0, 0), cw ? "toBeLessThan" : "toBeGreaterThan"],
       ["outside", Point(5, 0), "toEqual"],
-    ]).test("for point %s polygon", (descr, point, matcher) => {
+    ])("for point %s polygon", (descr, point, matcher) => {
       expect(isPointInPolygonWnXY(polygon, point))[matcher](0);
     });
   });
