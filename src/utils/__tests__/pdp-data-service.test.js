@@ -107,10 +107,6 @@ describe("frequencyOptions2pdpFormat", () => {
 const dataFormatOption = (value) => ({ value });
 
 describe("dataDownloadTarget", () => {
-  beforeEach(() => {
-    jest.resetModules();
-  });
-
   const config = { pdpDataUrl: "PDP_DATA_URL" };
 
   const regex = (s) => new RegExp(escapeRegExp(s));

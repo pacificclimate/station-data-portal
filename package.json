@@ -46,26 +46,26 @@
   },
   "devDependencies": {
     "@tanstack/react-query-devtools": "^5.20.2",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.3",
     "craco": "^0.0.3",
     "husky": "^8.0.3",
-    "jest-each": "^28.1.1",
+    "jsdom": "^30.0.1",
     "lint-staged": "^15.2.0",
     "prettier": "3.2.2",
     "react-app-alias": "^2.2.2",
-    "serve": "^13.0.2"
+    "serve": "^13.0.2",
+    "vite": "^8.2.2",
+    "vitest": "^5.0.0"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
   },
-  "jest": {
-    "transformIgnorePatterns": [
-      "<rootDir>/node_modules/(?!(url-join|react-leaflet|@react-leaflet/core))"
-    ]
-  },
   "scripts": {
     "start": "craco start",
     "build": "REACT_APP_APP_VERSION=$(bash ./generate-commitish.sh) && craco build",
-    "test": "craco test --env=jsdom",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "docker:build": "npm run build && docker compose -f docker/docker-compose.yaml build",
     "docker:up": "docker compose -f docker/docker-compose.yaml up --force-recreate",
     "docker:down": "docker compose -f docker/docker-compose.yaml down",
