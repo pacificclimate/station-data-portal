@@ -1,5 +1,5 @@
-// PROTOTYPE (Leaflet-Geoman in place of leaflet-draw): a map toolbar for
-// drawing, editing and deleting the user's selection shapes.
+// A map toolbar, built on Leaflet-Geoman, for drawing, editing and deleting
+// the user's selection shapes.
 //
 // The shapes are plain Leaflet polygons (rectangles are polygons too). After
 // every create, edit or delete, `onChange` receives all of them as an array of

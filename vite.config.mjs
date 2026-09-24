@@ -23,16 +23,5 @@ export default defineConfig({
     // `import { describe, it, expect } from "vitest"` is a separate mechanical
     // edit across all test files.
     globals: true,
-    alias: {
-      // react-leaflet-draw's CJS `main` bundles a private copy of
-      // @react-leaflet/core, whose context never matches react-leaflet's.
-      // Point tests at its ESM `module` build, which webpack picks for the app.
-      "react-leaflet-draw": fileURLToPath(
-        new URL(
-          "./node_modules/react-leaflet-draw/dist/esm/index.js",
-          import.meta.url,
-        ),
-      ),
-    },
   },
 });

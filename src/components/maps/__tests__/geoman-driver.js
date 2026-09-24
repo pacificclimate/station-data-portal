@@ -1,6 +1,11 @@
-// PROTOTYPE: drives Leaflet-Geoman's toolbar and handlers the way a user
-// would, as leaflet-draw-driver.js does for leaflet-draw. Same five methods;
-// see that file for the conventions.
+// Drives Leaflet-Geoman's toolbar and handlers the way a user would, with
+// synthetic DOM events on the elements Geoman itself listens to. This is the
+// only drawing-library-specific part of the drawing test: a replacement
+// library supplies a driver with the same five methods.
+//
+// Points are Leaflet latlngs; `map` is the live L.Map. jsdom has no layout, so
+// the map container sits at (0, 0) with size 0 and a container point is also a
+// client point.
 import { fireEvent } from "@testing-library/react";
 import L from "leaflet";
 
