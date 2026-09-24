@@ -21,7 +21,18 @@ export default defineConfig({
     // Measured (`npm run test:coverage`), never gated: no thresholds.
     coverage: {
       include: ["src/**/*.{js,jsx}"],
-      exclude: ["src/test-utils.jsx"],
+      exclude: ["src/test-utils.jsx", "src/**/*-driver.js"],
+    },
+    alias: {
+      // react-leaflet-draw's CJS `main` bundles a private copy of
+      // @react-leaflet/core, whose context never matches react-leaflet's.
+      // Point tests at its ESM `module` build, which webpack picks for the app.
+      "react-leaflet-draw": fileURLToPath(
+        new URL(
+          "./node_modules/react-leaflet-draw/dist/esm/index.js",
+          import.meta.url,
+        ),
+      ),
     },
   },
 });
