@@ -36,16 +36,16 @@
 //  - `onSetArea` is called with a single GeoJSON object representing the
 //    contents of the layer group.
 
-import React, { useEffect, useMemo, useRef, useTransition } from "react";
+import React, { useEffect, useMemo, useTransition } from "react";
 
-import { FeatureGroup, LayerGroup } from "react-leaflet";
-import { EditControl } from "react-leaflet-draw";
+import { LayerGroup } from "react-leaflet";
 import isEqual from "lodash/fp/isEqual";
 import { layersToGeoJSONMultipolygon } from "@/utils/geoJSON-leaflet";
 import { getTimer } from "@/utils/timing";
 import baseMaps from "@/components/maps/baseMaps";
 
 import MapInfoDisplay from "./MapInfoDisplay";
+import UserShapeControl from "./UserShapeControl";
 import { defaultMarkerOptions, ManyStationMarkers } from "./StationMarkers";
 
 import logger from "@/logger";
@@ -66,7 +66,6 @@ const StationMapRenderer = React.memo(
     BaseMap,
     initialViewport,
     baseMapTilesUrl,
-    userShapeLayerRef,
     userShapeStyle,
     handleChangedGeometryLayers,
     stations,
@@ -132,41 +131,23 @@ const StationMapRenderer = React.memo(
         baseMapTilesUrl={baseMapTilesUrl}
         preferCanvas={true}
         maxZoom={13}
+        pmIgnore={false}
       >
         <MapInfoDisplay
           position={"bottomleft"}
           what={(map) => `Zoom: ${map.getZoom()}`}
         />
-        <FeatureGroup ref={userShapeLayerRef}>
-          <EditControl
+        <UserShapeControl
+          position={"topleft"}
+          shapeStyle={userShapeStyle}
+          onChange={handleChangedGeometryLayers}
+        />
+        {config.showReloadStationsButton && (
+          <StationRefresh
             position={"topleft"}
-            draw={{
-              marker: false,
-              circlemarker: false,
-              circle: false,
-              polyline: false,
-              polygon: {
-                showArea: false,
-                showLength: false,
-                shapeOptions: userShapeStyle,
-              },
-              rectangle: {
-                showArea: false,
-                showLength: false,
-                shapeOptions: userShapeStyle,
-              },
-            }}
-            onCreated={handleChangedGeometryLayers}
-            onEdited={handleChangedGeometryLayers}
-            onDeleted={handleChangedGeometryLayers}
+            onReloadStations={onReloadStations}
           />
-          {config.showReloadStationsButton && (
-            <StationRefresh
-              position={"topleft"}
-              onReloadStations={onReloadStations}
-            />
-          )}
-        </FeatureGroup>
+        )}
         {markerLayerGroup}
         {isPending && <MapSpinner {...config.mapSpinner} />}
       </BaseMap>
@@ -197,17 +178,12 @@ const StationMap = ({
   const { isFiltering, filteredStations: stations } =
     useStationFilteringContext();
 
-  const userShapeLayerRef = useRef();
-
   const { BaseMap, initialViewport, baseMapTilesUrl } =
     baseMaps[config.baseMap];
 
   const handleChangedGeometryLayers = useMemo(
-    () => () => {
-      const layers = userShapeLayerRef?.current?.getLayers();
-      setArea(layers && layersToGeoJSONMultipolygon(layers));
-    },
-    [userShapeLayerRef],
+    () => (layers) => setArea(layersToGeoJSONMultipolygon(layers)),
+    [],
   );
 
   smtimer.log();
@@ -219,7 +195,6 @@ const StationMap = ({
         BaseMap,
         initialViewport,
         baseMapTilesUrl,
-        userShapeLayerRef,
         userShapeStyle,
         handleChangedGeometryLayers,
         onReloadStations,
