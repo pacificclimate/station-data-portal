@@ -18,7 +18,6 @@ import { previewLoader } from "@/components/preview/previewLoader";
 
 import "bootstrap/dist/css/bootstrap.css";
 import "react-datepicker/dist/react-datepicker.css";
-import "leaflet-draw/dist/leaflet.draw.css";
 import "./bootstrap-extension.css";
 import "./index.css";
 
