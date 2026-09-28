@@ -15,10 +15,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Export REACT_APP_APP_VERSION env var
-        run: |
-          git fetch --prune --unshallow
-          echo "REACT_APP_APP_VERSION=$(git describe --tags --abbrev=0) ($(git rev-parse --abbrev-ref HEAD):$(git log -1 --format=%h))" >> $GITHUB_ENV
+      - name: Fetch full history for the version string
+        run: git fetch --prune --unshallow
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version: "24"
