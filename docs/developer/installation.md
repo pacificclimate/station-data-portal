@@ -2,63 +2,52 @@
 
 ## Tooling
 
-Your Node.js tooling must satisfy the following version requirements:
+Your Node.js tooling must match the `engines` field in
+[`package.json`](../../package.json):
 
-- `npm` >= 8.1.0
-- `node` >= 16
+- `node` 24.x
+- `npm` 12.x
+
+The [devcontainer](../../.devcontainer) sets up both.
 
 ## Install
 
 With the appropriate versions of `node`/`npm` in use:
 
 ```bash
-npm install
+npm ci
 ```
 
+`npm ci` installs exactly what `package-lock.json` records. Use
+`npm install` only to add or change a dependency.
+
 If you need to start fresh after much messing about, the `reinstall` script
-deletes `./node_modules/` and then installs:
+does the same thing (`npm ci` deletes `./node_modules/` before installing):
 
 ```bash
 npm run reinstall
 ```
 
+## Dependency policy
+
+[`.npmrc`](../../.npmrc) sets a security policy that npm 12 enforces on every
+install:
+
+- `min-release-age=7`: npm won't install a package version published less
+  than 7 days ago. If `npm install` refuses a new release, take the previous
+  version rather than overriding the policy. `npm ci` from an existing
+  lockfile isn't affected.
+- `strict-allow-scripts=true`: an install fails if a dependency has an
+  install script that the `allowScripts` field in `package.json` doesn't
+  mention. Review the script, then add the package there with `true` to run
+  it or `false` to skip it.
+- `allow-git=root` and `allow-remote=none`: git dependencies may be declared
+  only in this project's own `package.json` (as
+  `pcic-react-leaflet-components` is), and no dependency may come from a
+  tarball URL outside the npm registry.
+
 ## Notes
 
-There are complications in the current dependencies of this application that
-are worth documenting.
-
-### React Leaflet 3.x
-
-We are presently using [React Leaflet 3.x](https://react-leaflet.js.org/docs/v3/start-introduction/). It is already marked as
-"no longer maintained", but it is still a documented release (unlike RL 2.x).
-We may decide to upgrade to RL 4.x, but we're taking this one step at a time.
-
-React Leaflet 3.x poses some installation problems, as documented in
-[`pcic-react-leaflet-components` 2.x](https://github.com/pacificclimate/pcic-react-leaflet-components/blob/master/docs/installation.md#dependencies).
-For reference, see [this issue](https://github.com/PaulLeCam/react-leaflet/issues/891);
-particularly,
-[this comment](https://github.com/PaulLeCam/react-leaflet/issues/891#issuecomment-924374035).
-
-We have adopted the base installation documented for
-`pcic-react-leaflet-components` 2.x. Specifically, it pins the following
-dependencies:
-
-```json
-"leaflet": "^1.7.1",
-"react": "^17.0.2",
-"react-dom": "^17.0.2",
-"@react-leaflet/core": "1.0.2",
-"react-leaflet": "3.1.0"
-```
-
-### Leaflet-Geoman
-
-[Leaflet-Geoman](https://geoman.io/docs/leaflet) (`@geoman-io/leaflet-geoman-free`)
-provides the tools for a user to draw, edit and remove selection polygons on
-the map. It is a plain Leaflet plugin, used through `UserShapeControl`
-(`src/components/maps/UserShapeControl.jsx`), and installs as usual.
-
-Notes:
-
-This project was started via [create-react-app](https://github.com/facebook/create-react-app)
-and augmented via [craco](https://github.com/dilanx/craco)
+`pcic-react-leaflet-components` is installed from a git tag. See
+[development](./development.md#upgrading-pcic-react-leaflet-components) for
+how to upgrade it.
