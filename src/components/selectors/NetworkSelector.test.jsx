@@ -1,6 +1,7 @@
+import { it } from "vitest";
 import React from "react";
 import { renderWithProviders } from "@/test-utils";
-import NetworkSelector from "../NetworkSelector";
+import NetworkSelector from "./NetworkSelector";
 import noop from "lodash/noop";
 
 // TODO: Put this elsewhere

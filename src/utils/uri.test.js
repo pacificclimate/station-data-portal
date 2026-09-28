@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { qsStringify, makeURI } from "./uri";
 
 describe("qsStringify", () => {

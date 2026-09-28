@@ -1,14 +1,15 @@
+import { describe, it, expect } from "vitest";
 import {
   geoJSONToLeafletLayers,
   layersToGeoJSON,
   layersToGeoJSONMultipolygon,
-} from "../geoJSON-leaflet.js";
+} from "./geoJSON-leaflet.js";
 import {
   fakeLeafletLayer1,
   fakeLeafletLayer2,
   polygon1,
   polygon2,
-} from "../__test_data__/sample-leaflet-layers.js";
+} from "./__test_data__/sample-leaflet-layers.js";
 
 // No tests written for this function yet; `.todo` keeps the gap visible.
 describe.todo("geoJSONToLeafletLayers");

@@ -1,6 +1,7 @@
+import { it } from "vitest";
 import React from "react";
 import { renderWithProviders } from "@/test-utils";
-import { OneStationMarkers } from "../StationMarkers";
+import { OneStationMarkers } from "./StationMarkers";
 import stations from "@/utils/__test_data__/stations-bc.json";
 import networks from "@/utils/__test_data__/networks-bc.json";
 import { NETWORKS_QUERY_KEY } from "@/state/query-hooks/use-networks";

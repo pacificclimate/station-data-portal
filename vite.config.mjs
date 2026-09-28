@@ -17,11 +17,11 @@ export default defineConfig({
     // Only unit tests under src/. Without this, Vitest's default glob also
     // picks up the Playwright specs kept under docs/.
     include: ["src/**/*.test.{js,jsx}"],
-    // Carried over from the Jest setup during the test-runner migration: the
-    // suite was written against Jest's ambient describe/it/expect, and is left
-    // that way so the runner swap stays a parity change. Moving to explicit
-    // `import { describe, it, expect } from "vitest"` is a separate mechanical
-    // edit across all test files.
-    globals: true,
+    setupFiles: "./vitest.setup.js",
+    // Measured (`npm run test:coverage`), never gated: no thresholds.
+    coverage: {
+      include: ["src/**/*.{js,jsx}"],
+      exclude: ["src/test-utils.jsx"],
+    },
   },
 });

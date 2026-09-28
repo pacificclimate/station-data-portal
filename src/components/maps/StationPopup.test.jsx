@@ -1,7 +1,8 @@
+import { it } from "vitest";
 import React from "react";
 import { renderWithProviders } from "@/test-utils";
 import { CircleMarker } from "react-leaflet";
-import StationPopup from "../StationPopup";
+import StationPopup from "./StationPopup";
 import { NETWORKS_QUERY_KEY } from "@/state/query-hooks/use-networks";
 import { VARIABLES_QUERY_KEY } from "@/state/query-hooks/use-variables";
 

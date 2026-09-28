@@ -1,6 +1,7 @@
+import { it } from "vitest";
 import React from "react";
 import { createRoot } from "react-dom/client";
-import AdjustableColumns from "../AdjustableColumns";
+import AdjustableColumns from "./AdjustableColumns";
 
 it("renders without crashing", () => {
   const container = document.createElement("div");

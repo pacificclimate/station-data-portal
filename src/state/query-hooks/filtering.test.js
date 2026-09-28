@@ -1,4 +1,5 @@
-import { filterExpressionsParser, filterPredicate } from "../filtering";
+import { describe, it, expect } from "vitest";
+import { filterExpressionsParser, filterPredicate } from "./filtering";
 import every from "lodash/fp/every";
 import flow from "lodash/fp/flow";
 import zipAll from "lodash/fp/zipAll";

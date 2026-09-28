@@ -1,6 +1,7 @@
+import { it } from "vitest";
 import React from "react";
 import { renderWithProviders } from "@/test-utils";
-import FrequencySelector from "../FrequencySelector";
+import FrequencySelector from "./FrequencySelector";
 import noop from "lodash/noop";
 
 // TODO: Use better test data.
