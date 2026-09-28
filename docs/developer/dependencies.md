@@ -2,7 +2,7 @@
 
 ## Execution environment
 
-Node.js >= 16 (**important**)
+Node.js 24 and npm 12 (**important**; see [installation](./installation.md))
 
 All other package requirements are specified in `package.json`.
 

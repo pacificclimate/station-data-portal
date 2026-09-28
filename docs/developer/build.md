@@ -1,17 +1,22 @@
 # Building the project
 
-There are 3 modes of operation for the application which take slightly different build steps:
+The app is built with [Vite](https://vite.dev/), configured in
+[`vite.config.mjs`](../../vite.config.mjs). There are 3 modes of operation for
+the application which take slightly different build steps:
 
 ### Local
 
 Everything in the project should be set up for easy development with defaults provided that allow
-execution without modification to configuration. This execution is done via `npm run start`. The
-project is then built via create react app and a local development server is started.
+execution without modification to configuration. This execution is done via `npm start`, which
+starts Vite's development server at http://localhost:3000 with hot module replacement. Nothing is
+bundled ahead of time; Vite serves the source files directly. If port 3000 is taken, `npm start`
+fails rather than picking another port.
 
-Local config is provided via [public/config.js](../public/config.js) and is loaded automatically
-as a static javascript file via the local development server.
+Local config is provided via [public/config.js](../../public/config.js) and is loaded automatically
+as a static javascript file via the local development server. It is read once when the page loads,
+so reload the page after editing it.
 
-Public URL is overridden by the `.env.development` file to our expected `http://localhost:3000`
+The development server always serves the app at the root of `localhost:3000`.
 
 ### Local Docker
 
@@ -20,10 +25,13 @@ in production. This allows us to ensure that dependencies are met and gives us a
 that we can set up on any docker capable machine and expect to work.
 
 Creating the image can be done via `npm run docker:build`. This command executes `npm run build`
-creating a static version of the website. `process.env` variables are baked into the files at this
-time, so it should be avoided for evironment specific configuration use. These static assests are in
-the `build/` folder. Once built the [Dockerfile](../../docker/Dockerfile) pulls in these files along
-with dependencies to generate a docker image, tagged `pcic/station-data-portal-frontend:local`.
+creating a static version of the website in the `dist/` folder. Values that are fixed at build time
+(see [configuration](./configuration.md#build-time-values)) are baked into these files, so they
+should not be used for environment specific configuration. Once built the
+[Dockerfile](../../docker/Dockerfile) copies `dist/` into a docker image, tagged
+`pcic/station-data-portal-frontend:local`.
+
+`npm run build` also writes source maps next to the JavaScript in `dist/assets/`.
 
 Running the created docker image can be done via `npm run docker:up`, and removing the container via
 `npm run docker:down`. See [development](./development.md#test-docker-infrastructure) for running a
@@ -33,12 +41,12 @@ overrides our local development configuration values by mounting an alternative 
 are provided `config.bc.js` and `config.ynwt.js` representing our two common production versions. `bc`
 is used by default.
 
-`PUBLIC_URL` is handled in two steps. During the build process we define a replacement value in `.env.production`
-which is injected into any locations where the public URL is required. When the container starts we replace
-these instances with the public URL defined in whatever `/app/config.js` within the container has for the
-`PUBLIC_URL` value. The specific implementation of this replacement can be found in the
-[entrypoint.sh](../../docker/entrypoint.sh) file which is used as the default entrypoint for the container
-when it starts.
+`PUBLIC_URL` is handled in two steps. `npm run build` builds the app under the placeholder base path
+`/__REPLACE_PUBLIC_URL__/`, so every URL the built files use for the app's own files starts with it.
+When the container starts, it replaces the placeholder with the path of the `PUBLIC_URL` value in
+`/app/config.js`. See [production](./production.md#base-path-rewrite-at-container-start) for
+the details. Because of this placeholder, the contents of `dist/` only work once they're inside the
+container.
 
 ### Production Docker
 
