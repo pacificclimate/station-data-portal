@@ -32,7 +32,6 @@
     "react-range-slider": "^0.2.1",
     "react-router-bootstrap": "^0.26.2",
     "react-router-dom": "^6.21.3",
-    "react-scripts": "5.0.1",
     "react-select": "^5.3.2",
     "react-table": "^7.8.0",
     "sass": "^1.70.0",
@@ -40,62 +39,44 @@
     "use-immer": "^0.7.0",
     "zustand": "^4.4.7"
   },
-  "overrides": {
-    "autoprefixer": "10.4.5"
-  },
   "devDependencies": {
     "@tanstack/react-query-devtools": "^5.20.2",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
-    "@vitest/coverage-v8": "^5.0.0",
-    "craco": "^0.0.3",
+    "@vitejs/plugin-react": "^6.1.1",
+    "@vitest/coverage-v8": "^5.0.1",
     "husky": "^8.0.3",
     "jsdom": "^30.0.1",
     "lint-staged": "^15.2.0",
     "prettier": "3.2.2",
-    "react-app-alias": "^2.2.2",
     "serve": "^13.0.2",
-    "vite": "^8.2.2",
-    "vitest": "^5.0.0"
+    "vite": "^8.3.0",
+    "vitest": "^5.0.1"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
   },
   "scripts": {
-    "start": "craco start",
-    "build": "REACT_APP_APP_VERSION=$(bash ./generate-commitish.sh) && craco build",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "docker:build": "npm run build && docker compose -f docker/docker-compose.yaml build",
     "docker:up": "docker compose -f docker/docker-compose.yaml up --force-recreate",
     "docker:down": "docker compose -f docker/docker-compose.yaml down",
-    "eject": "react-scripts eject",
     "reinstall": "npm ci",
     "prepare": "husky install",
     "format": "prettier --write .",
     "check-format": "prettier --check ."
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   },
   "engines": {
     "node": "24.x",
     "npm": "12.x"
   },
   "allowScripts": {
-    "core-js@3.23.2": true,
-    "core-js-pure@3.23.2": true,
     "es5-ext@0.10.62": false
   }
 }
