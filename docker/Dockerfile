@@ -1,8 +1,8 @@
 FROM node:24-bookworm-slim
 
-RUN apt-get -y update &&  \ 
+RUN apt-get -y update &&  \
     apt-get install --no-install-recommends  \
-    -y curl rpl && \
+    -y curl && \
     rm -rf /var/lib/apt/lists/*
 
 RUN npm install --global npm@12 && \
@@ -10,8 +10,8 @@ RUN npm install --global npm@12 && \
     test "$(npm --version | cut -d. -f1)" = "12" && \
     npm install --global serve
 
-COPY --chown=node build /app
-COPY --chown=node docker/entrypoint.sh /app/docker/entrypoint.sh
+COPY --chown=node dist /app
+COPY --chown=node docker/entrypoint.sh docker/set-base-path.mjs /app/docker/
 WORKDIR /app
 
 USER node
