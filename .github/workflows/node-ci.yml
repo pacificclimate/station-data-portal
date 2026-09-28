@@ -26,13 +26,8 @@ jobs:
           test "$(npm --version | cut -d. -f1)" = "12"
 
       - name: Node.js Test Suite
-        # Note CI=false is required to prevent script from terminating with error
-        # on warnings. This is the intended behaviour of `build` and the
-        # recommended solution, despite how stupid it seems:
-        # https://github.com/facebook/create-react-app/issues/3657
         run: |
-          npm --version
           npm ci
-          CI=false npm run build
+          npm run build
           npm test
           npm run check-format
