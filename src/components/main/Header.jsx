@@ -3,6 +3,7 @@ import { Row, Col } from "react-bootstrap";
 import { useConfigContext } from "@/state/context-hooks/use-config-context";
 
 import "./Header.css";
+import logo from "./logo.png";
 
 function Header() {
   const config = useConfigContext();
@@ -11,7 +12,7 @@ function Header() {
       <Col lg={3} className="text-left">
         <a href="https://pacificclimate.org/">
           <img
-            src={require("./logo.png")}
+            src={logo}
             width="328"
             height="38"
             alt="Pacific Climate Impacts Consortium"
