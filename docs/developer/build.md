@@ -7,9 +7,9 @@ the application which take slightly different build steps:
 ### Local
 
 Everything in the project should be set up for easy development with defaults provided that allow
-execution without modification to configuration. This execution is done via `npm start`, which
+execution without modification to configuration. This execution is done via `npm run dev`, which
 starts Vite's development server at http://localhost:3000 with hot module replacement. Nothing is
-bundled ahead of time; Vite serves the source files directly. If port 3000 is taken, `npm start`
+bundled ahead of time; Vite serves the source files directly. If port 3000 is taken, `npm run dev`
 fails rather than picking another port.
 
 Local config is provided via [public/config.js](../../public/config.js) and is loaded automatically
