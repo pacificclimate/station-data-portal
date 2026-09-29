@@ -46,10 +46,10 @@
     "@testing-library/react": "^16.3.3",
     "@vitejs/plugin-react": "^6.1.1",
     "@vitest/coverage-v8": "^5.0.1",
-    "husky": "^8.0.3",
+    "husky": "^9.1.7",
     "jsdom": "^30.0.1",
-    "lint-staged": "^15.2.0",
-    "prettier": "3.2.2",
+    "lint-staged": "^17.5.1",
+    "prettier": "^3.9.8",
     "serve": "^13.0.2",
     "vite": "^8.3.0",
     "vitest": "^5.0.1"
@@ -58,7 +58,7 @@
     "**/*": "prettier --write --ignore-unknown"
   },
   "scripts": {
-    "start": "vite",
+    "dev": "vite",
     "build": "vite build",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -66,10 +66,9 @@
     "docker:build": "npm run build && docker compose -f docker/docker-compose.yaml build",
     "docker:up": "docker compose -f docker/docker-compose.yaml up --force-recreate",
     "docker:down": "docker compose -f docker/docker-compose.yaml down",
-    "reinstall": "npm ci",
-    "prepare": "husky install",
+    "prepare": "husky",
     "format": "prettier --write .",
-    "check-format": "prettier --check ."
+    "format:check": "prettier --check ."
   },
   "engines": {
     "node": "24.x",

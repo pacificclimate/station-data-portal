@@ -3,7 +3,7 @@
 ## Run app locally
 
 ```bash
-npm start
+npm run dev
 ```
 
 This starts Vite's development server at http://localhost:3000. Edits under
@@ -40,20 +40,26 @@ block of [`vite.config.mjs`](../../vite.config.mjs). Test files sit next to
 the code they test and are named `*.test.js` or `*.test.jsx`.
 
 ```bash
-npm test            # run once
-npm run test:watch  # rerun on change
+npm test               # run once
+npm run test:watch     # rerun on change
+npm run test:coverage  # run once and report coverage in coverage/
 ```
 
-Tests run in jsdom, with Jest-style globals (`describe`, `it`, `expect`), so
-test files don't import them. Components that need the app's contexts or a
-Leaflet map can be rendered with `renderWithProviders` from
-[`src/test-utils.jsx`](../../src/test-utils.jsx).
+Tests run in jsdom. Test files import `describe`, `it`, `expect` and the rest
+from `vitest`, and can use
+[jest-dom](https://github.com/testing-library/jest-dom)'s DOM matchers
+(`toBeInTheDocument`, `toHaveTextContent`, …), which
+[`vitest.setup.js`](../../vitest.setup.js) loads. Coverage is measured, not
+enforced: there are no thresholds and CI doesn't run it.
+
+Components that need the app's contexts or a Leaflet map can be rendered with
+`renderWithProviders` from [`src/test-utils.jsx`](../../src/test-utils.jsx).
 
 Component logging is on in local test runs. It is off when `CI` is set,
 unless `CI=log` (see [`vitest.setup.js`](../../vitest.setup.js)).
 
 Tests are also automatically run by a GitHub action on each commit, along
-with `npm run build` and `npm run check-format`.
+with `npm run build` and `npm run format:check`.
 
 ### Test Docker infrastructure
 
@@ -110,7 +116,7 @@ skipped, so a passing run reports 2 skipped.
 
 From an e2e-tests checkout, with the app running locally:
 
-- Against `npm start`, while developing:
+- Against `npm run dev`, while developing:
 
   ```bash
   BASE_URL=http://localhost:3000/ npx playwright test tests/met-data-portal-pcds --project=chromium

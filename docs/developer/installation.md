@@ -21,12 +21,8 @@ npm ci
 `npm ci` installs exactly what `package-lock.json` records. Use
 `npm install` only to add or change a dependency.
 
-If you need to start fresh after much messing about, the `reinstall` script
-does the same thing (`npm ci` deletes `./node_modules/` before installing):
-
-```bash
-npm run reinstall
-```
+`npm ci` also deletes `./node_modules/` before installing, so it is the way to
+start fresh after much messing about.
 
 ## Dependency policy
 
