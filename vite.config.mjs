@@ -21,7 +21,7 @@ export default defineConfig({
     // Measured (`npm run test:coverage`), never gated: no thresholds.
     coverage: {
       include: ["src/**/*.{js,jsx}"],
-      exclude: ["src/test-utils.jsx"],
+      exclude: ["src/test-utils.jsx", "src/**/*-driver.js"],
     },
   },
 });
