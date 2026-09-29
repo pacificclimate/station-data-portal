@@ -102,8 +102,7 @@ const downloadPolygonLatLngs = (index) =>
 
 // A rectangle selects a lat/lng box, as leaflet-draw's did: its corners are
 // the two dragged-out corners and the other two corners of the lat/lng box
-// they span, which the BC map's Albers projection draws as a trapezoid.
-// Compared on screen, because clicks land on whole pixels.
+// they span. Compared on screen, because clicks land on whole pixels.
 const expectLatLngBox = (index, [corner, oppositeCorner]) => {
   const [a, b] = [L.latLng(corner), L.latLng(oppositeCorner)];
   const onScreen = (latlng) => map.latLngToContainerPoint(latlng);
@@ -120,6 +119,38 @@ const expectLatLngBox = (index, [corner, oppositeCorner]) => {
       `no vertex at ${point}, got ${actual.join(" ")}`,
     ).toBe(true);
   }
+};
+
+// A rectangle wide enough that its south edge, a parallel, sags a few pixels
+// below the straight line between its corners at zoom 9.
+const wideRectangle = [
+  [49, -124.5],
+  [50, -121.5],
+];
+
+// The drawn rectangle's south edge follows its parallel: it passes through
+// the edge's lon/lat midpoint, well off the straight line between its corners
+// on screen.
+const expectSouthEdgeCurves = () => {
+  const [layer] = map.pm.getGeomanDrawLayers();
+  const bounds = layer.getBounds();
+  const layerPoint = (latlng) =>
+    map.project(latlng).subtract(map.getPixelOrigin());
+  const [west, east, middle] = [
+    bounds.getSouthWest(),
+    bounds.getSouthEast(),
+    [bounds.getSouth(), bounds.getCenter().lng],
+  ].map(layerPoint);
+  const [ring] = layer._rings;
+  const distanceToRing = Math.min(
+    ...ring.map((p, i) =>
+      L.LineUtil.pointToSegmentDistance(middle, p, ring[(i + 1) % ring.length]),
+    ),
+  );
+  expect(L.LineUtil.pointToSegmentDistance(middle, west, east)).toBeGreaterThan(
+    2,
+  );
+  expect(distanceToRing).toBeLessThan(0.5);
 };
 
 const expectSelection = async (count, polygons) => {
@@ -179,5 +210,13 @@ describe.each([geomanDriver])("drawing with $name", (driver) => {
 
     await driver.deleteAll(map);
     await expectSelection(6, 0);
+  });
+
+  it("draws edges straight in lon/lat, and sends only the corners", async () => {
+    map.setView([49.5, -123], 9, { animate: false });
+    await driver.drawRectangle(map, wideRectangle);
+    await waitFor(() => expect(downloadPolygons()).toHaveLength(1));
+    expect(downloadPolygonLatLngs(0)).toHaveLength(5);
+    expectSouthEdgeCurves();
   });
 });

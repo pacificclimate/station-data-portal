@@ -9,21 +9,26 @@
 // layer has `pmIgnore: false`. That keeps its edit and delete modes off the
 // station markers, and spares it from setting up thousands of them. The map
 // therefore needs `pmIgnore={false}`.
+//
+// A selection's edges are straight in lon/lat, which is what the station
+// filter and the backend select, so the shapes, and Geoman's previews of them,
+// are drawn with `lonLatEdges` (see ./lonLatEdges).
 import { useEffect, useRef } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
 import "@geoman-io/leaflet-geoman-free";
 import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css";
+import "./lonLatEdges";
 
 L.PM.setOptIn(true);
 
-// Keep rectangles as lat/lng boxes, as leaflet-draw drew them (a trapezoid on
-// the BC map's Albers projection). Geoman works out every rectangle's corners
-// here (while drawing, and when a corner is dragged in edit mode) as a box on
-// screen, then creates the finished rectangle as a lat/lng box, so without
-// this the shape jumps on release. The angle is ignored: rotate mode is off,
-// and in edit mode Geoman infers one from the first edge, a meridian that
-// Albers draws tilted.
+// Keep rectangles as lat/lng boxes, as leaflet-draw drew them (on the BC map's
+// Albers projection, curved top and bottom edges between straight, converging
+// sides). Geoman works out every rectangle's corners here (while drawing, and
+// when a corner is dragged in edit mode) as a box on screen, then creates the
+// finished rectangle as a lat/lng box, so without this the shape jumps on
+// release. The angle is ignored: rotate mode is off, and in edit mode Geoman
+// infers one from the first edge, a meridian that Albers draws tilted.
 L.PM.Utils._getRotatedRectangle = (A, B) => {
   const [a, b] = [L.latLng(A), L.latLng(B)];
   return [a, L.latLng(a.lat, b.lng), b, L.latLng(b.lat, a.lng)];
@@ -38,11 +43,13 @@ const UserShapeControl = ({ position = "topleft", shapeStyle, onChange }) => {
     const shapes = L.featureGroup().addTo(map);
     const report = () => onChangeRef.current(shapes.getLayers());
 
+    const style = { ...shapeStyle, lonLatEdges: true };
     map.pm.setGlobalOptions({
       layerGroup: shapes,
-      pathOptions: { ...shapeStyle, pmIgnore: false },
-      templineStyle: shapeStyle,
-      hintlineStyle: { ...shapeStyle, dashArray: [5, 5] },
+      pathOptions: { ...style, pmIgnore: false },
+      templineStyle: style,
+      hintlineStyle: { ...style, dashArray: [5, 5] },
+      snapSegment: false,
     });
     map.pm.addControls({
       position,
