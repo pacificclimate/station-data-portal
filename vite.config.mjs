@@ -20,7 +20,7 @@ const gitVersion = () => {
 
 export default defineConfig(({ command }) => ({
   // The built app doesn't know its path until the container starts, so it's
-  // built under a placeholder that docker/entrypoint.sh replaces with the
+  // built under a placeholder that docker/set-base-path.mjs replaces with the
   // pathname of PUBLIC_URL (or the empty string at root). Dev serves at root.
   base: command === "build" ? "/__REPLACE_PUBLIC_URL__/" : "/",
   plugins: [react()],
@@ -34,14 +34,17 @@ export default defineConfig(({ command }) => ({
     "import.meta.env.VITE_APP_VERSION": JSON.stringify(gitVersion()),
   },
   build: {
-    // The oldest browsers matched by CRA's former browserslist query
-    // (">0.2%, not dead, not op_mini all") as of 2026-09.
+    // The oldest browsers matched by the browserslist query
+    // ">0.2%, not dead, not op_mini all" as of 2026-09.
     target: ["chrome109", "edge119", "firefox120", "safari15.6", "ios15.6"],
     sourcemap: true,
     rolldownOptions: {
       output: {
-        // Keep licence notices (Vite 8.3 already does; this pins it).
-        comments: { legal: true },
+        // Keep licence notices, which a minified build drops by default. All
+        // three flags are set because Vite 8.3.0 replaces the default object
+        // rather than merging into it, so `{ legal: true }` alone would also
+        // keep every __PURE__ annotation.
+        comments: { legal: true, annotation: false, jsdoc: false },
       },
     },
   },
