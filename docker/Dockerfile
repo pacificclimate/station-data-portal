@@ -8,7 +8,7 @@ RUN apt-get -y update &&  \
 RUN npm install --global npm@12 && \
     test "$(node --version | cut -d. -f1 | tr -d v)" = "24" && \
     test "$(npm --version | cut -d. -f1)" = "12" && \
-    npm install --global serve
+    npm install --global serve@14.2.6
 
 COPY --chown=node dist /app
 COPY --chown=node docker/entrypoint.sh docker/set-base-path.mjs /app/docker/

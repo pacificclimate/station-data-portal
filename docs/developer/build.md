@@ -31,7 +31,10 @@ should not be used for environment specific configuration. Once built the
 [Dockerfile](../../docker/Dockerfile) copies `dist/` into a docker image, tagged
 `pcic/station-data-portal-frontend:local`.
 
-`npm run build` also writes source maps next to the JavaScript in `dist/assets/`.
+`npm run build` also writes source maps next to the JavaScript in `dist/assets/`, and
+`dist/third-party-licenses.txt`, which lists every bundled dependency with its licence. The image
+serves it publicly at the app's root, `<PUBLIC_URL>/third-party-licenses.txt`. Its content is
+Markdown, but the `.txt` name makes browsers show it as plain text.
 
 Running the created docker image can be done via `npm run docker:up`, and removing the container via
 `npm run docker:down`. See [development](./development.md#test-docker-infrastructure) for running a
