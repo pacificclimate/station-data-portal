@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { execFileSync } from "node:child_process";
 import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vite";
@@ -38,6 +39,12 @@ export default defineConfig(({ command }) => ({
     // ">0.2%, not dead, not op_mini all" as of 2026-09.
     target: ["chrome109", "edge119", "firefox120", "safari15.6", "ios15.6"],
     sourcemap: true,
+    // Just above the largest chunk (StationPreview, about 1,130 kB), so a
+    // warning means a chunk grew.
+    chunkSizeWarningLimit: 1200,
+    // The licences of every bundled dependency, served publicly beside the
+    // app. The content is Markdown; .txt keeps it text/plain in the browser.
+    license: { fileName: "third-party-licenses.txt" },
     rolldownOptions: {
       output: {
         // Keep licence notices, which a minified build drops by default. All
