@@ -8,10 +8,22 @@ This project contains [Docker infrastructure](../../docker) and a
 builds and tags a Docker image on each commit. The image name is
 `pcic/station-data-portal-frontend`.
 
-The image holds the built app (`dist/`) and serves it with
-[`serve`](https://www.npmjs.com/package/serve) on port 8080. `serve -s`
-answers any path that isn't a file with `index.html`, so client-side routes
-such as `/preview/<stationId>` survive a hard refresh.
+The image holds the built app (`dist/`) in `/app` and serves it with nginx on
+port 8080, as a non-root user
+([`nginxinc/nginx-unprivileged`](https://hub.docker.com/r/nginxinc/nginx-unprivileged),
+Debian). [`docker/nginx.conf`](../../docker/nginx.conf) sets how it answers:
+
+| Request                                                         | Response                                                                 |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `/assets/*` (hashed build output)                               | the file, `Cache-Control: public, max-age=31536000, immutable`; else 404 |
+| any other file (`config.js`, `favicon.ico`, `manifest.json`, …) | the file, `Cache-Control: no-cache`                                      |
+| any other path                                                  | `index.html`, `Cache-Control: no-cache`                                  |
+
+So client-side routes such as `/preview/<stationId>` survive a hard refresh,
+and the app shows its own "not found" for unknown paths. `no-cache` makes
+browsers revalidate `index.html` and `config.js` on every load, so a new build
+or config is picked up at once. Text responses are gzipped, and nothing
+redirects.
 
 ### Configuration, environment variables, and Docker
 
@@ -44,11 +56,13 @@ and every URL the built files use for the app's own files (scripts, styles,
 `config.js`, the favicon and manifest, lazily loaded code, images) starts
 with it.
 
-When the container starts, [`docker/entrypoint.sh`](../../docker/entrypoint.sh)
-runs [`docker/set-base-path.mjs`](../../docker/set-base-path.mjs) before
-starting `serve`. The script:
+When the container starts, the nginx image runs
+[`docker/set-base-path.sh`](../../docker/set-base-path.sh) (installed in
+`/docker-entrypoint.d/`) before starting nginx. The script:
 
-1. Evaluates `/app/config.js` and reads `window.env.PUBLIC_URL`.
+1. Reads `PUBLIC_URL` from `/app/config.js`. It must be a quoted string on
+   its own line, as in [`docker/config.bc.js`](../../docker/config.bc.js):
+   `PUBLIC_URL: "https://host/path/",`.
 2. Takes the URL's path, without a trailing slash: `/met-data-portal-pcds/app`
    for the URL above, or the empty string for an app at the root.
 3. Replaces `/__REPLACE_PUBLIC_URL__` with that path in every `.html`, `.css`
@@ -59,14 +73,15 @@ The container's log shows what it did:
 
 ```
 set-base-path: PUBLIC_URL https://services.pacificclimate.org/met-data-portal-pcds/app/ -> base path "/met-data-portal-pcds/app"
-set-base-path: index.html: 5 replaced
 set-base-path: assets/index-<hash>.js: 2 replaced
+set-base-path: index.html: 5 replaced
 set-base-path: 7 replaced in total
 ```
 
-The container exits, and `serve` never starts, when:
+The container exits, and nginx never starts, when:
 
-- `config.js` can't be evaluated, or doesn't set `window.env.PUBLIC_URL`;
+- `config.js` can't be read, or doesn't set `PUBLIC_URL` exactly once as a
+  quoted string on its own line;
 - `PUBLIC_URL` isn't an absolute `http://` or `https://` URL;
 - no placeholder is found, which means the image wasn't built by
   `npm run build`.

@@ -359,7 +359,7 @@ volumes:
 ```
 
 Note: We mount to target `/app/config.js` because the built app is copied
-into `/app`. When the container starts, its entrypoint rewrites the built
+into `/app`. When the container starts, a startup script rewrites the built
 files to use the path of `PUBLIC_URL` from this file. See
 [production](./production.md#base-path-rewrite-at-container-start).
 
