@@ -21,7 +21,7 @@ const gitVersion = () => {
 
 export default defineConfig(({ command }) => ({
   // The built app doesn't know its path until the container starts, so it's
-  // built under a placeholder that docker/set-base-path.mjs replaces with the
+  // built under a placeholder that docker/set-base-path.sh replaces with the
   // pathname of PUBLIC_URL (or the empty string at root). Dev serves at root.
   base: command === "build" ? "/__REPLACE_PUBLIC_URL__/" : "/",
   plugins: [react()],
