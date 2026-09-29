@@ -1,3 +1,4 @@
+import { describe, test, expect } from "vitest";
 import identity from "lodash/fp/identity";
 import includes from "lodash/fp/includes";
 import some from "lodash/fp/some";
@@ -14,13 +15,13 @@ import {
   climatologyVairableIdsFromVariables,
   stationFilter,
   stationAreaFilter,
-} from "../station-filtering";
+} from "./station-filtering";
 
-import stations from "../__test_data__/stations-bc.json";
-import networks from "../__test_data__/networks-bc.json";
-import variables from "../__test_data__/variables-bc.json";
-import frequencies from "../__test_data__/frequencies-bc.json";
-import polygons from "../__test_data__/polygons-bc.json";
+import stations from "./__test_data__/stations-bc.json";
+import networks from "./__test_data__/networks-bc.json";
+import variables from "./__test_data__/variables-bc.json";
+import frequencies from "./__test_data__/frequencies-bc.json";
+import polygons from "./__test_data__/polygons-bc.json";
 
 const ACTIVE_PASS_STATION = stations[0];
 const HOPE_AIRPORT_STATION = stations.filter(

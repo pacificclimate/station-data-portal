@@ -1,6 +1,7 @@
+import { it } from "vitest";
 import React from "react";
-import { createRoot } from "react-dom/client";
-import FrequencySelector from "../FrequencySelector";
+import { renderWithProviders } from "@/test-utils";
+import FrequencySelector from "./FrequencySelector";
 import noop from "lodash/noop";
 
 // TODO: Use better test data.
@@ -66,9 +67,7 @@ const allStations = [
 ];
 
 it("renders without crashing", () => {
-  const container = document.createElement("div");
-  const root = createRoot(container);
-  root.render(
+  renderWithProviders(
     <FrequencySelector
       allStations={allStations}
       onReady={noop}

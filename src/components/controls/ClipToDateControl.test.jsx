@@ -1,9 +1,10 @@
+import { it } from "vitest";
 import React from "react";
 import { createRoot } from "react-dom/client";
-import Template from "../Template";
+import ClipToDateControl from "./ClipToDateControl";
 
 it("renders without crashing", () => {
   const container = document.createElement("div");
   const root = createRoot(container);
-  root.render(<Template />);
+  root.render(<ClipToDateControl value={false} onChange={() => {}} />);
 });

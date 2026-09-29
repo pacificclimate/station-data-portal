@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import map from "lodash/fp/map";
 import escapeRegExp from "lodash/fp/escapeRegExp";
 
@@ -8,7 +9,7 @@ import {
   variableIds2pdpFormats,
   frequencies2pdpFormat,
   dataDownloadTarget,
-} from "../pdp-data-service";
+} from "./pdp-data-service";
 
 describe("date2pdpFormat", () => {
   it("works for null date", () => {
@@ -107,10 +108,6 @@ describe("frequencyOptions2pdpFormat", () => {
 const dataFormatOption = (value) => ({ value });
 
 describe("dataDownloadTarget", () => {
-  beforeEach(() => {
-    jest.resetModules();
-  });
-
   const config = { pdpDataUrl: "PDP_DATA_URL" };
 
   const regex = (s) => new RegExp(escapeRegExp(s));

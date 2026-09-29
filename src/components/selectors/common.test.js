@@ -1,4 +1,5 @@
-import { defaultValue } from "../common";
+import { describe, test, expect } from "vitest";
+import { defaultValue } from "./common";
 
 describe("defaultValue", () => {
   const allOptions = [1, 2, 3, 4];

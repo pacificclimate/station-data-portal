@@ -1,6 +1,7 @@
+import { it } from "vitest";
 import React from "react";
-import { createRoot } from "react-dom/client";
-import VariableSelector from "../VariableSelector";
+import { renderWithProviders } from "@/test-utils";
+import VariableSelector from "./VariableSelector";
 import noop from "lodash/noop";
 
 // TODO: Put this elsewhere
@@ -70,9 +71,7 @@ const commonSelectorStyles = {
 };
 
 it("renders without crashing", () => {
-  const container = document.createElement("div");
-  const root = createRoot(container);
-  root.render(
+  renderWithProviders(
     <VariableSelector
       allVariables={allVariables}
       onReady={noop}
