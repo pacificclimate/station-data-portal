@@ -94,8 +94,8 @@ const fetchConfig = async () => {
 
   checkMissingKeys(config);
 
-  // Extend config with some env var values
-  config.appVersion = process.env.REACT_APP_APP_VERSION ?? "unknown";
+  // Extend config with build-time values (see vite.config.mjs)
+  config.appVersion = import.meta.env.VITE_APP_VERSION;
 
   // Extend config with some computed goodies
   // TODO: Store shouldn't know about data presentation

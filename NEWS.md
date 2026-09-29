@@ -119,7 +119,7 @@ Changes:
 - [Update user documentation (published on PDP)](https://github.com/pacificclimate/station-data-portal/pull/154)
 - [Handle filtering of stations with histories with no observations](https://github.com/pacificclimate/station-data-portal/pull/152)
 - [Add column sorting to Networks table](https://github.com/pacificclimate/station-data-portal/pull/151)
-- [Apply provinces query param to all metadata requests ]()
+- [Apply provinces query param to all metadata requests ](<>)
 
 ## 1.1.0
 
