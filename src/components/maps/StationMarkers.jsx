@@ -66,7 +66,7 @@ function LocationMarker({
       key={location.id}
       center={location}
       {...markerOptions}
-      color={color}
+      color={color ?? markerOptions.color}
       eventHandlers={{ click: addPopup }}
     >
       <StationTooltip station={station} />
