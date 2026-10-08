@@ -9,9 +9,8 @@
       "request": "launch",
       "reAttach": true,
       "name": "Launch Frontend",
-      "url": "http://localhost:3001/",
+      "url": "http://localhost:3000/",
       "webRoot": "${workspaceFolder}",
-      "enableCRAWorkaround": true,
       "pathMappings": [
         {
           "url": "file:///workspaces/station-data-portal",
@@ -21,10 +20,10 @@
     },
     {
       "type": "node",
-      "name": "vscode-jest-tests",
+      "name": "Vitest tests",
       "request": "launch",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "test", "--runInBand"],
+      "runtimeArgs": ["test"],
       "args": [],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",

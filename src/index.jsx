@@ -15,10 +15,10 @@ import {
 
 import { bodyLoader } from "@/components/main/Body/bodyLoader";
 import { previewLoader } from "@/components/preview/previewLoader";
+import { createPreloadErrorHandler } from "@/utils/preload-error";
 
 import "bootstrap/dist/css/bootstrap.css";
 import "react-datepicker/dist/react-datepicker.css";
-import "leaflet-draw/dist/leaflet.draw.css";
 import "./bootstrap-extension.css";
 import "./index.css";
 
@@ -36,6 +36,14 @@ const getBaseName = () => {
 
   return "";
 };
+
+window.addEventListener(
+  "vite:preloadError",
+  createPreloadErrorHandler({
+    storage: () => window.sessionStorage,
+    reload: () => window.location.reload(),
+  }),
+);
 
 // Create a client
 const queryClient = new QueryClient({

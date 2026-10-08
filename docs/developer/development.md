@@ -3,21 +3,24 @@
 ## Run app locally
 
 ```bash
-npm start
+npm run dev
 ```
 
-This starts the app with environment variables taken from local `.env` files. Generally env variables should be avoided
-In favour of values being placed in the `public/config.js` file as these values are pulled when the code
-is built. See [configuration](./configuration.md) for more details.
+This starts Vite's development server at http://localhost:3000. Edits under
+`src/` show up in the browser without a reload.
+
+The app's configuration comes from `public/config.js`, not from environment
+variables. See [configuration](./configuration.md) for the options, and
+[build](./build.md) for how local runs differ from Docker ones.
 
 ## Upgrading `pcic-react-leaflet-components`
 
 To get a successful upgrade in your local environment, you must do the
 following:
 
-```
+```bash
 npm uninstall pcic-react-leaflet-components
-npm install git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git#<version>
+npm install git+https://github.com/pacificclimate/pcic-react-leaflet-components.git#<version>
 ```
 
 ## Testing
@@ -32,11 +35,31 @@ useful and important ones are those in `src/data-services` and `src/utils`.
 
 ### Run tests locally
 
+Unit tests run with [Vitest](https://vitest.dev/), configured in the `test`
+block of [`vite.config.mjs`](../../vite.config.mjs). Test files sit next to
+the code they test and are named `*.test.js` or `*.test.jsx`.
+
 ```bash
-npm test
+npm test               # run once
+npm run test:watch     # rerun on change
+npm run test:coverage  # run once and report coverage in coverage/
 ```
 
-Tests are also automatically run by a GitHub action on each commit.
+Tests run in jsdom. Test files import `describe`, `it`, `expect` and the rest
+from `vitest`, and can use
+[jest-dom](https://github.com/testing-library/jest-dom)'s DOM matchers
+(`toBeInTheDocument`, `toHaveTextContent`, …), which
+[`vitest.setup.js`](../../vitest.setup.js) loads. Coverage is measured, not
+enforced: there are no thresholds and CI doesn't run it.
+
+Components that need the app's contexts or a Leaflet map can be rendered with
+`renderWithProviders` from [`src/test-utils.jsx`](../../src/test-utils.jsx).
+
+Component logging is on in local test runs. It is off when `CI` is set,
+unless `CI=log` (see [`vitest.setup.js`](../../vitest.setup.js)).
+
+Tests are also automatically run by a GitHub action on each commit, along
+with `npm run build` and `npm run format:check`.
 
 ### Test Docker infrastructure
 
@@ -81,3 +104,36 @@ deployment on a server. The `docker:*` npm scripts wrap
    ```bash
    npm run docker:down
    ```
+
+### Run the end-to-end tests locally
+
+The browser tests for the deployed portals live in
+[pacificclimate/e2e-tests](https://github.com/pacificclimate/e2e-tests)
+(private). Their portal specs can also run against a local copy of the app:
+set `BASE_URL` to the app's full URL, and they test that instead of a
+deployment. With `BASE_URL` set, the version and backend-health tests are
+skipped, so a passing run reports 2 skipped.
+
+From an e2e-tests checkout, with the app running locally:
+
+- Against `npm run dev`, while developing:
+
+  ```bash
+  BASE_URL=http://localhost:3000/ npx playwright test tests/met-data-portal-pcds --project=chromium
+  ```
+
+- Against the Docker image (`npm run docker:build`, then `npm run docker:up`):
+
+  ```bash
+  BASE_URL=http://localhost:30503/ npx playwright test tests/met-data-portal-pcds --project=chromium
+  ```
+
+  This is the one that checks a production build: only the container
+  rewrites the build's base path (see
+  [production](./production.md#base-path-rewrite-at-container-start)).
+
+Use `localhost`, not `127.0.0.1`, to match `PUBLIC_URL` in the local
+configs.
+
+Both local targets serve the app at the root. To test a deployment at its
+subpath, see [production](./production.md#testing-a-deployment).

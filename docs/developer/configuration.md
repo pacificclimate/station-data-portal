@@ -1,14 +1,15 @@
 # Configuration
 
-Most configuration of the Station Data Portal frontend is done via a YAML
-file, `public/config.js`. For details, see below.
+Configuration of the Station Data Portal frontend is done via a JavaScript
+file, `public/config.js`, which the app loads at run time. For details, see
+below.
 
-For technical reasons, a few configuration parameters must be supplied via
-environment variables.
+The only value fixed at build time is the app's version (see
+[Build-time values](#build-time-values)).
 
 ## Configuration via `public/config.js`
 
-This file must be a key-value map. It overrides the default configuration
+This file must assign a key-value map to `window.env`. It overrides the default configuration
 values, which are given below. Certain keys do not have default values and
 _must_ be specified in `public/config.js`. The others are optional.
 
@@ -48,6 +49,31 @@ in `public/config.js`. They are critical to the functioning of the app.
   - `BC`: BC OSM Lite (or similar) base map; BC Albers projection.
   - `YNWT`: YNWT OSM Lite (or similar) base map; Yukon Albers projection.
 - Required; no default.
+
+#### Deployment values
+
+These values have no defaults. The Docker configs in [`docker/`](../../docker)
+and `public/config.js` set them.
+
+`PUBLIC_URL`
+
+- Full URL the app is served at, e.g.
+  `https://services.pacificclimate.org/met-data-portal-pcds/app/`.
+- Type: string; an absolute `http://` or `https://` URL.
+- Its path is the path the app's routes live under. In a Docker container,
+  it also sets the path the built files use, which is rewritten at container
+  start (see [production](./production.md#base-path-rewrite-at-container-start)).
+  The container won't start without it.
+- The router only uses the path when the URL's host contains a `.`, so a
+  `localhost` URL always gives routes at the root.
+
+`REACT_APP_BC_BASE_MAP_TILES_URL`, `REACT_APP_YNWT_BASE_MAP_TILES_URL`
+
+- Tile URL template for the `BC` and `YNWT` base maps respectively. Only the
+  one for the configured `baseMap` is needed.
+- Type: string, e.g.
+  `https://services.pacificclimate.org/tiles/bc-albers-lite/{z}/{x}/{y}.png`.
+- Read at run time, like any other `config.js` key.
 
 #### Required values with defaults
 
@@ -307,10 +333,6 @@ window.env = {
 window.env = {
   appTitle: "YNWT Station Data",
   baseMap: "YNWT",
-
-`PUBLIC_URL`
- this at true run time. See `docker/entrypoint.sh` for the specifics
-  of this replace implementation.
   // We do not at present need to filter based on province (verify!)
   //stationsQpProvinces: YK,NT
   // We do not at present need to filter networks (verify!)
@@ -325,7 +347,7 @@ window.env = {
 ### Custom configuration and Docker deployment
 
 To use a custom configuration in a Docker deployment, mount
-a custom config file to `/app/public/config.yaml`.
+a custom config file to `/app/config.js`.
 For example, in your docker-compose.yaml, include the following mount:
 
 ```yaml
@@ -336,40 +358,29 @@ volumes:
     read_only: true
 ```
 
-Note: We mount to target `/app/config.js` because the app is built and loaded into
-this directory. When executed the docker container's entrypoint will substitute any
-`%PUBLIC_URL%` references in code (`%REPLACE_PUBLIC_URL%` in the container) with
-the values of PUBLIC_URL in the config.js.
+Note: We mount to target `/app/config.js` because the built app is copied
+into `/app`. When the container starts, a startup script rewrites the built
+files to use the path of `PUBLIC_URL` from this file. See
+[production](./production.md#base-path-rewrite-at-container-start).
 
-## Environment variables
+## Build-time values
 
-A small number of configuration parameters must be provided via environment
-variables.
+`VITE_APP_VERSION`
 
-In a Create React App app, [environment variables are managed carefully](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables).
-Therefore, most of the environment variables below begin with `REACT_APP_`,
-as required by CRA.
+- Current version of the app, shown in the header as `TAG (BRANCH: SHA)`.
+- Worked out from git by [`vite.config.mjs`](../../vite.config.mjs) when the
+  app is built or the development server starts, and read by the app as
+  `import.meta.env.VITE_APP_VERSION`.
+- It is `unknown` when git can't tell: no `.git` directory, no tags, or a
+  shallow clone (so the publishing workflow fetches the full history before
+  building).
+- Not set from the environment; there's nothing to override.
 
-For development runs of the app launched with `npm start`, the files
-`.env` and `.env.development` provide environment variable values.
-For more details, see the
-[CRA documentation](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables).
-
-### Build time variables
-
-`PUBLIC_URL`
-
-- Base URL for Station Data Portal frontend, required mostly for frontend routing
-- For local development this should match the expected local url (generally http://localhost:3000/)
-- For production this will be set to %REPLACE_PUBLIC_URL% and needs to be injected at start time. This happens in the docker container's entrypoint.sh and allows us to configure the sites expected path at run time.
-
-`REACT_APP_APP_VERSION`
-
-- Current version of the app.
-- Type: string.
-- This value should be set using `generate-commitish.sh` when the Docker image is built.
-- It is not recommended to manually override the automatically generated value when the image is run.
-- Note doubled `APP_` in name.
+Any new value that must be fixed at build time goes in a `.env` file (or
+`.env.development`, `.env.production`) as `VITE_<NAME>=...`, and is read as
+`import.meta.env.VITE_<NAME>`. See
+[Vite's documentation](https://vite.dev/guide/env-and-mode). Prefer
+`config.js` for anything that can differ between deployments.
 
 ## Filtering metadata
 
@@ -377,7 +388,7 @@ The app can filter metadata to include only a desired subset of items.
 (For example, station metadata can be filtered to include only
 stations in BC.)
 
-Filtering is configured by setting the appropriate environment variable
+Filtering is configured by setting the appropriate `config.js` key
 to a string containing zero or more semicolon-separated filter expressions.
 
 ### Filter expression
