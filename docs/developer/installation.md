@@ -51,28 +51,12 @@ dependencies:
 "react-leaflet": "3.1.0"
 ```
 
-### React Leaflet Draw
+### Leaflet-Geoman
 
-[React Leaflet Draw](https://github.com/alex3165/react-leaflet-draw#readme)
-provides the tools for a user to draw a polygon on the map.
-
-The peer dependency specification in its `package.json` states that its
-latest release, 0.19.8, is _not_ compatible with React Leaflet 3.x and React 17,
-but that, fortunately, is false.
-
-For reference:
-
-- RLD was [updated to react-leaflet@3.0.0 in some release prior to 0.19.8](https://github.com/alex3165/react-leaflet-draw/pull/90)
-- The peer dependency declaration appears to be buggy (still requiring
-  react-leaflet@2), causing installation fails:
-  - https://github.com/alex3165/react-leaflet-draw/issues/100
-  - https://github.com/alex3165/react-leaflet-draw/pull/116
-
-To overcome the false error messages, it was installed with
-`npm install --save --force react-leaflet-draw`. The effect of `--force` is
-to treat the errors in this particular install as warnings. The result is
-enshrined in `package-lock.json` and the application can be installed as
-usual (no `--force`) when this `package-lock.json` is present.
+[Leaflet-Geoman](https://geoman.io/docs/leaflet) (`@geoman-io/leaflet-geoman-free`)
+provides the tools for a user to draw, edit and remove selection polygons on
+the map. It is a plain Leaflet plugin, used through `UserShapeControl`
+(`src/components/maps/UserShapeControl.jsx`), and installs as usual.
 
 Notes:
 

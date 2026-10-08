@@ -135,26 +135,28 @@ station inside any polygon is selected.
 
     *Drawing controls*
 
-|draw rectangle|   To draw a roughly rectangular polygon, click the
-**Draw a rectangle** tool icon. Click and drag the mouse pointer from
-one corner of your desired rectangular region to the opposite corner.
+|draw rectangle|   To draw a rectangle, click the **Draw Rectangle** tool
+icon. Click on the map at one corner of your desired rectangular region,
+then click at the opposite corner. The rectangle's edges follow lines of
+latitude and longitude.
 
-|draw polygon|   To draw a more elaborate polygon, click the **Draw a
-polygon** tool icon. Click on the map at each successive corner of the
-polygon. Finish the polygon by clicking on the first corner again.
+|draw polygon|   To draw a more elaborate polygon, click the **Draw
+Polygons** tool icon. Click on the map at each successive corner of the
+polygon. Finish the polygon by clicking on the first corner again, or by
+clicking **Finish**.
 
 |edit shapes|   To edit a polygon already drawn on the map, click the
-**Edit shapes** icon. Click and drag the corners of a polygon on the map
-to adjust its shape. A rectangle’s location and dimensions can be
-changed but not the rectangular shape. A general polygon can be adjusted
-arbitrarily, including adding new corners by clicking “ghost” corners in
-the middle of existing edges.
+**Edit Layers** icon. Click and drag the corners of a polygon on the map
+to adjust its shape. A rectangle stays a rectangle as you drag its
+corners. A general polygon can be adjusted arbitrarily, including adding
+new corners by clicking or dragging the “ghost” corners in the middle of
+existing edges, and removing a corner by right-clicking it. Click
+**Finish** when you are done.
 
-|remove shapes|   To remove one or more polygons from the map, click the
-**Remove shapes** icon. To remove all shapes, click **Remove all**. To
-remove a single shape, click on it. Repeat as desired. When you have
-removed all shapes you wish to remove, click **Save**. To cancel the
-effect of removing one or more individual shapes, click **Cancel**.
+|remove shapes|   To remove polygons from the map, click the **Remove
+Layers** icon. To remove a single shape, click on it. Repeat as desired.
+To remove all shapes, click **Clear all**. Click **Finish** when you are
+done.
 
 When you add, remove or change a polygon on the map, the station count
 on the **Station Filters** tab is adjusted to reflect the stations

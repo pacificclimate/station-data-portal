@@ -4,8 +4,9 @@
 // the stations store, station filtering, the download URL) is the real app.
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
-import { screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
 import L from "leaflet";
+import { MemoryRouter } from "react-router-dom";
 import { renderWithProviders, testConfig } from "@/test-utils";
 import StationMap from "./StationMap";
 import StationData from "@/components/info/StationData";
@@ -48,10 +49,18 @@ L.Map.addInitHook(function () {
 });
 
 // Six EC daily stations in three clusters: Saanich (2, 3, 4), Kamloops
-// (275, 276) and Prince George (791).
-const stations = allStations.filter(({ id }) =>
-  [2, 3, 4, 275, 276, 791].includes(id),
-);
+// (275, 276) and Prince George (791). Observation times are dates, as the
+// stations query delivers them.
+const stations = allStations
+  .filter(({ id }) => [2, 3, 4, 275, 276, 791].includes(id))
+  .map((station) => ({
+    ...station,
+    histories: station.histories.map((history) => ({
+      ...history,
+      min_obs_time: history.min_obs_time && new Date(history.min_obs_time),
+      max_obs_time: history.max_obs_time && new Date(history.max_obs_time),
+    })),
+  }));
 
 const saanichRectangle = [
   [48.4, -123.6],
@@ -68,6 +77,15 @@ const kamloopsPolygon = [
 const saanichCorner = [48.7, -123.2];
 const saanichCornerMoved = [48.7, -123.4];
 const insideSaanich = [48.55, -123.5];
+// Inside the Saanich rectangle, and around `insideSaanich` too.
+const innerSaanichRectangle = [
+  [48.45, -123.55],
+  [48.65, -123.3],
+];
+// Station 3, inside the Saanich rectangle.
+const brentwoodBay = [48.6, -123.466667];
+// Station 275, inside the Kamloops polygon.
+const cherryCreek = [50.683333, -120.583333];
 
 // Zoom in on the shapes before drawing them, as a user would: at the initial
 // zoom the Kamloops polygon spans only a few pixels.
@@ -100,9 +118,8 @@ const downloadPolygonLatLngs = (index) =>
       return L.latLng(lat, lng);
     });
 
-// A rectangle selects a lat/lng box, as leaflet-draw's did: its corners are
-// the two dragged-out corners and the other two corners of the lat/lng box
-// they span. Compared on screen, because clicks land on whole pixels.
+// A rectangle selects a lat/lng box: its corners are the two clicked corners
+// and the other two corners of the lat/lng box they span. Compared on screen, because clicks land on whole pixels.
 const expectLatLngBox = (index, [corner, oppositeCorner]) => {
   const [a, b] = [L.latLng(corner), L.latLng(oppositeCorner)];
   const onScreen = (latlng) => map.latLngToContainerPoint(latlng);
@@ -153,6 +170,25 @@ const expectSouthEdgeCurves = () => {
   expect(distanceToRing).toBeLessThan(0.5);
 };
 
+// Hovering a station shows its tooltip, and clicking it opens its popup, with
+// the preview link. jsdom gives the map no size, so Leaflet clips shapes to the
+// map's centre: the station goes there, to be under any shape covering it.
+const expectStationReachable = async (latlng, name) => {
+  lookAt(latlng);
+  const canvas = map
+    .getContainer()
+    .querySelector(".leaflet-overlay-pane canvas");
+  const point = { clientX: 0, clientY: 0 };
+  fireEvent.mouseMove(canvas, point);
+  await waitFor(() =>
+    expect(document.querySelector(".leaflet-tooltip")).toHaveTextContent(name),
+  );
+  fireEvent.click(canvas, point);
+  await waitFor(() =>
+    expect(document.querySelector(".leaflet-popup")).toHaveTextContent(name),
+  );
+};
+
 const expectSelection = async (count, polygons) => {
   await waitFor(() => expect(selectedCount()).toBe(String(count)));
   expect(downloadPolygons()).toHaveLength(polygons);
@@ -166,11 +202,14 @@ describe.each([geomanDriver])("drawing with $name", (driver) => {
       selectedFrequencies: ["daily"],
       area: null,
     });
+    // The station popups link to the station's preview.
     renderWithProviders(
-      <StationFilteringProvider>
-        <StationMap />
-        <StationData />
-      </StationFilteringProvider>,
+      <MemoryRouter>
+        <StationFilteringProvider>
+          <StationMap />
+          <StationData />
+        </StationFilteringProvider>
+      </MemoryRouter>,
       {
         config: {
           ...testConfig,
@@ -207,9 +246,29 @@ describe.each([geomanDriver])("drawing with $name", (driver) => {
 
     await driver.deleteShapeAt(map, insideSaanich);
     await expectSelection(2, 1);
+    // Out of delete mode, shapes let the pointer through again.
+    await expectStationReachable(cherryCreek, "KAMLOOPS CHERRY CREEK");
 
     await driver.deleteAll(map);
     await expectSelection(6, 0);
+  });
+
+  it("keeps stations inside a shape hoverable and clickable", async () => {
+    lookAt(insideSaanich);
+    await driver.drawRectangle(map, saanichRectangle);
+    await expectSelection(3, 1);
+    await expectStationReachable(brentwoodBay, "BRENTWOOD BAY 2");
+  });
+
+  it("removes the topmost of overlapping shapes, the newest", async () => {
+    lookAt(insideSaanich);
+    await driver.drawRectangle(map, saanichRectangle);
+    await driver.drawRectangle(map, innerSaanichRectangle);
+    await waitFor(() => expect(downloadPolygons()).toHaveLength(2));
+
+    await driver.deleteShapeAt(map, insideSaanich);
+    await waitFor(() => expect(downloadPolygons()).toHaveLength(1));
+    expectLatLngBox(0, saanichRectangle);
   });
 
   it("draws edges straight in lon/lat, and sends only the corners", async () => {

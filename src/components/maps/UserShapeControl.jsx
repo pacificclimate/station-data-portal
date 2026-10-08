@@ -22,12 +22,11 @@ import "./lonLatEdges";
 
 L.PM.setOptIn(true);
 
-// Keep rectangles as lat/lng boxes, as leaflet-draw drew them (on the BC map's
-// Albers projection, curved top and bottom edges between straight, converging
-// sides). Geoman works out every rectangle's corners here (while drawing, and
-// when a corner is dragged in edit mode) as a box on screen, then creates the
-// finished rectangle as a lat/lng box, so without this the shape jumps on
-// release. The angle is ignored: rotate mode is off, and in edit mode Geoman
+// Keep rectangles as lat/lng boxes (on the BC map's Albers projection, curved
+// top and bottom edges between straight, converging sides). Geoman works out
+// every rectangle's corners here (while drawing, and when a corner is dragged
+// in edit mode) as a box on screen, then creates the finished rectangle as a
+// lat/lng box, so without this the shape jumps on release. The angle is ignored: rotate mode is off, and in edit mode Geoman
 // infers one from the first edge, a meridian that Albers draws tilted.
 L.PM.Utils._getRotatedRectangle = (A, B) => {
   const [a, b] = [L.latLng(A), L.latLng(B)];
@@ -43,7 +42,7 @@ const UserShapeControl = ({ position = "topleft", shapeStyle, onChange }) => {
     const shapes = L.featureGroup().addTo(map);
     const report = () => onChangeRef.current(shapes.getLayers());
 
-    const style = { ...shapeStyle, lonLatEdges: true };
+    const style = { ...shapeStyle, lonLatEdges: true, interactive: false };
     map.pm.setGlobalOptions({
       layerGroup: shapes,
       pathOptions: { ...style, pmIgnore: false },
@@ -66,7 +65,7 @@ const UserShapeControl = ({ position = "topleft", shapeStyle, onChange }) => {
       removalMode: true,
       rotateMode: false,
     });
-    // leaflet-draw offered "Clear all layers" in delete mode; keep it.
+    // Delete mode also offers "Clear all", which removes every shape.
     map.pm.Toolbar.changeActionsOfControl("removalMode", [
       "finishMode",
       {
@@ -81,15 +80,31 @@ const UserShapeControl = ({ position = "topleft", shapeStyle, onChange }) => {
     ]);
 
     const onCreate = ({ layer }) => {
+      // push shapes back so that station pins are on top, clickable and with
+      // no discolouration from the selection. Newest first, so the shapes
+      // keep their stacking order: the newest on top, removed first.
+      shapes
+        .getLayers()
+        .reverse()
+        .forEach((shape) => shape.bringToBack());
       layer.on("pm:edit", report);
       report();
     };
+    // Shapes are drawn non-interactive, so the pointer reaches the station
+    // markers under them: their tooltips and popups. Delete mode needs to
+    // be able to click the shapes
+    const onRemovalModeToggled = ({ enabled }) =>
+      shapes.eachLayer((layer) => {
+        layer.options.interactive = enabled;
+      });
     map.on("pm:create", onCreate);
     map.on("pm:remove", report);
+    map.on("pm:globalremovalmodetoggled", onRemovalModeToggled);
 
     return () => {
       map.off("pm:create", onCreate);
       map.off("pm:remove", report);
+      map.off("pm:globalremovalmodetoggled", onRemovalModeToggled);
       map.pm.removeControls();
       shapes.remove();
     };
