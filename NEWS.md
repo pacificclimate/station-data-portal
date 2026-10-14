@@ -1,5 +1,17 @@
 # News / Release Notes
 
+## 1.9.0
+
+_Release Date: 2026-Oct-14_
+
+Changes:
+
+- [Build with Vite 8, test with Vitest, draw selections with Geoman, serve with nginx](https://github.com/pacificclimate/station-data-portal/pull/199)
+  - Selection polygons curve their top and bottom edges to match the BC Albers projection
+  - Station pins stay on top of the drawn selection
+  - The Docker image serves the static build from nginx (unprivileged, port 8080)
+- [Use the default marker colour for stations](https://github.com/pacificclimate/station-data-portal/pull/202)
+
 ## 1.8.1
 
 _Release Date: 2026-Aug-29_

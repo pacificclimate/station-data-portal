@@ -1,6 +1,6 @@
 {
   "name": "station-data-portal",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "private": true,
   "dependencies": {
     "@geoman-io/leaflet-geoman-free": "^2.20.1",
