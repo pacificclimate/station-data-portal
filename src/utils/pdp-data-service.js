@@ -1,4 +1,5 @@
 import { makeURI } from "./uri";
+import urljoin from "url-join";
 import assignAll from "lodash/fp/assignAll";
 import capitalize from "lodash/fp/capitalize";
 import flow from "lodash/fp/flow";
@@ -82,7 +83,7 @@ export const dataDownloadTarget = ({
   allFrequencies,
 }) =>
   makeURI(
-    `${config.pdpDataUrl}/pcds/agg/`,
+    urljoin(config.pdpDataUrl, "/agg"),
     assignAll([
       {
         "from-date": date2pdpFormat(startDate),
