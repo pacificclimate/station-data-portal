@@ -165,6 +165,14 @@ value types. Typically, these values configure basic UI functionality.
 These values default to `undefined`. They may be overridden with values
 of the correct type.
 
+`REACT_APP_EEZ_GEOJSON_URL`
+
+- URL of the EEZ boundary GeoJSON overlay. Omit to hide the overlay.
+- Type: string.
+- Set in `window.env` in the runtime config file.
+- For BC, use `https://beehive.pacificclimate.org/tiles/eez/eez_boundaries_bc_v12.geojson`.
+- For YNWT, use `https://beehive.pacificclimate.org/tiles/eez/eez_boundaries_canada_v12.geojson`.
+
 `stationsQpProvinces`
 
 - Sets the `provinces` query parameter in the request sent by the app
