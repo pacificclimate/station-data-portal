@@ -6,7 +6,14 @@ export const utcDateOnly = (d) => {
   if (!d) {
     return d;
   }
-  const r = new Date(d);
+  // Observation timestamps without a timezone represent UTC. Native Date
+  // parsing would interpret them in the browser's local timezone instead.
+  const value =
+    typeof d === "string" &&
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/.test(d)
+      ? `${d}Z`
+      : d;
+  const r = new Date(value);
   r.setUTCHours(0, 0, 0, 0);
   return r;
 };
