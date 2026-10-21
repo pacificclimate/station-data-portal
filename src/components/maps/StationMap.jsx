@@ -65,6 +65,7 @@ const StationMapRenderer = React.memo(
   ({
     BaseMap,
     initialViewport,
+    minZoom,
     baseMapTilesUrl,
     eezGeoJSONUrl,
     userShapeStyle,
@@ -132,6 +133,7 @@ const StationMapRenderer = React.memo(
         baseMapTilesUrl={baseMapTilesUrl}
         preferCanvas={true}
         maxZoom={13}
+        minZoom={minZoom}
         pmIgnore={false}
       >
         {eezGeoJSONUrl && <EEZLayer url={eezGeoJSONUrl} />}
@@ -180,7 +182,7 @@ const StationMap = ({
   const { isFiltering, filteredStations: stations } =
     useStationFilteringContext();
 
-  const { BaseMap, initialViewport, baseMapTilesUrl, eezGeoJSONUrl } =
+  const { BaseMap, initialViewport, minZoom, baseMapTilesUrl, eezGeoJSONUrl } =
     baseMaps[config.baseMap];
 
   const handleChangedGeometryLayers = useMemo(
@@ -196,6 +198,7 @@ const StationMap = ({
       {...{
         BaseMap,
         initialViewport,
+        minZoom,
         baseMapTilesUrl,
         eezGeoJSONUrl,
         userShapeStyle,
