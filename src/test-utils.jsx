@@ -61,7 +61,7 @@ export const renderWithProviders = (
       <ConfigContext.Provider value={config}>
         <StationFilteringContext.Provider value={stationFiltering}>
           {withMap ? (
-            <MapContainer center={[50, -125]} zoom={6}>
+            <MapContainer center={[50, -125]} zoom={5}>
               {ui}
             </MapContainer>
           ) : (
