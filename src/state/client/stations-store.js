@@ -3,6 +3,43 @@ import { devtools } from "zustand/middleware";
 
 export const useStationsStore = create(
   devtools((set, get) => ({
+    downloadStations: [],
+    setStationDownloadSelected: (station, selected) =>
+      set((state) => ({
+        downloadStations: selected
+          ? state.downloadStations.some(({ id }) => id === station.id)
+            ? state.downloadStations
+            : [...state.downloadStations, station]
+          : state.downloadStations.filter(({ id }) => id !== station.id),
+      })),
+    selectStationsForDownload: (stations) =>
+      set((state) => ({
+        downloadStations: [
+          ...new Map(
+            [...state.downloadStations, ...stations].map((station) => [
+              station.id,
+              station,
+            ]),
+          ).values(),
+        ],
+      })),
+    clearDownloadSelection: () => set({ downloadStations: [] }),
+    pruneDownloadSelection: (availableStations) =>
+      set((state) => {
+        const available = new Map(
+          availableStations.map((station) => [station.id, station]),
+        );
+        const next = state.downloadStations
+          .filter(({ id }) => available.has(id))
+          .map(({ id }) => available.get(id));
+        return next.length === state.downloadStations.length &&
+          next.every(
+            (station, index) => station === state.downloadStations[index],
+          )
+          ? state
+          : { downloadStations: next };
+      }),
+
     stations: [],
     setStations: (stations) => {
       set({ stations: stations });
