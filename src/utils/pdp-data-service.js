@@ -140,3 +140,59 @@ export const dataDownloadTarget = ({
 export const dataDownloadFilename = ({ dataCategory, fileFormat }) => {
   return `${dataCategory}.${get("value", fileFormat)}`;
 };
+
+// Native POST downloads let the browser stream server-generated ZIPs directly
+// to disk, without GET URL limits or buffering the archive in JavaScript.
+export const stationDataDownloadRequest = ({
+  config,
+  stationIds,
+  dataCategory,
+  dataFormat,
+  clipToDate = false,
+  startDate,
+  endDate,
+  selectedNetworksUris = [],
+  selectedVariablesIds = [],
+  selectedFrequencies = [],
+  polygon,
+  onlyWithClimatology = false,
+  allNetworks = [],
+  allVariables = [],
+  allFrequencies = [],
+}) => {
+  if (
+    !Array.isArray(stationIds) ||
+    !stationIds.length ||
+    stationIds.some((id) => !Number.isSafeInteger(id) || id <= 0)
+  ) {
+    throw new Error("Select at least one station with a valid database ID.");
+  }
+  const ids = [...new Set(stationIds)].sort((left, right) => left - right);
+  const isoDate = (date) => date2pdpFormat(date).replaceAll("/", "-");
+  return {
+    action: urljoin(config.pdpDataUrl, "agg"),
+    fields: {
+      "station-ids": ids.join(","),
+      format: dataFormat.value,
+      climatology: String(dataCategory === "climatology"),
+      clip_dates: String(clipToDate),
+      "network-name": selectedNetworksUris
+        .map((uri) => {
+          const network = networkUrlToNetwork(allNetworks)(uri);
+          if (!network)
+            throw new Error(
+              "A selected network is unavailable. Refresh the filters.",
+            );
+          return network.name;
+        })
+        .join(","),
+      "input-vars": variableIds2pdpFormats(allVariables)(selectedVariablesIds),
+      "input-freq": frequencies2pdpFormat(allFrequencies)(selectedFrequencies),
+      "input-polygon": geoJSON2WKT(polygon),
+      only_with_climatology: String(onlyWithClimatology),
+      // Dates select stations even when downloaded observations are not clipped.
+      ...(startDate ? { from_date: isoDate(startDate) } : {}),
+      ...(endDate ? { to_date: isoDate(endDate) } : {}),
+    },
+  };
+};

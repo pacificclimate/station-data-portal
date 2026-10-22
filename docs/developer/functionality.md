@@ -15,3 +15,21 @@ impose the following choice on us:
    click for station info).
 
 At present, we have chosen (1).
+
+## Station data ZIP downloads
+
+Station tooltips, map summaries, preview pages and metadata table rows offer
+single-station downloads. Checkboxes in the table and map summary share a
+selection; the Selected button opens one download dialog for that station set.
+Selections are unique across histories and cleared when filters change. Selected
+only affects table display, not the metadata CSV export.
+
+The dialog posts a native URL-encoded form to `/agg` using numeric database
+`station-ids`, network names, variables, observation frequencies, dates,
+climatology-only criteria and the map polygon. IDs intersect those filters.
+Date clipping is separate from date filtering. Timeseries and climatology are
+separate server-generated ZIPs; format choices remain NetCDF, CSV and Excel.
+The browser manages streaming and errors open in a separate tab.
+
+The existing tabs, standalone preview route, metadata export scope and inline
+table filters remain in place in this branch. Workspace changes follow separately.

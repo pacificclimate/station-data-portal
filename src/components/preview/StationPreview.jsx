@@ -1,3 +1,4 @@
+import DownloadStationData from "@/components/controls/DownloadStationData";
 import { useLoaderData } from "react-router-dom";
 import React from "react";
 import { Container, Spinner } from "react-bootstrap";
@@ -10,7 +11,9 @@ import GraphsBlock from "./GraphsBlock";
 export default function StationPreview() {
   const urlParams = useLoaderData();
   // initialize the zustand store with defaults based on data loaded from react query.
-  const { isLoading: isStationLoading } = useStation(urlParams.stationId);
+  const { data: station, isLoading: isStationLoading } = useStation(
+    urlParams.stationId,
+  );
   const { data: previewStationVariables, isLoading } =
     useStationVariablesDefaults(urlParams.stationId);
 
@@ -29,6 +32,9 @@ export default function StationPreview() {
   return (
     <Container className="StationPreview mt-2">
       <HeaderBlock />
+      <div className="my-2">
+        <DownloadStationData stations={station ? [station] : []} />
+      </div>
       {hasVariables && (
         <>
           <NavBlock />

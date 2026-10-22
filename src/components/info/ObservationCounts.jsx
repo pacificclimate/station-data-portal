@@ -28,17 +28,22 @@ const totalCounts = timer.timeThis("totalCounts")((counts, stations) =>
   reduce((sum, station) => sum + (counts[station.id] || 0), 0)(stations),
 );
 
-function ObservationCounts({ clipToDate }) {
-  const { selectedStations: stations } = useStationFilteringContext();
+function ObservationCounts({ clipToDate = false, stations: downloadStations }) {
+  const { selectedStations } = useStationFilteringContext();
+  const stations = downloadStations ?? selectedStations;
   const { startDate, endDate } = useStationsStore(
     useShallow(pick(["startDate", "endDate"])),
   );
-  const { data: countData, isLoading } = useObservationCounts(
+  const {
+    data: countData,
+    isLoading,
+    isError,
+  } = useObservationCounts(
     clipToDate ? dateToStrForQuery(startDate) : null,
     clipToDate ? dateToStrForQuery(endDate) : null,
   );
 
-  const loadingMessage = "Loading ...";
+  const loadingMessage = isError ? "Unavailable" : "Loading ...";
 
   const countTotals = useMemo(() => {
     if (isLoading || !countData) {
@@ -58,9 +63,14 @@ function ObservationCounts({ clipToDate }) {
     };
   }, [countData, stations]);
 
-  const timePeriod = clipToDate
-    ? `${dateToStrForQuery(startDate)} to ${dateToStrForQuery(endDate)}`
-    : "all dates";
+  const timePeriod =
+    !clipToDate || (!startDate && !endDate)
+      ? "all dates"
+      : startDate && endDate
+        ? `${dateToStrForQuery(startDate)} to ${dateToStrForQuery(endDate)}`
+        : startDate
+          ? `from ${dateToStrForQuery(startDate)}`
+          : `up to ${dateToStrForQuery(endDate)}`;
 
   return (
     <Table size="sm">
@@ -102,8 +112,7 @@ function ObservationCounts({ clipToDate }) {
 }
 
 ObservationCounts.propTypes = {
-  startDate: PropTypes.object,
-  endDate: PropTypes.object,
+  clipToDate: PropTypes.bool,
   stations: PropTypes.array,
 };
 

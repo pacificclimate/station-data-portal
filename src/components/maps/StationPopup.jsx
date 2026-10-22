@@ -1,3 +1,4 @@
+import DownloadStationData from "@/components/controls/DownloadStationData";
 import PropTypes from "prop-types";
 import React from "react";
 import { Table } from "react-bootstrap";
@@ -21,6 +22,7 @@ import {
 } from "@/utils/station-info";
 import { useNetworks } from "@/state/query-hooks/use-networks";
 import { useVariables } from "@/state/query-hooks/use-variables";
+import { useStationsStore } from "@/state/client/stations-store";
 import useConfigContext from "@/state/context-hooks/use-config-context";
 
 import "./StationPopup.css";
@@ -31,6 +33,12 @@ const formatDate = (d) => (d ? d.toISOString().substr(0, 10) : "unknown");
 
 function StationPopup({ station }) {
   const config = useConfigContext();
+  const selectedForDownload = useStationsStore((state) =>
+    state.downloadStations.some(({ id }) => id === station.id),
+  );
+  const setStationDownloadSelected = useStationsStore(
+    (state) => state.setStationDownloadSelected,
+  );
   const { data: networks } = useNetworks();
   const { data: variables } = useVariables();
 
@@ -144,6 +152,27 @@ function StationPopup({ station }) {
           <tr>
             <td>Recorded variables</td>
             <td>{variableNames}</td>
+          </tr>
+          <tr>
+            <td>Selection</td>
+            <td>
+              <label className="station-download-selection">
+                <input
+                  type="checkbox"
+                  checked={selectedForDownload}
+                  onChange={(event) =>
+                    setStationDownloadSelected(station, event.target.checked)
+                  }
+                />{" "}
+                Select for download
+              </label>
+            </td>
+          </tr>
+          <tr>
+            <td>Download</td>
+            <td>
+              <DownloadStationData stations={[station]} />
+            </td>
           </tr>
           <tr>
             <td>Preview</td>

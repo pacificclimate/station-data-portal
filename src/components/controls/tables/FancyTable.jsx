@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
+import isEqual from "lodash/isEqual";
 import styles from "./FancyTable.module.css";
 import { usePagination, useTable, useFilters } from "react-table";
 import { Table } from "react-bootstrap";
@@ -19,6 +20,7 @@ function FancyTable({
   defaultColumn = {},
   // Value for filterTypes argument to useTable (see note)
   filterTypes = () => {},
+  onFiltersChange,
   // All additional props are passed through to the React Bootstrap Table.
   ...restOfProps
 }) {
@@ -52,11 +54,13 @@ function FancyTable({
       // Pagination
       pageIndex,
       pageSize,
+      filters,
     },
   } = useTable(
     {
       columns,
       data,
+      autoResetFilters: false,
       defaultColumn: React.useMemo(() => defaultColumn, []),
       filterTypes: React.useMemo(() => filterTypes, []),
       initialState: {
@@ -68,6 +72,14 @@ function FancyTable({
     useFilters,
     usePagination,
   );
+
+  const previousFilters = useRef(filters);
+  useEffect(() => {
+    if (!isEqual(previousFilters.current, filters)) {
+      previousFilters.current = filters;
+      onFiltersChange?.(filters);
+    }
+  }, [filters, onFiltersChange]);
 
   // Pagination controls are used in header and footer.
   const paginationControls = (
@@ -179,6 +191,7 @@ FancyTable.propTypes = {
   hiddenColumns: PropTypes.array,
   defaultColumn: PropTypes.object,
   filterTypes: PropTypes.object,
+  onFiltersChange: PropTypes.func,
 };
 
 export default FancyTable;
