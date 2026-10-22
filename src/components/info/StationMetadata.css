@@ -12,3 +12,98 @@ ul.compact {
 ul.compact li {
   margin-left: 0;
 }
+
+.station-table-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.station-table-download svg {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+}
+
+.StationMetadata .station-row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.StationMetadata .station-row-select {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 2rem;
+  margin: 0;
+  cursor: pointer;
+}
+
+.StationMetadata .station-row-select input {
+  width: 0.875rem;
+  height: 0.875rem;
+  margin: 0;
+  accent-color: #23715a;
+}
+
+.StationMetadata .station-row-action-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.125rem;
+  border: 1px solid #d7e0dc;
+  border-radius: 0.375rem;
+  background: #fff;
+}
+
+.StationMetadata .station-row-actions .station-row-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 1.875rem;
+  width: 1.875rem;
+  height: 1.875rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.25rem;
+  background: transparent;
+  color: #49615a;
+  font-size: 1rem;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: none;
+}
+
+.StationMetadata .station-row-action svg {
+  display: block;
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+}
+
+.StationMetadata .station-row-actions .station-row-action:hover,
+.StationMetadata .station-row-actions .station-row-action:focus-visible {
+  background: #e8f2ed;
+  color: #175d43;
+}
+
+.StationMetadata .station-row-actions .station-row-action:focus-visible {
+  outline: 2px solid #23715a;
+  outline-offset: 1px;
+}
+
+.StationMetadata .station-row-actions .station-row-action:disabled {
+  opacity: 0.4;
+}
+
+.station-download-selection {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  cursor: pointer;
+}
