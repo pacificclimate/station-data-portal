@@ -1,5 +1,14 @@
 # News / Release Notes
 
+## 1.9.1
+
+_Release Date: 2026-Oct-27_
+
+Changes:
+
+- Upgrade OS packages in the Docker image, including libbrotli1 for CVE-2026-111497
+- Apply non-breaking npm security updates
+
 ## 1.9.0
 
 _Release Date: 2026-Oct-14_
