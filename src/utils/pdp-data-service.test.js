@@ -336,3 +336,47 @@ describe("stationDataDownloadRequest", () => {
     },
   );
 });
+
+it("keeps a direct request independent of every supplied station filter", () => {
+  const request = stationDataDownloadRequest({
+    config: { pdpDataUrl: "https://example.invalid/data/" },
+    stationIds: [37],
+    scope: "station",
+    dataCategory: "timeseries",
+    dataFormat: { value: "nc" },
+    selectedNetworksUris: ["/missing"],
+    selectedVariablesIds: [999],
+    selectedFrequencies: ["missing"],
+    onlyWithClimatology: true,
+    startDate: new Date(2050, 0, 1),
+    endDate: new Date(2050, 11, 31),
+    polygon: {
+      type: "Polygon",
+      coordinates: [
+        [
+          [0, 0],
+          [1, 0],
+          [1, 1],
+          [0, 0],
+        ],
+      ],
+    },
+  });
+  expect(request.fields).toEqual({
+    "station-ids": "37",
+    format: "nc",
+    climatology: "false",
+    clip_dates: "false",
+  });
+});
+
+it("cannot use direct-download scope to bypass filters for multiple station IDs", () => {
+  expect(() =>
+    stationDataDownloadRequest({
+      config: { pdpDataUrl: "https://example.invalid/data/" },
+      stationIds: [37, 42],
+      scope: "station",
+      dataFormat: { value: "nc" },
+    }),
+  ).toThrow(/exactly one station/);
+});

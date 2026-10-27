@@ -1,14 +1,24 @@
 import React from "react";
 import { beforeEach, expect, it } from "vitest";
-import { fireEvent, screen } from "@testing-library/react";
+import { act, fireEvent, screen } from "@testing-library/react";
 import { renderWithProviders as renderBase, testConfig } from "@/test-utils";
 import { useStationsStore } from "@/state/client/stations-store";
 import DownloadStationData from "./DownloadStationData";
 
-const station = (id) => ({
+const station = (id, overrides = {}) => ({
   id,
   native_id: `N${id}`,
-  histories: [{ station_name: `Weather station ${id}` }],
+  network_uri: "/networks/1",
+  histories: [
+    {
+      station_name: `Weather station ${id}`,
+      lat: 0.25,
+      lon: 0.75,
+      variable_ids: [],
+      freq: "daily",
+    },
+  ],
+  ...overrides,
 });
 
 beforeEach(() =>
@@ -42,6 +52,7 @@ const renderWithProviders = (ui, options = {}) =>
             id: 999,
             standard_name: "precipitation_amount",
             cell_method: "time: sum",
+            tags: ["climatology"],
           },
         ],
       ],
@@ -227,8 +238,23 @@ it("submits IDs together with network, spatial, variable and frequency filters",
       ],
     },
   });
+  const matchingStation = (id) =>
+    station(id, {
+      network_uri: "/networks/99",
+      histories: [
+        {
+          station_name: `Weather station ${id}`,
+          lat: 0.25,
+          lon: 0.75,
+          variable_ids: [999],
+          freq: "daily",
+        },
+      ],
+    });
   renderWithProviders(
-    <DownloadStationData stations={[station(37), station(42), station(37)]} />,
+    <DownloadStationData
+      stations={[matchingStation(37), matchingStation(42), matchingStation(37)]}
+    />,
     {
       stationFiltering: { selectedStations: [station(99)] },
     },
@@ -267,4 +293,183 @@ it("keeps a large selection enabled regardless of URL length limits", () => {
   expect(button).toBeEnabled();
   expect(button.form.action).toBe("https://example.invalid/data/agg");
   expect(fields(button)["station-ids"].split(",")).toHaveLength(1000);
+});
+
+it("does not offer a ZIP for a station outside the drawn area, and recovers when the area is cleared", () => {
+  useStationsStore.setState({
+    area: {
+      type: "MultiPolygon",
+      coordinates: [
+        [
+          [
+            [10, 10],
+            [11, 10],
+            [11, 11],
+            [10, 10],
+          ],
+        ],
+      ],
+    },
+  });
+  renderWithProviders(<DownloadStationData stations={[station(37)]} />);
+  fireEvent.click(
+    screen.getByRole("button", { name: "Download station data" }),
+  );
+  expect(screen.getByRole("alert")).toHaveTextContent(
+    "Outside the current drawn area",
+  );
+  expect(screen.queryByRole("form")).not.toBeInTheDocument();
+  act(() => useStationsStore.setState({ area: null }));
+  expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  expect(
+    fields(screen.getByRole("button", { name: "Download Timeseries ZIP" }))[
+      "station-ids"
+    ],
+  ).toBe("37");
+});
+
+it("withdraws both forms if an open dialog's stations become excluded", () => {
+  renderWithProviders(
+    <DownloadStationData stations={[station(37), station(42)]} />,
+  );
+  fireEvent.click(
+    screen.getByRole("button", { name: "Download station data" }),
+  );
+  expect(screen.getAllByRole("form")).toHaveLength(2);
+  act(() => useStationsStore.setState({ selectedNetworks: ["/networks/99"] }));
+  expect(screen.getByRole("alert")).toHaveTextContent("network is excluded");
+  expect(screen.queryByRole("form")).not.toBeInTheDocument();
+});
+
+it("blocks the entire batch when only some requested stations match", () => {
+  renderWithProviders(
+    <DownloadStationData
+      stations={[station(37), station(42, { network_uri: "/networks/99" })]}
+    />,
+  );
+  fireEvent.click(
+    screen.getByRole("button", { name: "Download station data" }),
+  );
+  expect(screen.getByRole("alert")).toHaveTextContent(
+    "Weather station 42 (N42)",
+  );
+  expect(screen.queryByRole("form")).not.toBeInTheDocument();
+});
+
+it("ignores map and station criteria for a direct station download outside the area", () => {
+  useStationsStore.setState({
+    area: {
+      type: "MultiPolygon",
+      coordinates: [
+        [
+          [
+            [10, 10],
+            [11, 10],
+            [11, 11],
+            [10, 10],
+          ],
+        ],
+      ],
+    },
+  });
+  renderWithProviders(
+    <DownloadStationData scope="station" stations={[station(37)]} />,
+  );
+  fireEvent.click(
+    screen.getByRole("button", { name: "Download station data" }),
+  );
+  expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  for (const category of ["Timeseries", "Climatology"]) {
+    const submitted = fields(
+      screen.getByRole("button", { name: `Download ${category} ZIP` }),
+    );
+    expect(submitted).not.toHaveProperty("input-polygon");
+    expect(submitted).toEqual({
+      "station-ids": "37",
+      format: "nc",
+      climatology: String(category === "Climatology"),
+      clip_dates: "false",
+    });
+  }
+  expect(useStationsStore.getState().area).not.toBeNull();
+});
+
+it("downloads a station despite excluded, empty, or unavailable selector values and dates", () => {
+  useStationsStore.setState({
+    selectedNetworks: ["/networks/missing"],
+    selectedVariables: [123456],
+    selectedFrequencies: ["missing"],
+    onlyWithClimatology: true,
+    includeStationsWithNoObs: false,
+    startDate: new Date(2050, 0, 1),
+    endDate: new Date(2050, 11, 31),
+  });
+  renderWithProviders(
+    <DownloadStationData scope="station" stations={[station(37)]} />,
+  );
+  fireEvent.click(
+    screen.getByRole("button", { name: "Download station data" }),
+  );
+  expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  const button = screen.getByRole("button", {
+    name: "Download Timeseries ZIP",
+  });
+  expect(fields(button)).toEqual({
+    "station-ids": "37",
+    format: "nc",
+    climatology: "false",
+    clip_dates: "false",
+  });
+  act(() =>
+    useStationsStore.setState({
+      selectedNetworks: [],
+      selectedVariables: [],
+      selectedFrequencies: [],
+    }),
+  );
+  expect(fields(button)).toEqual({
+    "station-ids": "37",
+    format: "nc",
+    climatology: "false",
+    clip_dates: "false",
+  });
+  fireEvent.click(
+    screen.getByRole("checkbox", {
+      name: "Clip time series to filter date range",
+    }),
+  );
+  expect(fields(button)).toEqual({
+    "station-ids": "37",
+    format: "nc",
+    climatology: "false",
+    clip_dates: "true",
+    from_date: "2050-01-01",
+    to_date: "2050-12-31",
+  });
+});
+
+it("does not wait for filter metadata for a direct station download", () => {
+  renderBase(<DownloadStationData scope="station" stations={[station(37)]} />);
+  fireEvent.click(
+    screen.getByRole("button", { name: "Download station data" }),
+  );
+  expect(
+    screen.getByRole("button", { name: "Download Timeseries ZIP" }),
+  ).toBeEnabled();
+});
+
+it("blocks invalid IDs and multiple stations in the direct download route", () => {
+  renderWithProviders(
+    <DownloadStationData
+      scope="station"
+      stations={[station(37), station(42)]}
+    />,
+  );
+  fireEvent.click(
+    screen.getByRole("button", { name: "Download station data" }),
+  );
+  expect(screen.getByRole("alert")).toHaveTextContent(
+    "Choose exactly one station",
+  );
+  expect(screen.queryByRole("form")).not.toBeInTheDocument();
 });

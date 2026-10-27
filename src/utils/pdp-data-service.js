@@ -146,6 +146,7 @@ export const dataDownloadFilename = ({ dataCategory, fileFormat }) => {
 export const stationDataDownloadRequest = ({
   config,
   stationIds,
+  scope = "selection",
   dataCategory,
   dataFormat,
   clipToDate = false,
@@ -168,7 +169,24 @@ export const stationDataDownloadRequest = ({
     throw new Error("Select at least one station with a valid database ID.");
   }
   const ids = [...new Set(stationIds)].sort((left, right) => left - right);
+  if (scope === "station" && ids.length !== 1)
+    throw new Error(
+      "A direct station download must contain exactly one station.",
+    );
   const isoDate = (date) => date2pdpFormat(date).replaceAll("/", "-");
+  if (scope === "station") {
+    return {
+      action: urljoin(config.pdpDataUrl, "agg"),
+      fields: {
+        "station-ids": ids.join(","),
+        format: dataFormat.value,
+        climatology: String(dataCategory === "climatology"),
+        clip_dates: String(clipToDate),
+        ...(clipToDate && startDate ? { from_date: isoDate(startDate) } : {}),
+        ...(clipToDate && endDate ? { to_date: isoDate(endDate) } : {}),
+      },
+    };
+  }
   return {
     action: urljoin(config.pdpDataUrl, "agg"),
     fields: {
