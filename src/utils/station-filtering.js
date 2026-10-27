@@ -63,7 +63,7 @@ import { utcDateOnly } from "./dates";
 import {
   checkGeoJSONMultiPolygon,
   gJMultiPolygonBoundingBox,
-  isPointInGeoJSONPolygon,
+  isPointInGeoJSONArea,
 } from "./geoJSON";
 import { stationVariableIds, uniqStationLocations } from "./station-info";
 import { getTimer } from "./timing";
@@ -220,7 +220,7 @@ export const stationInsideMultiPolygon = ft.timeThis(
     return some(
       (point) =>
         some(
-          (polygon) => isPointInGeoJSONPolygon(polygon[0], point),
+          (polygon) => isPointInGeoJSONArea(polygon, point),
           multiPolygon.coordinates,
         ),
       stationCoords,

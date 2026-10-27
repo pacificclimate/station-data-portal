@@ -22,6 +22,7 @@ import {
 } from "@/utils/station-info";
 import { useNetworks } from "@/state/query-hooks/use-networks";
 import { useVariables } from "@/state/query-hooks/use-variables";
+import { stationAreaFilter } from "@/utils/station-filtering";
 import { useStationsStore } from "@/state/client/stations-store";
 import useConfigContext from "@/state/context-hooks/use-config-context";
 
@@ -33,6 +34,8 @@ const formatDate = (d) => (d ? d.toISOString().substr(0, 10) : "unknown");
 
 function StationPopup({ station }) {
   const config = useConfigContext();
+  const area = useStationsStore((state) => state.area);
+  const insideArea = stationAreaFilter(area, [station]).length > 0;
   const selectedForDownload = useStationsStore((state) =>
     state.downloadStations.some(({ id }) => id === station.id),
   );
@@ -159,19 +162,35 @@ function StationPopup({ station }) {
               <label className="station-download-selection">
                 <input
                   type="checkbox"
-                  checked={selectedForDownload}
-                  onChange={(event) =>
-                    setStationDownloadSelected(station, event.target.checked)
+                  checked={insideArea && selectedForDownload}
+                  disabled={!insideArea}
+                  aria-describedby={
+                    !insideArea
+                      ? `station-area-conflict-${station.id}`
+                      : undefined
                   }
+                  onChange={(event) => {
+                    if (insideArea)
+                      setStationDownloadSelected(station, event.target.checked);
+                  }}
                 />{" "}
                 Select for download
               </label>
+              {!insideArea && (
+                <p
+                  className="small text-muted mb-0"
+                  id={`station-area-conflict-${station.id}`}
+                >
+                  Outside the drawn area. Clear or redraw it to select this
+                  station. Its direct download is still available.
+                </p>
+              )}
             </td>
           </tr>
           <tr>
             <td>Download</td>
             <td>
-              <DownloadStationData stations={[station]} />
+              <DownloadStationData scope="station" stations={[station]} />
             </td>
           </tr>
           <tr>

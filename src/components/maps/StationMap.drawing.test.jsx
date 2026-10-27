@@ -253,6 +253,27 @@ describe.each([geomanDriver])("drawing with $name", (driver) => {
     await expectSelection(6, 0);
   });
 
+  it("allows direct downloads outside the drawing without allowing outside-area selection", async () => {
+    lookAt(insideSaanich);
+    await driver.drawRectangle(map, saanichRectangle);
+    await expectSelection(3, 1);
+    await expectStationReachable(cherryCreek, "KAMLOOPS CHERRY CREEK");
+    const check = screen.getByRole("checkbox", { name: "Select for download" });
+    expect(check).toBeDisabled();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Download station data" }),
+    );
+    const form = screen.getByRole("form", { name: "Download Timeseries ZIP" });
+    expect(Object.fromEntries(new FormData(form))).toEqual({
+      "station-ids": "275",
+      format: "nc",
+      climatology: "false",
+      clip_dates: "false",
+    });
+    expect(useStationsStore.getState().area).toBeTruthy();
+    expect(useStationsStore.getState().downloadStations).toEqual([]);
+  });
+
   it("keeps stations inside a shape hoverable and clickable", async () => {
     lookAt(insideSaanich);
     await driver.drawRectangle(map, saanichRectangle);
