@@ -1,5 +1,13 @@
 # News / Release Notes
 
+## 1.9.2
+
+_Release Date: 2026-Oct-27_
+
+Changes:
+
+- Upgrade the Docker base image from Nginx 1.30.5 to 1.30.6 for CVE-2026-15176, CVE-2026-93479, CVE-2026-95101, CVE-2026-97629 and CVE-2026-97205
+
 ## 1.9.1
 
 _Release Date: 2026-Oct-27_

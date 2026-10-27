@@ -1,4 +1,4 @@
-FROM nginxinc/nginx-unprivileged:1.30.5-trixie
+FROM nginxinc/nginx-unprivileged:1.30.6-trixie
 
 # The base image runs as nginx (101); switch to root only to patch OS packages.
 USER root
