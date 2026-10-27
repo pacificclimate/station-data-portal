@@ -57,37 +57,39 @@ function FrequencySelector() {
 
   return (
     <Form>
-      <div>
-        <Form.Label>Observation Frequency</Form.Label>{" "}
-        <InfoPopup title={"Observation Frequency multiselector"}>
-          <ul className={"compact"}>
-            <li>At startup, all frequencies are selected.</li>
-            <li>
-              Use the None button to clear all frequencies from the selector.
-            </li>
-            <li>
-              Use the All button to add all available frequencies to the
-              selector.
-            </li>
-            <li>
-              Click the dropdown and select an item to add a single unselected
-              frequency.
-            </li>
-            <li>Click the X next to a selected frequency to remove it.</li>
-          </ul>
-        </InfoPopup>
+      <div className={css.selectorHeading}>
+        <div className={css.selectorLabel}>
+          <Form.Label>Observation Frequency</Form.Label>{" "}
+          <InfoPopup title={"Observation Frequency multiselector"}>
+            <ul className={"compact"}>
+              <li>At startup, all frequencies are selected.</li>
+              <li>
+                Use the None button to clear all frequencies from the selector.
+              </li>
+              <li>
+                Use the All button to add all available frequencies to the
+                selector.
+              </li>
+              <li>
+                Click the dropdown and select an item to add a single unselected
+                frequency.
+              </li>
+              <li>Click the X next to a selected frequency to remove it.</li>
+            </ul>
+          </InfoPopup>
+        </div>
+        <ButtonToolbar className={css.selectorButtons}>
+          <Button
+            {...selectorButtonProps}
+            onClick={() => onChange(getOptions(frequencies))}
+          >
+            All
+          </Button>
+          <Button {...selectorButtonProps} onClick={() => onChange([])}>
+            None
+          </Button>
+        </ButtonToolbar>
       </div>
-      <ButtonToolbar className={css.selectorButtons}>
-        <Button
-          {...selectorButtonProps}
-          onClick={() => onChange(getOptions(frequencies))}
-        >
-          All
-        </Button>
-        <Button {...selectorButtonProps} onClick={() => onChange([])}>
-          None
-        </Button>
-      </ButtonToolbar>
       <Select
         options={getOptions(frequencies)}
         placeholder={frequencies ? "Select or type to search..." : "Loading..."}

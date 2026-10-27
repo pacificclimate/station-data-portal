@@ -23,15 +23,14 @@ const SelectionCounts = ({ Container = "p" }) => {
     return <Container>Loading station info ...</Container>;
   }
   if (!selectedStations) {
-    return <Container>Loading selection info ...</Container>;
+    return <Container>Loading matching station info ...</Container>;
   }
-  const numAllHistories = numHistories(stations);
   const numSelectedHistories = numHistories(selectedStations);
   return (
-    <Container>
-      <b>{selectedStations.length}</b> stations selected of{" "}
-      <b>{stations.length}</b> available; {numSelectedHistories} histories of{" "}
-      {numAllHistories}
+    <Container aria-label="Matching stations">
+      <b>{selectedStations.length.toLocaleString()}</b> of{" "}
+      <b>{stations.length.toLocaleString()}</b> stations match (
+      {numSelectedHistories.toLocaleString()} histories)
     </Container>
   );
 };

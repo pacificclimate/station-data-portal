@@ -11,13 +11,28 @@ import logger from "@/logger";
 
 logger.configure({ active: true });
 
-function DownloadMetadata({
-  data,
-  columns,
-  filename = "station-metadata.csv",
-  children,
-}) {
-  const { allColumns, rows, prepareRow } = useTable({ columns, data });
+const DownloadMetadata = React.forwardRef(function DownloadMetadata(
+  {
+    data,
+    columns,
+    filename = "station-metadata.csv",
+    className = "btn btn-primary btn-sm",
+    title,
+    ariaLabel,
+    onClick,
+    children,
+    ...linkProps
+  },
+  ref,
+) {
+  const csvColumns = React.useMemo(
+    () => columns.filter((column) => !column.excludeFromCsv),
+    [columns],
+  );
+  const { allColumns, rows, prepareRow } = useTable({
+    columns: csvColumns,
+    data,
+  });
 
   // Data for CSV download can be bulky, so it is generated lazily.
   // This state value holds the generated data.
@@ -39,26 +54,38 @@ function DownloadMetadata({
   const handleClick = (event, done) => {
     setCsvData(makeCsvData());
     done(true);
+    onClick?.(event);
   };
 
   return (
     <CSVLink
+      {...linkProps}
+      ref={(instance) => {
+        if (typeof ref === "function") ref(instance?.link ?? null);
+        else if (ref) ref.current = instance?.link ?? null;
+      }}
       headers={csvHeaders}
       data={csvData}
       filename={filename}
       asyncOnClick={true}
       onClick={handleClick}
-      className={"btn btn-primary btn-sm"}
+      className={className}
+      title={title}
+      aria-label={ariaLabel}
     >
       {children}
     </CSVLink>
   );
-}
+});
 
 DownloadMetadata.propTypes = {
   data: PropTypes.array.isRequired,
   columns: PropTypes.array.isRequired,
   filename: PropTypes.string,
+  className: PropTypes.string,
+  title: PropTypes.string,
+  ariaLabel: PropTypes.string,
+  onClick: PropTypes.func,
 };
 
 export default DownloadMetadata;
