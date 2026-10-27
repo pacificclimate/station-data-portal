@@ -23,7 +23,6 @@ import {
 import {
   Download,
   Eye,
-  QuestionCircle,
   CloudArrowDown,
   FileEarmarkSpreadsheet,
 } from "react-bootstrap-icons";
@@ -90,6 +89,7 @@ function StationMetadata({
   filterOnly = false,
   onOpenFilters,
   onCloseFilters,
+  helpVisible = false,
 }) {
   const { data: allNetworks } = useNetworks();
   const { data: allVariables } = useVariables();
@@ -141,7 +141,6 @@ function StationMetadata({
     [selectedDownloadStations],
   );
 
-  const [helpVisible, setHelpVisible] = useState(false);
   const [downloadsOpen, setDownloadsOpen] = useState(false);
   const compact = useStationsStore((state) => state.metadataCompact);
   const setCompact = useStationsStore((state) => state.setMetadataCompact);
@@ -371,20 +370,6 @@ function StationMetadata({
   // control what it does. We consider it an adjunct to the table.
   return (
     <>
-      <div className="station-table-title mb-2 mt-2">
-        <h2 className="h5 mb-0">Station metadata</h2>
-        <Button
-          size="sm"
-          variant="link"
-          title="Station table help"
-          aria-label="Station table help"
-          aria-expanded={helpVisible}
-          aria-controls="station-table-help"
-          onClick={() => setHelpVisible(!helpVisible)}
-        >
-          <QuestionCircle aria-hidden="true" />
-        </Button>
-      </div>
       <Row className={rowClasses}>
         <SelectionCounts />
       </Row>
@@ -445,6 +430,7 @@ StationMetadata.propTypes = {
   filterOnly: PropTypes.bool,
   onOpenFilters: PropTypes.func,
   onCloseFilters: PropTypes.func,
+  helpVisible: PropTypes.bool,
 };
 
 export default StationMetadata;

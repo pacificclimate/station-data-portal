@@ -1,5 +1,12 @@
+.portal {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .portal :global(.leaflet-container) {
-  height: 800px;
+  height: 100%;
   width: 100%;
 }
 
@@ -9,8 +16,4 @@
 
 .portal :global(.leaflet-tooltip) {
   font-size: 12px;
-}
-
-.portal .mainTabs :global(.nav-tabs) {
-  margin-bottom: 15px;
 }
