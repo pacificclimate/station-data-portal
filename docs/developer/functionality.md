@@ -6,15 +6,10 @@ about those topics.
 
 ## Selection of area by map polygon
 
-Leaflet, or at least our ability to make it do what we want it to do, seems to
-impose the following choice on us:
-
-1. EITHER map polygons can be edited and deleted individually (by clicking on
-   the polygon, rather than by clicking Clear All),
-2. OR markers inside a polygon can be interacted with (hover for tootip;
-   click for station info).
-
-At present, we have chosen (1).
+Draw rectangles or polygons to limit matching stations and selected downloads.
+Shapes can be edited or removed with the map tools. Drawing, editing or clearing
+an area clears the checkbox selection. Stations outside the area can still be
+inspected and downloaded directly; their selection checkbox is disabled.
 
 ## Station data ZIP downloads
 
@@ -47,14 +42,11 @@ separate tab.
 
 ## Station table and filters
 
-The Station Filters, Station Metadata, Station Data and Networks tabs provide
-access to station controls. The table's Filters button opens Station Filters,
-and Done returns to
-Station Metadata. The Station Data tab opens the same station-ID download dialog,
-so it also respects shared attributes and cannot download a broader set than its
-matching count. Criteria use Networks, Variables, Observations, Dates, Area
-and Attributes sections. Shared criteria and current-view attributes filter the
-map and table together; the matching summary uses matching rather than selected.
+The map's Table button opens the station metadata table. The table and map
+Filters buttons open the same filter panel. Closing filters returns to the table
+if it was open. Criteria use Networks, Variables, Observations, Dates, Area and
+Attributes sections. Shared criteria and current-view attributes filter the map
+and table together; summaries show matching stations and histories.
 History and station views retain their own attributes and show active counts.
 
 Clear offers All or the current section. It restores selector All values, resets
@@ -78,3 +70,14 @@ do not limit it. It keeps original coordinate precision, dates and variables.
 Variable cells show three names and can expand; locations and record spans use
 three-line cells. Network names include their colour marker. Preview links open
 the station preview page.
+
+## Map and station panels
+
+Round Table, Networks and Filters buttons sit on the map. Table and Filters share
+one panel on the right, showing one at a time. The map stays interactive, without
+a backdrop, focus trap or page scroll lock. On narrow screens the panel sits below
+the map. Closing panels retains filters and checkbox selections.
+
+The table heading, controls and column headers stay pinned while rows scroll.
+Networks opens an expandable colour legend over the map. Network filtering is
+available in Filters. Preview links open the station preview page.
