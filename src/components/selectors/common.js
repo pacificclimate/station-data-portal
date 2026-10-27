@@ -17,5 +17,4 @@ export const defaultValue = (defaultValueSelector, allOptions) =>
 export const selectorButtonProps = {
   size: "xs",
   variant: "outline-dark",
-  className: "ms-1",
 };

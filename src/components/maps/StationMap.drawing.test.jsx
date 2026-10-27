@@ -4,7 +4,7 @@
 // the stations store, station filtering, the download URL) is the real app.
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor } from "@testing-library/react";
 import L from "leaflet";
 import { MemoryRouter } from "react-router-dom";
 import { renderWithProviders, testConfig } from "@/test-utils";
@@ -92,7 +92,10 @@ const cherryCreek = [50.683333, -120.583333];
 const lookAt = (latlng) => map.setView(latlng, 10, { animate: false });
 
 const selectedCount = () =>
-  screen.getByText(/stations selected of/).textContent.match(/^(\d+)/)[1];
+  screen
+    .getByLabelText("Matching stations")
+    .textContent.match(/^([\d,]+)/)[1]
+    .replaceAll(",", "");
 
 // The WKT polygon on the timeseries download link, as a list of polygons.
 const downloadPolygons = () => {
@@ -251,6 +254,18 @@ describe.each([geomanDriver])("drawing with $name", (driver) => {
 
     await driver.deleteAll(map);
     await expectSelection(6, 0);
+  });
+
+  it("removes map drawings when the area is cleared from the filter controls", async () => {
+    lookAt(insideSaanich);
+    await driver.drawRectangle(map, saanichRectangle);
+    await expectSelection(3, 1);
+    expect(map.pm.getGeomanDrawLayers()).toHaveLength(1);
+    act(() => useStationsStore.getState().setArea(null));
+    await expectSelection(6, 0);
+    expect(map.pm.getGeomanDrawLayers()).toHaveLength(0);
+    await driver.drawRectangle(map, saanichRectangle);
+    await expectSelection(3, 1);
   });
 
   it("allows direct downloads outside the drawing without allowing outside-area selection", async () => {

@@ -28,3 +28,50 @@
 .numberRange .control {
   width: 5em;
 }
+
+.textTerms {
+  min-width: 0;
+  font-size: 0.9em;
+}
+.textTermsLabel,
+.textTermsHint {
+  display: block;
+  color: #52616b;
+  font-weight: normal;
+  margin-bottom: 0.25rem;
+}
+.textTermsHint {
+  margin: 0.25rem 0 0;
+  font-size: 0.85em;
+}
+.textTermInput,
+.terms,
+.term {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.textTermInput input {
+  min-width: 0;
+}
+.terms {
+  flex-wrap: wrap;
+  margin-bottom: 0.375rem;
+}
+.term {
+  max-width: 100%;
+  padding: 0.125rem 0.375rem;
+  border: 1px solid #c6ddd2;
+  border-radius: 0.25rem;
+  background: #e8f2ed;
+}
+.term > span {
+  overflow-wrap: anywhere;
+}
+.term button {
+  flex: none;
+  border: 0;
+  padding: 0 0.125rem;
+  background: transparent;
+  color: #23715a;
+}

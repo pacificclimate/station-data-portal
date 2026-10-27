@@ -1,4 +1,4 @@
-import { useState, useTransition, useEffect, useRef } from "react";
+import { useState, useTransition, useEffect, useMemo, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 import pick from "lodash/fp/pick";
 import { StationFilteringContext } from "@/state/context-hooks/use-station-filtering-context";
@@ -6,6 +6,8 @@ import { useStationsStore } from "@/state/client/stations-store";
 import { stationAreaFilter, stationFilter } from "@/utils/station-filtering";
 import { useStations } from "@/state/query-hooks/use-stations";
 import { useVariables } from "@/state/query-hooks/use-variables";
+import { useNetworks } from "@/state/query-hooks/use-networks";
+import { useMetadataStationFilter } from "@/state/client-server-hooks/use-metadata-station-filter";
 
 export const StationFilteringProvider = ({ children }) => {
   const {
@@ -17,6 +19,8 @@ export const StationFilteringProvider = ({ children }) => {
     selectedFrequencies,
     onlyWithClimatology,
     area,
+    metadataCompact,
+    metadataFilters,
   } = useStationsStore(
     useShallow(
       pick([
@@ -28,6 +32,8 @@ export const StationFilteringProvider = ({ children }) => {
         "selectedFrequencies",
         "onlyWithClimatology",
         "area",
+        "metadataCompact",
+        "metadataFilters",
       ]),
     ),
   );
@@ -40,6 +46,7 @@ export const StationFilteringProvider = ({ children }) => {
     selectedFrequencies,
     onlyWithClimatology,
     area,
+    attributes: metadataFilters[metadataCompact ? "station" : "history"],
   });
   const previousFilterKey = useRef(filterKey);
   useEffect(() => {
@@ -51,8 +58,21 @@ export const StationFilteringProvider = ({ children }) => {
   const { data: stations, isLoading: isStationsLoading } = useStations();
   const { data: variables, isLoading: isVariablesLoading } = useVariables();
 
-  const [filteredStations, setFilteredStations] = useState([]);
-  const [selectedStations, setSelectedStations] = useState([]);
+  const { data: networks } = useNetworks();
+  const [baseFilteredStations, setBaseFilteredStations] = useState([]);
+  const filteredStations = useMetadataStationFilter(
+    baseFilteredStations,
+    networks,
+    variables,
+  );
+  const selectedStations = useMemo(
+    () => stationAreaFilter(area, filteredStations),
+    [area, filteredStations],
+  );
+  const baseSelectedStations = useMemo(
+    () => stationAreaFilter(area, baseFilteredStations),
+    [area, baseFilteredStations],
+  );
   const [isFiltering, startFilteringTransition] = useTransition();
 
   useEffect(() => {
@@ -76,17 +96,12 @@ export const StationFilteringProvider = ({ children }) => {
         });
       }
 
-      const compSelectedStations = stationAreaFilter(
-        area,
-        compFilteredStations,
-      );
       if (!isStationsLoading && !isVariablesLoading) {
         useStationsStore
           .getState()
-          .pruneDownloadSelection(compSelectedStations);
+          .pruneDownloadSelection(compFilteredStations);
       }
-      setFilteredStations(compFilteredStations);
-      setSelectedStations(compSelectedStations);
+      setBaseFilteredStations(compFilteredStations);
     });
   }, [
     includeStationsWithNoObs,
@@ -105,7 +120,13 @@ export const StationFilteringProvider = ({ children }) => {
 
   return (
     <StationFilteringContext.Provider
-      value={{ isFiltering, filteredStations, selectedStations }}
+      value={{
+        isFiltering,
+        filteredStations,
+        selectedStations,
+        baseFilteredStations,
+        baseSelectedStations,
+      }}
     >
       {children}
     </StationFilteringContext.Provider>
