@@ -44,6 +44,7 @@ import { layersToGeoJSONMultipolygon } from "@/utils/geoJSON-leaflet";
 import { getTimer } from "@/utils/timing";
 import baseMaps from "@/components/maps/baseMaps";
 
+import StationFocus from "./StationFocus";
 import MapResizeObserver from "./MapResizeObserver";
 import MapInfoDisplay from "./MapInfoDisplay";
 import UserShapeControl from "./UserShapeControl";
@@ -137,6 +138,7 @@ const StationMapRenderer = React.memo(
         minZoom={minZoom}
         pmIgnore={false}
       >
+        <StationFocus />
         <MapResizeObserver />
         {eezGeoJSONUrl && <EEZLayer url={eezGeoJSONUrl} />}
         <MapInfoDisplay

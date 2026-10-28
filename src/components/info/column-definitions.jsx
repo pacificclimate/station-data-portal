@@ -25,7 +25,7 @@ import FrequencySelector, {
 import SelectColumnFilter from "../controls/tables/column-filters/SelectColumnFilter";
 import NumberRangeColumnFilter from "../controls/tables/column-filters/NumberRangeColumnFilter";
 import SelectArrayColumnFilter from "../controls/tables/column-filters/SelectArrayColumnFilter";
-import { Link } from "react-router-dom";
+import StationPreviewLink from "@/components/preview/StationPreviewLink";
 
 // TODO: Move to utils
 const formatDate = (d) => (d ? d.toISOString().substr(0, 10) : "unknown");
@@ -224,7 +224,9 @@ export function smtColumnInfo({ allNetworks, allVariables, compact = true }) {
               {map(
                 (name) => (
                   <li key={name}>
-                    <Link to={`preview/${row.row.original.id}`}>{name}</Link>
+                    <StationPreviewLink stationId={row.row.original.id}>
+                      {name}
+                    </StationPreviewLink>
                   </li>
                 ),
                 row.value,
@@ -365,7 +367,9 @@ export function smtColumnInfo({ allNetworks, allVariables, compact = true }) {
         accessor: (data) => [data.history.station_name, data.station.id],
         doFilter: true,
         Cell: (row) => (
-          <Link to={`preview/${row.value[1]}`}>{row.value[0]}</Link>
+          <StationPreviewLink stationId={row.value[1]}>
+            {row.value[0]}
+          </StationPreviewLink>
         ),
       },
       { ...historyIdColumn, accessor: "history.id" },

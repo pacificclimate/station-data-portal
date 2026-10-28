@@ -1,23 +1,26 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button, Badge } from "react-bootstrap";
 import { Table as TableIcon, Funnel } from "react-bootstrap-icons";
 import StationMap from "@/components/maps/StationMap";
 import NetworkLegend from "@/components/maps/NetworkLegend";
 import StationWorkspacePanels from "./StationWorkspacePanels";
 import { useStationsStore } from "@/state/client/stations-store";
+import { Outlet } from "react-router-dom";
+import { useWorkspaceUrlState } from "@/state/client-server-hooks/use-workspace-url-state";
 import { useStationFilterSummary } from "@/state/client-server-hooks/use-station-filter-summary";
 import css from "../common.module.css";
 import "./BodyContent.css";
 
 export const BodyContent = () => {
   const filterSummary = useStationFilterSummary();
-  const [tableOpen, updateTableOpen] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const [legendOpen, setLegendOpen] = useState(false);
-  const setTableOpen = (open) => {
-    updateTableOpen(open);
-    if (open) setFiltersOpen(false);
-  };
+  const {
+    tableOpen,
+    setTableOpen,
+    filtersOpen,
+    setFiltersOpen,
+    legendOpen,
+    setLegendOpen,
+  } = useWorkspaceUrlState();
   const selectedCount = useStationsStore(
     (state) => state.downloadStations.length,
   );
@@ -93,6 +96,7 @@ export const BodyContent = () => {
           setFiltersOpen={setFiltersOpen}
         />
       </div>
+      <Outlet />
     </div>
   );
 };

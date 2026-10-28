@@ -53,6 +53,7 @@ beforeEach(() =>
     metadataSelectedOnly: false,
     metadataFilters: { history: [], station: [] },
     selectedNetworks: ["/networks/1"],
+    focusedStation: null,
     defaultNetworksApplied: true,
     defaultVariablesApplied: true,
     defaultFrequenciesApplied: true,
@@ -190,6 +191,16 @@ it("shares map and table filters and preserves filters and download selection wh
       name: "Select Active Pass (N2)",
     }),
   ).not.toBeInTheDocument();
+  fireEvent.click(
+    within(reopened).getByRole("button", {
+      name: "Locate Brentwood (N1) on map",
+    }),
+  );
+  expect(reopened).toBeVisible();
+  expect(screen.getByTestId("station-map")).toBeVisible();
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  expect(document.querySelector(".modal-backdrop")).not.toBeInTheDocument();
+  expect(useStationsStore.getState().focusedStation.id).toBe(1);
 });
 
 it("uses one right-hand panel for either table or filters, with both filter buttons opening the same view", () => {
