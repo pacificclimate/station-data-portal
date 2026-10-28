@@ -9,6 +9,8 @@ import StationMap from "@/components/maps/StationMap";
 import NetworkLegend from "@/components/maps/NetworkLegend";
 import StationMetadata from "@/components/info/StationMetadata";
 import { useStationsStore } from "@/state/client/stations-store";
+import { Outlet } from "react-router-dom";
+import { useWorkspaceUrlState } from "@/state/client-server-hooks/use-workspace-url-state";
 import { useStationFilterSummary } from "@/state/client-server-hooks/use-station-filter-summary";
 import css from "../common.module.css";
 import "./BodyContent.css";
@@ -16,13 +18,14 @@ import "./BodyContent.css";
 export const BodyContent = () => {
   const [helpVisible, setHelpVisible] = useState(false);
   const filterSummary = useStationFilterSummary();
-  const [tableOpen, updateTableOpen] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const [legendOpen, setLegendOpen] = useState(false);
-  const setTableOpen = (open) => {
-    updateTableOpen(open);
-    if (open) setFiltersOpen(false);
-  };
+  const {
+    tableOpen,
+    setTableOpen,
+    filtersOpen,
+    setFiltersOpen,
+    legendOpen,
+    setLegendOpen,
+  } = useWorkspaceUrlState();
   const filtersDialog = useRef(null);
   useEffect(() => {
     if (!filtersOpen) return;
@@ -176,6 +179,7 @@ export const BodyContent = () => {
           </section>
         </aside>
       </div>
+      <Outlet />
     </div>
   );
 };

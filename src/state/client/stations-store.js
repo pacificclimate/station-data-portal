@@ -16,6 +16,17 @@ export const useStationsStore = create(
           : { metadataFilters: { ...state.metadataFilters, [view]: filters } },
       ),
 
+    focusedStation: null,
+    focusStation: (station) =>
+      set({ focusedStation: { ...station }, stationPopupRequest: null }),
+    clearStationFocus: () =>
+      set({ focusedStation: null, stationPopupRequest: null }),
+
+    stationPopupRequest: null,
+    requestStationPopup: (stationId) =>
+      set({ stationPopupRequest: { stationId } }),
+    clearStationPopupRequest: () => set({ stationPopupRequest: null }),
+
     downloadStations: [],
     setStationDownloadSelected: (station, selected) =>
       set((state) => ({

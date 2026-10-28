@@ -214,7 +214,7 @@ function StationDownloadOptions({ stations, scope }) {
   );
 }
 
-// Mount the download controls only while the options dialog is open.
+// Mount the download controls only while open, including for map tooltips.
 export default function DownloadStationData({
   stations,
   title,

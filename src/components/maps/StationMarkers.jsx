@@ -6,6 +6,7 @@ import flow from "lodash/fp/flow";
 import mapValues from "lodash/fp/mapValues";
 import logger from "@/logger";
 
+import { useStationsStore } from "@/state/client/stations-store";
 import StationPopup from "./StationPopup";
 import StationTooltip from "./StationTooltip";
 import { stationNetwork, uniqStationLocations } from "@/utils/station-info";
@@ -23,12 +24,24 @@ const timer = getTimer("StationMarkers timing");
 //    triggers popup. Creates the popup (once; effectively memoized).
 //  `popup`: Lazily created popup to be rendered inside marker. Value `null`
 //    until `addPopup` called; value is the popup thereafter.
-const useLazyPopup = ({ station }) => {
+const useLazyPopup = ({ station, openForFocus = false }) => {
   const markerRef = useRef();
   const [popup, setPopup] = useState(null);
+  const popupRequest = useStationsStore((state) =>
+    openForFocus && state.stationPopupRequest?.stationId === station.id
+      ? state.stationPopupRequest
+      : null,
+  );
+  useEffect(() => {
+    if (!popupRequest) return;
+    if (popup === null) setPopup(<StationPopup station={station} />);
+    else markerRef.current?.openPopup();
+    useStationsStore.getState().clearStationPopupRequest();
+  }, [popupRequest, station, popup]);
 
   // Callback: create popup if not already created.
   const addPopup = () => {
+    useStationsStore.getState().clearStationFocus();
     if (popup === null) {
       setPopup(<StationPopup station={station} />);
     }
@@ -57,8 +70,12 @@ function LocationMarker({
   location, // One location of the station (there may be several)
   color, // Station colour; overrides default color in markerOptions
   markerOptions = defaultMarkerOptions,
+  openForFocus = false,
 }) {
-  const { markerRef, popup, addPopup } = useLazyPopup({ station });
+  const { markerRef, popup, addPopup } = useLazyPopup({
+    station,
+    openForFocus,
+  });
 
   return (
     <CircleMarker
@@ -98,7 +115,7 @@ function MultiLocationMarker({
       {...polygonOptions}
       color={color}
       positions={locations}
-      onClick={addPopup}
+      eventHandlers={{ click: addPopup }}
     >
       <StationTooltip station={station} />
       {popup}
@@ -139,6 +156,12 @@ export function OneStationMarkers({
           <LocationMarker
             station={station}
             location={location}
+            openForFocus={
+              location.id ===
+              uniqLatLngs.find(
+                ({ lat, lng }) => Number.isFinite(lat) && Number.isFinite(lng),
+              )?.id
+            }
             color={locationColor}
             markerOptions={markerOptions}
             key={location.id}
