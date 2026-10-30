@@ -1,0 +1,31 @@
+/* The locator is decoration: all pointer events reach the real station marker. */
+.station-locator,
+.station-locator * {
+  pointer-events: none !important;
+}
+
+.station-locator-ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid #52616b;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 80%);
+  border-radius: 50%;
+  animation: station-locator-pulse 1.6s ease-out 3 forwards;
+}
+
+@keyframes station-locator-pulse {
+  from {
+    transform: scale(0.7);
+    opacity: 1;
+  }
+  to {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .station-locator-ring {
+    animation: none;
+  }
+}

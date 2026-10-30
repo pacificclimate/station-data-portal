@@ -22,11 +22,12 @@ import {
 
 import {
   Download,
+  GeoAlt,
   Eye,
   CloudArrowDown,
   FileEarmarkSpreadsheet,
 } from "react-bootstrap-icons";
-import { Link } from "react-router-dom";
+import StationPreviewLink from "@/components/preview/StationPreviewLink";
 import { stationDisplayName } from "@/utils/station-info";
 import StationFilters from "@/components/controls/StationFilters";
 import { useStationFilterSummary } from "@/state/client-server-hooks/use-station-filter-summary";
@@ -89,6 +90,7 @@ function StationMetadata({
   filterOnly = false,
   onOpenFilters,
   onCloseFilters,
+  onLocateStation,
   helpVisible = false,
 }) {
   const { data: allNetworks } = useNetworks();
@@ -116,6 +118,7 @@ function StationMetadata({
   const pruneDownloadSelection = useStationsStore(
     (state) => state.pruneDownloadSelection,
   );
+  const focusStation = useStationsStore((state) => state.focusStation);
   const stationsFromRows = (rows) => [
     ...new Map(
       rows.map((row) => {
@@ -214,8 +217,8 @@ function StationMetadata({
                   <Download aria-hidden="true" />
                 </DownloadStationData>
                 <Button
-                  as={Link}
-                  to={`preview/${station.id}`}
+                  as={StationPreviewLink}
+                  stationId={station.id}
                   variant="link"
                   size="sm"
                   className="station-row-action"
@@ -223,6 +226,26 @@ function StationMetadata({
                   aria-label={`Preview variables for ${name}`}
                 >
                   <Eye aria-hidden="true" />
+                </Button>
+                <Button
+                  variant="link"
+                  size="sm"
+                  className="station-row-action"
+                  title={`Locate ${name} on map`}
+                  aria-label={`Locate ${name} on map`}
+                  disabled={
+                    !station.histories.some(
+                      (history) =>
+                        Number.isFinite(history.lat) &&
+                        Number.isFinite(history.lon),
+                    )
+                  }
+                  onClick={() => {
+                    onLocateStation?.(station);
+                    focusStation(station);
+                  }}
+                >
+                  <GeoAlt aria-hidden="true" />
                 </Button>
               </span>
             </div>
@@ -239,7 +262,14 @@ function StationMetadata({
         ].includes(column.id),
       })),
     ],
-    [columnInfo, compact, selectedIds, setStationDownloadSelected],
+    [
+      columnInfo,
+      compact,
+      selectedIds,
+      focusStation,
+      setStationDownloadSelected,
+      onLocateStation,
+    ],
   );
 
   const data = useMemo(() => smtData(stations, compact), [stations, compact]);
@@ -391,8 +421,8 @@ function StationMetadata({
             </p>
             <p>
               Use Download for selected or all matching station data, or
-              metadata as CSV. Row icons download one station or open its
-              variable preview page.
+              metadata as CSV. Row icons download one station, preview its
+              variables, or locate it on the map and open its summary.
             </p>
             <p className="mb-0">
               Scroll within the table for additional rows and columns. Expand a
@@ -430,6 +460,7 @@ StationMetadata.propTypes = {
   filterOnly: PropTypes.bool,
   onOpenFilters: PropTypes.func,
   onCloseFilters: PropTypes.func,
+  onLocateStation: PropTypes.func,
   helpVisible: PropTypes.bool,
 };
 

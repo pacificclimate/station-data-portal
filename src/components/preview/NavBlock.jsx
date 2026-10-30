@@ -18,7 +18,7 @@ import { useStore } from "@/state/client/state-store";
 
 import css from "./NavBlock.module.css";
 
-const NavBlock = () => {
+const NavBlock = ({ onClose }) => {
   const data = useStore(
     useShallow((state) => ({
       showLegend: state.showLegend,
@@ -71,9 +71,13 @@ const NavBlock = () => {
         <RangeBlock />
         <Card.Body>
           <Stack direction="horizontal" gap={3}>
-            <LinkContainer to="/" style={{ width: "160px" }}>
-              <Button>Back to Map</Button>
-            </LinkContainer>
+            {onClose ? (
+              <Button onClick={onClose}>Close preview</Button>
+            ) : (
+              <LinkContainer to="/" style={{ width: "160px" }}>
+                <Button>Back to Map</Button>
+              </LinkContainer>
+            )}
             <InputGroup>
               <Form.Select
                 aria-label="duration"

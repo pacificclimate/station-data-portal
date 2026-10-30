@@ -1,5 +1,5 @@
 import DownloadStationData from "@/components/controls/DownloadStationData";
-import { useLoaderData } from "react-router-dom";
+import { useStore } from "@/state/client/state-store";
 import React from "react";
 import { Container, Spinner } from "react-bootstrap";
 import { useStation } from "@/state/query-hooks/use-station";
@@ -8,16 +8,28 @@ import HeaderBlock from "./HeaderBlock";
 import NavBlock from "./NavBlock";
 import GraphsBlock from "./GraphsBlock";
 
-export default function StationPreview() {
-  const urlParams = useLoaderData();
+export default function StationPreview({ stationId, onClose }) {
+  const readyStationId = useStore((state) => state.stationId);
   // initialize the zustand store with defaults based on data loaded from react query.
-  const { data: station, isLoading: isStationLoading } = useStation(
-    urlParams.stationId,
-  );
-  const { data: previewStationVariables, isLoading } =
-    useStationVariablesDefaults(urlParams.stationId);
+  const {
+    data: station,
+    isLoading: isStationLoading,
+    isError: isStationError,
+  } = useStation(stationId);
+  const {
+    data: previewStationVariables,
+    isLoading,
+    isError,
+  } = useStationVariablesDefaults(stationId);
 
-  if (isLoading || isStationLoading) {
+  if (isError || isStationError)
+    return (
+      <div role="alert">
+        Unable to load this station preview. Please try again.
+      </div>
+    );
+
+  if (isLoading || isStationLoading || readyStationId !== stationId) {
     return (
       <Container fluid className="StationPreview">
         <Spinner animation="border" role="status">
@@ -38,9 +50,12 @@ export default function StationPreview() {
           stations={station ? [station] : []}
         />
       </div>
+      {!hasVariables && (
+        <p>This station has no observation variables to preview.</p>
+      )}
       {hasVariables && (
         <>
-          <NavBlock />
+          <NavBlock onClose={onClose} />
           <GraphsBlock />
         </>
       )}

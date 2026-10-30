@@ -8,6 +8,8 @@ beforeEach(() =>
     metadataSelectedOnly: false,
     metadataFilters: { history: [], station: [] },
     downloadStations: [],
+    focusedStation: null,
+    stationPopupRequest: null,
   }),
 );
 
@@ -32,7 +34,7 @@ const downloadChoice = (name) => {
   return screen.getByRole("button", { name });
 };
 
-it("selects unique stations across histories and table views", () => {
+it("selects unique stations across histories and table views, and focuses their locations", () => {
   const station = {
     id: 37,
     native_id: "TEST",
@@ -69,6 +71,12 @@ it("selects unique stations across histories and table views", () => {
     screen.getAllByRole("checkbox", { name: "Select Test Station (TEST)" })[1],
   ).toBeChecked();
   expect(downloadChoice("Download selected stations (1)")).toBeEnabled();
+  fireEvent.click(
+    screen.getAllByRole("button", {
+      name: "Locate Test Station (TEST) on map",
+    })[0],
+  );
+  expect(useStationsStore.getState().focusedStation.id).toBe(37);
   fireEvent.click(screen.getByText("By Station"));
   expect(
     screen.getAllByRole("checkbox", { name: "Select Test Station (TEST)" }),

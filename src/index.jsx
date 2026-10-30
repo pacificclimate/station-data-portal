@@ -65,15 +65,16 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
       <Route
-        index
         lazy={() => import("./components/main/Body/Body")}
         loader={bodyLoader(queryClient)}
-      />
-      <Route
-        path="preview/:stationId"
-        lazy={() => import("./components/preview/StationPreview")}
-        loader={previewLoader(queryClient)}
-      />
+      >
+        <Route index element={null} />
+        <Route
+          path="preview/:stationId"
+          lazy={() => import("./components/preview/StationPreviewModal")}
+          loader={previewLoader(queryClient)}
+        />
+      </Route>
     </Route>,
   ),
   {
