@@ -112,25 +112,26 @@ function FancyTable({
     }
   }, [filters, onFiltersChange, syncFilters]);
   // Pagination controls are used in header and footer.
+  const pagination = (
+    <PaginationControls
+      {...{
+        canPreviousPage,
+        canNextPage,
+        pageCount,
+        pageIndex,
+        gotoPage,
+        nextPage,
+        previousPage,
+        pageSize,
+        setPageSize,
+      }}
+      variant={"success"}
+      className="justify-content-center"
+    />
+  );
   const paginationControls = (
     <tr>
-      <td colSpan={visibleColumns.length}>
-        <PaginationControls
-          {...{
-            canPreviousPage,
-            canNextPage,
-            pageCount,
-            pageIndex,
-            gotoPage,
-            nextPage,
-            previousPage,
-            pageSize,
-            setPageSize,
-          }}
-          variant={"success"}
-          className="justify-content-center"
-        />
-      </td>
+      <td colSpan={visibleColumns.length}>{pagination}</td>
     </tr>
   );
 
@@ -207,7 +208,12 @@ function FancyTable({
               Clear attribute filters
             </Button>
           )}
-          <Button size="sm" className="ms-auto" onClick={onCloseFilters}>
+          <Button
+            size="sm"
+            variant="success"
+            className="ms-auto"
+            onClick={onCloseFilters}
+          >
             Done
           </Button>
         </div>
@@ -235,7 +241,8 @@ function FancyTable({
       <Funnel aria-hidden="true" /> Filters{" "}
       {activeFilterCount > 0 && (
         <Badge bg="light" text="dark">
-          {activeFilterCount}
+          <span aria-hidden="true">•</span>
+          <span className="visually-hidden">{activeFilterCount}</span>
         </Badge>
       )}
     </Button>
@@ -398,8 +405,13 @@ function FancyTable({
             })
           }
         </tbody>
-        <tfoot>{paginationControls}</tfoot>
+        {!dialogFilters && <tfoot>{paginationControls}</tfoot>}
       </Table>
+      {dialogFilters && (
+        <nav className="table-page-controls" aria-label="Table pages">
+          {pagination}
+        </nav>
+      )}
     </>
   );
 }
