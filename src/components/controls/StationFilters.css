@@ -24,3 +24,11 @@
 .station-filter-tools > p {
   margin-bottom: 0;
 }
+
+.station-filter-grouping {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}

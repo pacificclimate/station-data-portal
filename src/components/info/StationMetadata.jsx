@@ -5,20 +5,13 @@
 import PropTypes from "prop-types";
 import React, {
   useState,
+  useId,
   useMemo,
   useTransition,
   useEffect,
   useCallback,
 } from "react";
-import {
-  Button,
-  Dropdown,
-  ToggleButton,
-  ToggleButtonGroup,
-  Card,
-  Row,
-  Form,
-} from "react-bootstrap";
+import { Button, Dropdown, Card, Row, Form } from "react-bootstrap";
 
 import {
   Download,
@@ -30,6 +23,7 @@ import {
 import StationPreviewLink from "@/components/preview/StationPreviewLink";
 import { stationDisplayName } from "@/utils/station-info";
 import StationFilters from "@/components/controls/StationFilters";
+import StationGroupingControl from "@/components/controls/StationGroupingControl";
 import { useStationFilterSummary } from "@/state/client-server-hooks/use-station-filter-summary";
 import DownloadStationData from "@/components/controls/DownloadStationData";
 import { useStationsStore } from "@/state/client/stations-store";
@@ -119,14 +113,6 @@ function StationMetadata({
     (state) => state.pruneDownloadSelection,
   );
   const focusStation = useStationsStore((state) => state.focusStation);
-  const stationsFromRows = (rows) => [
-    ...new Map(
-      rows.map((row) => {
-        const station = compact ? row : row.station;
-        return [station.id, station];
-      }),
-    ).values(),
-  ];
   const selectedOnly = useStationsStore((state) => state.metadataSelectedOnly);
   const setSelectedOnly = useStationsStore(
     (state) => state.setMetadataSelectedOnly,
@@ -144,7 +130,6 @@ function StationMetadata({
     [selectedDownloadStations],
   );
 
-  const [downloadsOpen, setDownloadsOpen] = useState(false);
   const compact = useStationsStore((state) => state.metadataCompact);
   const setCompact = useStationsStore((state) => state.setMetadataCompact);
   const storedFilters = useStationsStore(
@@ -272,7 +257,6 @@ function StationMetadata({
     ],
   );
 
-  const data = useMemo(() => smtData(stations, compact), [stations, compact]);
   const tableData = useMemo(
     () =>
       smtData(
@@ -288,97 +272,42 @@ function StationMetadata({
     ],
   );
 
-  const renderToolbar = ({ rows, filterButton }) => {
-    const matching = stationsFromRows(rows);
-    const count = (value) => value.toLocaleString();
-    return (
-      <>
-        <div className="station-toolbar-group" role="group" aria-label="View">
-          <span className="station-toolbar-label">View</span>
-          <ToggleButtonGroup
-            type="radio"
-            name="compact"
-            value={compact}
-            onChange={handleChangeCompact}
-          >
-            {[false, true].map((value) => (
-              <ToggleButton
-                id={`stn-md-compact-${value}`}
-                key={String(value)}
-                size="sm"
-                variant="outline-success"
-                value={value}
-              >
-                By {value ? "Station" : "History"}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
-          {filterButton}
-          <Form.Check
-            id="metadata-selected-only"
-            type="checkbox"
-            label="Selected only"
-            checked={selectedOnly}
-            onChange={(event) => setSelectedOnly(event.target.checked)}
-          />
-        </div>
-        <div className="station-toolbar-group" role="group" aria-label="Select">
-          <span className="station-toolbar-label">Select</span>
-          <Button
-            size="sm"
-            variant="outline-secondary"
-            disabled={!selectedIds.length}
-            onClick={clearDownloadSelection}
-          >
-            Clear selection
-          </Button>
-        </div>
-        <div className="station-toolbar-group" role="group" aria-label="Export">
-          <span className="station-toolbar-label">Export</span>
-          <Dropdown show={downloadsOpen} onToggle={setDownloadsOpen}>
-            <Dropdown.Toggle
-              variant="success"
-              size="sm"
-              id="station-download-menu"
-            >
-              <Download aria-hidden="true" /> Download
-            </Dropdown.Toggle>
-            <Dropdown.Menu renderOnMount>
-              <DownloadStationData
-                stations={selectedDownloadStations}
-                menuItem
-                ariaLabel={`Download selected stations (${selectedIds.length})`}
-                title="Download data for stations selected with checkboxes"
-              >
-                <Download aria-hidden="true" /> Selected (
-                {count(selectedIds.length)})
-              </DownloadStationData>
-              <DownloadStationData
-                stations={matching}
-                menuItem
-                ariaLabel={`Download all matching stations (${matching.length})`}
-                title="Download all matching stations across every page"
-              >
-                <CloudArrowDown aria-hidden="true" /> All matching (
-                {count(matching.length)})
-              </DownloadStationData>
-              <Dropdown.Divider />
-              <Dropdown.Item
-                as={DownloadMetadata}
-                data={data}
-                columns={columnInfo.columns}
-                filename={`station-metadata-${compact ? "by-station" : "by-history"}.csv`}
-                ariaLabel="Download Metadata"
-                title="Download matching station metadata as CSV, including original coordinate fields"
-              >
-                <FileEarmarkSpreadsheet aria-hidden="true" /> Metadata (CSV)
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        </div>
-      </>
-    );
-  };
+  const renderToolbar = ({ filterButton }) => (
+    <>
+      <div className="station-toolbar-group" role="group" aria-label="View">
+        <span className="station-toolbar-label">View</span>
+        <StationGroupingControl
+          compact={compact}
+          onChange={handleChangeCompact}
+        />
+        {filterButton}
+        <Button
+          size="sm"
+          variant="outline-secondary"
+          disabled={!selectedIds.length}
+          onClick={clearDownloadSelection}
+        >
+          Clear selected ({selectedIds.length.toLocaleString()})
+        </Button>
+      </div>
+      <div
+        className="station-table-downloads"
+        role="group"
+        aria-label="Downloads"
+      >
+        <StationDownloads drop="down" />
+      </div>
+      <Form.Check
+        id="metadata-selected-only"
+        className="station-selected-only"
+        type="switch"
+        role="switch"
+        label="Show selected only"
+        checked={selectedOnly}
+        onChange={(event) => setSelectedOnly(event.target.checked)}
+      />
+    </>
+  );
   if (filterOnly)
     return (
       <FancyTable
@@ -396,8 +325,6 @@ function StationMetadata({
       />
     );
 
-  // Note: Download button is rendered here because it uses `columnInfo` to
-  // control what it does. We consider it an adjunct to the table.
   return (
     <>
       <Row className={rowClasses}>
@@ -452,6 +379,78 @@ function StationMetadata({
         )}
       </div>
     </>
+  );
+}
+
+// The map, filters and table share these downloads and their matching set.
+export function StationDownloads({ drop = "up" }) {
+  const filtered = useStationFilterSummary().total > 0;
+  const menuId = useId();
+  const { selectedStations: matching } = useStationFilteringContext();
+  const selectedDownloadStations = useStationsStore(
+    (state) => state.downloadStations,
+  );
+  const selectedIds = selectedDownloadStations.map(({ id }) => id);
+  const compact = useStationsStore((state) => state.metadataCompact);
+  const { data: allNetworks } = useNetworks();
+  const { data: allVariables } = useVariables();
+  const [downloadsOpen, setDownloadsOpen] = useState(false);
+  const columnInfo = useMemo(
+    () => smtColumnInfo({ allNetworks, allVariables, compact }),
+    [allNetworks, allVariables, compact],
+  );
+  const data = useMemo(() => smtData(matching, compact), [matching, compact]);
+  const count = (value) => value.toLocaleString();
+  return (
+    <Dropdown
+      drop={drop}
+      align="end"
+      show={downloadsOpen}
+      onToggle={setDownloadsOpen}
+    >
+      <Dropdown.Toggle
+        variant="success"
+        className="station-download-primary"
+        id={`station-download-menu-${menuId}`}
+      >
+        <Download aria-hidden="true" /> Download
+      </Dropdown.Toggle>
+      <Dropdown.Menu popperConfig={{ strategy: "fixed" }}>
+        <DownloadStationData
+          stations={selectedDownloadStations}
+          menuItem
+          ariaLabel={`Download selected stations (${selectedIds.length})`}
+          title="Download data for stations selected with checkboxes"
+        >
+          <Download aria-hidden="true" /> Selected ({count(selectedIds.length)})
+        </DownloadStationData>
+        <DownloadStationData
+          stations={matching}
+          menuItem
+          ariaLabel={`Download all ${filtered ? "filtered " : ""}stations (${matching.length})`}
+          title={
+            filtered
+              ? "Download all stations matching the current filters"
+              : "Download all available stations"
+          }
+        >
+          <CloudArrowDown aria-hidden="true" />{" "}
+          {filtered ? "All filtered" : "All stations"} ({count(matching.length)}
+          )
+        </DownloadStationData>
+        <Dropdown.Divider />
+        <Dropdown.Item
+          as={DownloadMetadata}
+          data={data}
+          columns={columnInfo.columns}
+          filename={`station-metadata-${compact ? "by-station" : "by-history"}.csv`}
+          ariaLabel="Download Metadata"
+          title="Download matching station metadata as CSV, including original coordinate fields"
+        >
+          <FileEarmarkSpreadsheet aria-hidden="true" /> Metadata (CSV)
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
   );
 }
 

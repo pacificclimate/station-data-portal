@@ -29,7 +29,4 @@ git tag -a -m"x.x.x" x.x.x
 git push --follow-tags
 ```
 
-**Note**: When a new release of this portal is deployed, also create a new
-release of the PDP and deploy it. This will cause the updated documentation
-for this portal to be included in the PDP
-documentation. For more details, see [User documentation](docs/developer/user-doc.md).
+When deploying a portal release, update the portal commit pinned in pdp-station-api/docs/portal-source.json, then rebuild and deploy the shared documentation. See [User documentation](docs/developer/user-doc.md) for preview and release instructions.

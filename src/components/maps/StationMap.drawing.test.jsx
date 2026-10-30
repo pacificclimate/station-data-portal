@@ -6,7 +6,12 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
 import { act, fireEvent, screen, waitFor } from "@testing-library/react";
 import L from "leaflet";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, useNavigate, useLocation } from "react-router-dom";
+import { useWorkspaceUrlState } from "@/state/client-server-hooks/use-workspace-url-state";
+import {
+  encodeWorkspaceView,
+  decodeWorkspaceView,
+} from "@/utils/workspace-url";
 import { renderWithProviders, testConfig } from "@/test-utils";
 import StationMap from "./StationMap";
 import StationData from "@/components/info/StationData";
@@ -44,6 +49,14 @@ vi.hoisted(() => {
 // Capture the map StationMap creates, so the driver can turn latlngs into
 // pointer positions.
 let map;
+let navigate;
+let search;
+function UrlState() {
+  useWorkspaceUrlState();
+  navigate = useNavigate();
+  search = useLocation().search;
+  return null;
+}
 L.Map.addInitHook(function () {
   map = this;
 });
@@ -108,7 +121,7 @@ const downloadPolygons = () => {
     return [];
   }
   expect(wkt).toMatch(/^MULTIPOLYGON \(/);
-  return wkt.match(/\(\([^()]*\)\)/g);
+  return wkt.match(/\(\([^()]*\)(?:,\s*\([^()]*\))*\)/g);
 };
 
 // The download polygon's vertices, as latlngs.
@@ -204,10 +217,15 @@ describe.each([geomanDriver])("drawing with $name", (driver) => {
       selectedVariables: variables.map(({ id }) => id),
       selectedFrequencies: ["daily"],
       area: null,
+      mapViewport: null,
+      defaultNetworksApplied: true,
+      defaultVariablesApplied: true,
+      defaultFrequenciesApplied: true,
     });
     // The station popups link to the station's preview.
     renderWithProviders(
       <MemoryRouter>
+        <UrlState />
         <StationFilteringProvider>
           <StationMap />
           <StationData />
@@ -287,6 +305,71 @@ describe.each([geomanDriver])("drawing with $name", (driver) => {
     });
     expect(useStationsStore.getState().area).toBeTruthy();
     expect(useStationsStore.getState().downloadStations).toEqual([]);
+  });
+
+  it("restores multiple editable drawings and holes from shared area state", async () => {
+    const area = {
+      type: "MultiPolygon",
+      coordinates: [
+        [
+          [
+            [-123.6, 48.4],
+            [-123.2, 48.4],
+            [-123.2, 48.7],
+            [-123.6, 48.7],
+            [-123.6, 48.4],
+          ],
+          [
+            [-123.48, 48.59],
+            [-123.45, 48.59],
+            [-123.45, 48.61],
+            [-123.48, 48.61],
+            [-123.48, 48.59],
+          ],
+        ],
+        [
+          kamloopsPolygon
+            .map(([lat, lon]) => [lon, lat])
+            .concat([[-120.7, 50.6]]),
+        ],
+      ],
+    };
+    act(() =>
+      navigate(
+        `?view=${encodeWorkspaceView({ ...useStationsStore.getState(), area, mapViewport: [48.55, -123.5, 10] })}`,
+      ),
+    );
+    await expectSelection(4, 2);
+    expect(map.getCenter().lat).toBeCloseTo(48.55, 5);
+    expect(
+      map.pm.getGeomanLayers().filter((layer) => layer instanceof L.Polygon),
+    ).toHaveLength(2);
+    const restored = map.pm
+      .getGeomanLayers()
+      .filter((layer) => layer instanceof L.Polygon)[0];
+    expect(restored.getLatLngs()).toHaveLength(2);
+    lookAt(insideSaanich);
+    expect(
+      map.pm.getGeomanLayers().filter((layer) => layer instanceof L.Polygon)[0],
+    ).toBe(restored);
+    await driver.moveVertex(map, saanichCorner, saanichCornerMoved);
+    await waitFor(() =>
+      expect(useStationsStore.getState().area.coordinates).not.toEqual(
+        area.coordinates,
+      ),
+    );
+    expect(downloadPolygons()).toHaveLength(2);
+    const shared = decodeWorkspaceView(new URLSearchParams(search).get("view"));
+    expect(shared.area.coordinates).toEqual(
+      useStationsStore.getState().area.coordinates,
+    );
+    expect(shared.mapViewport[2]).toBe(map.getZoom());
+    expect(useStationsStore.getState().area.coordinates[0]).toHaveLength(2);
+    act(() => useStationsStore.getState().setArea(null));
+    await expectSelection(6, 0);
+    expect(
+      map.pm.getGeomanLayers().filter((layer) => layer instanceof L.Polygon),
+    ).toHaveLength(0);
   });
 
   it("keeps stations inside a shape hoverable and clickable", async () => {

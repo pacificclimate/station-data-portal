@@ -7,7 +7,9 @@ import {
 } from "react-bootstrap-icons";
 import StationMap from "@/components/maps/StationMap";
 import NetworkLegend from "@/components/maps/NetworkLegend";
-import StationMetadata from "@/components/info/StationMetadata";
+import StationMetadata, {
+  StationDownloads,
+} from "@/components/info/StationMetadata";
 import { useStationsStore } from "@/state/client/stations-store";
 import { Outlet } from "react-router-dom";
 import { useWorkspaceUrlState } from "@/state/client-server-hooks/use-workspace-url-state";
@@ -95,13 +97,22 @@ export const BodyContent = () => {
               <Funnel aria-hidden="true" />
               {filterSummary.total > 0 && (
                 <Badge bg="success" aria-hidden="true">
-                  {filterSummary.total}
+                  •
                 </Badge>
               )}
             </Button>
           </nav>
 
           {legendOpen && <NetworkLegend onClose={() => setLegendOpen(false)} />}
+          {(!tableOpen || filtersOpen) && (
+            <div
+              className="station-map-downloads"
+              role="group"
+              aria-label="Downloads"
+            >
+              <StationDownloads />
+            </div>
+          )}
         </div>
         <aside
           className="station-side-panel"

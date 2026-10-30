@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import Select from "react-select";
-import { Badge, Button, Col, Dropdown, Row, Tab, Tabs } from "react-bootstrap";
+import { Button, Col, Dropdown, Row, Tab, Tabs } from "react-bootstrap";
 import { useShallow } from "zustand/react/shallow";
 import pick from "lodash/fp/pick";
 
 import SelectionCounts from "@/components/info/SelectionCounts";
+import StationGroupingControl from "./StationGroupingControl";
 import IncludeStationsWithNoObsControl from "./IncludeStationsWithNoObsControl";
 import NetworkSelector from "@/components/selectors/NetworkSelector";
 import VariableSelector from "@/components/selectors/VariableSelector";
@@ -27,6 +28,8 @@ function StationFilters({ children }) {
   const { data: variables } = useVariables();
   const { data: frequencies } = useFrequencies();
   const reset = useStationsStore((state) => state.resetStationFilters);
+  const compact = useStationsStore((state) => state.metadataCompact);
+  const setCompact = useStationsStore((state) => state.setMetadataCompact);
   const tabLabels = {
     networks: "Networks",
     variables: "Variables",
@@ -72,7 +75,10 @@ function StationFilters({ children }) {
         {count > 0 && (
           <>
             {" "}
-            <Badge bg="secondary">{count}</Badge>
+            <span className="text-success">
+              <span aria-hidden="true">•</span>
+              <span className="visually-hidden">{count}</span>
+            </span>
           </>
         )}
       </>
@@ -122,6 +128,14 @@ function StationFilters({ children }) {
           </Dropdown.Menu>
         </Dropdown>
       </div>
+      <div className="station-filter-grouping">
+        <span>Group stations</span>
+        <StationGroupingControl compact={compact} onChange={setCompact} />
+      </div>
+      <p className="small text-muted">
+        Station criteria apply to both views. Attributes are saved separately
+        for each view.
+      </p>
       <Tabs
         id="station-filter-sections"
         activeKey={activeTab}
@@ -205,7 +219,12 @@ function StationFilters({ children }) {
                 {summary.attributeCount > 0 && (
                   <>
                     {" "}
-                    <Badge bg="secondary">{summary.attributeCount}</Badge>
+                    <span className="text-success">
+                      <span aria-hidden="true">•</span>
+                      <span className="visually-hidden">
+                        {summary.attributeCount}
+                      </span>
+                    </span>
                   </>
                 )}
               </>
