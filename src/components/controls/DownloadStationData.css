@@ -1,0 +1,19 @@
+.station-download-list {
+  max-height: 10rem;
+  overflow-y: auto;
+  padding-left: 1.25rem;
+}
+
+.station-download-trigger:not(.station-row-action):not(
+    .station-download-button
+  ) {
+  color: #17695b;
+  font: inherit;
+  line-height: inherit;
+  vertical-align: baseline;
+}
+.station-download-trigger:not(.station-row-action):not(
+    .station-download-button
+  ):hover {
+  color: #104b41;
+}
