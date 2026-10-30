@@ -197,6 +197,37 @@ ul.compact li {
   margin-top: 0.5rem;
 }
 
+/* Scroll the rows independently so panel controls and table headings stay put. */
+.station-panel-content > .row {
+  flex-shrink: 0;
+}
+.station-panel-content > .StationMetadata {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.station-panel-content .StationMetadata > .btn-toolbar,
+.station-panel-content .StationMetadata > .table-view-toolbar {
+  flex-shrink: 0;
+}
+.station-panel-content .StationMetadata > .card {
+  max-height: 40%;
+  overflow: auto;
+}
+.station-panel-content .StationMetadata > .table-responsive {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.station-panel-content .StationMetadata thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: white;
+  box-shadow: 0 1px 0 #d7e0dc;
+}
+
 .station-toolbar-group {
   display: flex;
   flex-wrap: wrap;
