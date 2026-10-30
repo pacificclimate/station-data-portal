@@ -14,6 +14,9 @@ Map and station information
 
 Drag the map to pan; use its zoom buttons or mouse wheel to zoom. Moving or
 zooming the map does not filter stations or limit downloads to the visible area.
+You can zoom in beyond the basemap's native detail to separate nearby station
+markers. Existing tiles are enlarged at these closer zoom levels; labels and
+background features may look softer, but station locations remain selectable.
 Station marker colours identify their networks. A station may have several
 history records describing changes to its name, location or instruments;
 lines connect its different recorded locations.
@@ -94,6 +97,14 @@ Open **Filters** from the map or table. Changes apply immediately to the map
 and table. Matching counts describe the stations satisfying the filters;
 these are separate from stations checked for download.
 
+The **By History / By Station** toggle above the filter tabs is shared with
+the table. It is available even when the table is closed. Use it to choose the
+attribute fields and saved attribute filters to apply. Networks, Variables,
+Observations, Dates and Area remain shared criteria in either mode. Changing
+the grouping can change the matching set because each view has its own saved
+attributes. Switching to different active attribute filters clears the download
+selection.
+
 The filter tabs contain:
 
 * **Networks**: choose observing networks. **All** includes every available
@@ -122,13 +133,14 @@ resets shared criteria, both views' attributes, and Selected only.
 Example: find stations by elevation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Open **Table** and choose **By History**. Elevation is an attribute of a
-   history record, so its range control is available in this view.
-2. Open **Filters**, then **Attributes**.
+1. Open **Filters** and choose **By History** using the toggle above its tabs.
+   Elevation is an attribute of a history record, so its range control is
+   available in this view.
+2. Choose the **Attributes** tab.
 3. Under **Elevation (m)**, enter a minimum, a maximum, or both. For example,
    enter ``1000`` as the minimum to find histories at or above 1,000 metres.
-4. Choose **Done** to return to the matching table, then use a row's Locate
-   action to inspect a result on the map.
+4. Choose **Done**, then open **Table** if it is not already open. Use a row's
+   Locate action to inspect a result on the map.
 
 Leave a bound blank for an open-ended range. Other criteria still apply: a
 network choice, date range or drawn area can further narrow the result. Use
@@ -283,13 +295,19 @@ Sharing a view
 --------------
 
 Copy the browser address to share a station preview, open table or filters,
-network legend, station criteria, table grouping and attribute filters.
+network legend, station criteria, table grouping, attribute filters, drawn areas
+and the map's current position and zoom.
 Browser Back and Forward navigate between panel and preview views.
 
-Checked stations, Selected only, drawn areas and the map's pan and zoom are
-not included in the link. A recipient must draw an area and check stations
-again if those are needed for a download. Shared links reflect the data
-available when opened, so station counts can change over time.
+The address uses an encoded view value instead of a long JSON query. Existing
+links using the older format still open. When an area is shared, its editable
+drawing and its filter are restored together, including multiple shapes and
+holes. Panning, zooming, changing filters or editing a drawing updates the link
+without adding a history entry for every change.
+
+Checked stations and Selected only are not included in the link. A recipient
+must check stations again for a selected-station download. Shared links reflect
+the data available when opened, so station counts can change over time.
 
 Programmatic access
 -------------------

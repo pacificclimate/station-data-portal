@@ -10,15 +10,7 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import {
-  Button,
-  Dropdown,
-  ToggleButton,
-  ToggleButtonGroup,
-  Card,
-  Row,
-  Form,
-} from "react-bootstrap";
+import { Button, Dropdown, Card, Row, Form } from "react-bootstrap";
 
 import {
   Download,
@@ -30,6 +22,7 @@ import {
 import StationPreviewLink from "@/components/preview/StationPreviewLink";
 import { stationDisplayName } from "@/utils/station-info";
 import StationFilters from "@/components/controls/StationFilters";
+import StationGroupingControl from "@/components/controls/StationGroupingControl";
 import { useStationFilterSummary } from "@/state/client-server-hooks/use-station-filter-summary";
 import DownloadStationData from "@/components/controls/DownloadStationData";
 import { useStationsStore } from "@/state/client/stations-store";
@@ -295,24 +288,10 @@ function StationMetadata({
       <>
         <div className="station-toolbar-group" role="group" aria-label="View">
           <span className="station-toolbar-label">View</span>
-          <ToggleButtonGroup
-            type="radio"
-            name="compact"
-            value={compact}
+          <StationGroupingControl
+            compact={compact}
             onChange={handleChangeCompact}
-          >
-            {[false, true].map((value) => (
-              <ToggleButton
-                id={`stn-md-compact-${value}`}
-                key={String(value)}
-                size="sm"
-                variant="outline-success"
-                value={value}
-              >
-                By {value ? "Station" : "History"}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
+          />
           {filterButton}
           <Form.Check
             id="metadata-selected-only"

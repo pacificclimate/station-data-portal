@@ -18,7 +18,17 @@ export function useMetadataStationFilter(stations, networks, variables) {
       }),
     [networks, variables, compact],
   );
-  const data = useMemo(() => smtData(stations, compact), [stations, compact]);
+  // The map needs only the active predicates, not every display accessor.
+  // In particular, grouping alone must not rebuild variable/name/location
+  // cells for every history when there are no attribute filters to apply.
+  const columns = useMemo(() => {
+    const ids = new Set(filters.map(({ id }) => id));
+    return columnInfo.columns.filter(({ id }) => ids.has(id));
+  }, [columnInfo.columns, filters]);
+  const data = useMemo(
+    () => (filters.length ? smtData(stations, compact) : []),
+    [stations, compact, filters.length],
+  );
   const useControlledState = useCallback(
     (state) => ({ ...state, filters }),
     [filters],
@@ -26,6 +36,7 @@ export function useMetadataStationFilter(stations, networks, variables) {
   const { rows } = useTable(
     {
       ...columnInfo,
+      columns,
       data,
       autoResetFilters: false,
       useControlledState,

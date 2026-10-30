@@ -121,12 +121,16 @@ opened preview returns to the map with the same query parameters. Preview graphs
 are loaded only for a preview route, keeping Plotly out of the map's initial bundle.
 
 Shareable URLs retain open Table, Filters and Networks panels through `table=1`,
-`filters=1` and `networks=1`. The `criteria` JSON query parameter restores date bounds,
+`filters=1` and `networks=1`. The versioned, URL-safe `view` query parameter restores date bounds,
 network/variable/frequency selection, observation/climatology criteria, table grouping
-and station-attribute filters. Filter edits replace the current history entry;
+and station-attribute filters, the viewport and drawn areas. Legacy `criteria`
+JSON links remain readable and are rewritten to the compact format. Filter edits
+and map movements replace the current history entry;
 opening panels and station previews creates a navigable entry. Incoming URL data
 is validated before updating the store, and restored selections take precedence
-over startup defaults. Download checkboxes and map navigation stay local.
+over startup defaults. Download checkboxes and Selected only stay local.
+Restored polygons, including holes and multiple shapes, are rendered as editable
+map drawings. Coordinates and geometry structure are validated before restoration.
 
 The station table toolbar groups View (history/station, Filters, Selected only),
 Select (clear), and Export. One Download menu offers
@@ -162,3 +166,14 @@ through the resulting station IDs.
 The filter pane's matching rows are independent of the table's Selected only
 view. Selected only remains a table display option and does not hide otherwise
 matching stations from filter controls or their counts.
+
+The station map permits zoom levels up to 18. It reuses each regional basemap's
+projection and tile matrix, extends the projection scales through the displayed
+zoom range, and caps tile requests at the tileset's native maximum (currently
+13). Closer zooms enlarge those tiles while station markers remain interactive.
+
+By History / By Station is available above the filter tabs as well as in the
+table. Both controls update the same grouping state. Shared station criteria
+remain unchanged; available attribute fields and saved attribute filters follow
+the active grouping. Switching to different active attribute filters clears
+download selection, even when the table is closed.

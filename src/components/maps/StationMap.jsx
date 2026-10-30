@@ -38,7 +38,6 @@
 
 import React, { useEffect, useMemo, useTransition } from "react";
 
-import { LayerGroup } from "react-leaflet";
 import isEqual from "lodash/fp/isEqual";
 import { layersToGeoJSONMultipolygon } from "@/utils/geoJSON-leaflet";
 import { getTimer } from "@/utils/timing";
@@ -48,6 +47,8 @@ import StationFocus from "./StationFocus";
 import MapResizeObserver from "./MapResizeObserver";
 import MapInfoDisplay from "./MapInfoDisplay";
 import UserShapeControl from "./UserShapeControl";
+import StationBaseMap from "./StationBaseMap";
+import MapUrlViewport from "./MapUrlViewport";
 import { defaultMarkerOptions, ManyStationMarkers } from "./StationMarkers";
 
 import logger from "@/logger";
@@ -77,67 +78,43 @@ const StationMapRenderer = React.memo(
     config,
     externalIsPending,
   }) => {
-    // Manage marker radius as a function of zoom. Use a transition so that it
-    // doesn't interrupt other UI activity (including updating the base map).
-    // An immutable value makes setting `markerOptions` nice. To slightly improve
-    // performance, we use memoization in setting initial state and defining the
-    // map events.
-    const [markerOptions, setMarkerOptions] = useImmer(() => ({
-      ...defaultMarkerOptions,
-      radius: config.zoomToMarkerRadius(initialViewport.zoom),
-    }));
     const [markerLayerGroup, setMarkers] = useImmer(<></>);
-    const [markerUpdateIsPending, markerUpdateStartTransition] =
-      useTransition();
     const [markerRenderIsPending, markerRenderStartTransition] =
       useTransition();
-    const markerMapEvents = useMemo(
-      () => ({
-        zoomend: (leafletMap) => {
-          markerUpdateStartTransition(() => {
-            setMarkerOptions((draft) => {
-              draft.radius = config.zoomToMarkerRadius(leafletMap.getZoom());
-            });
-          });
-        },
-      }),
-      [],
-    );
 
     // By applying these markers into a piece of local state and wrapping their generation into a transition,
     // changes to the markers can be decoupled from the rendering of the rest of the map allowing for more
     // responsive user interaction when interacting with filters or switching between pages. Further wrapping the
-    // whole operation in a useEffect ensures that the markers are only generated when the stations or marker options
-    // change.
+    // whole operation in a useEffect ensures that the markers are only generated when the stations or radius policy
+    // change. Zooming updates native circles directly, without rebuilding the React marker tree.
     useEffect(() => {
       markerRenderStartTransition(() => {
         setMarkers(() => (
-          <LayerGroup>
-            <ManyStationMarkers
-              stations={stations}
-              markerOptions={markerOptions}
-              mapEvents={markerMapEvents}
-            />
-          </LayerGroup>
+          <ManyStationMarkers
+            stations={stations}
+            markerOptions={defaultMarkerOptions}
+            zoomToMarkerRadius={config.zoomToMarkerRadius}
+          />
         ));
       });
-    }, [stations, markerOptions]);
+    }, [stations, config.zoomToMarkerRadius]);
 
-    const isPending =
-      externalIsPending || markerUpdateIsPending || markerRenderIsPending;
+    const isPending = externalIsPending || markerRenderIsPending;
 
     console.log(baseMapTilesUrl);
 
     return (
-      <BaseMap
+      <StationBaseMap
+        baseMap={BaseMap}
         zoom={initialViewport.zoom}
         center={initialViewport.center}
         baseMapTilesUrl={baseMapTilesUrl}
         preferCanvas={true}
-        maxZoom={13}
+        maxZoom={18}
         minZoom={minZoom}
         pmIgnore={false}
       >
+        <MapUrlViewport />
         <StationFocus />
         <MapResizeObserver />
         {eezGeoJSONUrl && <EEZLayer url={eezGeoJSONUrl} />}
@@ -158,7 +135,7 @@ const StationMapRenderer = React.memo(
         )}
         {markerLayerGroup}
         {isPending && <MapSpinner {...config.mapSpinner} />}
-      </BaseMap>
+      </StationBaseMap>
     );
   },
   (prevProps, nextProps) => {

@@ -1,4 +1,9 @@
-import { textAttributeIds } from "@/utils/text-filter-terms";
+import {
+  decodeWorkspaceFilters,
+  decodeWorkspaceView,
+  encodeWorkspaceView,
+} from "@/utils/workspace-url";
+export { decodeWorkspaceFilters } from "@/utils/workspace-url";
 import { useLayoutEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useStationsStore } from "@/state/client/stations-store";
@@ -13,103 +18,37 @@ const fields = [
   "selectedFrequencies",
   "metadataCompact",
   "metadataFilters",
+  "area",
+  "mapViewport",
 ];
 const snapshot = () =>
   Object.fromEntries(
     fields.map((key) => [key, useStationsStore.getState()[key]]),
   );
-const attributeIds = new Set([
-  "Native ID",
-  "Station name",
-  "Province",
-  "Elevation",
-  "Unique Names",
-  "# Hx",
-]);
-
-// URL data is untrusted: accept only supported filter fields and value types.
-export function decodeWorkspaceFilters(value) {
-  if (!value || value.length > 50000) return null;
-  try {
-    const parsed = JSON.parse(value);
-    const result = {};
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
-      return null;
-    for (const key of ["startDate", "endDate"]) {
-      if (parsed[key] === null) result[key] = null;
-      else if (
-        typeof parsed[key] === "string" &&
-        Number.isFinite(Date.parse(parsed[key]))
-      )
-        result[key] = new Date(parsed[key]);
-    }
-    for (const key of [
-      "includeStationsWithNoObs",
-      "onlyWithClimatology",
-      "metadataCompact",
-    ]) {
-      if (typeof parsed[key] === "boolean") result[key] = parsed[key];
-    }
-    for (const key of [
-      "selectedNetworks",
-      "selectedVariables",
-      "selectedFrequencies",
-    ]) {
-      if (
-        Array.isArray(parsed[key]) &&
-        parsed[key].length <= 10000 &&
-        parsed[key].every(
-          (item) => typeof item === "string" || typeof item === "number",
-        )
-      )
-        result[key] = parsed[key];
-    }
-    if (parsed.metadataFilters && typeof parsed.metadataFilters === "object") {
-      result.metadataFilters = Object.fromEntries(
-        ["history", "station"].map((view) => [
-          view,
-          Array.isArray(parsed.metadataFilters[view])
-            ? parsed.metadataFilters[view].filter(
-                (filter) =>
-                  filter &&
-                  attributeIds.has(filter.id) &&
-                  (["Elevation", "# Hx"].includes(filter.id)
-                    ? Array.isArray(filter.value) &&
-                      filter.value.length === 2 &&
-                      filter.value.every(
-                        (item) => item == null || Number.isFinite(item),
-                      )
-                    : typeof filter.value === "string" ||
-                      (textAttributeIds.has(filter.id) &&
-                        Array.isArray(filter.value) &&
-                        filter.value.every(
-                          (term) => typeof term === "string",
-                        ))),
-              )
-            : [],
-        ]),
-      );
-    }
-    if (result.selectedNetworks) result.defaultNetworksApplied = true;
-    if (result.selectedVariables) result.defaultVariablesApplied = true;
-    if (result.selectedFrequencies) result.defaultFrequenciesApplied = true;
-    return result;
-  } catch {
-    return null;
-  }
-}
-
 export function useWorkspaceUrlState() {
   const location = useLocation();
   const navigate = useNavigate();
   useLayoutEffect(() => {
     const params = new URLSearchParams(location.search);
-    const restored = decodeWorkspaceFilters(params.get("criteria"));
-    if (restored && params.get("criteria") !== JSON.stringify(snapshot()))
-      useStationsStore.setState(restored);
+    const restored = params.has("view")
+      ? decodeWorkspaceView(params.get("view"))
+      : decodeWorkspaceFilters(params.get("criteria"));
+    if (restored) {
+      const state = useStationsStore.getState();
+      const changes = Object.fromEntries(
+        Object.entries(restored).filter(([key, value]) =>
+          key === "area"
+            ? JSON.stringify(state.area?.coordinates ?? null) !==
+              JSON.stringify(value?.coordinates ?? null)
+            : JSON.stringify(state[key]) !== JSON.stringify(value),
+        ),
+      );
+      if (Object.keys(changes).length) useStationsStore.setState(changes);
+    }
     const writeFilters = () => {
       const state = useStationsStore.getState();
       if (
+        !params.has("view") &&
         !params.has("criteria") &&
         !(
           state.defaultNetworksApplied &&
@@ -118,9 +57,10 @@ export function useWorkspaceUrlState() {
         )
       )
         return;
-      const serialized = JSON.stringify(snapshot());
-      if (params.get("criteria") === serialized) return;
-      params.set("criteria", serialized);
+      const serialized = encodeWorkspaceView(snapshot());
+      if (params.get("view") === serialized && !params.has("criteria")) return;
+      params.delete("criteria");
+      params.set("view", serialized);
       navigate(
         { search: params.toString() },
         { replace: true, preventScrollReset: true, state: location.state },
