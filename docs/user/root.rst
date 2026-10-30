@@ -59,7 +59,7 @@ from the labelled **Filters** button in the table.
 
 The first three icons are map buttons. Download, Preview and Locate are in each
 table row's Actions column; Help is beside the table title. A numbered badge on
-Table counts checked stations, while a badge on Filters counts active filters.
+Table counts checked stations, while a dot on Filters indicates active filters.
 The network legend explains marker colours; it does not enable or disable
 networks.
 
@@ -120,8 +120,8 @@ The filter tabs contain:
 * **Attributes**: filter the current table view by fields such as station name,
   native ID, province and elevation.
 
-Badges count active criteria and attributes. Network, variable and frequency
-choices count as active when they differ from All. A field with several text
+Dots mark filter tabs with active criteria or attributes. Network, variable
+and frequency choices count as active when they differ from All. A field with several text
 alternatives counts as one attribute filter.
 
 The **Clear** menu offers **All** and the current tab. Clearing Networks,
@@ -183,7 +183,8 @@ attribute filters are saved separately for each view. The filter panel identifie
 which view's attributes you are editing.
 
 The table keeps its controls and column headings visible while rows scroll.
-Use its paging controls to move through results. Location cells combine
+Paging controls remain below the scrolling rows. Use them to move through
+results. Location cells combine
 latitude, longitude and elevation; record spans show start and end dates.
 Variable cells initially show three entries; expand a cell to browse the rest.
 Network names have markers matching their map colours. The help button beside
@@ -206,9 +207,9 @@ views and station summaries.
 The header checkbox checks all matching stations across every page, not just
 the visible page. A partially checked header indicates that only some matching
 stations are checked. Uncheck it to remove matching stations from the selection,
-or use **Clear selection** to clear the whole selection.
+or use **Clear selected (count)** to clear the whole selection.
 
-**Selected only** limits the table display to checked stations. It does not
+**Show selected only** below the main table controls limits the table display to checked stations. It does not
 change the shared filters or matching set. Turning it off reveals the other
 matching stations again.
 
@@ -233,13 +234,16 @@ Its direct download does not change your filters or checked stations.
 Selected or all matching stations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The table's **Download** menu offers checked stations, all matching stations,
-and metadata. Counts beside the station download choices distinguish the checked
-selection from the entire matching set.
+The **Download** menu sits over the map's bottom-right corner, or at the top
+right of the table toolbar when the table is visible. It offers checked stations, all matching
+stations, and metadata.
+Counts beside the station download choices distinguish the checked selection
+from the entire matching set.
 
 * Choose the selected-stations option to download the checked stations.
-* Choose the all-matching option to download the current matching set without
-  checking rows first.
+* Choose **All stations** with no active filters, or **All filtered** when
+  filters are active, to download the current matching set without checking
+  rows first.
 
 These batch downloads respect the active station criteria and drawn area,
 even when the batch contains only one station. Requested station IDs do not
@@ -271,7 +275,7 @@ they are included in the download scope.
 Metadata CSV
 ~~~~~~~~~~~~
 
-Choose **Metadata** from the table's Download menu to export the matching
+Choose **Metadata** from the Download menu to export the matching
 stations as CSV. The export follows the shared filters, drawn area and active
 table attributes. It includes all histories for the matching stations and full
 variable lists and coordinate fields, even where the table uses compact cells.

@@ -84,7 +84,7 @@ it("selects unique stations across histories and table views, and focuses their 
   expect(
     screen.getByRole("checkbox", { name: "Select Test Station (TEST)" }),
   ).toBeChecked();
-  fireEvent.click(screen.getByRole("button", { name: "Clear selection" }));
+  fireEvent.click(screen.getByRole("button", { name: /^Clear selected/ }));
   expect(downloadChoice("Download selected stations (0)")).toHaveAttribute(
     "aria-disabled",
     "true",
@@ -193,14 +193,14 @@ it("shows only checked stations and can return to all rows", () => {
   fireEvent.click(
     screen.getByRole("checkbox", { name: "Select Brentwood Bay (N1)" }),
   );
-  fireEvent.click(screen.getByRole("checkbox", { name: "Selected only" }));
+  fireEvent.click(screen.getByRole("switch", { name: "Show selected only" }));
   expect(
     screen.queryByRole("checkbox", { name: "Select Active Pass (N2)" }),
   ).not.toBeInTheDocument();
   expect(
     screen.getByRole("checkbox", { name: "Select Brentwood Bay (N1)" }),
   ).toBeChecked();
-  fireEvent.click(screen.getByRole("checkbox", { name: "Selected only" }));
+  fireEvent.click(screen.getByRole("switch", { name: "Show selected only" }));
   expect(
     screen.getByRole("checkbox", { name: "Select Active Pass (N2)" }),
   ).not.toBeChecked();
@@ -295,8 +295,7 @@ it("selects all matching stations across pages and deduplicates their histories"
     useStationsStore.getState().downloadStations.map(({ id }) => id),
   ).toEqual(Array.from({ length: 12 }, (_, i) => i + 1));
   expect(downloadChoice("Download selected stations (12)")).toBeEnabled();
-  expect(downloadChoice("Download all matching stations (12)")).toBeEnabled();
-  fireEvent.click(screen.getByRole("button", { name: "Clear selection" }));
+  fireEvent.click(screen.getByRole("button", { name: /^Clear selected/ }));
   fireEvent.click(
     screen.getByRole("checkbox", { name: "Select all matching stations" }),
   );

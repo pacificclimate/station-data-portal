@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Select from "react-select";
-import { Badge, Button, Col, Dropdown, Row, Tab, Tabs } from "react-bootstrap";
+import { Button, Col, Dropdown, Row, Tab, Tabs } from "react-bootstrap";
 import { useShallow } from "zustand/react/shallow";
 import pick from "lodash/fp/pick";
 
@@ -75,7 +75,10 @@ function StationFilters({ children }) {
         {count > 0 && (
           <>
             {" "}
-            <Badge bg="secondary">{count}</Badge>
+            <span className="text-success">
+              <span aria-hidden="true">•</span>
+              <span className="visually-hidden">{count}</span>
+            </span>
           </>
         )}
       </>
@@ -216,7 +219,12 @@ function StationFilters({ children }) {
                 {summary.attributeCount > 0 && (
                   <>
                     {" "}
-                    <Badge bg="secondary">{summary.attributeCount}</Badge>
+                    <span className="text-success">
+                      <span aria-hidden="true">•</span>
+                      <span className="visually-hidden">
+                        {summary.attributeCount}
+                      </span>
+                    </span>
                   </>
                 )}
               </>

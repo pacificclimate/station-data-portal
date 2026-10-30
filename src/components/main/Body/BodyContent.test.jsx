@@ -252,6 +252,14 @@ it("filters map and table together live, including zero matches and clearing", a
     expect(useStationsStore.getState().downloadStations).toEqual([]),
   );
   expect(map).not.toHaveTextContent("N2");
+  const downloadToggle = within(
+    screen.getByRole("group", { name: "Downloads" }),
+  ).getByRole("button", { name: "Download", exact: true });
+  fireEvent.click(downloadToggle);
+  expect(
+    screen.getByRole("button", { name: "Download all filtered stations (1)" }),
+  ).toBeEnabled();
+  fireEvent.click(downloadToggle);
   fireEvent.change(nameFilter, { target: { value: "No such station" } });
   await waitFor(() => expect(map).toHaveTextContent(/^Map:$/));
   fireEvent.click(
@@ -367,7 +375,7 @@ it("counts shared criteria in both table views and identifies view-specific attr
   const tools = within(
     screen.getByRole("navigation", { name: "Station tools" }),
   );
-  expect(tools.getByRole("button", { name: "Filters" })).toHaveTextContent("3");
+  expect(tools.getByRole("button", { name: "Filters" })).toHaveTextContent("•");
   fireEvent.click(tools.getByRole("button", { name: "Table" }));
   const table = screen.getByRole("region", { name: "Station table" });
   expect(
@@ -398,7 +406,7 @@ it("counts shared criteria in both table views and identifies view-specific attr
     ).getByPlaceholderText("Min"),
     { target: { value: "50" } },
   );
-  expect(tools.getByRole("button", { name: "Filters" })).toHaveTextContent("4");
+  expect(tools.getByRole("button", { name: "Filters" })).toHaveTextContent("•");
   expect(
     within(panel).getByRole("heading", { name: "By History attributes 1" }),
   ).toBeInTheDocument();
@@ -418,16 +426,29 @@ it("counts shared criteria in both table views and identifies view-specific attr
   ).toBeInTheDocument();
 });
 
-it("groups table controls and downloads the checked or matching stations from one menu", async () => {
+it("keeps the shared download menu available from the map and table", async () => {
   setup(true, [[FREQUENCIES_QUERY_KEY, ["daily"]]]);
+  let downloads = within(screen.getByRole("group", { name: "Downloads" }));
+  expect(
+    downloads.getByRole("button", { name: "Download", exact: true }),
+  ).toBeVisible();
+  expect(screen.queryByRole("region", { name: "Station table" })).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: /^Table/ }));
   const table = screen.getByRole("region", { name: "Station table" });
+  downloads = within(within(table).getByRole("group", { name: "Downloads" }));
+  expect(table.querySelector(".table-view-toolbar")).toContainElement(
+    downloads.getByRole("button", { name: "Download", exact: true }),
+  );
+  expect(document.querySelector(".station-map-downloads")).toBeNull();
   expect(within(table).getByLabelText("Matching stations")).toHaveTextContent(
     "2 of 2 stations match (2 histories)",
   );
-  for (const name of ["View", "Select", "Export"]) {
-    expect(within(table).getByRole("group", { name })).toBeInTheDocument();
-  }
+  expect(
+    within(table).getByRole("group", { name: "View" }),
+  ).toBeInTheDocument();
+  expect(
+    within(table).getByRole("button", { name: "Clear selected (0)" }),
+  ).toBeDisabled();
   expect(within(table).queryByText(/Showing .* rows/)).not.toBeInTheDocument();
   fireEvent.click(
     within(table).getByRole("button", { name: "Station table help" }),
@@ -438,22 +459,22 @@ it("groups table controls and downloads the checked or matching stations from on
   );
   expect(within(table).queryByText("Explore stations")).not.toBeInTheDocument();
 
-  const toggle = within(table).getByRole("button", {
+  const toggle = downloads.getByRole("button", {
     name: "Download",
     exact: true,
   });
   fireEvent.click(toggle);
   expect(
-    within(table).getByRole("button", {
+    downloads.getByRole("button", {
       name: "Download selected stations (0)",
     }),
   ).toHaveAttribute("aria-disabled", "true");
   expect(
-    within(table).getByRole("link", { name: "Download Metadata" }),
+    downloads.getByRole("link", { name: "Download Metadata" }),
   ).toBeInTheDocument();
   fireEvent.click(
-    within(table).getByRole("button", {
-      name: "Download all matching stations (2)",
+    downloads.getByRole("button", {
+      name: "Download all filtered stations (2)",
     }),
   );
   expect(toggle).toHaveAttribute("aria-expanded", "false");
@@ -473,7 +494,7 @@ it("groups table controls and downloads the checked or matching stations from on
   );
   fireEvent.click(toggle);
   fireEvent.click(
-    within(table).getByRole("button", {
+    downloads.getByRole("button", {
       name: "Download selected stations (1)",
     }),
   );
@@ -590,7 +611,7 @@ it("clears all criteria and both saved attribute views, resetting counts and the
     within(table).getByRole("button", { name: "Filters", exact: true }),
   ).toBeInTheDocument();
   expect(
-    within(table).getByRole("checkbox", { name: "Selected only" }),
+    within(table).getByRole("switch", { name: "Show selected only" }),
   ).not.toBeChecked();
   expect(
     within(table).getByRole("checkbox", { name: "Select Brentwood (N1)" }),
@@ -598,6 +619,18 @@ it("clears all criteria and both saved attribute views, resetting counts and the
   expect(
     within(table).getByRole("checkbox", { name: "Select Active Pass (N2)" }),
   ).toBeInTheDocument();
+  const downloads = within(
+    within(table).getByRole("group", { name: "Downloads" }),
+  );
+  const downloadToggle = downloads.getByRole("button", {
+    name: "Download",
+    exact: true,
+  });
+  fireEvent.click(downloadToggle);
+  expect(
+    downloads.getByRole("button", { name: "Download all stations (2)" }),
+  ).toHaveTextContent("All stations (2)");
+  fireEvent.click(downloadToggle);
   fireEvent.click(within(table).getByText("By Station"));
   expect(
     within(table).getByRole("button", { name: "Filters", exact: true }),
