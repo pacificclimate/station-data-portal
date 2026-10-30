@@ -1,6 +1,13 @@
 import PropTypes from "prop-types";
 import React, { useEffect, useRef, useState } from "react";
-import { CircleMarker, Polygon, useMap, useMapEvents } from "react-leaflet";
+import {
+  CircleMarker,
+  LayerGroup,
+  Polygon,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
+import { CircleMarker as LeafletCircleMarker } from "leaflet";
 import map from "lodash/fp/map";
 import flow from "lodash/fp/flow";
 import mapValues from "lodash/fp/mapValues";
@@ -189,24 +196,50 @@ function ManyStationMarkers({
   stations = [],
   markerOptions = defaultMarkerOptions,
   mapEvents = {},
+  zoomToMarkerRadius,
 }) {
   const leafletMap = useMap();
+  const groupRef = useRef();
   const mapEventsWithMap = mapValues(
     (eventCallback) =>
       (...eventArgs) =>
         eventCallback(leafletMap, ...eventArgs),
   )(mapEvents);
-  useMapEvents(mapEventsWithMap);
+  useMapEvents({
+    ...mapEventsWithMap,
+    zoomend: (...args) => {
+      if (zoomToMarkerRadius) {
+        const radius = zoomToMarkerRadius(leafletMap.getZoom());
+        // Leaflet batches canvas redraws, avoiding thousands of React updates
+        // and the delayed radius jump after the zoom animation finishes.
+        groupRef.current?.eachLayer((layer) => {
+          if (
+            layer instanceof LeafletCircleMarker &&
+            layer.getRadius() !== radius
+          )
+            layer.setRadius(radius);
+        });
+      }
+      mapEventsWithMap.zoomend?.(...args);
+    },
+  });
+  const currentOptions = zoomToMarkerRadius
+    ? { ...markerOptions, radius: zoomToMarkerRadius(leafletMap.getZoom()) }
+    : markerOptions;
 
-  return map(
-    (station) => (
-      <OneStationMarkers
-        key={station.id}
-        station={station}
-        markerOptions={markerOptions}
-      />
-    ),
-    stations,
+  return (
+    <LayerGroup ref={groupRef}>
+      {map(
+        (station) => (
+          <OneStationMarkers
+            key={station.id}
+            station={station}
+            markerOptions={currentOptions}
+          />
+        ),
+        stations,
+      )}
+    </LayerGroup>
   );
 }
 // ManyStationMarkers = React.memo(ManyStationMarkers);
@@ -214,5 +247,6 @@ ManyStationMarkers.propTypes = {
   stations: PropTypes.arrayOf(PropTypes.object).isRequired,
   markerOptions: PropTypes.object,
   mapEvents: PropTypes.object,
+  zoomToMarkerRadius: PropTypes.func,
 };
 export { ManyStationMarkers };

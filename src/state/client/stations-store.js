@@ -72,6 +72,9 @@ export const useStationsStore = create(
           : { downloadStations: next };
       }),
 
+    mapViewport: null,
+    setMapViewport: (mapViewport) => set({ mapViewport }),
+
     stations: [],
     setStations: (stations) => {
       set({ stations: stations });

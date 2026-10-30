@@ -5,6 +5,7 @@ import { useShallow } from "zustand/react/shallow";
 import pick from "lodash/fp/pick";
 
 import SelectionCounts from "@/components/info/SelectionCounts";
+import StationGroupingControl from "./StationGroupingControl";
 import IncludeStationsWithNoObsControl from "./IncludeStationsWithNoObsControl";
 import NetworkSelector from "@/components/selectors/NetworkSelector";
 import VariableSelector from "@/components/selectors/VariableSelector";
@@ -27,6 +28,8 @@ function StationFilters({ children }) {
   const { data: variables } = useVariables();
   const { data: frequencies } = useFrequencies();
   const reset = useStationsStore((state) => state.resetStationFilters);
+  const compact = useStationsStore((state) => state.metadataCompact);
+  const setCompact = useStationsStore((state) => state.setMetadataCompact);
   const tabLabels = {
     networks: "Networks",
     variables: "Variables",
@@ -122,6 +125,14 @@ function StationFilters({ children }) {
           </Dropdown.Menu>
         </Dropdown>
       </div>
+      <div className="station-filter-grouping">
+        <span>Group stations</span>
+        <StationGroupingControl compact={compact} onChange={setCompact} />
+      </div>
+      <p className="small text-muted">
+        Station criteria apply to both views. Attributes are saved separately
+        for each view.
+      </p>
       <Tabs
         id="station-filter-sections"
         activeKey={activeTab}

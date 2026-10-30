@@ -1,0 +1,21 @@
+.station-grouping-control .btn-check:checked + .btn-outline-success {
+  color: #fff;
+  background-color: #146c43;
+  border-color: #13653f;
+}
+
+/* Pointer focus should not leave Bootstrap's green glow behind. */
+.station-grouping-control .btn-check:focus + .btn-outline-success {
+  box-shadow: none;
+}
+
+.station-grouping-control .btn-check:focus-visible + .btn-outline-success {
+  outline: 2px solid #146c43;
+  outline-offset: 3px;
+}
+
+.station-grouping-control .btn-check:active + .btn-outline-success {
+  color: #fff;
+  background-color: #0f5132;
+  border-color: #0f5132;
+}

@@ -12,10 +12,16 @@ import {
   useWorkspaceUrlState,
   decodeWorkspaceFilters,
 } from "./use-workspace-url-state";
+import {
+  decodeWorkspaceView,
+  encodeWorkspaceView,
+} from "@/utils/workspace-url";
 import { useStationsStore } from "@/state/client/stations-store";
 
 beforeEach(() =>
   useStationsStore.setState({
+    area: null,
+    mapViewport: null,
     metadataCompact: false,
     metadataFilters: { history: [], station: [] },
     selectedNetworks: ["/networks/1"],
@@ -83,9 +89,15 @@ it("restores shared dates, selectors, attribute filters and open panels", async 
         { id: "Unique Names", value: "Victoria" },
       ]),
   );
-  await waitFor(() =>
-    expect(screen.getByTestId("url")).toHaveTextContent("Victoria"),
-  );
+  await waitFor(() => {
+    const params = new URLSearchParams(
+      screen.getByTestId("url").textContent.split("?")[1],
+    );
+    expect(params.has("criteria")).toBe(false);
+    expect(
+      decodeWorkspaceView(params.get("view")).metadataFilters.station[0].value,
+    ).toBe("Victoria");
+  });
   expect(screen.getByTestId("url")).toHaveTextContent("/preview/42?");
 });
 it("supports browser Back and Forward for opening and closing the table", async () => {
@@ -112,13 +124,13 @@ it("waits for startup defaults before publishing a shareable filter snapshot", (
       <Harness />
     </MemoryRouter>,
   );
-  expect(screen.getByTestId("url")).not.toHaveTextContent("criteria");
+  expect(screen.getByTestId("url")).not.toHaveTextContent("view=");
   act(() => {
     useStationsStore.getState().setDefaultNetworks(["/networks/3"]);
     useStationsStore.getState().setDefaultVariables([6]);
     useStationsStore.getState().setDefaultFrequencies(["daily"]);
   });
-  expect(screen.getByTestId("url")).toHaveTextContent("criteria");
+  expect(screen.getByTestId("url")).toHaveTextContent("view=");
   expect(useStationsStore.getState().selectedNetworks).toEqual(["/networks/3"]);
 });
 it("ignores malformed URL data and cannot replace store actions", () => {
@@ -171,9 +183,9 @@ it("restores and serializes text alternatives while rejecting invalid arrays", (
   const params = new URLSearchParams(
     screen.getByTestId("url").textContent.split("?")[1],
   );
-  expect(JSON.parse(params.get("criteria")).metadataFilters.history).toEqual([
-    { id: "Native ID", value: ["AB", "CD"] },
-  ]);
+  expect(
+    decodeWorkspaceView(params.get("view")).metadataFilters.history,
+  ).toEqual([{ id: "Native ID", value: ["AB", "CD"] }]);
   expect(
     decodeWorkspaceFilters(
       JSON.stringify({
@@ -187,4 +199,47 @@ it("restores and serializes text alternatives while rejecting invalid arrays", (
       }),
     ).metadataFilters,
   ).toEqual({ history: [], station: [] });
+});
+
+it("restores the area and viewport across shared links and browser history", async () => {
+  const area = {
+    type: "MultiPolygon",
+    coordinates: [
+      [
+        [
+          [-124, 48],
+          [-123, 48],
+          [-123, 49],
+          [-124, 48],
+        ],
+      ],
+    ],
+  };
+  const base = {
+    ...useStationsStore.getState(),
+    area: null,
+    mapViewport: [49, -125, 9],
+  };
+  const first = encodeWorkspaceView(base);
+  const second = encodeWorkspaceView({
+    ...base,
+    area,
+    mapViewport: [48.5, -123.5, 16],
+  });
+  render(
+    <MemoryRouter
+      initialEntries={[`/?view=${first}`, `/preview/42?table=1&view=${second}`]}
+      initialIndex={1}
+    >
+      <Harness />
+    </MemoryRouter>,
+  );
+  expect(useStationsStore.getState().area).toEqual(area);
+  expect(useStationsStore.getState().mapViewport).toEqual([48.5, -123.5, 16]);
+  fireEvent.click(screen.getByRole("button", { name: "Back" }));
+  await waitFor(() => expect(useStationsStore.getState().area).toBeNull());
+  expect(useStationsStore.getState().mapViewport).toEqual([49, -125, 9]);
+  fireEvent.click(screen.getByRole("button", { name: "Forward" }));
+  await waitFor(() => expect(useStationsStore.getState().area).toEqual(area));
+  expect(useStationsStore.getState().mapViewport).toEqual([48.5, -123.5, 16]);
 });

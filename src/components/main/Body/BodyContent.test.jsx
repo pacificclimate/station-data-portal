@@ -713,3 +713,72 @@ it("uses name alternatives with OR, other fields with AND, and the same matching
     ).getByRole("textbox"),
   ).toHaveValue("");
 });
+
+it("switches grouping from the filters pane with the table closed and keeps both controls in sync", () => {
+  useStationsStore.setState({
+    metadataFilters: {
+      history: [{ id: "Elevation", value: [200, null] }],
+      station: [{ id: "Native ID", value: ["N1"] }],
+    },
+  });
+  setup(true, [
+    [
+      [STATIONS_QUERY_KEY],
+      stations.map((station, index) => ({
+        ...station,
+        histories: station.histories.map((history) => ({
+          ...history,
+          elevation: index === 0 ? 100 : 500,
+        })),
+      })),
+    ],
+  ]);
+  const criteria = {
+    networks: useStationsStore.getState().selectedNetworks,
+    variables: useStationsStore.getState().selectedVariables,
+    frequencies: useStationsStore.getState().selectedFrequencies,
+  };
+  fireEvent.click(screen.getByRole("button", { name: "Filters", exact: true }));
+  const filters = screen.getByRole("dialog", { name: "Station filters" });
+  expect(screen.queryByRole("region", { name: "Station table" })).toBeNull();
+  expect(screen.getByTestId("station-map")).toHaveTextContent("Map: N2");
+  // Grouping is available even while a shared-criteria tab is active.
+  expect(
+    within(filters).getByRole("tab", { name: "Networks" }),
+  ).toHaveAttribute("aria-selected", "true");
+  fireEvent.click(within(filters).getByRole("radio", { name: "By Station" }));
+  expect(screen.getByTestId("station-map")).toHaveTextContent("Map: N1");
+  expect(useStationsStore.getState().selectedNetworks).toEqual(
+    criteria.networks,
+  );
+  expect(useStationsStore.getState().selectedVariables).toEqual(
+    criteria.variables,
+  );
+  expect(useStationsStore.getState().selectedFrequencies).toEqual(
+    criteria.frequencies,
+  );
+  fireEvent.click(within(filters).getByRole("tab", { name: /Attributes/ }));
+  expect(
+    within(filters).getByRole("heading", { name: "By Station attributes 1" }),
+  ).toBeVisible();
+  expect(
+    within(filters).queryByRole("group", { name: "Elevation (m)" }),
+  ).toBeNull();
+  fireEvent.click(within(filters).getByRole("radio", { name: "By History" }));
+  expect(screen.getByTestId("station-map")).toHaveTextContent("Map: N2");
+  expect(
+    within(filters).getByRole("group", { name: "Elevation (m)" }),
+  ).toBeVisible();
+  expect(useStationsStore.getState().metadataFilters).toEqual({
+    history: [{ id: "Elevation", value: [200, null] }],
+    station: [{ id: "Native ID", value: ["N1"] }],
+  });
+  // Return to the table in the mode chosen in Filters.
+  fireEvent.click(within(filters).getByRole("radio", { name: "By Station" }));
+  fireEvent.click(within(filters).getByRole("button", { name: "Done" }));
+  fireEvent.click(screen.getByRole("button", { name: "Table", exact: true }));
+  const table = screen.getByRole("region", { name: "Station table" });
+  expect(
+    within(table).getByRole("radio", { name: "By Station" }),
+  ).toBeChecked();
+});
