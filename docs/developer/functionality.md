@@ -44,3 +44,37 @@ Hover tooltips show identification only; downloads belong in the station popup.
 Timeseries and climatology use separate server-generated ZIPs; format choices
 remain NetCDF, CSV and Excel. The browser manages streaming and errors open in a
 separate tab.
+
+## Station table and filters
+
+The Station Filters, Station Metadata, Station Data and Networks tabs provide
+access to station controls. The table's Filters button opens Station Filters,
+and Done returns to
+Station Metadata. The Station Data tab opens the same station-ID download dialog,
+so it also respects shared attributes and cannot download a broader set than its
+matching count. Criteria use Networks, Variables, Observations, Dates, Area
+and Attributes sections. Shared criteria and current-view attributes filter the
+map and table together; the matching summary uses matching rather than selected.
+History and station views retain their own attributes and show active counts.
+
+Clear offers All or the current section. It restores selector All values, resets
+dates/options/area, and clears the current view's attributes. All resets both
+views and Selected only. Clearing an area removes its map drawing too. Filter
+counts ignore inactive constraints and unavailable unpublished network options.
+
+Name, native ID and unique names support Contains any alternatives: case-insensitive
+OR within the field and AND with other fields. Enter or Add creates removable
+entries; punctuation is literal and duplicates collapse. One field counts once.
+Selections clear when criteria change. Filters operate on all matching stations,
+independently of the table's Selected only view.
+
+The selection checkbox has its own column; its header selects or deselects every
+matching station across pages, showing partial selection when appropriate.
+Actions are centred separately. The grouped toolbar has one Download menu for
+selected station data, all matching station data and metadata CSV. Metadata CSV
+follows shared attributes, across every page; checkboxes and Selected only
+do not limit it. It keeps original coordinate precision, dates and variables.
+
+Variable cells show three names and can expand; locations and record spans use
+three-line cells. Network names include their colour marker. Preview links open
+the station preview page.

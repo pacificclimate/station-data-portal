@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import PropTypes from "prop-types";
-import { Button, Form, Modal } from "react-bootstrap";
+import { Button, Dropdown, Form, Modal } from "react-bootstrap";
 import { useShallow } from "zustand/react/shallow";
 import { useNetworks } from "@/state/query-hooks/use-networks";
 import { useVariables } from "@/state/query-hooks/use-variables";
@@ -220,6 +220,7 @@ export default function DownloadStationData({
   title,
   variant = "link",
   ariaLabel,
+  menuItem = false,
   scope = "selection",
   children = "Download station data",
 }) {
@@ -227,22 +228,27 @@ export default function DownloadStationData({
   useEffect(() => {
     if (!stations.length) setShow(false);
   }, [stations.length]);
+  const Trigger = menuItem ? Dropdown.Item : Button;
   return (
     <>
-      <Button
-        variant={variant}
-        size="sm"
-        className={`station-download-trigger ${variant !== "link" ? "station-download-button station-table-download" : title ? "station-row-action" : "p-0"}`}
+      <Trigger
+        as={menuItem ? "button" : undefined}
+        {...(menuItem ? {} : { variant, size: "sm" })}
+        className={
+          menuItem
+            ? undefined
+            : `station-download-trigger ${variant !== "link" ? "station-download-button station-table-download" : title ? "station-row-action" : "p-0"}`
+        }
         disabled={!stations.length}
         title={title}
         aria-label={ariaLabel ?? title}
         onClick={(event) => {
-          event.stopPropagation();
+          if (!menuItem) event.stopPropagation();
           setShow(true);
         }}
       >
         {children}
-      </Button>
+      </Trigger>
       {show && stations.length > 0 && (
         <Modal
           show
@@ -268,6 +274,7 @@ DownloadStationData.propTypes = {
   title: PropTypes.string,
   variant: PropTypes.string,
   ariaLabel: PropTypes.string,
+  menuItem: PropTypes.bool,
   scope: PropTypes.oneOf(["station", "selection"]),
   children: PropTypes.node,
 };

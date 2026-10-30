@@ -170,49 +170,55 @@ const VariableSelector = () => {
 
   return (
     <Form>
-      <div>
-        <Form.Label>Variable</Form.Label>{" "}
-        <InfoPopup title={"Variable multiselector"}>
-          <ul className={"compact"}>
-            <li>At startup, all variables are selected.</li>
-            <li>
-              Use the None button to clear all variables from the selector.
-            </li>
-            <li>
-              Use the All button to add all available variables to the selector.
-            </li>
-            <li>
-              Use the All <i>Category</i> button to select all (and only)
-              variables of a given category to the selector.
-            </li>
-            <li>
-              Click the dropdown and select an item to add a single unselected
-              variable.
-            </li>
-            <li>Click the X next to a selected variable to remove it.</li>
-          </ul>
-        </InfoPopup>
-      </div>
-      <ButtonToolbar className={css.selectorButtons}>
-        <Button
-          {...{ size, variant, className }}
-          onClick={() => onChange(flattenOptions(options))}
-        >
-          All
-        </Button>
-        {map((group) => (
+      <div className={css.selectorHeading}>
+        <div className={css.selectorLabel}>
+          <Form.Label>Variable</Form.Label>{" "}
+          <InfoPopup title={"Variable multiselector"}>
+            <ul className={"compact"}>
+              <li>At startup, all variables are selected.</li>
+              <li>
+                Use the None button to clear all variables from the selector.
+              </li>
+              <li>
+                Use the All button to add all available variables to the
+                selector.
+              </li>
+              <li>
+                Use the All <i>Category</i> button to select all (and only)
+                variables of a given category to the selector.
+              </li>
+              <li>
+                Click the dropdown and select an item to add a single unselected
+                variable.
+              </li>
+              <li>Click the X next to a selected variable to remove it.</li>
+            </ul>
+          </InfoPopup>
+        </div>
+        <ButtonToolbar className={css.selectorButtons}>
           <Button
-            key={group.label}
             {...{ size, variant, className }}
-            onClick={() => onChange(group.options)}
+            onClick={() => onChange(flattenOptions(options))}
           >
-            {`All ${group.label}`}
+            All
           </Button>
-        ))(options)}
-        <Button {...{ size, variant, className }} onClick={() => onChange([])}>
-          None
-        </Button>
-      </ButtonToolbar>
+          <Button
+            {...{ size, variant, className }}
+            onClick={() => onChange([])}
+          >
+            None
+          </Button>
+          {map((group) => (
+            <Button
+              key={group.label}
+              {...{ size, variant, className }}
+              onClick={() => onChange(group.options)}
+            >
+              {`All ${group.label}`}
+            </Button>
+          ))(options)}
+        </ButtonToolbar>
+      </div>
       <Select
         options={options}
         placeholder={variables ? "Select or type to search..." : "Loading..."}

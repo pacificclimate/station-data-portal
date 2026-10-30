@@ -1,3 +1,6 @@
+import StationVariableList from "./StationVariableList";
+import StationLocation from "./StationLocation";
+import useConfigContext from "@/state/context-hooks/use-config-context";
 import flow from "lodash/fp/flow";
 import map from "lodash/fp/map";
 import flatten from "lodash/fp/flatten";
@@ -13,6 +16,7 @@ import {
 } from "../../utils/station-info";
 
 import { filterTypes } from "../controls/tables/filterTypes";
+import TextTermsColumnFilter from "../controls/tables/column-filters/TextTermsColumnFilter";
 import DefaultColumnFilter from "../controls/tables/column-filters/DefaultColumnFilter";
 
 import FrequencySelector, {
@@ -25,6 +29,13 @@ import { Link } from "react-router-dom";
 
 // TODO: Move to utils
 const formatDate = (d) => (d ? d.toISOString().substr(0, 10) : "unknown");
+const RecordSpan = ({ period }) => (
+  <div className="station-record-span">
+    <div>{formatDate(period.min_obs_time)}</div>
+    <div>to</div>
+    <div>{formatDate(period.max_obs_time)}</div>
+  </div>
+);
 // TODO: Move to utils
 const csvArrayRep = (sep = "|") => join(sep);
 
@@ -88,6 +99,23 @@ export function smtColumnInfo({ allNetworks, allVariables, compact = true }) {
     minWidth: 80,
     maxWidth: 100,
     doFilter: true,
+    Cell: function NetworkNameCell({ value, row }) {
+      const config = useConfigContext();
+      const station = compact ? row.original : row.original.station;
+      const network = stationNetwork(allNetworks, station);
+      return (
+        <span className="station-network-name">
+          <span
+            className="station-network-dot"
+            style={{
+              backgroundColor: network?.color || config.defaultNetworkColor,
+            }}
+            aria-hidden="true"
+          />
+          {value}
+        </span>
+      );
+    },
     Filter: ({ column }) => (
       <SelectColumnFilter column={column} allValue={"*"} />
     ),
@@ -97,6 +125,8 @@ export function smtColumnInfo({ allNetworks, allVariables, compact = true }) {
   const nativeIdColumn = {
     id: "Native ID",
     Header: "Native ID",
+    Filter: TextTermsColumnFilter,
+    filter: "containsAnyText",
     minWidth: 80,
     maxWidth: 100,
     doFilter: true,
@@ -125,7 +155,7 @@ export function smtColumnInfo({ allNetworks, allVariables, compact = true }) {
     maxWidth: 100,
     doFilter: true,
     Filter: ({ column }) => (
-      <SelectColumnFilter column={column} allValue={"*"} />
+      <SelectColumnFilter column={column} allValue={"*"} autoSelectSingle />
     ),
     filter: "exactOrAllAsterisk",
   };
@@ -137,16 +167,7 @@ export function smtColumnInfo({ allNetworks, allVariables, compact = true }) {
     Header: "Variables",
     sortable: false,
     accessor: (data) => uniqStationVariableNames(allVariables)(data.station),
-    Cell: (row) => (
-      <ul className={"compact"}>
-        {map(
-          (name) => (
-            <li key={name}>{name}</li>
-          ),
-          row.value,
-        )}
-      </ul>
-    ),
+    Cell: ({ value }) => <StationVariableList names={value} />,
     doFilter: true,
     Filter: ({ column }) => (
       <SelectArrayColumnFilter
@@ -203,7 +224,7 @@ export function smtColumnInfo({ allNetworks, allVariables, compact = true }) {
               {map(
                 (name) => (
                   <li key={name}>
-                    <Link to={`/preview/${row.row.original.id}`}>{name}</Link>
+                    <Link to={`preview/${row.row.original.id}`}>{name}</Link>
                   </li>
                 ),
                 row.value,
@@ -211,7 +232,8 @@ export function smtColumnInfo({ allNetworks, allVariables, compact = true }) {
             </ul>
           ),
           doFilter: true,
-          filter: "includesSubstringInArrayOfString",
+          Filter: TextTermsColumnFilter,
+          filter: "containsAnyText",
           csv: csvArrayRep(),
         },
         {
@@ -221,20 +243,12 @@ export function smtColumnInfo({ allNetworks, allVariables, compact = true }) {
           maxWidth: 200,
           sortable: false,
           accessor: uniqStationLocations,
-          Cell: (row) => (
-            <ul className={"compact"}>
-              {map(
-                (location) => (
-                  // A location is a representative history item
-                  <li key={location.id}>
-                    {-location.lon} W <br />
-                    {location.lat} N <br />
-                    Elev. {location.elevation} m
-                  </li>
-                ),
-                row.value,
-              )}
-            </ul>
+          Cell: ({ value }) => (
+            <div className="station-location-list">
+              {value.map((location) => (
+                <StationLocation key={location.id} location={location} />
+              ))}
+            </div>
           ),
           csv: flow(
             map(
@@ -246,7 +260,7 @@ export function smtColumnInfo({ allNetworks, allVariables, compact = true }) {
         },
         {
           id: "Unique Records",
-          Header: "Unique Records",
+          Header: "Record spans",
           minWidth: 100,
           maxWidth: 100,
           sortable: false,
@@ -257,8 +271,7 @@ export function smtColumnInfo({ allNetworks, allVariables, compact = true }) {
                 (period) => (
                   // A period is a representative history item
                   <li key={period.id}>
-                    {formatDate(period.min_obs_time)} to <br />
-                    {formatDate(period.max_obs_time)}
+                    <RecordSpan period={period} />
                   </li>
                 ),
                 row.value,
@@ -345,16 +358,26 @@ export function smtColumnInfo({ allNetworks, allVariables, compact = true }) {
       {
         id: "Station name",
         Header: "Station Name",
+        Filter: TextTermsColumnFilter,
+        filter: "containsAnyText",
         minWidth: 80,
         maxWidth: 100,
         accessor: (data) => [data.history.station_name, data.station.id],
         doFilter: true,
         Cell: (row) => (
-          <Link to={`/preview/${row.value[1]}`}>{row.value[0]}</Link>
+          <Link to={`preview/${row.value[1]}`}>{row.value[0]}</Link>
         ),
       },
       { ...historyIdColumn, accessor: "history.id" },
       { ...provinceColumn, accessor: "history.province" },
+      {
+        id: "Location",
+        Header: "Location",
+        accessor: "history",
+        minWidth: 135,
+        excludeFromCsv: true,
+        Cell: ({ value }) => <StationLocation location={value} />,
+      },
       {
         id: "Longitude",
         Header: "Longitude",
@@ -372,12 +395,21 @@ export function smtColumnInfo({ allNetworks, allVariables, compact = true }) {
       {
         id: "Elevation",
         Header: "Elevation (m)",
+        filterWhenHidden: true,
         minWidth: 80,
         maxWidth: 100,
         accessor: (data) => data.history.elevation ?? "n/a",
         doFilter: true,
         Filter: NumberRangeColumnFilter,
         filter: "between",
+      },
+      {
+        id: "Record spans",
+        Header: "Record spans",
+        accessor: "history",
+        minWidth: 95,
+        excludeFromCsv: true,
+        Cell: ({ value }) => <RecordSpan period={value} />,
       },
       {
         id: "Record Start",
@@ -407,7 +439,16 @@ export function smtColumnInfo({ allNetworks, allVariables, compact = true }) {
       },
       { ...variablesColumn },
     ],
-    hiddenColumns: [networkIdColumn.id, stationIdColumn.id, historyIdColumn.id],
+    hiddenColumns: [
+      networkIdColumn.id,
+      stationIdColumn.id,
+      historyIdColumn.id,
+      "Longitude",
+      "Latitude",
+      "Elevation",
+      "Record Start",
+      "Record End",
+    ],
   };
 }
 

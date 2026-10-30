@@ -1,125 +1,222 @@
-// This module packages up the state, state setters, and controls needed for
-// station filtering.
-//
-// State and setters are returned by a custom hook, `useStationFiltering`.
-//
-// Controls are provided by the component `StationFilters`. This
-// component does not invoke the hook or have any state of its own; it
-// receives the hook returns (state and setters) from the client component
-// (<Body>), which does invoke the hook. This enables the client component
-// to feed the hook outputs into `StationFilters` and to use the state for
-// other purposes, such as performing actual station filtering, which is
-// *not* done by anything in this module.
-//
-// Additionally, `useStationFiltering` provides an `isPending` state, which is
-// true if and only if updates due to invoking the setters are in progress.
-// It uses the new (as of React 18) concurrency hook `useTransition`, which
-// proves pretty magical.
-//
-// The hook and the component `StationFilters` are a matched pair.
-// This module does not hide much from its client(s), but it hides a bit of
-// complexity, and it places the state declarations right next to a key
-// consumer of them, the component `StationFilters`.
-
-import React from "react";
-import { Col, Row } from "react-bootstrap";
+import React, { useState } from "react";
+import Select from "react-select";
+import { Badge, Button, Col, Dropdown, Row, Tab, Tabs } from "react-bootstrap";
 import { useShallow } from "zustand/react/shallow";
 import pick from "lodash/fp/pick";
 
 import SelectionCounts from "@/components/info/SelectionCounts";
-import IncludeStationsWithNoObsControl from "@/components/controls/IncludeStationsWithNoObsControl";
+import IncludeStationsWithNoObsControl from "./IncludeStationsWithNoObsControl";
 import NetworkSelector from "@/components/selectors/NetworkSelector";
 import VariableSelector from "@/components/selectors/VariableSelector";
 import FrequencySelector from "@/components/selectors/FrequencySelector";
 import DateSelector from "@/components/selectors/DateSelector";
-import OnlyWithClimatologyControl from "@/components/controls/OnlyWithClimatologyControl";
+import OnlyWithClimatologyControl from "./OnlyWithClimatologyControl";
 import { useStationsStore } from "@/state/client/stations-store";
 import { useStore } from "@/state/client/state-store";
 import { useConfigContext } from "@/state/context-hooks/use-config-context";
+import { useStationFilterSummary } from "@/state/client-server-hooks/use-station-filter-summary";
+import { useNetworks } from "@/state/query-hooks/use-networks";
+import { useVariables } from "@/state/query-hooks/use-variables";
+import { useFrequencies } from "@/state/query-hooks/use-frequencies";
+import "./StationFilters.css";
 
-function StationFilters({ rowClasses = "mb-3" }) {
+function StationFilters({ children }) {
   const config = useConfigContext();
-  const { startDate, endDate, setStartDate, setEndDate } = useStationsStore(
-    useShallow(pick(["startDate", "endDate", "setStartDate", "setEndDate"])),
-  );
+  const [activeTab, setActiveTab] = useState("networks");
+  const { data: networks } = useNetworks();
+  const { data: variables } = useVariables();
+  const { data: frequencies } = useFrequencies();
+  const reset = useStationsStore((state) => state.resetStationFilters);
+  const tabLabels = {
+    networks: "Networks",
+    variables: "Variables",
+    observations: "Observations",
+    dates: "Dates",
+    area: "Area",
+    attributes: "Attributes",
+  };
+  const ready = {
+    all: Boolean(networks && variables && frequencies),
+    networks: Boolean(networks),
+    variables: Boolean(variables),
+    observations: Boolean(frequencies),
+    dates: true,
+    area: true,
+    attributes: true,
+  };
+
+  const summary = useStationFilterSummary();
+  const { startDate, endDate, setStartDate, setEndDate, area, setArea } =
+    useStationsStore(
+      useShallow(
+        pick([
+          "startDate",
+          "endDate",
+          "setStartDate",
+          "setEndDate",
+          "area",
+          "setArea",
+        ]),
+      ),
+    );
   const { stationsLimit, setStationsLimit } = useStore(
     useShallow(pick(["stationsLimit", "setStationsLimit"])),
   );
-
+  const title = (label, criteria) => {
+    const count = summary.criteria.filter((name) =>
+      criteria.includes(name),
+    ).length;
+    return (
+      <>
+        {label}
+        {count > 0 && (
+          <>
+            {" "}
+            <Badge bg="secondary">{count}</Badge>
+          </>
+        )}
+      </>
+    );
+  };
   return (
-    <>
+    <div className="station-filter-tabs">
       {config.stationDebugFetchOptions && (
-        <Row>
-          <Col lg={6}>Fetch limit</Col>
-          <Col lg={6}>
-            <Select
-              options={config.stationDebugFetchLimitsOptions}
-              value={stationsLimit}
-              onChange={setStationsLimit}
-            />
-          </Col>
-        </Row>
+        <div className="mb-3">
+          <label>Fetch limit</label>
+          <Select
+            options={config.stationDebugFetchLimitsOptions}
+            value={stationsLimit}
+            onChange={setStationsLimit}
+          />
+        </div>
       )}
-      <Row className={rowClasses}>
-        <Col lg={12} md={12} sm={12}>
-          <SelectionCounts />
-          <p className={"mb-0"}>
-            (See Station Metadata and Station Data tabs for details)
-          </p>
-        </Col>
-      </Row>
-      <Row className={rowClasses}>
-        <Col lg={12} md={12} sm={12}>
-          <IncludeStationsWithNoObsControl />
-        </Col>
-      </Row>
-      <Row className={rowClasses}>
-        <Col lg={6} md={6} sm={6}>
-          {/*<Button size={'sm'} onClick={handleClickAll}>Select all criteria</Button>*/}
-          {/*<Button size={'sm'} onClick={handleClickNone}>Clear all criteria</Button>*/}
-          <DateSelector
-            label={"Start Date"}
-            value={startDate}
-            onChange={setStartDate}
-            maxDate={endDate}
-          />
-        </Col>
-        <Col lg={6} md={6} sm={6}>
-          <DateSelector
-            label={"End Date"}
-            value={endDate}
-            onChange={setEndDate}
-            minDate={startDate}
-          />
-        </Col>
-      </Row>
-      <Row className={rowClasses}>
-        <Col lg={12} md={12} sm={12}>
-          <OnlyWithClimatologyControl />
-        </Col>
-      </Row>
-      <Row className={rowClasses}>
-        <Col lg={12} md={12} sm={12}>
+      <div className="station-filter-tools">
+        <SelectionCounts />
+        <Dropdown>
+          <Dropdown.Toggle
+            size="sm"
+            variant="outline-secondary"
+            id="clear-station-filters"
+          >
+            Clear
+          </Dropdown.Toggle>
+          <Dropdown.Menu align="end">
+            <Dropdown.Item
+              as="button"
+              disabled={!ready.all}
+              onClick={() => reset("all", { networks, variables, frequencies })}
+              aria-label="Clear all filters"
+            >
+              All
+            </Dropdown.Item>
+            <Dropdown.Item
+              as="button"
+              disabled={!ready[activeTab]}
+              onClick={() =>
+                reset(activeTab, { networks, variables, frequencies })
+              }
+              aria-label={`Clear ${tabLabels[activeTab]} filters`}
+            >
+              {tabLabels[activeTab]}
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>
+      <Tabs
+        id="station-filter-sections"
+        activeKey={activeTab}
+        onSelect={setActiveTab}
+        mountOnEnter
+        unmountOnExit
+        transition={false}
+        className="mb-3"
+        aria-label="Filter by"
+      >
+        <Tab eventKey="networks" title={title("Networks", ["Networks"])}>
           <NetworkSelector />
-          {/*<JSONstringify object={selectedNetworksOptions}/>*/}
-        </Col>
-      </Row>
-      <Row className={rowClasses}>
-        <Col lg={12} md={12} sm={12}>
+        </Tab>
+        <Tab eventKey="variables" title={title("Variables", ["Variables"])}>
           <VariableSelector />
-          {/*<JSONstringify object={selectedVariablesOptions}/>*/}
-        </Col>
-      </Row>
-      <Row className={rowClasses}>
-        <Col lg={12} md={12} sm={12}>
-          <FrequencySelector />
-          {/*<JSONstringify object={selectedFrequenciesOptions}/>*/}
-        </Col>
-      </Row>
-    </>
+        </Tab>
+        <Tab
+          eventKey="observations"
+          title={title("Observations", [
+            "Observation frequency",
+            "Only with climatology",
+            "Include stations with no observations",
+          ])}
+        >
+          <div className="mb-3">
+            <FrequencySelector />
+          </div>
+          <div className="mb-3">
+            <IncludeStationsWithNoObsControl />
+          </div>
+          <OnlyWithClimatologyControl />
+        </Tab>
+        <Tab
+          eventKey="dates"
+          title={title("Dates", ["Start date", "End date"])}
+        >
+          <Row className="g-3">
+            <Col xs={6}>
+              <DateSelector
+                label="Start Date"
+                value={startDate}
+                onChange={setStartDate}
+                maxDate={endDate}
+              />
+            </Col>
+            <Col xs={6}>
+              <DateSelector
+                label="End Date"
+                value={endDate}
+                onChange={setEndDate}
+                minDate={startDate}
+              />
+            </Col>
+          </Row>
+          <p className="small text-muted mt-3">
+            Dates filter stations by record coverage. Choose date clipping
+            separately when downloading.
+          </p>
+        </Tab>
+        <Tab eventKey="area" title={title("Area", ["Spatial area"])}>
+          <p>
+            {area
+              ? "A drawn area limits matching stations and downloads. Stations outside it can still be inspected on the map."
+              : "No area is drawn. Use the map drawing tools to limit matching stations and downloads."}
+          </p>
+          <Button
+            size="sm"
+            variant="outline-secondary"
+            disabled={!area}
+            onClick={() => setArea(null)}
+          >
+            Clear drawn area
+          </Button>
+        </Tab>
+        {children && (
+          <Tab
+            eventKey="attributes"
+            title={
+              <>
+                Attributes
+                {summary.attributeCount > 0 && (
+                  <>
+                    {" "}
+                    <Badge bg="secondary">{summary.attributeCount}</Badge>
+                  </>
+                )}
+              </>
+            }
+          >
+            {children}
+          </Tab>
+        )}
+      </Tabs>
+    </div>
   );
 }
-
-StationFilters.propTypes = {};
 
 export default StationFilters;

@@ -13,6 +13,7 @@
 // A selection's edges are straight in lon/lat, which is what the station
 // filter and the backend select, so the shapes, and Geoman's previews of them,
 // are drawn with `lonLatEdges` (see ./lonLatEdges).
+import { useStationsStore } from "@/state/client/stations-store";
 import { useEffect, useRef } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
@@ -97,11 +98,22 @@ const UserShapeControl = ({ position = "topleft", shapeStyle, onChange }) => {
       shapes.eachLayer((layer) => {
         layer.options.interactive = enabled;
       });
+    // Clearing the area from the filter panel must also remove the visible
+    // drawing, so the map cannot show a box that no longer constrains data.
+    const unsubscribe = useStationsStore.subscribe((state, previous) => {
+      if (!state.area && previous.area) {
+        shapes.clearLayers();
+        map.pm.disableDraw();
+        map.pm.disableGlobalEditMode();
+        map.pm.disableGlobalRemovalMode();
+      }
+    });
     map.on("pm:create", onCreate);
     map.on("pm:remove", report);
     map.on("pm:globalremovalmodetoggled", onRemovalModeToggled);
 
     return () => {
+      unsubscribe();
       map.off("pm:create", onCreate);
       map.off("pm:remove", report);
       map.off("pm:globalremovalmodetoggled", onRemovalModeToggled);

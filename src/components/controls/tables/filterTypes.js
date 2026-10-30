@@ -1,3 +1,4 @@
+import { textFilterTerms } from "@/utils/text-filter-terms";
 // Custom column filter functions (not UIs).
 // This module mostly copied from wx-files-frontend.
 
@@ -161,8 +162,31 @@ coordinatesWithinRadius.autoRemove = (val) =>
     typeof val[2] !== "number");
 coordinatesWithinRadius.filterName = "Coordinates within radius";
 
+// Alternatives within a text field use OR. React Table still combines distinct
+// columns with AND. Text arrays contain names; numeric link IDs are not names.
+export function containsAnyText(rows, ids, filterValue) {
+  const terms = textFilterTerms(filterValue).map((term) => term.toLowerCase());
+  if (!terms.length) return rows;
+  return rows.filter((row) =>
+    ids.some((id) => {
+      const value = row.values[id];
+      const candidates = Array.isArray(value)
+        ? value.filter((item) => typeof item === "string")
+        : value == null
+          ? []
+          : [String(value)];
+      return candidates.some((candidate) =>
+        terms.some((term) => candidate.toLowerCase().includes(term)),
+      );
+    }),
+  );
+}
+containsAnyText.autoRemove = (value) => textFilterTerms(value).length === 0;
+containsAnyText.filterName = "Contains any";
+
 // Value for React Table filterTypes argument (must be memoized).
 export const filterTypes = {
+  containsAnyText,
   textStartsWith,
   includesIfDefined,
   includesInArrayOfString,

@@ -3,6 +3,19 @@ import { devtools } from "zustand/middleware";
 
 export const useStationsStore = create(
   devtools((set, get) => ({
+    metadataCompact: false,
+    setMetadataCompact: (metadataCompact) => set({ metadataCompact }),
+    metadataSelectedOnly: false,
+    setMetadataSelectedOnly: (metadataSelectedOnly) =>
+      set({ metadataSelectedOnly }),
+    metadataFilters: { history: [], station: [] },
+    setMetadataFilters: (view, filters) =>
+      set((state) =>
+        state.metadataFilters[view] === filters
+          ? state
+          : { metadataFilters: { ...state.metadataFilters, [view]: filters } },
+      ),
+
     downloadStations: [],
     setStationDownloadSelected: (station, selected) =>
       set((state) => ({
@@ -23,6 +36,14 @@ export const useStationsStore = create(
           ).values(),
         ],
       })),
+    deselectStationsForDownload: (stations) => {
+      const ids = new Set(stations.map(({ id }) => id));
+      set((state) => ({
+        downloadStations: state.downloadStations.filter(
+          ({ id }) => !ids.has(id),
+        ),
+      }));
+    },
     clearDownloadSelection: () => set({ downloadStations: [] }),
     pruneDownloadSelection: (availableStations) =>
       set((state) => {
@@ -49,6 +70,43 @@ export const useStationsStore = create(
     setVariables: (variables) => {
       set({ variables: variables });
     },
+
+    resetStationFilters: (
+      scope,
+      { networks = [], variables = [], frequencies = [] } = {},
+    ) =>
+      set((state) => {
+        const reset = {};
+        if (scope === "all" || scope === "networks") {
+          reset.selectedNetworks = networks
+            .filter(({ publish }) => publish !== false)
+            .map(({ uri }) => uri);
+          reset.defaultNetworksApplied = true;
+        }
+        if (scope === "all" || scope === "variables") {
+          reset.selectedVariables = variables.map(({ id }) => id);
+          reset.defaultVariablesApplied = true;
+        }
+        if (scope === "all" || scope === "observations") {
+          reset.selectedFrequencies = [...frequencies];
+          reset.onlyWithClimatology = false;
+          reset.includeStationsWithNoObs = false;
+          reset.defaultFrequenciesApplied = true;
+        }
+        if (scope === "all" || scope === "dates") {
+          reset.startDate = null;
+          reset.endDate = null;
+        }
+        if (scope === "all" || scope === "area") reset.area = null;
+        if (scope === "all") {
+          reset.metadataFilters = { history: [], station: [] };
+          reset.metadataSelectedOnly = false;
+        } else if (scope === "attributes") {
+          const view = state.metadataCompact ? "station" : "history";
+          reset.metadataFilters = { ...state.metadataFilters, [view]: [] };
+        }
+        return reset;
+      }),
 
     // Start of filter options
     startDate: null,

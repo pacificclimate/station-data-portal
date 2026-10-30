@@ -1,0 +1,42 @@
+.station-variable-cell {
+  position: relative;
+  min-width: 11rem;
+  max-width: 18rem;
+  padding-right: 2.5rem;
+}
+.station-variable-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  line-height: 1.5;
+}
+.station-variable-list li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.station-variable-cell.is-expanded .station-variable-list {
+  max-height: 10.5rem;
+  overflow-y: auto;
+}
+.station-variable-cell.is-expanded li {
+  white-space: normal;
+}
+.station-variable-toggle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.2rem;
+  border: 1px solid #d7e0dc;
+  border-radius: 0.25rem;
+  background: #fff;
+  color: #17695b;
+  font-size: 0.75rem;
+}
+.station-variable-toggle:hover,
+.station-variable-toggle:focus-visible {
+  background: #e8f2ed;
+}

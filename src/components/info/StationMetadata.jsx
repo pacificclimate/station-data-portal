@@ -3,11 +3,16 @@
 // the data in the table, plus extra hidden columns, as a CSV file.
 
 import PropTypes from "prop-types";
-import React, { useState, useMemo, useTransition, useEffect } from "react";
+import React, {
+  useState,
+  useMemo,
+  useTransition,
+  useEffect,
+  useCallback,
+} from "react";
 import {
   Button,
-  ButtonGroup,
-  ButtonToolbar,
+  Dropdown,
   ToggleButton,
   ToggleButtonGroup,
   Card,
@@ -15,11 +20,19 @@ import {
   Form,
 } from "react-bootstrap";
 
-import { Download } from "react-bootstrap-icons";
+import {
+  Download,
+  Eye,
+  QuestionCircle,
+  CloudArrowDown,
+  FileEarmarkSpreadsheet,
+} from "react-bootstrap-icons";
+import { Link } from "react-router-dom";
+import { stationDisplayName } from "@/utils/station-info";
+import StationFilters from "@/components/controls/StationFilters";
+import { useStationFilterSummary } from "@/state/client-server-hooks/use-station-filter-summary";
 import DownloadStationData from "@/components/controls/DownloadStationData";
 import { useStationsStore } from "@/state/client/stations-store";
-import { stationDisplayName } from "@/utils/station-info";
-import InfoPopup from "@/components/util/InfoPopup";
 import FancyTable from "@/components/controls/tables/FancyTable";
 import DownloadMetadata from "@/components/controls/DownloadMetadata";
 import SelectionCounts from "@/components/info/SelectionCounts";
@@ -33,11 +46,66 @@ import "./StationMetadata.css";
 
 logger.configure({ active: true });
 
-function StationMetadata({ rowClasses }) {
+function StationSelectionHeader({ rows }) {
+  const compact = useStationsStore((state) => state.metadataCompact);
+  const selectedStations = useStationsStore((state) => state.downloadStations);
+  const select = useStationsStore((state) => state.selectStationsForDownload);
+  const deselect = useStationsStore(
+    (state) => state.deselectStationsForDownload,
+  );
+  const matching = [
+    ...new Map(
+      rows.map(({ original }) => {
+        const station = compact ? original : original.station;
+        return [station.id, station];
+      }),
+    ).values(),
+  ];
+  const selected = new Set(selectedStations.map(({ id }) => id));
+  const count = matching.filter(({ id }) => selected.has(id)).length;
+  const checked = matching.length > 0 && count === matching.length;
+  const mixed = count > 0 && !checked;
+  return (
+    <label className="station-row-select">
+      <input
+        type="checkbox"
+        aria-label="Select all matching stations"
+        title="Select or deselect all matching stations across every page"
+        disabled={!matching.length}
+        checked={checked}
+        aria-checked={mixed ? "mixed" : checked}
+        ref={(input) => {
+          if (input) input.indeterminate = mixed;
+        }}
+        onChange={(event) =>
+          event.target.checked ? select(matching) : deselect(matching)
+        }
+      />
+    </label>
+  );
+}
+
+function StationMetadata({
+  rowClasses,
+  filterOnly = false,
+  onOpenFilters,
+  onCloseFilters,
+}) {
   const { data: allNetworks } = useNetworks();
   const { data: allVariables } = useVariables();
-  const { selectedStations: stations } = useStationFilteringContext();
-
+  const filterSummary = useStationFilterSummary();
+  const {
+    selectedStations: stations,
+    filteredStations,
+    baseFilteredStations,
+    baseSelectedStations,
+  } = useStationFilteringContext();
+  const availableStations =
+    baseSelectedStations ??
+    baseFilteredStations ??
+    filteredStations ??
+    stations;
+  const tableStations = baseSelectedStations ?? stations;
   const downloadStations = useStationsStore((state) => state.downloadStations);
   const setStationDownloadSelected = useStationsStore(
     (state) => state.setStationDownloadSelected,
@@ -48,258 +116,302 @@ function StationMetadata({ rowClasses }) {
   const pruneDownloadSelection = useStationsStore(
     (state) => state.pruneDownloadSelection,
   );
-  const [selectedOnly, setSelectedOnly] = useState(false);
+  const stationsFromRows = (rows) => [
+    ...new Map(
+      rows.map((row) => {
+        const station = compact ? row : row.station;
+        return [station.id, station];
+      }),
+    ).values(),
+  ];
+  const selectedOnly = useStationsStore((state) => state.metadataSelectedOnly);
+  const setSelectedOnly = useStationsStore(
+    (state) => state.setMetadataSelectedOnly,
+  );
   useEffect(
-    () => pruneDownloadSelection(stations),
-    [stations, pruneDownloadSelection],
+    () => pruneDownloadSelection(availableStations),
+    [availableStations, pruneDownloadSelection],
   );
+  const selectedDownloadStations = useMemo(() => {
+    const available = new Set(availableStations.map(({ id }) => id));
+    return downloadStations.filter(({ id }) => available.has(id));
+  }, [downloadStations, availableStations]);
   const selectedIds = useMemo(
-    () => downloadStations.map(({ id }) => id),
-    [downloadStations],
+    () => selectedDownloadStations.map(({ id }) => id),
+    [selectedDownloadStations],
   );
-  const tableStations = useMemo(
-    () =>
-      selectedOnly
-        ? stations.filter(({ id }) => selectedIds.includes(id))
-        : stations,
-    [stations, selectedOnly, selectedIds],
-  );
+
   const [helpVisible, setHelpVisible] = useState(false);
-  const [compact, setCompact] = useState(false);
+  const [downloadsOpen, setDownloadsOpen] = useState(false);
+  const compact = useStationsStore((state) => state.metadataCompact);
+  const setCompact = useStationsStore((state) => state.setMetadataCompact);
+  const storedFilters = useStationsStore(
+    (state) => state.metadataFilters[compact ? "station" : "history"],
+  );
+  const setMetadataFilters = useStationsStore(
+    (state) => state.setMetadataFilters,
+  );
+  const handleFiltersChange = useCallback(
+    (filters) => setMetadataFilters(compact ? "station" : "history", filters),
+    [compact, setMetadataFilters],
+  );
   const [isPending, startTransition] = useTransition();
   const handleChangeCompact = (v) => startTransition(() => setCompact(v));
-  const handleHelpButtonClick = () => setHelpVisible(!helpVisible);
 
   const columnInfo = useMemo(
     () => smtColumnInfo({ allNetworks, allVariables, compact }),
     [allNetworks, allVariables, compact],
   );
 
-  const data = useMemo(() => smtData(stations, compact), [stations, compact]);
-
-  const tableData = useMemo(
-    () => smtData(tableStations, compact),
-    [tableStations, compact],
-  );
   const tableColumns = useMemo(
     () => [
       {
+        id: "station-selection",
+        Header: StationSelectionHeader,
+        className: "station-selection-column",
+        minWidth: 40,
+        maxWidth: 40,
+        hideFilter: true,
+        Cell: ({ row }) => {
+          const station = compact ? row.original : row.original.station;
+          const name = stationDisplayName(station);
+          return (
+            <label className="station-row-select">
+              <input
+                type="checkbox"
+                aria-label={`Select ${name}`}
+                title={`Select ${name}`}
+                checked={selectedIds.includes(station.id)}
+                onChange={(event) =>
+                  setStationDownloadSelected(station, event.target.checked)
+                }
+              />
+            </label>
+          );
+        },
+      },
+      {
         id: "station-actions",
         Header: "Actions",
-        doFilter: false,
+        className: "station-actions-column",
+        minWidth: 112,
+        maxWidth: 112,
+        hideFilter: true,
         Cell: ({ row }) => {
           const station = compact ? row.original : row.original.station;
           const name = stationDisplayName(station);
           return (
             <div className="station-row-actions">
-              <label className="station-row-select">
-                <input
-                  type="checkbox"
-                  aria-label={`Select ${name}`}
-                  checked={selectedIds.includes(station.id)}
-                  onChange={(event) =>
-                    setStationDownloadSelected(station, event.target.checked)
-                  }
-                />
-              </label>
-              <DownloadStationData
-                scope="station"
-                stations={[station]}
-                title={`Download ${name}`}
+              <span
+                className="station-row-action-group"
+                role="group"
+                aria-label={`Actions for ${name}`}
               >
-                <Download aria-hidden="true" />
-              </DownloadStationData>
+                <DownloadStationData
+                  scope="station"
+                  stations={[station]}
+                  title={`Download ${name}`}
+                >
+                  <Download aria-hidden="true" />
+                </DownloadStationData>
+                <Button
+                  as={Link}
+                  to={`preview/${station.id}`}
+                  variant="link"
+                  size="sm"
+                  className="station-row-action"
+                  title={`Preview variables for ${name}`}
+                  aria-label={`Preview variables for ${name}`}
+                >
+                  <Eye aria-hidden="true" />
+                </Button>
+              </span>
             </div>
           );
         },
       },
-      ...columnInfo.columns,
+      ...columnInfo.columns.map((column) => ({
+        ...column,
+        hideFilter: [
+          "Network Name",
+          "Variables",
+          "Obs Freq",
+          "Uniq Obs Freqs",
+        ].includes(column.id),
+      })),
     ],
     [columnInfo, compact, selectedIds, setStationDownloadSelected],
   );
+
+  const data = useMemo(() => smtData(stations, compact), [stations, compact]);
+  const tableData = useMemo(
+    () =>
+      smtData(
+        selectedOnly && !filterOnly ? selectedDownloadStations : tableStations,
+        compact,
+      ),
+    [
+      selectedOnly,
+      filterOnly,
+      selectedDownloadStations,
+      tableStations,
+      compact,
+    ],
+  );
+
+  const renderToolbar = ({ rows, filterButton }) => {
+    const matching = stationsFromRows(rows);
+    const count = (value) => value.toLocaleString();
+    return (
+      <>
+        <div className="station-toolbar-group" role="group" aria-label="View">
+          <span className="station-toolbar-label">View</span>
+          <ToggleButtonGroup
+            type="radio"
+            name="compact"
+            value={compact}
+            onChange={handleChangeCompact}
+          >
+            {[false, true].map((value) => (
+              <ToggleButton
+                id={`stn-md-compact-${value}`}
+                key={String(value)}
+                size="sm"
+                variant="outline-success"
+                value={value}
+              >
+                By {value ? "Station" : "History"}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+          {filterButton}
+          <Form.Check
+            id="metadata-selected-only"
+            type="checkbox"
+            label="Selected only"
+            checked={selectedOnly}
+            onChange={(event) => setSelectedOnly(event.target.checked)}
+          />
+        </div>
+        <div className="station-toolbar-group" role="group" aria-label="Select">
+          <span className="station-toolbar-label">Select</span>
+          <Button
+            size="sm"
+            variant="outline-secondary"
+            disabled={!selectedIds.length}
+            onClick={clearDownloadSelection}
+          >
+            Clear selection
+          </Button>
+        </div>
+        <div className="station-toolbar-group" role="group" aria-label="Export">
+          <span className="station-toolbar-label">Export</span>
+          <Dropdown show={downloadsOpen} onToggle={setDownloadsOpen}>
+            <Dropdown.Toggle
+              variant="success"
+              size="sm"
+              id="station-download-menu"
+            >
+              <Download aria-hidden="true" /> Download
+            </Dropdown.Toggle>
+            <Dropdown.Menu renderOnMount>
+              <DownloadStationData
+                stations={selectedDownloadStations}
+                menuItem
+                ariaLabel={`Download selected stations (${selectedIds.length})`}
+                title="Download data for stations selected with checkboxes"
+              >
+                <Download aria-hidden="true" /> Selected (
+                {count(selectedIds.length)})
+              </DownloadStationData>
+              <DownloadStationData
+                stations={matching}
+                menuItem
+                ariaLabel={`Download all matching stations (${matching.length})`}
+                title="Download all matching stations across every page"
+              >
+                <CloudArrowDown aria-hidden="true" /> All matching (
+                {count(matching.length)})
+              </DownloadStationData>
+              <Dropdown.Divider />
+              <Dropdown.Item
+                as={DownloadMetadata}
+                data={data}
+                columns={columnInfo.columns}
+                filename={`station-metadata-${compact ? "by-station" : "by-history"}.csv`}
+                ariaLabel="Download Metadata"
+                title="Download matching station metadata as CSV, including original coordinate fields"
+              >
+                <FileEarmarkSpreadsheet aria-hidden="true" /> Metadata (CSV)
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
+      </>
+    );
+  };
+  if (filterOnly)
+    return (
+      <FancyTable
+        data={tableData}
+        {...columnInfo}
+        columns={tableColumns}
+        filterPresentation="dialog"
+        filterOnly
+        filterContent={<StationFilters />}
+        filterSummary={filterSummary}
+        syncFilters
+        initialFilters={storedFilters}
+        onFiltersChange={handleFiltersChange}
+        onCloseFilters={onCloseFilters}
+      />
+    );
 
   // Note: Download button is rendered here because it uses `columnInfo` to
   // control what it does. We consider it an adjunct to the table.
   return (
     <>
+      <div className="station-table-title mb-2 mt-2">
+        <h2 className="h5 mb-0">Station metadata</h2>
+        <Button
+          size="sm"
+          variant="link"
+          title="Station table help"
+          aria-label="Station table help"
+          aria-expanded={helpVisible}
+          aria-controls="station-table-help"
+          onClick={() => setHelpVisible(!helpVisible)}
+        >
+          <QuestionCircle aria-hidden="true" />
+        </Button>
+      </div>
       <Row className={rowClasses}>
         <SelectionCounts />
       </Row>
       <div className={"StationMetadata"}>
-        <ButtonToolbar className="justify-content-between">
-          {/* Table help show/hide button */}
-          <ButtonToolbar>
-            <ButtonGroup className={"me-3"}>
-              <Button
-                onClick={handleHelpButtonClick}
-                size="sm"
-                variant="outline-secondary"
-              >
-                {helpVisible ? "Hide" : "Show"} Help
-              </Button>
-            </ButtonGroup>
-          </ButtonToolbar>
-
-          {/* Table data organization buttons */}
-          <ButtonToolbar>
-            <ToggleButtonGroup
-              type={"radio"}
-              name={"compact"}
-              value={compact}
-              onChange={handleChangeCompact}
-              className={"me-1"}
-            >
-              {[false, true].map((value) => (
-                <ToggleButton
-                  id={`stn-md-compact-${value.toString()}`}
-                  key={value.toString()}
-                  size={"sm"}
-                  variant={"outline-success"}
-                  value={value}
-                >
-                  By {value ? "Station" : "History"}
-                </ToggleButton>
-              ))}
-            </ToggleButtonGroup>
-            <ButtonGroup className={"me-3"}>
-              <InfoPopup title={"Table Data Organization"}>
-                <p>
-                  Station metadata can be displayed (and downloaded) in two
-                  formats, by history and by station.
-                </p>
-                <p>
-                  The by-history format presents one history per table row,
-                  repeating station information in each row as necessary. It is
-                  a less compact and readable format, but more easily
-                  mechanically processed, and it breaks out values such as
-                  latitude and longitude into separate columns.
-                </p>
-                <p>
-                  The by-station format presents one station per table row, and
-                  rolls up information from all histories for a station into a
-                  more compact and readable form. It is however less easily
-                  mechanically processed, and combines related values such as
-                  latitude and longitude into single columns.
-                </p>
-              </InfoPopup>
-            </ButtonGroup>
-          </ButtonToolbar>
-
-          <ButtonToolbar className="align-items-center gap-2">
-            <DownloadStationData
-              stations={downloadStations}
-              variant="outline-success"
-              ariaLabel={`Download selected stations (${selectedIds.length})`}
-            >
-              <Download aria-hidden="true" /> Selected ({selectedIds.length})
-            </DownloadStationData>
-            <Button
-              size="sm"
-              variant="outline-secondary"
-              disabled={!selectedIds.length}
-              onClick={clearDownloadSelection}
-            >
-              Clear selection
-            </Button>
-            <Form.Check
-              id="metadata-selected-only"
-              label="Selected only"
-              checked={selectedOnly}
-              onChange={(event) => setSelectedOnly(event.target.checked)}
-            />
-          </ButtonToolbar>
-
-          {/* Table download button */}
-          <ButtonToolbar>
-            <ButtonGroup className={"me-1"}>
-              <DownloadMetadata
-                data={data}
-                columns={columnInfo.columns}
-                filename={`station-metadata-${compact ? "by-station" : "by-history"}.csv`}
-              >
-                Download Metadata
-              </DownloadMetadata>
-            </ButtonGroup>
-            <ButtonGroup>
-              <InfoPopup placement="left" title={"Download Metadata"}>
-                Download the metadata presented in the table below (all rows,
-                not just those visible) as a CSV file. The downloaded file
-                includes extra columns not visible in the table.
-              </InfoPopup>
-            </ButtonGroup>
-          </ButtonToolbar>
-        </ButtonToolbar>
-
         {helpVisible && (
-          <Card body className="mt-3 mb-3">
-            <h1>Station metadata table</h1>
+          <Card body className="mb-3" id="station-table-help">
+            <h3 className="h6">Explore stations</h3>
             <p>
-              This table allows you to explore station metadata dynamically.
+              By History shows one history per row; By Station combines each
+              station’s histories. Filters update the map and table together.
+              Station criteria apply to both views; attribute filters are saved
+              separately for each view.
             </p>
             <p>
-              The controls in this table affect only the <em>display</em> of
-              metadata of the stations selected by the{" "}
-              <strong>Station Filters</strong> tab and the map. They affect
-              neither the stations selected on the map, nor the metadata that is
-              downloaded by the <strong>Download Metadata</strong> button on
-              this tab, nor the data downloaded by the{" "}
-              <strong>Download Timeseries/Climatology</strong> buttons on the{" "}
-              <strong>Station Data</strong> tab.
+              Select stations using the table or station summary checkboxes. The
+              header checkbox selects matching stations across every page;
+              Selected only shows your checked stations. Changing filters clears
+              the download selection.
             </p>
             <p>
-              Select station checkboxes in the table or map summary, then use
-              the Selected download button for one ZIP. The download icon opens
-              options for a single station. Changing filters clears the download
-              selection. Selected only limits the table display; metadata CSV
-              still includes all stations matching the station criteria and map
-              polygon.
+              Use Download for selected or all matching station data, or
+              metadata as CSV. Row icons download one station or open its
+              variable preview page.
             </p>
-            <h1>Filter controls</h1>
-            <p>
-              Filter controls are located just below each column label. A filter
-              allows through only those rows whose column matches what you
-              select or enter in them. The count of rows that pass all the
-              filters is shown at the top of the table header, above the column
-              labels and the filter controls. Examples:
-              <ul>
-                <li>
-                  The Network Name column filter allows you to select all or
-                  just one of the networks selected by the{" "}
-                  <strong>Networks</strong> control in the{" "}
-                  <strong>Station Filters</strong> tab.
-                </li>
-                <li>
-                  To find a station or stations whose name partially matches a
-                  given string, enter that string in the Station Name column
-                  filter.
-                </li>
-                <li>
-                  You can use any number of the column filters, and the rows
-                  visible are only those that match all the filters.
-                </li>
-              </ul>
-            </p>
-            <h1>Managing overflow</h1>
-            <p>
-              Because the table contains a lot of information, it can overflow
-              horizontally and run far down the page vertically.
-              <ul>
-                <li>
-                  Use the column width buttons just below the header to give
-                  more space for the table and less space for the map. This can
-                  make it far easier to use the table.
-                </li>
-                <li>
-                  If table content is overflowing horizontally, scroll down to
-                  the bottom of the page to use the table's horizontal scroll
-                  bar.
-                </li>
-              </ul>
-            </p>
-            <h1>Other help</h1>
-            <p>
-              See the <InfoPopup title="Very helpful!" /> next to various items
-              on this page.
+            <p className="mb-0">
+              Scroll within the table for additional rows and columns. Expand a
+              variable cell to see its full list.
             </p>
           </Card>
         )}
@@ -307,10 +419,17 @@ function StationMetadata({ rowClasses }) {
           <p>Loading...</p>
         ) : (
           <FancyTable
+            key={compact ? "by-station" : "by-history"}
             data={tableData}
             {...columnInfo}
             columns={tableColumns}
-            onFiltersChange={clearDownloadSelection}
+            filterPresentation="dialog"
+            syncFilters
+            initialFilters={storedFilters}
+            onFiltersChange={handleFiltersChange}
+            onOpenFilters={onOpenFilters}
+            filterSummary={filterSummary}
+            renderToolbar={renderToolbar}
             size="sm"
             responsive
             striped
@@ -322,8 +441,10 @@ function StationMetadata({ rowClasses }) {
 }
 
 StationMetadata.propTypes = {
-  stations: PropTypes.array,
-  metadata: PropTypes.object,
+  rowClasses: PropTypes.string,
+  filterOnly: PropTypes.bool,
+  onOpenFilters: PropTypes.func,
+  onCloseFilters: PropTypes.func,
 };
 
 export default StationMetadata;
