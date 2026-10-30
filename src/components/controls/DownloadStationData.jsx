@@ -11,11 +11,12 @@ import ClipToDateControl from "@/components/controls/ClipToDateControl";
 import { useConfigContext } from "@/state/context-hooks/use-config-context";
 import { useStationsStore } from "@/state/client/stations-store";
 import { stationDisplayName } from "@/utils/station-info";
+import { stationDownloadConflicts } from "@/utils/station-download-eligibility";
 import { stationDataDownloadRequest } from "@/utils/pdp-data-service";
 
 import "./DownloadStationData.css";
 
-function StationDownloadOptions({ stations }) {
+function StationDownloadOptions({ stations, scope }) {
   const config = useConfigContext();
   const startDate = useStationsStore((state) => state.startDate);
   const endDate = useStationsStore((state) => state.endDate);
@@ -32,23 +33,27 @@ function StationDownloadOptions({ stations }) {
       includeStationsWithNoObs: state.includeStationsWithNoObs,
     })),
   );
-  const filtersReady = allNetworks && allVariables && allFrequencies;
+  const direct = scope === "station";
+  const filtersReady =
+    direct || (allNetworks && allVariables && allFrequencies);
   const filtersAvailable =
-    filtersReady &&
-    selection.selectedNetworksUris.every((uri) =>
-      allNetworks.some((network) => network.uri === uri),
-    ) &&
-    selection.selectedVariablesIds.every((id) =>
-      allVariables.some((variable) => variable.id === id),
-    ) &&
-    selection.selectedFrequencies.every((frequency) =>
-      allFrequencies.includes(frequency),
-    );
+    direct ||
+    (filtersReady &&
+      selection.selectedNetworksUris.every((uri) =>
+        allNetworks.some((network) => network.uri === uri),
+      ) &&
+      selection.selectedVariablesIds.every((id) =>
+        allVariables.some((variable) => variable.id === id),
+      ) &&
+      selection.selectedFrequencies.every((frequency) =>
+        allFrequencies.includes(frequency),
+      ));
   const canDownload =
-    selection.selectedNetworksUris.length > 0 &&
-    (selection.includeStationsWithNoObs ||
-      (selection.selectedVariablesIds.length > 0 &&
-        selection.selectedFrequencies.length > 0));
+    direct ||
+    (selection.selectedNetworksUris.length > 0 &&
+      (selection.includeStationsWithNoObs ||
+        (selection.selectedVariablesIds.length > 0 &&
+          selection.selectedFrequencies.length > 0)));
   const [dataFormat, setDataFormat] = useState({
     value: "nc",
     label: "NetCDF",
@@ -61,8 +66,72 @@ function StationDownloadOptions({ stations }) {
     [stations],
   );
 
+  const conflicts = useMemo(() => {
+    if (direct) {
+      const valid =
+        uniqueStations.length === 1 &&
+        Number.isSafeInteger(uniqueStations[0].id) &&
+        uniqueStations[0].id > 0;
+      if (!valid)
+        return uniqueStations.map((station) => ({
+          station,
+          reason: "Choose exactly one station with a valid database ID.",
+        }));
+      if (clipToDate && startDate && endDate && startDate > endDate)
+        return [
+          {
+            station: uniqueStations[0],
+            reason: "The start date must be on or before the end date.",
+          },
+        ];
+      return [];
+    }
+    return filtersAvailable
+      ? stationDownloadConflicts(
+          uniqueStations,
+          {
+            selectedNetworks: selection.selectedNetworksUris,
+            selectedVariables: selection.selectedVariablesIds,
+            selectedFrequencies: selection.selectedFrequencies,
+            includeStationsWithNoObs: selection.includeStationsWithNoObs,
+            onlyWithClimatology: selection.onlyWithClimatology,
+            area: scope === "station" ? null : selection.polygon,
+            startDate,
+            endDate,
+          },
+          allVariables,
+        )
+      : [];
+  }, [
+    filtersAvailable,
+    uniqueStations,
+    selection,
+    startDate,
+    endDate,
+    allVariables,
+    scope,
+    direct,
+    clipToDate,
+  ]);
+
   return (
     <>
+      {conflicts.length > 0 && (
+        <div className="alert alert-warning" role="alert">
+          <p>
+            {direct
+              ? "Check the station and download options before downloading."
+              : "These stations conflict with the current filters. Update the filters before downloading; the station IDs do not override them."}
+          </p>
+          <ul className="mb-0">
+            {conflicts.map(({ station, reason }) => (
+              <li key={station.id}>
+                <strong>{stationDisplayName(station)}:</strong> {reason}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <ObservationCounts clipToDate={clipToDate} stations={uniqueStations} />
       <details className="mb-3">
         <summary>
@@ -74,6 +143,11 @@ function StationDownloadOptions({ stations }) {
           ))}
         </ul>
       </details>
+      <p className="small text-muted">
+        {scope === "station"
+          ? "Download this station independently of map and station filters. Date clipping is optional."
+          : "Selected stations must match the drawn area and station filters."}
+      </p>
       <p>
         Download all recorded variables for these stations as one ZIP archive.
         Enable date clipping to use the filter date range.
@@ -92,7 +166,7 @@ function StationDownloadOptions({ stations }) {
             Some selected filters are unavailable. Update your filters before
             downloading.
           </span>
-        ) : !canDownload ? (
+        ) : conflicts.length > 0 ? null : !canDownload ? (
           <span role="status">No stations match the current filters.</span>
         ) : (
           ["timeseries", "climatology"].map((dataCategory) => {
@@ -103,6 +177,7 @@ function StationDownloadOptions({ stations }) {
               allVariables,
               allFrequencies,
               stationIds: uniqueStations.map(({ id }) => id),
+              scope,
               dataCategory,
               dataFormat,
               clipToDate,
@@ -139,12 +214,13 @@ function StationDownloadOptions({ stations }) {
   );
 }
 
-// Mount the download controls only while open, including for map tooltips.
+// Mount the download controls only while the options dialog is open.
 export default function DownloadStationData({
   stations,
   title,
   variant = "link",
   ariaLabel,
+  scope = "selection",
   children = "Download station data",
 }) {
   const [show, setShow] = useState(false);
@@ -179,7 +255,7 @@ export default function DownloadStationData({
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <StationDownloadOptions stations={stations} />
+            <StationDownloadOptions stations={stations} scope={scope} />
           </Modal.Body>
         </Modal>
       )}
@@ -192,5 +268,6 @@ DownloadStationData.propTypes = {
   title: PropTypes.string,
   variant: PropTypes.string,
   ariaLabel: PropTypes.string,
+  scope: PropTypes.oneOf(["station", "selection"]),
   children: PropTypes.node,
 };

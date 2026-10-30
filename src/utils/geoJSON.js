@@ -47,3 +47,27 @@ export const gJMultiPolygonBoundingBox = (geometry) => {
 const getX = (point) => point[0];
 const getY = (point) => point[1];
 export const isPointInGeoJSONPolygon = isPointInPolygonWn(getX, getY);
+
+// ST_Intersects includes polygon boundaries, including hole boundaries.
+export const isPointOnGeoJSONRing = (ring, point) =>
+  ring.some((start, i) => {
+    const end = ring[(i + 1) % ring.length];
+    const [x, y] = point;
+    const dx = end[0] - start[0];
+    const dy = end[1] - start[1];
+    const cross = dx * (y - start[1]) - dy * (x - start[0]);
+    const tolerance =
+      Number.EPSILON * 32 * Math.max(1, Math.abs(dx), Math.abs(dy)) ** 2;
+    return (
+      Math.abs(cross) <= tolerance &&
+      x >= Math.min(start[0], end[0]) &&
+      x <= Math.max(start[0], end[0]) &&
+      y >= Math.min(start[1], end[1]) &&
+      y <= Math.max(start[1], end[1])
+    );
+  });
+
+export const isPointInGeoJSONArea = (rings, point) =>
+  rings.some((ring) => isPointOnGeoJSONRing(ring, point)) ||
+  (Boolean(isPointInGeoJSONPolygon(rings[0], point)) &&
+    !rings.slice(1).some((ring) => isPointInGeoJSONPolygon(ring, point)));

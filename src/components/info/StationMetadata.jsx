@@ -103,6 +103,7 @@ function StationMetadata({ rowClasses }) {
                 />
               </label>
               <DownloadStationData
+                scope="station"
                 stations={[station]}
                 title={`Download ${name}`}
               >

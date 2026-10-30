@@ -1,5 +1,9 @@
-import { it } from "vitest";
-import React from "react";
+import { beforeEach, expect, it } from "vitest";
+import React, { createRef } from "react";
+import { act, fireEvent, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import { useStationsStore } from "@/state/client/stations-store";
+import { FREQUENCIES_QUERY_KEY } from "@/state/query-hooks/use-frequencies";
 import { renderWithProviders } from "@/test-utils";
 import { CircleMarker } from "react-leaflet";
 import StationPopup from "./StationPopup";
@@ -22,6 +26,7 @@ const station = {
       tz_offset: null,
       uri: "/histories/33",
       variable_uris: [],
+      variable_ids: [],
     },
   ],
   id: 37,
@@ -60,4 +65,64 @@ it("renders without crashing", () => {
       ],
     },
   );
+});
+
+beforeEach(() =>
+  useStationsStore.setState({
+    area: null,
+    downloadStations: [],
+    selectedNetworks: ["/networks/8"],
+    selectedVariables: [],
+    selectedFrequencies: [],
+    includeStationsWithNoObs: true,
+    onlyWithClimatology: false,
+    startDate: null,
+    endDate: null,
+  }),
+);
+
+it("keeps a direct download available outside the area while preventing selected-set membership", () => {
+  useStationsStore.setState({
+    area: {
+      type: "MultiPolygon",
+      coordinates: [
+        [
+          [
+            [0, 0],
+            [1, 0],
+            [1, 1],
+            [0, 0],
+          ],
+        ],
+      ],
+    },
+  });
+  const marker = createRef();
+  renderWithProviders(
+    <MemoryRouter>
+      <CircleMarker ref={marker} center={station.histories[0]}>
+        <StationPopup station={station} />
+      </CircleMarker>
+    </MemoryRouter>,
+    {
+      withMap: true,
+      seedQueries: [
+        [[NETWORKS_QUERY_KEY], [network]],
+        [VARIABLES_QUERY_KEY, []],
+        [FREQUENCIES_QUERY_KEY, []],
+      ],
+    },
+  );
+  act(() => marker.current.openPopup());
+  const check = screen.getByRole("checkbox", { name: "Select for download" });
+  expect(check).toBeDisabled();
+  expect(screen.getByText(/Outside the drawn area/)).toBeVisible();
+  fireEvent.click(check);
+  expect(useStationsStore.getState().downloadStations).toEqual([]);
+  fireEvent.click(
+    screen.getByRole("button", { name: "Download station data" }),
+  );
+  const form = screen.getByRole("form", { name: "Download Timeseries ZIP" });
+  expect(new FormData(form).get("station-ids")).toBe("37");
+  expect(new FormData(form).has("input-polygon")).toBe(false);
 });

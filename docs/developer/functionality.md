@@ -18,18 +18,29 @@ At present, we have chosen (1).
 
 ## Station data ZIP downloads
 
-Station tooltips, map summaries, preview pages and metadata table rows offer
+Map summaries, preview pages and metadata table rows offer
 single-station downloads. Checkboxes in the table and map summary share a
 selection; the Selected button opens one download dialog for that station set.
 Selections are unique across histories and cleared when filters change. Selected
 only affects table display, not the metadata CSV export.
 
 The dialog posts a native URL-encoded form to `/agg` using numeric database
-`station-ids`, network names, variables, observation frequencies, dates,
-climatology-only criteria and the map polygon. IDs intersect those filters.
-Date clipping is separate from date filtering. Timeseries and climatology are
-separate server-generated ZIPs; format choices remain NetCDF, CSV and Excel.
-The browser manages streaming and errors open in a separate tab.
+`station-ids`. Direct single-station downloads are independent of all station and
+map filters: only one station ID, output format and data category are sent. Date
+bounds are included only when the user explicitly enables clipping. Direct
+downloads do not wait for selector metadata or change the current filters.
 
-The existing tabs, standalone preview route, metadata export scope and inline
-table filters remain in place in this branch. Workspace changes follow separately.
+Selected-station requests retain network, variable, frequency, date,
+climatology-only and polygon criteria, even for a selected set of one station.
+IDs intersect the supplied filters. A pre-submission check blocks the whole batch
+if any station conflicts and names the problem; it never silently drops a station
+or broadens the request. The same history must match area and criteria together,
+and checks update while the dialog is open. Polygon boundaries are included and
+hole interiors excluded, matching intersection semantics.
+
+Stations outside the area remain inspectable on the map. Their popup selection
+checkbox is disabled with an explanation, while direct download remains available.
+Hover tooltips show identification only; downloads belong in the station popup.
+Timeseries and climatology use separate server-generated ZIPs; format choices
+remain NetCDF, CSV and Excel. The browser manages streaming and errors open in a
+separate tab.

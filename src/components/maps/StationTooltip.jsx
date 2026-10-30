@@ -1,4 +1,3 @@
-import DownloadStationData from "@/components/controls/DownloadStationData";
 import PropTypes from "prop-types";
 import React from "react";
 import { Tooltip } from "react-leaflet";
@@ -14,11 +13,8 @@ function StationTooltip({ station }) {
   const stationNames = flow(uniqStationNames, join(", "))(station);
 
   return (
-    <Tooltip sticky interactive>
+    <Tooltip sticky>
       {stationNames} <span>({network.name})</span>
-      <div>
-        <DownloadStationData stations={[station]} />
-      </div>
     </Tooltip>
   );
 }
