@@ -37,18 +37,28 @@ function StationDownloadOptions({ stations, scope }) {
   const direct = scope === "station";
   const filtersReady =
     direct || (allNetworks && allVariables && allFrequencies);
-  const filtersAvailable =
-    direct ||
-    (filtersReady &&
+  const selectedNetworksAvailable =
+    filtersReady &&
+    (direct ||
       selection.selectedNetworksUris.every((uri) =>
         allNetworks.some((network) => network.uri === uri),
-      ) &&
+      ));
+  const selectedVariablesAvailable =
+    filtersReady &&
+    (direct ||
       selection.selectedVariablesIds.every((id) =>
         allVariables.some((variable) => variable.id === id),
-      ) &&
+      ));
+  const selectedFrequenciesAvailable =
+    filtersReady &&
+    (direct ||
       selection.selectedFrequencies.every((frequency) =>
         allFrequencies.includes(frequency),
       ));
+  const filtersAvailable =
+    selectedNetworksAvailable &&
+    selectedVariablesAvailable &&
+    selectedFrequenciesAvailable;
   const canDownload =
     direct ||
     (selection.selectedNetworksUris.length > 0 &&
