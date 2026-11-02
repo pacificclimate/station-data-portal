@@ -24,6 +24,19 @@ function dateToStrForQuery(date) {
   );
 }
 
+function observationTimePeriod(clipToDate, startDate, endDate) {
+  if (!clipToDate || (!startDate && !endDate)) {
+    return "all dates";
+  }
+  if (startDate && endDate) {
+    return `${dateToStrForQuery(startDate)} to ${dateToStrForQuery(endDate)}`;
+  }
+  if (startDate) {
+    return `from ${dateToStrForQuery(startDate)}`;
+  }
+  return `up to ${dateToStrForQuery(endDate)}`;
+}
+
 const totalCounts = timer.timeThis("totalCounts")((counts, stations) =>
   reduce((sum, station) => sum + (counts[station.id] || 0), 0)(stations),
 );
@@ -63,14 +76,7 @@ function ObservationCounts({ clipToDate = false, stations: downloadStations }) {
     };
   }, [countData, stations]);
 
-  const timePeriod =
-    !clipToDate || (!startDate && !endDate)
-      ? "all dates"
-      : startDate && endDate
-        ? `${dateToStrForQuery(startDate)} to ${dateToStrForQuery(endDate)}`
-        : startDate
-          ? `from ${dateToStrForQuery(startDate)}`
-          : `up to ${dateToStrForQuery(endDate)}`;
+  const timePeriod = observationTimePeriod(clipToDate, startDate, endDate);
 
   return (
     <Table size="sm">

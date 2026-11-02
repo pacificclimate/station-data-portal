@@ -17,13 +17,13 @@ import "./DownloadStationData.css";
 
 function StationDownloadOptions({ stations }) {
   const config = useConfigContext();
-  const startDate = useStationsStore((state) => state.startDate);
-  const endDate = useStationsStore((state) => state.endDate);
   const { data: allNetworks } = useNetworks();
   const { data: allVariables } = useVariables();
   const { data: allFrequencies } = useFrequencies();
   const selection = useStationsStore(
     useShallow((state) => ({
+      startDate: state.startDate,
+      endDate: state.endDate,
       selectedNetworksUris: state.selectedNetworks,
       selectedVariablesIds: state.selectedVariables,
       selectedFrequencies: state.selectedFrequencies,
@@ -32,6 +32,7 @@ function StationDownloadOptions({ stations }) {
       includeStationsWithNoObs: state.includeStationsWithNoObs,
     })),
   );
+  const { startDate, endDate } = selection;
   const filtersReady = allNetworks && allVariables && allFrequencies;
   const filtersAvailable =
     filtersReady &&
