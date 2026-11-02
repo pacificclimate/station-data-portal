@@ -1,20 +1,15 @@
-import React, { useRef, useEffect, useState } from "react";
-import { Button, Badge, CloseButton } from "react-bootstrap";
-import {
-  Table as TableIcon,
-  Funnel,
-  QuestionCircle,
-} from "react-bootstrap-icons";
+import React, { useState } from "react";
+import { Button, Badge } from "react-bootstrap";
+import { Table as TableIcon, Funnel } from "react-bootstrap-icons";
 import StationMap from "@/components/maps/StationMap";
 import NetworkLegend from "@/components/maps/NetworkLegend";
-import StationMetadata from "@/components/info/StationMetadata";
+import StationWorkspacePanels from "./StationWorkspacePanels";
 import { useStationsStore } from "@/state/client/stations-store";
 import { useStationFilterSummary } from "@/state/client-server-hooks/use-station-filter-summary";
 import css from "../common.module.css";
 import "./BodyContent.css";
 
 export const BodyContent = () => {
-  const [helpVisible, setHelpVisible] = useState(false);
   const filterSummary = useStationFilterSummary();
   const [tableOpen, updateTableOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -23,15 +18,6 @@ export const BodyContent = () => {
     updateTableOpen(open);
     if (open) setFiltersOpen(false);
   };
-  const filtersDialog = useRef(null);
-  useEffect(() => {
-    if (!filtersOpen) return;
-    const trigger = document.activeElement;
-    filtersDialog.current?.focus();
-    return () => {
-      if (trigger?.isConnected) trigger.focus();
-    };
-  }, [filtersOpen]);
   const selectedCount = useStationsStore(
     (state) => state.downloadStations.length,
   );
@@ -100,81 +86,12 @@ export const BodyContent = () => {
 
           {legendOpen && <NetworkLegend onClose={() => setLegendOpen(false)} />}
         </div>
-        <aside
-          className="station-side-panel"
-          hidden={!tableOpen && !filtersOpen}
-          aria-label="Station workspace"
-        >
-          <section
-            ref={filtersDialog}
-            tabIndex={-1}
-            role="dialog"
-            aria-modal="false"
-            aria-labelledby="station-filters-title"
-            className="station-filters-pane"
-            hidden={!filtersOpen}
-            onKeyDown={(event) => {
-              if (event.key === "Escape" && !event.defaultPrevented)
-                setFiltersOpen(false);
-            }}
-          >
-            {filtersOpen && (
-              <>
-                <div className="modal-header">
-                  <h2 className="modal-title h5" id="station-filters-title">
-                    Station filters
-                  </h2>
-                  <CloseButton
-                    aria-label="Close filters"
-                    onClick={() => setFiltersOpen(false)}
-                  />
-                </div>
-                <div className="modal-body">
-                  <StationMetadata
-                    filterOnly
-                    onCloseFilters={() => setFiltersOpen(false)}
-                  />
-                </div>
-              </>
-            )}
-          </section>
-          <section
-            className="station-table-pane"
-            hidden={!tableOpen || filtersOpen}
-            aria-label="Station table"
-          >
-            {tableOpen && (
-              <>
-                <header className="station-panel-heading">
-                  <div className="station-table-title">
-                    <h2>Station table</h2>
-                    <Button
-                      size="sm"
-                      variant="link"
-                      aria-label="Station table help"
-                      title="Station table help"
-                      aria-expanded={helpVisible}
-                      aria-controls="station-table-help"
-                      onClick={() => setHelpVisible(!helpVisible)}
-                    >
-                      <QuestionCircle aria-hidden="true" />
-                    </Button>
-                  </div>
-                  <CloseButton
-                    aria-label="Close panel"
-                    onClick={() => setTableOpen(false)}
-                  />
-                </header>
-                <div className="station-panel-content">
-                  <StationMetadata
-                    helpVisible={helpVisible}
-                    onOpenFilters={() => setFiltersOpen(!filtersOpen)}
-                  />
-                </div>
-              </>
-            )}
-          </section>
-        </aside>
+        <StationWorkspacePanels
+          tableOpen={tableOpen}
+          filtersOpen={filtersOpen}
+          setTableOpen={setTableOpen}
+          setFiltersOpen={setFiltersOpen}
+        />
       </div>
     </div>
   );
