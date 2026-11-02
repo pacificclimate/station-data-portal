@@ -465,10 +465,10 @@ it("keeps the shared download menu available from the map and table", async () =
   });
   fireEvent.click(toggle);
   expect(
-    downloads.getByRole("button", {
+    downloads.queryByRole("button", {
       name: "Download selected stations (0)",
     }),
-  ).toHaveAttribute("aria-disabled", "true");
+  ).not.toBeInTheDocument();
   expect(
     downloads.getByRole("link", { name: "Download Metadata" }),
   ).toBeInTheDocument();

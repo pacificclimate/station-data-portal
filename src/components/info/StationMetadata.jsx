@@ -416,14 +416,17 @@ export function StationDownloads({ drop = "up" }) {
         <Download aria-hidden="true" /> Download
       </Dropdown.Toggle>
       <Dropdown.Menu popperConfig={{ strategy: "fixed" }}>
-        <DownloadStationData
-          stations={selectedDownloadStations}
-          menuItem
-          ariaLabel={`Download selected stations (${selectedIds.length})`}
-          title="Download data for stations selected with checkboxes"
-        >
-          <Download aria-hidden="true" /> Selected ({count(selectedIds.length)})
-        </DownloadStationData>
+        {selectedIds.length > 0 && (
+          <DownloadStationData
+            stations={selectedDownloadStations}
+            menuItem
+            ariaLabel={`Download selected stations (${selectedIds.length})`}
+            title="Download data for stations selected with checkboxes"
+          >
+            <Download aria-hidden="true" /> Selected (
+            {count(selectedIds.length)})
+          </DownloadStationData>
+        )}
         <DownloadStationData
           stations={matching}
           menuItem

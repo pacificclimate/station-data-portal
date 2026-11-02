@@ -120,8 +120,15 @@ copying, new tabs, direct visits, and browser Back and Forward. Closing a direct
 opened preview returns to the map with the same query parameters. Preview graphs
 are loaded only for a preview route, keeping Plotly out of the map's initial bundle.
 
+Station summaries initially show three recorded variables, with the same
+expand/collapse control used in the table. Opening or closing a summary updates
+its station ID in the shared view. Reopening the link restores the summary on
+its station marker once that marker is available; checked download selections
+are not serialized.
+
 Shareable URLs retain open Table, Filters and Networks panels through `table=1`,
-`filters=1` and `networks=1`. The versioned, URL-safe `view` query parameter restores date bounds,
+`filters=1` and `networks=1`. The versioned, URL-safe `view` query parameter uses numeric network references
+and consecutive variable ID ranges to reduce length. It restores date bounds,
 network/variable/frequency selection, observation/climatology criteria, table grouping
 and station-attribute filters, the viewport and drawn areas. Legacy `criteria`
 JSON links remain readable and are rewritten to the compact format. Filter edits

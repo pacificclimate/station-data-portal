@@ -22,6 +22,7 @@ beforeEach(() =>
   useStationsStore.setState({
     area: null,
     mapViewport: null,
+    openStationId: null,
     metadataCompact: false,
     metadataFilters: { history: [], station: [] },
     selectedNetworks: ["/networks/1"],
@@ -218,12 +219,14 @@ it("restores the area and viewport across shared links and browser history", asy
   const base = {
     ...useStationsStore.getState(),
     area: null,
+    openStationId: null,
     mapViewport: [49, -125, 9],
   };
   const first = encodeWorkspaceView(base);
   const second = encodeWorkspaceView({
     ...base,
     area,
+    openStationId: 37,
     mapViewport: [48.5, -123.5, 16],
   });
   render(
@@ -235,11 +238,54 @@ it("restores the area and viewport across shared links and browser history", asy
     </MemoryRouter>,
   );
   expect(useStationsStore.getState().area).toEqual(area);
+  expect(useStationsStore.getState().openStationId).toBe(37);
   expect(useStationsStore.getState().mapViewport).toEqual([48.5, -123.5, 16]);
   fireEvent.click(screen.getByRole("button", { name: "Back" }));
   await waitFor(() => expect(useStationsStore.getState().area).toBeNull());
+  expect(useStationsStore.getState().openStationId).toBeNull();
   expect(useStationsStore.getState().mapViewport).toEqual([49, -125, 9]);
   fireEvent.click(screen.getByRole("button", { name: "Forward" }));
   await waitFor(() => expect(useStationsStore.getState().area).toEqual(area));
+  expect(useStationsStore.getState().openStationId).toBe(37);
   expect(useStationsStore.getState().mapViewport).toEqual([48.5, -123.5, 16]);
+});
+
+it("preserves frequencies including Unspecified when a shared URL is reopened and copied", () => {
+  const state = {
+    ...useStationsStore.getState(),
+    selectedFrequencies: ["daily", null],
+    mapViewport: [48.891307, -122.987011, 12],
+  };
+  let url = `/?view=${encodeWorkspaceView(state)}&networks=1&table=1`;
+  for (let reload = 0; reload < 2; reload++) {
+    useStationsStore.setState({
+      selectedNetworks: [],
+      selectedVariables: [],
+      selectedFrequencies: [],
+      defaultNetworksApplied: false,
+      defaultVariablesApplied: false,
+      defaultFrequenciesApplied: false,
+      mapViewport: null,
+    });
+    const { unmount } = render(
+      <MemoryRouter initialEntries={[url]}>
+        <Harness />
+      </MemoryRouter>,
+    );
+    expect(useStationsStore.getState()).toMatchObject({
+      selectedFrequencies: state.selectedFrequencies,
+      defaultFrequenciesApplied: true,
+    });
+    url = screen.getByTestId("url").textContent;
+    const params = new URLSearchParams(url.split("?")[1]);
+    expect(decodeWorkspaceView(params.get("view"))).toMatchObject({
+      selectedNetworks: state.selectedNetworks,
+      selectedVariables: state.selectedVariables,
+      selectedFrequencies: state.selectedFrequencies,
+      mapViewport: state.mapViewport,
+    });
+    expect(params.get("networks")).toBe("1");
+    expect(params.get("table")).toBe("1");
+    unmount();
+  }
 });

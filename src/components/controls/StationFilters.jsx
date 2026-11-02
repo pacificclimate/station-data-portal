@@ -27,9 +27,6 @@ function StationFilters({ children }) {
   const { data: networks } = useNetworks();
   const { data: variables } = useVariables();
   const { data: frequencies } = useFrequencies();
-  const reset = useStationsStore((state) => state.resetStationFilters);
-  const compact = useStationsStore((state) => state.metadataCompact);
-  const setCompact = useStationsStore((state) => state.setMetadataCompact);
   const tabLabels = {
     networks: "Networks",
     variables: "Variables",
@@ -49,19 +46,31 @@ function StationFilters({ children }) {
   };
 
   const summary = useStationFilterSummary();
-  const { startDate, endDate, setStartDate, setEndDate, area, setArea } =
-    useStationsStore(
-      useShallow(
-        pick([
-          "startDate",
-          "endDate",
-          "setStartDate",
-          "setEndDate",
-          "area",
-          "setArea",
-        ]),
-      ),
-    );
+  const {
+    startDate,
+    endDate,
+    setStartDate,
+    setEndDate,
+    area,
+    setArea,
+    resetStationFilters: reset,
+    metadataCompact: compact,
+    setMetadataCompact: setCompact,
+  } = useStationsStore(
+    useShallow(
+      pick([
+        "startDate",
+        "endDate",
+        "setStartDate",
+        "setEndDate",
+        "area",
+        "setArea",
+        "resetStationFilters",
+        "metadataCompact",
+        "setMetadataCompact",
+      ]),
+    ),
+  );
   const { stationsLimit, setStationsLimit } = useStore(
     useShallow(pick(["stationsLimit", "setStationsLimit"])),
   );

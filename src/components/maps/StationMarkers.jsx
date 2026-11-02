@@ -39,12 +39,18 @@ const useLazyPopup = ({ station, openForFocus = false }) => {
       ? state.stationPopupRequest
       : null,
   );
+  const restorePopup = useStationsStore(
+    (state) => state.openStationId === station.id,
+  );
   useEffect(() => {
     if (!popupRequest) return;
     if (popup === null) setPopup(<StationPopup station={station} />);
     else markerRef.current?.openPopup();
     useStationsStore.getState().clearStationPopupRequest();
   }, [popupRequest, station, popup]);
+  useEffect(() => {
+    if (!restorePopup) markerRef.current?.closePopup();
+  }, [restorePopup]);
 
   // Callback: create popup if not already created.
   const addPopup = () => {

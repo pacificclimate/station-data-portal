@@ -1,7 +1,7 @@
-Station Data Portal
-===================
+Station Preview
+===============
 
-Use the Station Data Portal to find weather and climate observation stations,
+Use Station Preview to find weather and climate observation stations,
 inspect their records, preview variables, and download data. The available
 stations and networks depend on the portal instance you are using.
 
@@ -69,7 +69,9 @@ closing Filters returns to it. Closing a panel retains its filters and download
 selection. On smaller screens the table appears below the map.
 
 Click a marker to open its station summary. This shows its network, IDs,
-locations, record spans, observation frequencies and recorded variables.
+locations, record spans, observation frequencies and recorded variables. The
+variable list initially shows three entries; use its expand button to see all
+variables and collapse it again when finished.
 Use **Preview variables** to inspect graphs, **Download station data** for a
 single-station download, or **Select for download** to add it to a batch.
 Close the summary with its close button.
@@ -298,13 +300,13 @@ cannot display variable graphs.
 Sharing a view
 --------------
 
-Copy the browser address to share a station preview, open table or filters,
-network legend, station criteria, table grouping, attribute filters, drawn areas
-and the map's current position and zoom.
+Copy the browser address to share an open station summary or variable preview,
+open table or filters, network legend, station criteria, table grouping,
+attribute filters, drawn areas and the map's current position and zoom.
 Browser Back and Forward navigate between panel and preview views.
 
-The address uses an encoded view value instead of a long JSON query. Existing
-links using the older format still open. When an area is shared, its editable
+The address uses an encoded view value with compact network references and
+variable ID ranges. When an area is shared, its editable
 drawing and its filter are restored together, including multiple shapes and
 holes. Panning, zooming, changing filters or editing a drawing updates the link
 without adding a history entry for every change.

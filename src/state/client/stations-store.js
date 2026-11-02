@@ -22,6 +22,7 @@ export const useStationsStore = create(
     clearStationFocus: () =>
       set({ focusedStation: null, stationPopupRequest: null }),
 
+    openStationId: null,
     stationPopupRequest: null,
     requestStationPopup: (stationId) =>
       set({ stationPopupRequest: { stationId } }),

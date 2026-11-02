@@ -1,7 +1,12 @@
 import React from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { MemoryRouter } from "react-router-dom";
-import { act, screen, fireEvent } from "@testing-library/react";
+import { MemoryRouter, useLocation } from "react-router-dom";
+import { useWorkspaceUrlState } from "@/state/client-server-hooks/use-workspace-url-state";
+import {
+  encodeWorkspaceView,
+  decodeWorkspaceView,
+} from "@/utils/workspace-url";
+import { act, screen, fireEvent, waitFor } from "@testing-library/react";
 import { renderWithProviders } from "@/test-utils";
 import { useStationsStore } from "@/state/client/stations-store";
 import StationFocus from "./StationFocus";
@@ -20,6 +25,7 @@ beforeEach(() =>
     downloadStations: [],
     stationPopupRequest: null,
     focusedStation: null,
+    openStationId: null,
   }),
 );
 afterEach(() => {
@@ -236,4 +242,94 @@ it("opens the existing station summary after flying and shares download selectio
     screen.getByRole("checkbox", { name: "Select Test Station (TEST)" }),
   );
   expect(popupSelection).not.toBeChecked();
+});
+
+it("reopens a shared station popup without download selection and collapses its variables", async () => {
+  const station = {
+    id: 37,
+    native_id: "TEST",
+    network_uri: "/networks/1",
+    histories: [
+      {
+        id: 1,
+        station_name: "Shared station",
+        lat: 50,
+        lon: -125,
+        variable_ids: [1, 2, 3, 4, 5],
+        freq: "daily",
+        min_obs_time: null,
+        max_obs_time: null,
+      },
+    ],
+  };
+  function PopupUrl() {
+    useWorkspaceUrlState();
+    const location = useLocation();
+    return <output data-testid="popup-url">{location.search}</output>;
+  }
+  useStationsStore.setState({
+    area: null,
+    defaultNetworksApplied: true,
+    defaultVariablesApplied: true,
+    defaultFrequenciesApplied: true,
+    downloadStations: [],
+  });
+  const setup = (entry) =>
+    renderWithProviders(
+      <MemoryRouter initialEntries={[entry]}>
+        <PopupUrl />
+        <OneStationMarkers station={station} />
+      </MemoryRouter>,
+      {
+        withMap: true,
+        seedQueries: [
+          [
+            [NETWORKS_QUERY_KEY],
+            [{ uri: "/networks/1", name: "Test Network", color: "#cc2222" }],
+          ],
+          [
+            VARIABLES_QUERY_KEY,
+            [1, 2, 3, 4, 5].map((id) => ({
+              id,
+              display_name: `Variable ${id}`,
+            })),
+          ],
+        ],
+      },
+    );
+  const first = setup("/");
+  fireEvent.click(first.container.querySelector("path.leaflet-interactive"));
+  const popup = document.querySelector(".leaflet-popup");
+  expect(popup).toHaveTextContent("Shared station");
+  expect(popup.querySelectorAll(".station-variable-list li")).toHaveLength(3);
+  fireEvent.click(screen.getByRole("button", { name: "Show all 5 variables" }));
+  expect(popup.querySelectorAll(".station-variable-list li")).toHaveLength(5);
+  fireEvent.click(
+    screen.getByRole("checkbox", { name: "Select for download" }),
+  );
+  const copied = screen.getByTestId("popup-url").textContent;
+  expect(
+    decodeWorkspaceView(new URLSearchParams(copied).get("view")).openStationId,
+  ).toBe(37);
+  first.unmount();
+  useStationsStore.setState({ downloadStations: [], openStationId: null });
+  setup(`/${copied}`);
+  await screen.findByText("Station: Shared station");
+  expect(
+    screen.getByRole("checkbox", { name: "Select for download" }),
+  ).not.toBeChecked();
+  expect(document.querySelectorAll(".station-variable-list li")).toHaveLength(
+    3,
+  );
+  fireEvent.click(document.querySelector(".leaflet-popup-close-button"));
+  await waitFor(() =>
+    expect(document.querySelector(".leaflet-popup")).not.toBeInTheDocument(),
+  );
+  expect(
+    decodeWorkspaceView(
+      new URLSearchParams(screen.getByTestId("popup-url").textContent).get(
+        "view",
+      ),
+    ).openStationId,
+  ).toBeNull();
 });

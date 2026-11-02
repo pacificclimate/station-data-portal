@@ -41,7 +41,10 @@ export function decodeWorkspaceFilters(value) {
         Array.isArray(parsed[key]) &&
         parsed[key].length <= 10000 &&
         parsed[key].every(
-          (item) => typeof item === "string" || typeof item === "number",
+          (item) =>
+            typeof item === "string" ||
+            typeof item === "number" ||
+            (key === "selectedFrequencies" && item === null),
         )
       )
         result[key] = parsed[key];
@@ -80,6 +83,11 @@ export function decodeWorkspaceFilters(value) {
       if (!validViewport(parsed.mapViewport)) return null;
       result.mapViewport = parsed.mapViewport;
     }
+    if (
+      parsed.openStationId === null ||
+      (Number.isSafeInteger(parsed.openStationId) && parsed.openStationId > 0)
+    )
+      result.openStationId = parsed.openStationId;
     if (result.selectedNetworks) result.defaultNetworksApplied = true;
     if (result.selectedVariables) result.defaultVariablesApplied = true;
     if (result.selectedFrequencies) result.defaultFrequenciesApplied = true;
@@ -102,8 +110,45 @@ const keys = {
   metadataCompact: "g",
   area: "p",
   mapViewport: "m",
+  openStationId: "i",
 };
 const attributes = [...attributeIds];
+
+function packIds(ids) {
+  const packed = [];
+  for (let start = 0; start < ids.length; start++) {
+    let end = start;
+    while (Number.isSafeInteger(ids[end]) && ids[end + 1] === ids[end] + 1)
+      end++;
+    if (end - start >= 2) {
+      packed.push([ids[start], ids[end]]);
+      start = end;
+    } else packed.push(ids[start]);
+  }
+  return packed;
+}
+
+function unpackIds(packed) {
+  if (!Array.isArray(packed)) return packed;
+  const ids = [];
+  for (const entry of packed) {
+    if (Array.isArray(entry)) {
+      const [start, end] = entry;
+      if (
+        entry.length !== 2 ||
+        !Number.isSafeInteger(start) ||
+        !Number.isSafeInteger(end) ||
+        start < 0 ||
+        end < start ||
+        ids.length + end - start + 1 > 10000
+      )
+        throw new Error("Invalid variable ID range");
+      for (let id = start; id <= end; id++) ids.push(id);
+    } else ids.push(entry);
+    if (ids.length > 10000) throw new Error("Too many variable IDs");
+  }
+  return ids;
+}
 
 export function validViewport(value) {
   return (
@@ -164,6 +209,14 @@ export function encodeWorkspaceView(state) {
     compact[key] =
       field === "area" ? value.coordinates : value === true ? 1 : value;
   }
+  if (compact.n)
+    compact.n = compact.n.map((uri) => {
+      const match = /^\/networks\/([1-9]\d*)$/.exec(uri);
+      return match && Number.isSafeInteger(Number(match[1]))
+        ? Number(match[1])
+        : uri;
+    });
+  if (compact.v) compact.v = packIds(compact.v);
   if (
     state.metadataFilters &&
     Object.values(state.metadataFilters).some((filters) => filters.length)
@@ -206,6 +259,7 @@ export function decodeWorkspaceView(value) {
       metadataFilters: { history: [], station: [] },
       area: null,
       mapViewport: null,
+      openStationId: null,
     };
     for (const [field, key] of Object.entries(keys)) {
       if (!(key in compact)) continue;
@@ -217,6 +271,12 @@ export function decodeWorkspaceView(value) {
             ? v === 1
             : v;
     }
+    if (restored.selectedNetworks)
+      restored.selectedNetworks = restored.selectedNetworks.map((id) =>
+        Number.isSafeInteger(id) && id > 0 ? `/networks/${id}` : id,
+      );
+    if (restored.selectedVariables)
+      restored.selectedVariables = unpackIds(restored.selectedVariables);
     if (compact.a) {
       if (!Array.isArray(compact.a) || compact.a.length !== 2) return null;
       restored.metadataFilters = Object.fromEntries(

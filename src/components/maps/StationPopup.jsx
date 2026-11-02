@@ -4,6 +4,7 @@ import React from "react";
 import { Table } from "react-bootstrap";
 import { Popup } from "react-leaflet";
 import StationPreviewLink from "@/components/preview/StationPreviewLink";
+import StationVariableList from "@/components/info/StationVariableList";
 import isNull from "lodash/fp/isNull";
 import flow from "lodash/fp/flow";
 import map from "lodash/fp/map";
@@ -105,18 +106,19 @@ function StationPopup({ station }) {
     usvns.length === 0 ? (
       <em>No observations</em>
     ) : (
-      <ul className={"compact"}>
-        {map(
-          (name) => (
-            <li key={name}>{name}</li>
-          ),
-          usvns,
-        )}
-      </ul>
+      <StationVariableList names={usvns} />
     );
 
   return (
-    <Popup>
+    <Popup
+      eventHandlers={{
+        add: () => useStationsStore.setState({ openStationId: station.id }),
+        remove: () => {
+          if (useStationsStore.getState().openStationId === station.id)
+            useStationsStore.setState({ openStationId: null });
+        },
+      }}
+    >
       <h1>Station: {stationNames}</h1>
       <Table size={"sm"} condensed="true">
         <tbody>

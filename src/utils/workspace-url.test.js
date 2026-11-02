@@ -1,4 +1,5 @@
 import { expect, it } from "vitest";
+import frequencies from "./__test_data__/frequencies-bc.json";
 import {
   encodeWorkspaceView,
   decodeWorkspaceView,
@@ -134,4 +135,65 @@ it("rejects invalid geometry, non-finite coordinates, oversized rings and unsupp
     ).toBeNull();
   }
   expect(decodeWorkspaceFilters('{"mapViewport":[50,-125,99]}')).toBeNull();
+});
+
+it("round-trips unspecified observation frequency without accepting null selector IDs", () => {
+  expect(
+    decodeWorkspaceView(
+      encodeWorkspaceView({ selectedFrequencies: frequencies }),
+    ),
+  ).toMatchObject({
+    selectedFrequencies: frequencies,
+    defaultFrequenciesApplied: true,
+  });
+  expect(
+    decodeWorkspaceFilters(
+      JSON.stringify({
+        selectedNetworks: [null],
+        selectedVariables: [null],
+        selectedFrequencies: [null],
+      }),
+    ),
+  ).toEqual({ selectedFrequencies: [null], defaultFrequenciesApplied: true });
+});
+
+it("compacts consecutive variable IDs and network references without losing order", () => {
+  const state = {
+    selectedNetworks: ["/networks/1", "/networks/72"],
+    selectedVariables: [427, 428, 429, 430, 7, 9, 8, 8],
+    selectedFrequencies: [null, "daily"],
+    openStationId: 37,
+    downloadStations: [{ id: 42 }],
+    metadataSelectedOnly: true,
+  };
+  const encoded = encodeWorkspaceView(state);
+  const compact = JSON.parse(
+    atob(encoded.slice(2).replaceAll("-", "+").replaceAll("_", "/")),
+  );
+  expect(compact.n).toEqual([1, 72]);
+  expect(compact.v).toEqual([[427, 430], 7, 9, 8, 8]);
+  const restored = decodeWorkspaceView(encoded);
+  expect(restored).toMatchObject({
+    selectedNetworks: state.selectedNetworks,
+    selectedVariables: state.selectedVariables,
+    selectedFrequencies: state.selectedFrequencies,
+    openStationId: 37,
+  });
+  expect(restored).not.toHaveProperty("downloadStations");
+  expect(restored).not.toHaveProperty("metadataSelectedOnly");
+});
+
+it.each([
+  { ranges: [[1, 1000000000]] },
+  { ranges: [[8, 2]] },
+  { ranges: [[1, 2, 3]] },
+  { ranges: [[-1, 3]] },
+])("rejects invalid or oversized ID ranges $ranges", ({ ranges }) => {
+  const encoded =
+    "1." +
+    btoa(JSON.stringify({ v: ranges }))
+      .replaceAll("+", "-")
+      .replaceAll("/", "_")
+      .replace(/=+$/, "");
+  expect(decodeWorkspaceView(encoded)).toBeNull();
 });

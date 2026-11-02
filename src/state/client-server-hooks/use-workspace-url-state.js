@@ -20,6 +20,7 @@ const fields = [
   "metadataFilters",
   "area",
   "mapViewport",
+  "openStationId",
 ];
 const snapshot = () =>
   Object.fromEntries(
@@ -43,6 +44,10 @@ export function useWorkspaceUrlState() {
             : JSON.stringify(state[key]) !== JSON.stringify(value),
         ),
       );
+      if ("openStationId" in changes)
+        changes.stationPopupRequest = changes.openStationId
+          ? { stationId: changes.openStationId }
+          : null;
       if (Object.keys(changes).length) useStationsStore.setState(changes);
     }
     const writeFilters = () => {

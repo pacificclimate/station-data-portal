@@ -31,7 +31,7 @@ import { VARIABLES_QUERY_KEY } from "@/state/query-hooks/use-variables";
 const downloadChoice = (name) => {
   const toggle = screen.getByRole("button", { name: "Download", exact: true });
   if (toggle.getAttribute("aria-expanded") !== "true") fireEvent.click(toggle);
-  return screen.getByRole("button", { name });
+  return screen.queryByRole("button", { name });
 };
 
 it("selects unique stations across histories and table views, and focuses their locations", () => {
@@ -85,10 +85,9 @@ it("selects unique stations across histories and table views, and focuses their 
     screen.getByRole("checkbox", { name: "Select Test Station (TEST)" }),
   ).toBeChecked();
   fireEvent.click(screen.getByRole("button", { name: /^Clear selected/ }));
-  expect(downloadChoice("Download selected stations (0)")).toHaveAttribute(
-    "aria-disabled",
-    "true",
-  );
+  expect(
+    downloadChoice("Download selected stations (0)"),
+  ).not.toBeInTheDocument();
 });
 
 import { StationFilteringContext } from "@/state/context-hooks/use-station-filtering-context";
@@ -148,10 +147,9 @@ it("does not restore selected stations after a network is excluded and re-added 
   expect(
     screen.getByRole("checkbox", { name: "Select Test Station (TEST)" }),
   ).not.toBeChecked();
-  expect(downloadChoice("Download selected stations (0)")).toHaveAttribute(
-    "aria-disabled",
-    "true",
-  );
+  expect(
+    downloadChoice("Download selected stations (0)"),
+  ).not.toBeInTheDocument();
 });
 
 const filterStations = ["Brentwood Bay", "Active Pass"].map((name, index) => ({
