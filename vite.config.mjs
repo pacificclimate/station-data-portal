@@ -60,6 +60,7 @@ export default defineConfig(({ command }) => ({
     strictPort: true,
   },
   test: {
+    env: { TZ: "UTC" },
     environment: "jsdom",
     // Only unit tests under src/. Without this, Vitest's default glob also
     // picks up the Playwright specs kept under docs/.
