@@ -33,7 +33,10 @@ export default function StationPreview() {
     <Container className="StationPreview mt-2">
       <HeaderBlock />
       <div className="my-2">
-        <DownloadStationData stations={station ? [station] : []} />
+        <DownloadStationData
+          scope="station"
+          stations={station ? [station] : []}
+        />
       </div>
       {hasVariables && (
         <>
