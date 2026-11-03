@@ -1,9 +1,11 @@
 window.env = {
   PUBLIC_URL: "http://localhost:30503",
   REACT_APP_BC_BASE_MAP_TILES_URL:
-    "https://swarm.pacificclimate.org/tiles/bc-albers-lite/{z}/{x}/{y}.png",
+    "https://beehive.pacificclimate.org/tiles/bc-albers-lite/{z}/{x}/{y}.webp",
   REACT_APP_YNWT_BASE_MAP_TILES_URL:
-    "https://swarm.pacificclimate.org/tiles/yukon-albers-lite/{z}/{x}/{y}.png",
+    "https://beehive.pacificclimate.org/tiles/yukon-albers-lite/{z}/{x}/{y}.webp",
+  REACT_APP_EEZ_GEOJSON_URL:
+    "https://beehive.pacificclimate.org/tiles/eez/eez_boundaries_bc_v12.geojson",
   appTitle: "BC Station Data - PCDS",
   baseMap: "BC",
 

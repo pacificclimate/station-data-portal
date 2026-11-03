@@ -49,7 +49,7 @@ import UserShapeControl from "./UserShapeControl";
 import { defaultMarkerOptions, ManyStationMarkers } from "./StationMarkers";
 
 import logger from "@/logger";
-import { MapSpinner } from "pcic-react-leaflet-components";
+import { EEZLayer, MapSpinner } from "pcic-react-leaflet-components";
 import { useImmer } from "use-immer";
 import { StationRefresh } from "./StationRefresh/StationRefresh";
 import useConfigContext from "@/state/context-hooks/use-config-context";
@@ -65,7 +65,9 @@ const StationMapRenderer = React.memo(
   ({
     BaseMap,
     initialViewport,
+    minZoom,
     baseMapTilesUrl,
+    eezGeoJSONUrl,
     userShapeStyle,
     handleChangedGeometryLayers,
     stations,
@@ -131,8 +133,10 @@ const StationMapRenderer = React.memo(
         baseMapTilesUrl={baseMapTilesUrl}
         preferCanvas={true}
         maxZoom={13}
+        minZoom={minZoom}
         pmIgnore={false}
       >
+        {eezGeoJSONUrl && <EEZLayer url={eezGeoJSONUrl} />}
         <MapInfoDisplay
           position={"bottomleft"}
           what={(map) => `Zoom: ${map.getZoom()}`}
@@ -178,7 +182,7 @@ const StationMap = ({
   const { isFiltering, filteredStations: stations } =
     useStationFilteringContext();
 
-  const { BaseMap, initialViewport, baseMapTilesUrl } =
+  const { BaseMap, initialViewport, minZoom, baseMapTilesUrl, eezGeoJSONUrl } =
     baseMaps[config.baseMap];
 
   const handleChangedGeometryLayers = useMemo(
@@ -194,7 +198,9 @@ const StationMap = ({
       {...{
         BaseMap,
         initialViewport,
+        minZoom,
         baseMapTilesUrl,
+        eezGeoJSONUrl,
         userShapeStyle,
         handleChangedGeometryLayers,
         onReloadStations,
