@@ -8,21 +8,30 @@ import sortBy from "lodash/fp/sortBy";
 export default function SelectColumnFilter({
   column: { filterValue, setFilter, preFilteredRows, id },
   allValue = "*",
+  autoSelectSingle = false,
 }) {
   // Calculate the options for filtering using the preFilteredRows
   const options = React.useMemo(() => {
     const options = new Set();
     preFilteredRows.forEach((row) => {
-      options.add(row.values[id]);
+      if (row.values[id] !== allValue) options.add(row.values[id]);
     });
     return sortBy((x) => x, [...options.values()]);
-  }, [id, preFilteredRows]);
+  }, [id, preFilteredRows, allValue]);
+
+  const singleOption = autoSelectSingle && options.length === 1;
+  React.useEffect(() => {
+    // Every row already has this value. Avoid a redundant station constraint,
+    // and clear a stale choice if the available province changes.
+    if (singleOption && filterValue !== undefined) setFilter(undefined);
+  }, [singleOption, options, filterValue, setFilter]);
 
   // Render a multi-select box
   return (
     <div className={`${styles.wrapper} ${styles.selectColumn}`}>
       <Form.Select
-        value={filterValue}
+        value={singleOption ? options[0] : (filterValue ?? allValue)}
+        disabled={singleOption}
         onChange={(e) => {
           setFilter(e.target.value || undefined);
         }}

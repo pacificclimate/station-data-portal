@@ -47,7 +47,7 @@ export const formatLabels = flow(
   map((network) => ({
     value: network,
     label: `${network.name}`,
-    isDisabled: !network.publish,
+    isDisabled: network.publish === false,
   })),
   sortBy("label"),
 );
@@ -89,38 +89,41 @@ export const NetworkSelector = (props) => {
 
   return (
     <Form>
-      <div>
-        <Form.Label>Network</Form.Label>{" "}
-        <InfoPopup title={"Network multiselector"}>
-          <ul className={"compact"}>
-            <li>At startup, all networks are selected.</li>
-            <li>
-              Use the None button to clear all networks from the selector.
-            </li>
-            <li>
-              Use the All button to add all available networks to the selector.
-            </li>
-            <li>
-              Click the dropdown and select an item to add a single unselected
-              network.
-            </li>
-            <li>Click the X next to a selected network to remove it.</li>
-          </ul>
-        </InfoPopup>
+      <div className={css.selectorHeading}>
+        <div className={css.selectorLabel}>
+          <Form.Label>Network</Form.Label>{" "}
+          <InfoPopup title={"Network multiselector"}>
+            <ul className={"compact"}>
+              <li>At startup, all networks are selected.</li>
+              <li>
+                Use the None button to clear all networks from the selector.
+              </li>
+              <li>
+                Use the All button to add all available networks to the
+                selector.
+              </li>
+              <li>
+                Click the dropdown and select an item to add a single unselected
+                network.
+              </li>
+              <li>Click the X next to a selected network to remove it.</li>
+            </ul>
+          </InfoPopup>
+        </div>
+        <ButtonToolbar className={css.selectorButtons}>
+          <Button
+            {...selectorButtonProps}
+            onClick={() =>
+              onChange(filter((option) => !option.isDisabled)(options))
+            }
+          >
+            All
+          </Button>
+          <Button {...selectorButtonProps} onClick={() => onChange([])}>
+            None
+          </Button>
+        </ButtonToolbar>
       </div>
-      <ButtonToolbar className={css.selectorButtons}>
-        <Button
-          {...selectorButtonProps}
-          onClick={() =>
-            onChange(filter((option) => !option.isDisabled)(options))
-          }
-        >
-          All
-        </Button>
-        <Button {...selectorButtonProps} onClick={() => onChange([])}>
-          None
-        </Button>
-      </ButtonToolbar>
       <Select
         options={options}
         placeholder={networks ? "Select or type to search..." : "Loading..."}
