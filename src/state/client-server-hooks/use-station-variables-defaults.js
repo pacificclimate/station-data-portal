@@ -35,7 +35,7 @@ export const useStationVariablesDefaults = (stationId) => {
     })),
   );
 
-  storeActions.setStationId(stationId);
+  useEffect(() => storeActions.setStationId(stationId), [stationId]);
 
   useEffect(() => {
     // if stationid changes, this will clear default ranges and set duration back to default

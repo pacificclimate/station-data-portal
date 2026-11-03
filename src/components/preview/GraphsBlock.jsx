@@ -32,7 +32,7 @@ const GraphsBlock = () => {
   const {
     data: previewStation,
     isLoading: isStationLoading,
-    isStationisError,
+    isError: isStationError,
   } = useStation(stationId);
   const {
     data: previewStationVariables,
@@ -76,7 +76,7 @@ const GraphsBlock = () => {
     );
   }
 
-  if (isStationisError || isVariableError) {
+  if (isStationError || isVariableError) {
     return (
       <Row id="graphs-root">
         <Col xs={12} className="d-flex justify-content-center">
@@ -105,7 +105,7 @@ const GraphsBlock = () => {
   }
 
   return (
-    <div id="graphs-root" style={{ marginBottom: "66dvh" }}>
+    <div id="graphs-root" style={{ marginBottom: "2rem" }}>
       {map((variable) => (
         <Row
           key={`${previewStation.id}-${variable.id}`}
