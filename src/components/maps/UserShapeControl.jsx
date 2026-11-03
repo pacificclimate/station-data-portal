@@ -41,7 +41,17 @@ const UserShapeControl = ({ position = "topleft", shapeStyle, onChange }) => {
 
   useEffect(() => {
     const shapes = L.featureGroup().addTo(map);
-    const report = () => onChangeRef.current(shapes.getLayers());
+    let reporting = false;
+    let restoring = false;
+    const report = () => {
+      if (restoring) return;
+      reporting = true;
+      try {
+        onChangeRef.current(shapes.getLayers());
+      } finally {
+        reporting = false;
+      }
+    };
 
     const style = { ...shapeStyle, lonLatEdges: true, interactive: false };
     map.pm.setGlobalOptions({
@@ -98,15 +108,40 @@ const UserShapeControl = ({ position = "topleft", shapeStyle, onChange }) => {
       shapes.eachLayer((layer) => {
         layer.options.interactive = enabled;
       });
-    // Clearing the area from the filter panel must also remove the visible
-    // drawing, so the map cannot show a box that no longer constrains data.
-    const unsubscribe = useStationsStore.subscribe((state, previous) => {
-      if (!state.area && previous.area) {
+    // A shared URL/Back/Forward restores the visible editable drawings too.
+    const restore = (area) => {
+      restoring = true;
+      try {
         shapes.clearLayers();
         map.pm.disableDraw();
         map.pm.disableGlobalEditMode();
         map.pm.disableGlobalRemovalMode();
+        for (const polygon of area?.coordinates ?? []) {
+          const rings = polygon.map((ring) =>
+            ring.map(([lon, lat]) => [lat, lon]),
+          );
+          const outer = polygon[0];
+          const rectangle =
+            polygon.length === 1 &&
+            outer.length === 5 &&
+            new Set(outer.map(([lon]) => lon)).size === 2 &&
+            new Set(outer.map(([, lat]) => lat)).size === 2;
+          const layer = rectangle
+            ? L.rectangle([rings[0][0], rings[0][2]], {
+                ...style,
+                pmIgnore: false,
+              })
+            : L.polygon(rings, { ...style, pmIgnore: false });
+          layer.addTo(shapes).bringToBack();
+          layer.on("pm:edit", report);
+        }
+      } finally {
+        restoring = false;
       }
+    };
+    restore(useStationsStore.getState().area);
+    const unsubscribe = useStationsStore.subscribe((state, previous) => {
+      if (!reporting && state.area !== previous.area) restore(state.area);
     });
     map.on("pm:create", onCreate);
     map.on("pm:remove", report);

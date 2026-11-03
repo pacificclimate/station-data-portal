@@ -1,486 +1,437 @@
 Meteorological Data Portal
---------------------------
+==========================
 
-PCIC maintains databases containing observations of weather and
-climate variables (such as temperature and rainfall amounts) for various
-regions in Canada. At present there are two such databases:
+The Meteorological Data Portal (MDP) lets you find weather and climate
+observation stations, inspect their records, preview variables, and download
+data from PCIC's observational databases. Regional instances include BC Station
+Data (the Provincial Climate Data Set, or PCDS) and Yukon and Northwest
+Territories Station Data. The controls work in the same way across instances;
+the available stations and networks depend on the database being served.
 
-* the Provincial Climate Data Set, or PCDS, containing data mainly from
-  British Columbia and Alberta
-* Yukon and Northwest Territories database, containing data from those regions
+Open the portal from the `PCIC Data Portal <https://pacificclimate.org/data>`_.
+Accept the terms of use if prompted, then allow the station metadata to load.
+A spinner and Loading messages indicate that station or filter information is
+still being fetched. Once loaded, station markers and filter choices appear.
+Hover over the info icons beside controls for explanations; the table also has
+a Help button beside its title.
 
-The Meteorological Data Portal (MDP) is an application that permits users to
-find and download data from these observational databases. A separate
-instance of the MDP serves data for each separate database. The MDP
-functions nearly identically for each database.
+Map and station information
+---------------------------
 
-In the MDP, locations of observation stations are shown on an
-interactive map of the region, which enables a user to zoom and pan to a
-region of interest, learn about the stations that are there, filter the
-displayed stations based on observation date, weather element, observing
-agency, spatial location, and more.
-
-.. figure:: ./images/app.png
-
-Starting the Meteorological Data Portal
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-To start the MDP, browse to the appropriate web page as found in the
-`Data Portal <https://pacificclimate.org/data>`_ section of the the PCIC
-website. The MDP app runs in your browser.
-
-For some regions, the app presents a disclaimer that must be accepted
-before it can be used to access data. Click the **Accept** button to
-accept the terms of use and enter the app proper.
-
-The MDP’s first action is to fetch data describing all stations in its
-region database. This may take several seconds. During this time, the map
-shows a spinner and some of the selectors show "Loading...".
-When all the descriptive data (metadata) has loaded, the map shows markers
-for each station and the selectors are populated.
-
-.. figure:: ./images/map-spinner.png
-
-   *Map-updating spinner*
-
-
-In-app info and help
-^^^^^^^^^^^^^^^^^^^^
-
-Throughout the app you will find info icons |info icon| next to controls
-and other elements. Hover over these icons to see an immediate explanation
-of the item it is next to. Often this will remove the need to refer to
-this documentation.
+Drag the map to pan; use its zoom buttons or mouse wheel to zoom. Double-click
+the map to zoom in. Moving or zooming the map does not filter stations or limit
+downloads to the visible area.
+You can zoom in beyond the basemap's native detail to separate nearby station
+markers. Existing tiles are enlarged at these closer zoom levels; labels and
+background features may look softer, but station locations remain selectable.
+Station marker colours identify their networks. Lines connect a station's
+different recorded locations.
 
 Stations and histories
-^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~
 
-Each station has one or more history items associated with it.
+Each station has one or more history records. A history describes a particular
+station configuration, including its name, location, elevation and reported
+variables. Several histories can reflect changes to the station's location or
+instruments over time.
 
-A station history item describes a particular configuration of a station,
-including its name, location, and the variables it reports (which relate
-to the sensors installed in the station hardware). Many stations have
-only one history item, but some have several, reflecting *small* changes of
-location or equipment.
+The map shows a marker for each distinct recorded location. The station summary
+lists its histories and locations. In the table, **By History** displays one
+history per row, while **By Station** groups the histories belonging to the
+same station.
 
-The distinction between station and history is often glossed over, but
-it does appear in things like station markers (there is one marker per
-unique station location, which is derived from histories) and in the
-metadata available on the **Station Metadata** tab. See below for
-details.
+Finding the tools
+~~~~~~~~~~~~~~~~~
 
-Finding and selecting stations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The three round buttons over the map open Table, Network legend and Filters.
+Hover over an icon to see its name. The same filter controls are also available
+from the labelled **Filters** button in the table.
 
-You find and select stations using a combination of station filtering
-options in the sidebar and spatial selection tools on the map.
+.. list-table:: Icon key
+   :header-rows: 1
+   :widths: 10 25 65
 
-The map is the primary display of the stations you have selected. It
-typically takes up much of the screen real estate, which it shares with
-a set of tabs that include station filtering. You can adjust the
-proportion of the screen allocated to the map and the tabs by using the
-column width controls at the top of the display.
+   * - Icon
+     - Control
+     - What it opens or does
+   * - |table icon|
+     - Table
+     - Opens the station table beside the map.
+   * - |networks icon|
+     - Network legend
+     - Shows network names and marker colours. Change networks in Filters.
+   * - |filters icon|
+     - Filters
+     - Opens shared station criteria and the current view's attribute filters.
+   * - |download icon|
+     - Download station data
+     - Opens download options for the station in that table row.
+   * - |preview icon|
+     - Preview variables
+     - Opens that station's variable graphs over the map.
+   * - |locate icon|
+     - Locate station on map
+     - Moves the map to the station and opens its summary.
+   * - |help icon|
+     - Station table help
+     - Shows explanations of the table controls below its heading.
 
-.. figure:: ./images/column-width-controls.png
+The first three icons are map buttons. Download, Preview and Locate are in each
+table row's Actions column; Help is beside the table title. A numbered badge on
+Table counts checked stations, while a dot on Filters indicates active filters.
+The network legend explains marker colours; it does not enable or disable
+networks. Expand a network's entry to see its full name and, when available,
+its station count.
 
-   *Column width controls*
+The table and filters share a panel, with one visible at a time. The map remains
+interactive beside it. Opening Filters from the table replaces the table;
+closing Filters returns to it. Closing a panel retains its filters and download
+selection. On smaller screens the table appears below the map.
 
-The main display area is divided into two columns, whose width can be
-adjusted in increments of 1/12 of the window width.
+Click a marker to open its station summary. This shows its network, IDs,
+locations, record spans, observation frequencies and recorded variables. The
+variable list initially shows three entries; use its expand button to see all
+variables and collapse it again when finished.
+Use **Preview variables** to inspect graphs, **Download station data** for a
+single-station download, or **Select for download** to add it to a batch.
+Close the summary with its close button.
 
--  To move the division one increment left or right, click the ``<`` or
-   ``>`` button.
--  To move the division two increments left or right, click the ``<<``
-   or ``>>`` button.
--  To move the division completely to the left or right, click the
-   ``|<`` or ``>|`` button.
+Panels, popups and dialogs
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Finding and selecting stations on the map
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* **Table and Filters panels** sit beside the map. Use a panel's close button
+  or its map button to close it. Filters also has a Done button. The map remains
+  usable while either panel is open.
+* **Station summaries** open when you click a marker or use Locate. They are
+  attached to a station on the map and contain selection, download and preview
+  controls. Their close button dismisses them.
+* **Variable preview** is a dialog over the map. Close it with its top-right
+  close button, Close preview, or Escape to return to the map.
+* **Download station data** is a separate dialog for reviewing included
+  stations and choosing format, date clipping and observation or climatology
+  output. Its close button or Escape returns to the previous view without
+  starting a download.
 
-The map shows all stations which meet the selection criteria in the
-**Station Filters** tab. A station is indicated by a circular marker at
-the station location. (More precisely, there is a marker for every
-unique station location recorded in its history records.) The colour of
-a station marker denotes the network it is part of. If a station has two
-or more unique locations, the markers for it are connected by coloured
-lines.
+Finding matching stations
+-------------------------
 
-Navigating the map
-""""""""""""""""""
+Open **Filters** from the map or table. Changes apply immediately to the map
+and table. Matching counts describe the stations satisfying the filters;
+these are separate from stations checked for download.
 
-.. figure:: ./images/map-zoom-controls.png
+The **By History / By Station** toggle above the filter tabs is shared with
+the table. It is available even when the table is closed. Use it to choose the
+attribute fields and saved attribute filters to apply. Networks, Variables,
+Observations, Dates and Area remain shared criteria in either mode. Changing
+the grouping can change the matching set because each view has its own saved
+attributes. Switching to different active attribute filters clears the download
+selection.
 
-   *Zoom controls*
+The filter tabs contain:
 
-**Zoom in**: Click the zoom in |zoom in| icon in the upper left, double-click on the map, or roll the mousewheel forward.
+* **Networks**: choose observing networks. **All** includes every available
+  network; **None** clears the network choices. Start typing in the selector to
+  find a network, or remove a selected network with its X button.
+* **Variables**: find stations recording at least one of the chosen variables.
+  Use **All**, **None**, or the variable group buttons to change the choices
+  together. Type to find a variable or remove an individual choice with its X.
+* **Observations**: choose observation frequencies, such as Daily or Hourly.
+  **All** includes every frequency, including Unspecified; **None** clears the
+  choices. **Include stations with no observations** also permits stations
+  without recorded observations. **Only include stations with climatology**
+  restricts the results to stations with climatology variables. Both checkboxes
+  are initially unchecked.
+* **Dates**: set a start date, an end date, or both to filter stations by record
+  coverage. This does not clip downloaded observations unless date clipping
+  is enabled in the download dialog.
+* **Area**: review or clear the area drawn on the map.
+* **Attributes**: filter the current table view by fields such as station name,
+  native ID, province and elevation.
 
-**Zoom out**: Click the zoom out |zoom out| icon in the upper left, or roll the mousewheel backward.
+Dots mark filter tabs with active criteria or attributes. Network, variable
+and frequency choices count as active when they differ from All. A field with several text
+alternatives counts as one attribute filter.
 
-**Pan**: Click and drag the mouse pointer |map pointer| on the map.
+The **Clear** menu offers **All** and the current tab. Clearing Networks,
+Variables or Observations restores their full choices rather than None.
+Clearing Dates removes both date bounds. Clearing Area also removes the drawing.
+Clearing Attributes resets attributes for the current table view. **Clear → All**
+resets shared criteria, both views' attributes, and Selected only.
 
-Note that zooming in to a particular area does not exclude stations
-which are out of your field of view from the set of selected stations.
-To select a spatially-limited subset of stations, you can draw one or
-more polygons on the map. To do so you must use one of the polygon
-drawing tools in the map toolbar on the left-hand side.
+Example: find stations by elevation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Drawing polygons (spatial selection)
-""""""""""""""""""""""""""""""""""""
+1. Open **Filters** and choose **By History** using the toggle above its tabs.
+   Elevation is an attribute of a history record, so its range control is
+   available in this view.
+2. Choose the **Attributes** tab.
+3. Under **Elevation (m)**, enter a minimum, a maximum, or both. For example,
+   enter ``1000`` as the minimum to find histories at or above 1,000 metres.
+4. Choose **Done**, then open **Table** if it is not already open. Use a row's
+   Locate action to inspect a result on the map.
 
-You can draw one or more polygons on the map. Any visible (filtered)
-station inside any polygon is selected.
+Leave a bound blank for an open-ended range. Other criteria still apply: a
+network choice, date range or drawn area can further narrow the result. Use
+**Clear → Attributes** to remove the current view's attribute constraints, or
+**Clear → All** to start again. Switching to By Station uses that view's saved
+attributes; the By History elevation filter remains saved for when you return.
 
-.. figure:: ./images/map-drawing-controls.png
+Text alternatives
+~~~~~~~~~~~~~~~~~
 
-    *Drawing controls*
+Text attributes use **Contains any**. For example, to match names containing
+``st``, ``pl`` or ``rd``, enter each alternative and press Enter or use Add.
+Typing already updates the matches; leaving the field also adds the current
+entry. Remove individual alternatives with their remove buttons.
 
-|draw rectangle|   To draw a rectangle, click the **Draw Rectangle** tool
-icon. Click on the map at one corner of your desired rectangular region,
-then click at the opposite corner. The rectangle's edges follow lines of
-latitude and longitude.
+Matching ignores letter case. A station needs to match any alternative within
+one field, and all the other active filters. Punctuation, including commas,
+is literal: enter three separate alternatives rather than ``st, pl, rd``.
 
-|draw polygon|   To draw a more elaborate polygon, click the **Draw
-Polygons** tool icon. Click on the map at each successive corner of the
-polygon. Finish the polygon by clicking on the first corner again, or by
-clicking **Finish**.
-
-|edit shapes|   To edit a polygon already drawn on the map, click the
-**Edit Layers** icon. Click and drag the corners of a polygon on the map
-to adjust its shape. A rectangle stays a rectangle as you drag its
-corners. A general polygon can be adjusted arbitrarily, including adding
-new corners by clicking or dragging the “ghost” corners in the middle of
-existing edges, and removing a corner by right-clicking it. Click
-**Finish** when you are done.
-
-|remove shapes|   To remove polygons from the map, click the **Remove
-Layers** icon. To remove a single shape, click on it. Repeat as desired.
-To remove all shapes, click **Clear all**. Click **Finish** when you are
-done.
-
-When you add, remove or change a polygon on the map, the station count
-on the **Station Filters** tab is adjusted to reflect the stations
-selected. However, *all* stations selected by the station filters are
-still shown on the map so that you can adjust your polygon(s) to include
-or exclude particular stations.
-
-Filtering stations (**Station Filters** tab)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When the app starts up (i.e., the web page is loaded or refreshed),
-all available
-stations are loaded and shown on the map. To select stations by criteria
-including date range of available observations, the network they are
-part of, the variables they report, and the frequency of observations
-reported by the station, use the controls on **Station Filters** tab.
-
-.. figure:: ./images/station-filters-tab.png
-
-   **Station Filters** *tab*
-
-At the top of the **Station Filters** tab is a legend that shows the
-number of stations (and associated histories; see section Stations
-and Histories) selected by these controls and by the map polygons
-(see above) out of the total available.
-
-The following controls control the filtering of stations.
-
-**Include stations with no observations**: Some stations do not (yet)
-have observations associated with them. To select *only* stations
-having at least one observation, check the checkbox. To exclude them,
-uncheck the checkbox.
-
-**Start Date**, **End Date**: Select only stations with observations
-within this period. Either date may be unspecified, in which case it
-means the earliest or latest date available, respectively. Default is
-empty (no filtering by date).
-
-**Only include stations with climatology**: Some stations have
-climatology variables associated with them. (These variables are
-typically computed as 30-year averages from instantaneous values reported by
-the station.) To select only stations for which there are climatology
-variables, check the checkbox. Default is unchecked.
-
-**Network**: Each station is part of a particular operational observation
-network. To select stations from particular networks, select one or more of
-them using the multi-select control. Default is all available stations.
-
-**Variable**: Different stations report different variables. To select
-stations that report specific variable types, select one or more
-variable types using the multi-select control. Default is all available
-variables.
-
-**Observation frequency**: Different stations report observations at
-different frequencies (intervals between reports). To select stations
-that report at specific frequencies, select frequencies using the
-multi-select control. Default is all available reporting frequencies.
-
-When you change one of the station filtering controls, the station count
-on the tab and the markers on the map are updated to reflect the newly
-selected stations. The map update can take a few seconds, and all
-controls are frozen during the update. Please be patient.
-
-Getting information about stations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Each station has associated with it a collection of metadata that
-describes it: name, location, variables reported, etc.
-
-Metadata on the map
-~~~~~~~~~~~~~~~~~~~
-
-On the map, you can view the metadata for a single station by clicking
-on the station marker. A popup displaying the metadata appears. Here is
-an example:
-
-.. figure:: ./images/map-metadata-popup-shedin-creek.png
-
-   *Metadata popup example*
-
-To dismiss the popup, click the **X** in the upper right corner.
-
-In addition to basic metadata, the popup contains a link to the
-**Station Preview** screen which allows you to view more detail on the 
-specific variables available on the station as well a s a subset of the 
-observations rendered in a graphical view.
-
-Station Preview
+Drawing an area
 ~~~~~~~~~~~~~~~
 
-The **Station Preview** screen allows a more specific view of an individual
-Station history. The screen is made up of a few sections.
+Use the map's rectangle or polygon tool to draw one or more areas of interest:
 
-.. figure:: ./images/preview-title.png
-     
-    *Preview Title example*
+* **Rectangle**: click one corner, then the opposite corner. Its boundaries
+  follow lines of latitude and longitude.
+* **Polygon**: click successive corners. Click the first corner again or use
+  **Finish** to complete the shape.
+* **Edit layers**: drag a shape's corner handles to adjust it. A rectangle
+  remains a rectangle. Use the handles between polygon corners to add corners,
+  or right-click a corner to remove it. Choose **Finish** when done.
+* **Remove layers**: click shapes to delete them, or choose **Clear all** to
+  remove every shape. Choose **Finish** to leave removal mode.
 
-The preview title is a collapsible section that initially shows the station name
-and the estimated range of available variables. Click the title to expand the
-section and see the stations lat/long location as well as elevation and province.
+Drawing, editing or clearing an area updates the matching table and download
+scope and clears the download checkboxes. Stations outside the area can remain
+visible on the map for inspection. Their summary explains why they cannot be
+checked for a batch download; a direct single-station download is still
+available. With several shapes, stations inside any shape are included.
 
-.. figure:: ./images/preview-range-controls.png
-     
-    *Preview Range Controls*
+Using the station table
+-----------------------
 
-The range controls allow you to select a date range for the observations you want to
-preview. This can be done in a few ways:
+**By History** shows one history record per row. **By Station** combines the
+histories belonging to a station. Shared station criteria apply in both views;
+attribute filters are saved separately for each view. The filter panel identifies
+which view's attributes you are editing.
 
-  - Clicking the range slider will shift the range to the left or right
-  - Dragging the handles on the range will likewise adjust the time range
-  - Selecting a duration from the dropdown will change the resolution of the graphs by increasing or decreasing the number of observations shown
-  - Selecting a specific date from the date picker will adjust the range to that date
+The table keeps its controls and column headings visible while rows scroll.
+Paging controls remain below the scrolling rows. Use them to move through
+results. Location cells combine
+latitude, longitude and elevation; record spans show start and end dates.
+Variable cells initially show three entries; expand a cell to browse the rest.
+Network names have markers matching their map colours. The help button beside
+the table title explains its controls.
 
-(The range slider control does a best effort to show the date range of available variables 
-for a station but due to limitations in our current data does render potential gaps if a
-piece of data's collection was stopped and re-started)
+Each row has a separate checkbox and station actions:
 
-.. figure:: ./images/preview-graphs.png
-     
-    *Preview Graphs Example*
+* Download opens that station's download dialog.
+* Preview opens its variable graphs.
+* Show on map moves to the station and opens its summary. A neutral locator
+  ring pulses three times. Clicking a station stops the locator.
 
-The graphs section displays a visual graph of the observations for the selected time range.
-Alongside the graph is a legend with basic data about the variable. This legend can be hidden
-by toggling the show/hide legend button in the range controls for more graph space.
+Checking stations for download
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Bulk metadata
-~~~~~~~~~~~~~
+Check a row to add its station to the download selection. A station with several
+history rows is included only once. Selection is shared across pages, table
+views and station summaries.
 
-Searching for stations using the map is a much easier way to find a
-station than is wading through a long spreadsheet of station attributes.
-That said, there can be substantial value and many use cases for
-obtaining the list of station attributes. On the **Station Metadata**
-tab, you can view and download the station attributes in a way that is
-dynamic and responsive your changes to the station filters.
+The header checkbox checks all matching stations across every page, not just
+the visible page. A partially checked header indicates that only some matching
+stations are checked. Uncheck it to remove matching stations from the selection,
+or use **Clear selected (count)** to clear the whole selection.
 
-.. figure:: ./images/station-metadata-tab.png
+**Show selected only** below the main table controls limits the table display to checked stations. It does not
+change the shared filters or matching set. Turning it off reveals the other
+matching stations again.
 
-   **Station Metadata** *tab*
-
-The tab contains a datagrid that presents the metadata for all stations
-selected jointly by the station filters and the map polygons. As the
-filters or map polygons are updated, the contents of the datagrid change
-accordingly.
-
-The contents of this tab can appear quite crowded; to view it with more
-column width, use the column width controls at the top of the column.
-
-Station metadata can be viewed and downloaded in two formats: by history
-and by station. (For information on the distinction between station and
-history, see the section above.)
-
-The **By History** format presents one history per datagrid row, repeating
-station information in each row as necessary. It is a less compact and
-readable format, but more easily mechanically processed, and it breaks
-out values such as latitude and longitude into separate columns. That is
-why it is the default format.
-
-The **By Station** format presents one station per datagrid row, and rolls
-up information from all histories for a station into a more compact and
-readable form. It is however less easily mechanically processed, and
-combines related values such as latitude and longitude into single
-columns.
-
-To see the metadata displayed in either format, click the appropriate
-button at the top of the tab.
-
-The datagrid is paginated, so that only a fixed number of available
-records are in view at one time. Use the controls at the top or bottom
-of the datagrid to page through it.
-
-The data in the datagrid can be downloaded as a CSV file at any time. To
-do so, click the **Download Metadata** button. A **Save As** dialog comes
-up. Select the name and location of the file in which to save the CSV
-file, and click **Save**.
-
-The data in the downloaded CSV file includes all columns shown in the
-datagrid, plus a few extra ones that are convenient for automated
-processing of the data.
+Changing filtering criteria clears the download selection, including changes
+to attributes or a drawn area. Opening or closing panels and toggling Selected
+only do not clear it. Select stations after setting your filters.
 
 Downloading station data
-^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------
 
-The final step in using the data portal, downloading station data, is
-typically the easiest. Data download is provided on the **Station Data**
-tab.
+Single station
+~~~~~~~~~~~~~~
 
-.. figure:: ./images/station-data-tab.png
+Choose **Download station data** in a station summary or preview, or use the
+row's download action. This downloads that station independently of network,
+variable, frequency and area filters. It also ignores the station-selection
+date range unless you explicitly enable date clipping.
 
-   **Station Data** *tab*
+For example, a station outside a drawn area can still be downloaded directly.
+Its direct download does not change your filters or checked stations.
 
-This tab shows a count of the stations selected, and of the number of
-observations and climatologies available from those selected stations.
+Selected or all matching stations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To download, select your desired output format, and then click either
-the **Download Timeseries** button (if you want the raw observations)
-or the **Download Climatology** button (if you want climatologies). The
-only additional option is a checkbox to optionally **Clip time series to
-filter date range**. If this is checked, your download will only include
-observations between the start date and end date that you have indicated
-in the station filtering options. If unchecked, you will get the full
-time range for all selected stations.
+The **Download** menu sits over the map's bottom-right corner, or at the top
+right of the table toolbar when the table is visible. It offers checked stations, all matching
+stations, and metadata.
+Counts beside the station download choices distinguish the checked selection
+from the entire matching set.
 
-Networks
-^^^^^^^^
+* Choose the selected-stations option to download the checked stations.
+* Choose **All stations** with no active filters, or **All filtered** when
+  filters are active, to download the current matching set without checking
+  rows first.
 
-The **Networks** tab lists details of all networks, showing their colour
-coding on the map and a count of the stations associated with them.
-It serves as a legend to the map.
+These batch downloads respect the active station criteria and drawn area,
+even when the batch contains only one station. Requested station IDs do not
+override the filters. If a requested station conflicts with them, the dialog
+explains the conflict and blocks the download until it is resolved.
 
-.. figure:: ./images/networks-tab.png
+Download options
+~~~~~~~~~~~~~~~~
 
-   **Networks** *tab*
+The download dialog shows the station count, observation and climatology totals,
+and an expandable list of included stations. Counts are summaries; enabling
+clipping updates observation estimates.
 
-Unexpected behaviour
-^^^^^^^^^^^^^^^^^^^^
+1. Choose **NetCDF**, **CSV/ASCII** or **MS Excel 2010** as the output format.
+2. Optionally enable **Clip time series to filter date range** to restrict
+   observations to the start and/or end date in Filters. Without clipping,
+   the date criteria select stations but their full time series are downloaded.
+3. Choose **Download Timeseries ZIP** for observations or **Download Climatology
+   ZIP** for climatologies.
 
-There are a few nuances to the aggregated data download that work the
-way the user expects most of the time, but may be unexpected in a few
-ways.
+The server prepares one ZIP containing the station files and variable indexes.
+Your browser manages progress and saving. Server error responses open in a
+separate tab, leaving the portal available.
 
-1. Even if you zoom in the map and limit your field of view, there may
-   be selected stations that extend beyond the field of view. Stations
-   are selected based on your entire set of filters, and are completely
-   unaffected by your view on the map.
-2. When downloading data, all variables for a selected station are
-   included in the download *regardless of whether you filter by
-   variable*. This is slightly different behaviour than is exhibited by
-   the time selection, so it’s a point that warrants attention.
-3. When downloading timeseries data, if you have selected stations by
-   drawing a polygon but have not filtered those stations by date range
-   or meteorological variable, your selection may include stations with
-   no data available. Files for these stations will still appear in your
-   downloaded archive, but they will not contain any observations, only
-   metadata and headings.
-4. **Station Filters** contains **Start Date** and **End Date** controls.
-   These controls always limit the stations selected, but not necessarily the data
-   downloaded. To limit the data downloaded to the filter range,
-   check the **Clip time series to filter date range** checkbox on the
-   **Station Data** tab.
+Variable filters find stations; the station files include all recorded
+variables. Stations without observations can have metadata-only files when
+they are included in the download scope.
 
-Station Listings
-^^^^^^^^^^^^^^^^
+Metadata CSV
+~~~~~~~~~~~~
 
-If you are interested in exploring the station offerings in a hierarchical 
-listing format (as opposed to a map), we offer a station listings interface 
-available at the URL https://data.pacificclimate.org/data/pcds/lister
+Choose **Metadata** from the Download menu to export the matching
+stations as CSV. The export follows the shared filters, drawn area and active
+table attributes. It includes all histories for the matching stations and full
+variable lists and coordinate fields, even where the table uses compact cells.
 
-These listing pages lay out the stations in a hierarchy, splitting on raw data 
-vs. climatology ("raw" or "climo"), CRMP network, and finally station. For example, 
-to list all of the climatologies available for the BC Hydro network, one would 
-navigate to https://data.pacificclimate.org/data/pcds/lister/climo/BCH/
+Checkboxes and Selected only do not restrict metadata export. To export a
+smaller metadata set, narrow the filters.
 
-The page for a single station includes a simple HTML page that lists all 
-global metadata, all variables for the station, and it provides some form controls 
-to download individual variables. Please note that you must select the checkbox for 
-*each and every* variable that you want to download. None are selected by default, 
-so clicking "Download" without any prior action will result in a bad request.
+Station Preview
+---------------
 
-Advanced/Programmatic Usage
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Choose **Preview variables** in a station summary or use the table row's
+Preview action to inspect that station's observations. The station preview
+opens in a **Variable preview** dialog over the map. It contains station
+history details, time-range controls and one graph per available variable.
 
-The whole data portal is written using open protocols and an advanced user with some 
-scripting abilities should be able to reasonably script up a bulk download (assuming 
-that the filters on the user interface do not cover your use case).
+Station history details
+~~~~~~~~~~~~~~~~~~~~~~~
 
-- The data portal speaks OPeNDAP. It should be able to generally do anything that's 
-- listed in the `OPeNDAP documentation <https://www.opendap.org/pdf/ESE-RFC-004v1.2.pdf>`_, including subselections with URL query string parameters.
-- You can select any number of a station's variables. If you don't specifically request one (or more) you get them all.
-- You can select (or deselect) observations based on simple conditional comparisons (less than, greater than, equal to, not equal to).
+At the top of the preview, each history heading shows its station name and
+observation date span. Expand a heading to inspect that history's latitude,
+longitude, elevation, province and the station's native ID. A station may have
+several histories, so check the location and date span when interpreting its
+observations.
 
-Example 1
-~~~~~~~~~
+Choosing the preview period
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For your purposes of demonstration, let's assume that a user is interested in downloading 
-data from a whole bunch of Wildfire Management Branch stations, network code "FLNRO-WMB". 
-From our instance of Pydap, you can get a station listing from the `data listing pages <https://data.pacificclimate.org/data/pcds/lister/raw/FLNRO-WMB/>`_.
+The time-range control shows the overall span of the station's variable
+records and the window currently displayed by the graphs.
 
-If you have a list of network_name/station_ids (where station_id is the id by which it
- is called *by the network*, then you can patch together a URL for the full data download. 
- For example, if you wanted to download FLNRO-WMB data for station "1002", the URL would 
- be https://data.pacificclimate.org/data/pcds/lister/raw/FLNRO-WMB/1002.rsql.csv
+* Drag a range handle or click the timeline to move the displayed time window.
+* Choose **1 Month**, **3 Months** or **6 Months** to set the length of the
+  window ending on the selected date.
+* Use the **Ending** date picker to choose another end date. The start date
+  moves with it according to the chosen duration.
 
-The file format extension on the end can be
-``csv``, ``xls``, ``ascii``, or ``nc``.
+A newly opened station preview initially shows six months ending at its latest
+available observation. Moving the time window updates the graphs. Preview dates
+are separate from the station filters and do not automatically clip downloads;
+choose date clipping in the download dialog when needed.
 
-Example 2
-~~~~~~~~~
+Reading the graphs and variable details
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Let's say that you wanted all of the available data in ASCII format
-for Nelson, BC where the temperature was below freezing.
+Each variable's graph shows observation time along the horizontal axis and its
+values and units along the vertical axis. The adjacent legend identifies the
+variable and lists its description, units, cell method, standard name and first
+and last observation times. Choose **Hide Legend** for more graph space, or
+**Show Legend** to restore these details.
 
-Station 1145M29, Nelson, BC, is available from the "EC_raw" network.
+Record spans and the range control describe the bounds of available records,
+not continuous coverage. Observations can be missing within those bounds. If a
+variable has no observations in the displayed period, its graph reports that
+no data was found; try another period. A station without associated observation
+variables has no variable graphs to display, but its station details and direct
+download control remain available.
 
-You could request:
+Close the preview with its top-right close button, **Close preview**, or Escape
+to return to the map and its panels. Preview links can also be copied or opened
+in another tab. The link identifies the station being previewed; the graph's
+chosen time window and legend visibility are not saved in the link.
 
-`https://data.pacificclimate.org/data/pcds/lister/raw/EC_raw/1145M29.rsql.ascii?station_observations.air_temperature\<0 <https://data.pacificclimate.org/data/pcds/lister/raw/EC_raw/1145M29.rsql.ascii?station_observations.air_temperature\<0>`_
+Sharing a view
+--------------
 
-If you only wanted the temperature and time variables (as opposed to *all* of the variables) where temperature is below freezing, you could say:
+Copy the browser address to share an open station summary or variable preview,
+open table or filters, network legend, station criteria, table grouping,
+attribute filters, drawn areas and the map's current position and zoom.
+Browser Back and Forward navigate between panel and preview views.
 
-`https://data.pacificclimate.org/data/pcds/lister/raw/EC_raw/1145M29.rsql.ascii?station_observations.air_temperature,station_observations.time&station_observations.air_temperature\<0 <https://data.pacificclimate.org/data/pcds/lister/raw/EC_raw/1145M29.rsql.ascii?station_observations.air_temperature,station_observations.time&station_observations.air_temperature\<0>`_
+The address uses an encoded view value with compact network references and
+variable ID ranges. When an area is shared, its editable
+drawing and its filter are restored together, including multiple shapes and
+holes. Panning, zooming, changing filters or editing a drawing updates the link
+without adding a history entry for every change.
 
-If you only wanted the freezing observations for *this year* you could use a temporal conditional and say:
+Checked stations and Selected only are not included in the link. A recipient
+must check stations again for a selected-station download. Shared links reflect
+the data available when opened, so station counts can change over time.
 
-`https://data.pacificclimate.org/data/pcds/lister/raw/EC_raw/1145M29.rsql.ascii?station_observations.air_temperature,station_observations.time&station_observations.time\>"2018-01-01 00:00:00"&station_observations.air_temperature\<0 <https://data.pacificclimate.org/data/pcds/lister/raw/EC_raw/1145M29.rsql.ascii?station_observations.air_temperature,station_observations.time&station_observations.time\>"2018-01-01 00:00:00"&station_observations.air_temperature\<0>`_
+Programmatic access
+-------------------
 
-The time format is a little tricky, because:
-a) You need to specify it in YYYY-MM-DD HH:MM:SS format and
-b) You need to put the quotes around the whole time.
+For station catalogs and station identifiers, see
+:doc:`Station listings <../stations>`. For selecting variables, observation
+conditions and scripted downloads, see :doc:`Programmatic downloads
+<../programmatic>`. For multi-station ZIP requests, see :doc:`Aggregate downloads
+<../aggregate>`. These API guides cover the station-listing and scripted-access
+workflows alongside the portal instructions.
 
-Depending on what browser/client you are using, you *may* need to URL encode all of that syntax, but so far all of the browsers tested will do the translation for you.
+.. |table icon| image:: images/ui-table.svg
+   :alt: Table icon
+   :width: 24px
+   :height: 24px
 
-For example:
+.. |networks icon| image:: images/ui-networks.svg
+   :alt: Network legend icon
+   :width: 24px
+   :height: 24px
 
-`https://data.pacificclimate.org/data/pcds/lister/raw/EC_raw/1145M29.rsql.ascii?station_observations.air_temperature,station_observations.time&station_observations.time\>"2018-01-01 00:00:00"&station_observations.air_temperature\<0 <https://data.pacificclimate.org/data/pcds/lister/raw/EC_raw/1145M29.rsql.ascii?station_observations.air_temperature,station_observations.time&station_observations.time\>"2018-01-01 00:00:00"&station_observations.air_temperature\<0>`_
+.. |filters icon| image:: images/ui-filters.svg
+   :alt: Filters icon
+   :width: 24px
+   :height: 24px
 
-becomes:
+.. |download icon| image:: images/ui-download.svg
+   :alt: Download station data icon
+   :width: 24px
+   :height: 24px
 
-`https://data.pacificclimate.org/data/pcds/lister/raw/EC_raw/145M29.rsql.ascii%3Fstation_observations.air_temperature%2Cstation_observations.time%26station_observations.time%3E%222018-01-01%2000%3A00%3A00%22%26station_o%5C%0D%0Abservations.air_temperature%3C0 <https://data.pacificclimate.org/data/pcds/lister/raw/EC_raw/145M29.rsql.ascii%3Fstation_observations.air_temperature%2Cstation_observations.time%26station_observations.time%3E%222018-01-01%2000%3A00%3A00%22%26station_o%5C%0D%0Abservations.air_temperature%3C0>`_
+.. |preview icon| image:: images/ui-preview.svg
+   :alt: Preview variables icon
+   :width: 24px
+   :height: 24px
 
-.. |zoom in| image:: ./images/map-nav-zoom-in-icon.png
-.. |zoom out| image:: ./images/map-nav-zoom-out-icon.png
-.. |map pointer| image:: ./images/map-pointer.png
-.. |draw rectangle| image:: ./images/map-drawing-rectangle-icon.png
-.. |draw polygon| image:: ./images/map-drawing-polygon-icon.png
-.. |edit shapes| image:: ./images/map-drawing-edit-icon.png
-.. |remove shapes| image:: ./images/map-drawing-delete-icon.png
-.. |info icon| image:: ./images/info-icon.png
+.. |locate icon| image:: images/ui-locate.svg
+   :alt: Locate station on map icon
+   :width: 24px
+   :height: 24px
+
+.. |help icon| image:: images/ui-help.svg
+   :alt: Station table help icon
+   :width: 24px
+   :height: 24px

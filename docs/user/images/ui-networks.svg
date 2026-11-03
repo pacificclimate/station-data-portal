@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+  <title>Network legend</title>
+  <circle cx="5" cy="5" r="2.5" fill="#df5353"/>
+  <circle cx="5" cy="12" r="2.5" fill="#2ca96d"/>
+  <circle cx="5" cy="19" r="2.5" fill="#3984d6"/>
+  <path d="M11 5h10M11 12h10M11 19h10" stroke="#315f5b" stroke-width="2" stroke-linecap="round"/>
+</svg>

@@ -18,9 +18,14 @@
 .station-variable-cell.is-expanded .station-variable-list {
   max-height: 10.5rem;
   overflow-y: auto;
+  list-style: disc;
+  padding-left: 1rem;
 }
 .station-variable-cell.is-expanded li {
   white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  margin-bottom: 0.25rem;
 }
 .station-variable-toggle {
   position: absolute;

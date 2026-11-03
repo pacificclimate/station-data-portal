@@ -1,1 +1,5 @@
-npx lint-staged
+npx lint-staged || exit $?
+
+if git diff --cached --name-only -- docs/user/ | read -r guide_file; then
+  printf '%s\n' 'Reminder: after pushing these guide changes, update docs/portal-source.json in pdp-station-api to the new portal commit SHA.'
+fi
