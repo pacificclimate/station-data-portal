@@ -6,3 +6,10 @@ h1 {
   max-height: 10em;
   overflow-y: scroll;
 }
+
+.leaflet-container .leaflet-popup-content a,
+.leaflet-container .leaflet-popup-content .station-download-trigger {
+  color: #17695b;
+  font: inherit;
+  line-height: inherit;
+}

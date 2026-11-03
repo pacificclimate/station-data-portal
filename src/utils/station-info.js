@@ -63,3 +63,11 @@ export const uniqStationVariableNames = curry((variables, station) =>
     sortedUniq,
   )(station.histories),
 );
+
+// Prefer names and network-native identifiers in controls and filenames.
+export const stationDisplayName = (station) => {
+  const names = uniqStationNames(station).filter(Boolean).join(", ");
+  return names && station.native_id
+    ? `${names} (${station.native_id})`
+    : names || station.native_id || `Station ${station.id}`;
+};

@@ -9,6 +9,7 @@ import {
   variableIds2pdpFormats,
   frequencies2pdpFormat,
   dataDownloadTarget,
+  stationDataDownloadRequest,
 } from "./pdp-data-service";
 
 describe("date2pdpFormat", () => {
@@ -202,4 +203,136 @@ describe("dataDownloadTarget", () => {
     expect(target).toMatch(regex("download-category=Category"));
     expect(target).toMatch(regex("data-format=format"));
   });
+});
+
+describe("stationDataDownloadRequest", () => {
+  const options = {
+    config: { pdpDataUrl: "https://example.invalid/data/", maxUrlLength: 10 },
+    stationIds: [42, 37, 42],
+    dataFormat: { value: "csv" },
+    dataCategory: "timeseries",
+    startDate: new Date(2000, 0, 1),
+    endDate: new Date(2010, 11, 31),
+  };
+  it.each(["nc", "csv", "xlsx"])(
+    "requests exact IDs as a server ZIP in %s",
+    (value) => {
+      expect(
+        stationDataDownloadRequest({ ...options, dataFormat: { value } }),
+      ).toEqual({
+        action: "https://example.invalid/data/agg",
+        fields: {
+          "station-ids": "37,42",
+          format: value,
+          climatology: "false",
+          clip_dates: "false",
+          "network-name": "",
+          "input-vars": "",
+          "input-freq": "",
+          "input-polygon": "",
+          only_with_climatology: "false",
+          from_date: "2000-01-01",
+          to_date: "2010-12-31",
+        },
+      });
+    },
+  );
+  it("sends the same IDs for climatologies", () => {
+    expect(
+      stationDataDownloadRequest({ ...options, dataCategory: "climatology" })
+        .fields,
+    ).toEqual({
+      "station-ids": "37,42",
+      format: "csv",
+      climatology: "true",
+      clip_dates: "false",
+      "network-name": "",
+      "input-vars": "",
+      "input-freq": "",
+      "input-polygon": "",
+      only_with_climatology: "false",
+      from_date: "2000-01-01",
+      to_date: "2010-12-31",
+    });
+  });
+  it("keeps date coverage filters separate from observation clipping", () => {
+    expect(
+      stationDataDownloadRequest({ ...options, clipToDate: true }).fields,
+    ).toMatchObject({
+      clip_dates: "true",
+      from_date: "2000-01-01",
+      to_date: "2010-12-31",
+    });
+    expect(
+      stationDataDownloadRequest({
+        ...options,
+        clipToDate: true,
+        startDate: null,
+      }).fields,
+    ).not.toHaveProperty("from_date");
+    expect(
+      stationDataDownloadRequest({
+        ...options,
+        clipToDate: true,
+        endDate: null,
+      }).fields,
+    ).not.toHaveProperty("to_date");
+  });
+  it("intersects IDs with every active aggregate selection criterion", () => {
+    const request = stationDataDownloadRequest({
+      ...options,
+      selectedNetworksUris: ["/networks/1"],
+      allNetworks: [{ uri: "/networks/1", name: "EC" }],
+      selectedVariablesIds: [1],
+      allVariables: [
+        {
+          id: 1,
+          standard_name: "precipitation_amount",
+          cell_method: "time: sum",
+        },
+        { id: 2, standard_name: "air_temperature" },
+      ],
+      selectedFrequencies: ["daily"],
+      allFrequencies: ["daily", "1-hourly"],
+      onlyWithClimatology: true,
+      polygon: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [0, 0],
+            [1, 0],
+            [1, 1],
+            [0, 0],
+          ],
+        ],
+      },
+    });
+    expect(request.fields).toEqual({
+      "station-ids": "37,42",
+      format: "csv",
+      climatology: "false",
+      clip_dates: "false",
+      "network-name": "EC",
+      "input-vars": "precipitation_amount_sum",
+      "input-freq": "daily",
+      "input-polygon": "POLYGON ((0 0, 1 0, 1 1, 0 0))",
+      only_with_climatology: "true",
+      from_date: "2000-01-01",
+      to_date: "2010-12-31",
+    });
+  });
+  it("keeps large selections out of the URL", () => {
+    const ids = Array.from({ length: 10000 }, (_, index) => index + 1);
+    const request = stationDataDownloadRequest({ ...options, stationIds: ids });
+    expect(request.action).toBe("https://example.invalid/data/agg");
+    expect(request.fields["station-ids"].split(",")).toHaveLength(10000);
+  });
+  it.each([[], [0], [-1], [true], [1.5], ["37"], [NaN], [null], undefined])(
+    "rejects empty or invalid station IDs (%j) rather than requesting every station",
+    (stationIds) => {
+      expect(() =>
+        stationDataDownloadRequest({ ...options, stationIds }),
+      ).toThrow(/valid database ID/);
+    },
+  );
 });

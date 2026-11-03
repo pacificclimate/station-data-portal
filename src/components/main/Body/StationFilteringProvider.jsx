@@ -1,4 +1,4 @@
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 import pick from "lodash/fp/pick";
 import { StationFilteringContext } from "@/state/context-hooks/use-station-filtering-context";
@@ -31,6 +31,23 @@ export const StationFilteringProvider = ({ children }) => {
       ]),
     ),
   );
+  const filterKey = JSON.stringify({
+    includeStationsWithNoObs,
+    startDate,
+    endDate,
+    selectedNetworks,
+    selectedVariables,
+    selectedFrequencies,
+    onlyWithClimatology,
+    area,
+  });
+  const previousFilterKey = useRef(filterKey);
+  useEffect(() => {
+    if (previousFilterKey.current !== filterKey) {
+      previousFilterKey.current = filterKey;
+      useStationsStore.getState().clearDownloadSelection();
+    }
+  }, [filterKey]);
   const { data: stations, isLoading: isStationsLoading } = useStations();
   const { data: variables, isLoading: isVariablesLoading } = useVariables();
 
@@ -63,6 +80,11 @@ export const StationFilteringProvider = ({ children }) => {
         area,
         compFilteredStations,
       );
+      if (!isStationsLoading && !isVariablesLoading) {
+        useStationsStore
+          .getState()
+          .pruneDownloadSelection(compSelectedStations);
+      }
       setFilteredStations(compFilteredStations);
       setSelectedStations(compSelectedStations);
     });
