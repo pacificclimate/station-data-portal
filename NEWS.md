@@ -1,5 +1,27 @@
 # News / Release Notes
 
+## 1.10.0
+
+_Release Date: 2026-Nov-03_
+
+Requires:
+
+- `pdp-station-api` with station-ID filtering on `/agg` for station ZIP downloads.
+
+Changes:
+
+- Added ZIP downloads of observations or climatologies for one station, checked stations, or all filtered stations, with output-format and optional date-clipping controls. ([#206](https://github.com/pacificclimate/station-data-portal/pull/206), [#208](https://github.com/pacificclimate/station-data-portal/pull/208))
+- Added a full-window map with round controls for the station table, shared filters and expandable network legend, plus variable previews in a dialog over the map. ([#210](https://github.com/pacificclimate/station-data-portal/pull/210), [#211](https://github.com/pacificclimate/station-data-portal/pull/211))
+- Synchronized map and table filtering, with elevation ranges and multiple station-name or native-ID terms. ([#209](https://github.com/pacificclimate/station-data-portal/pull/209))
+- Added station selection across pages and table views, a select-all checkbox and a selected-only view. Filter changes clear the download selection. ([#209](https://github.com/pacificclimate/station-data-portal/pull/209))
+- Added a fly-to action in the table to locate a station on the map, open its summary and display a temporary locator ring. ([#211](https://github.com/pacificclimate/station-data-portal/pull/211))
+- Improved the station table with sticky headings and pagination, compact location and record-span cells, expandable variable lists and network-colour markers. ([#209](https://github.com/pacificclimate/station-data-portal/pull/209), [#212](https://github.com/pacificclimate/station-data-portal/pull/212))
+- Increased the maximum map zoom to level 18 by scaling existing basemap tiles, with minimum zoom levels of 6 for BC and 5 for YNWT. ([#205](https://github.com/pacificclimate/station-data-portal/pull/205), [#212](https://github.com/pacificclimate/station-data-portal/pull/212))
+- Added configurable EEZ boundary overlays. ([#205](https://github.com/pacificclimate/station-data-portal/pull/205))
+- Added compact shareable links that restore filters, table grouping, panels, station summaries, variable previews, map position and editable drawn areas. Download selections are not included. ([#211](https://github.com/pacificclimate/station-data-portal/pull/211), [#212](https://github.com/pacificclimate/station-data-portal/pull/212))
+- Updated metadata exports to follow the filtered station set while retaining full variable lists and coordinate fields. ([#209](https://github.com/pacificclimate/station-data-portal/pull/209))
+- Updated the Meteorological Data Portal user guide with control icons, filter examples, preview instructions and shared API documentation publishing guidance. ([#212](https://github.com/pacificclimate/station-data-portal/pull/212))
+
 ## 1.9.2
 
 _Release Date: 2026-Oct-27_
